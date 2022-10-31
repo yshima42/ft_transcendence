@@ -2,6 +2,9 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
 
+const title = import.meta.env.VITE_APP_TITLE
+console.dir(import.meta.env)
+
 function App() {
   const [count, setCount] = useState(0)
 
@@ -16,6 +19,7 @@ function App() {
         </a>
       </div>
       <h1>ft_transcendence</h1>
+      <p>{title}</p>
     </div>
   )
 }
