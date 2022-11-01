@@ -17,7 +17,6 @@
       "plugin:jest/recommended",
       "prettier"
     ],
-    "overrides": [],
     "parserOptions": {
       "ecmaVersion": "latest",
       "tsconfigRootDir": ".",
