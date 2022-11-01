@@ -1,9 +1,10 @@
-import { FC } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { FC } from 'react';
+import reactLogo from './assets/react.svg';
+import './App.css';
+import { Button, ChakraProvider } from '@chakra-ui/react';
 
-const title = import.meta.env.VITE_APP_TITLE
-console.dir(import.meta.env)
+const title = import.meta.env.VITE_APP_TITLE;
+console.dir(import.meta.env);
 
 // function App () {
 const App: FC = () => {
@@ -20,7 +21,7 @@ const App: FC = () => {
       <h1>ft_transcendence</h1>
       <p>{title}</p>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
