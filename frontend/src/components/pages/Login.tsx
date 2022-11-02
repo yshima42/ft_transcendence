@@ -1,5 +1,6 @@
 import { memo, FC } from 'react';
 import { Box, Button, Divider, Flex, Heading, Stack } from '@chakra-ui/react';
+import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
 
 export const Login: FC = memo(() => {
   return (
@@ -10,9 +11,7 @@ export const Login: FC = memo(() => {
         </Heading>
         <Divider />
         <Stack spacing={4} py={4} px={10}>
-          <Button my={10} bg="teal.300" color="white" _hover={{ opacity: 0.8 }}>
-            42ユーザー認証
-          </Button>
+          <PrimaryButton>42ユーザー認証</PrimaryButton>
           <Button>アドミンテスト1</Button>
           <Button>アドミンテスト2</Button>
           <Button>アドミンテスト3</Button>
