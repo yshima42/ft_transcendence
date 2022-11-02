@@ -10,7 +10,6 @@ export const Router = (): React.ReactElement | null => {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-
       <Route
         path="/chatroom-list"
         element={
