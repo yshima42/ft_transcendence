@@ -10,6 +10,7 @@ export const Router = (): React.ReactElement | null => {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      {/* mapで処理する */}
       <Route
         path="/chatroom-list"
         element={
@@ -18,9 +19,30 @@ export const Router = (): React.ReactElement | null => {
           </HeaderLayout>
         }
       />
-      <Route path="/friend-list" element={<FriendList />} />
-      <Route path="/game-select" element={<GameSelect />} />
-      <Route path="*" element={<Page404 />} />
+      <Route
+        path="/friend-list"
+        element={
+          <HeaderLayout>
+            <FriendList />
+          </HeaderLayout>
+        }
+      />
+      <Route
+        path="/game-select"
+        element={
+          <HeaderLayout>
+            <GameSelect />
+          </HeaderLayout>
+        }
+      />
+      <Route
+        path="*"
+        element={
+          <HeaderLayout>
+            <Page404 />
+          </HeaderLayout>
+        }
+      />
     </Routes>
   );
 };
