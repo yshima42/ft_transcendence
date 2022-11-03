@@ -56,9 +56,10 @@
         "ignorePackages": true,
         "pattern": {
           "js": "never",
-          "jsx": "never",
           "ts": "never",
-          "tsx": "never"
+          "controller": "always",
+          "service": "always",
+          "module": "always"
         }
       }
     ],
