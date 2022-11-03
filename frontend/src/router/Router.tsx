@@ -1,7 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 import { ChatRoomList } from 'components/pages/ChatRoomList';
-import { FriendList } from 'components/pages/FriendList';
+import { Game } from 'components/pages/Game';
 import { GameSelect } from 'components/pages/GameSelect';
+import { UserList } from 'components/pages/UserList';
 import { HeaderLayout } from 'components/templates/HeaderLayout';
 import { Login } from '../components/pages/Login';
 import { Page404 } from '../components/pages/Page404';
@@ -20,10 +21,10 @@ export const Router = (): React.ReactElement | null => {
         }
       />
       <Route
-        path="friend-list"
+        path="user-list"
         element={
           <HeaderLayout>
-            <FriendList />
+            <UserList />
           </HeaderLayout>
         }
       />
@@ -32,6 +33,14 @@ export const Router = (): React.ReactElement | null => {
         element={
           <HeaderLayout>
             <GameSelect />
+          </HeaderLayout>
+        }
+      />
+      <Route
+        path="game"
+        element={
+          <HeaderLayout>
+            <Game />
           </HeaderLayout>
         }
       />
