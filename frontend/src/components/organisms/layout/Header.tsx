@@ -1,10 +1,13 @@
 import { memo, FC } from 'react';
-import { Flex, Heading, Link, Box, useDisclosure } from '@chakra-ui/react';
+import { Flex, Heading, Box, useDisclosure } from '@chakra-ui/react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { MenuIconButton } from 'components/atoms/button/MenuIconButton';
 import { MenuDrawer } from 'components/molecules/MenuDrawer';
 
 export const Header: FC = memo(() => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const navigate = useNavigate();
 
   return (
     <>
@@ -16,7 +19,13 @@ export const Header: FC = memo(() => {
         justify="space-batween"
         padding={{ base: 3, md: 5 }}
       >
-        <Flex align="center" as="a" mr={8} _hover={{ cursor: 'pointer' }}>
+        <Flex
+          align="center"
+          as="a"
+          mr={8}
+          _hover={{ cursor: 'pointer' }}
+          onClick={() => navigate('/friend-list', { replace: true })}
+        >
           <Heading as="h1" fontSize={{ base: 'md', md: 'lg' }}>
             TransPong
           </Heading>
@@ -28,9 +37,9 @@ export const Header: FC = memo(() => {
           display={{ base: 'none', md: 'flex' }}
         >
           <Box pr={4}>
-            <Link>ゲーム選択</Link>
+            <NavLink to="/game-select">ゲーム選択</NavLink>
           </Box>
-          <Link>チャットルーム</Link>
+          <NavLink to="/chatroom-list">チャットルーム</NavLink>
         </Flex>
         <MenuIconButton onOpen={onOpen} />
       </Flex>

@@ -12,7 +12,7 @@ export const Router = (): React.ReactElement | null => {
       <Route path="/" element={<Login />} />
       {/* mapで処理する */}
       <Route
-        path="/chatroom-list"
+        path="chatroom-list"
         element={
           <HeaderLayout>
             <ChatRoomList />
@@ -20,7 +20,7 @@ export const Router = (): React.ReactElement | null => {
         }
       />
       <Route
-        path="/friend-list"
+        path="friend-list"
         element={
           <HeaderLayout>
             <FriendList />
@@ -28,7 +28,7 @@ export const Router = (): React.ReactElement | null => {
         }
       />
       <Route
-        path="/game-select"
+        path="game-select"
         element={
           <HeaderLayout>
             <GameSelect />
