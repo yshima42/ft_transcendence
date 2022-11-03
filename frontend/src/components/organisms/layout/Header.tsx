@@ -24,7 +24,7 @@ export const Header: FC = memo(() => {
           as="a"
           mr={8}
           _hover={{ cursor: 'pointer' }}
-          onClick={() => navigate('/friend-list', { replace: true })}
+          onClick={() => navigate('/user-list', { replace: true })}
         >
           <Heading as="h1" fontSize={{ base: 'md', md: 'lg' }}>
             TransPong
