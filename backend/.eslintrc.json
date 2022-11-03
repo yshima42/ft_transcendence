@@ -1,23 +1,24 @@
 {
   "env": {
     "browser": true,
-    "es2022": true
+    "es2022": true,
+    "jest/globals": true
   },
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "standard-with-typescript",
+    "plugin:jest/recommended",
     "prettier"
   ],
-  "overrides": [],
   "parserOptions": {
     "ecmaVersion": "latest",
     "tsconfigRootDir": ".",
     "project": ["./tsconfig.json"],
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "jest"],
   "rules": {
     "padding-line-between-statements": [
       "error",
@@ -86,5 +87,18 @@
         }
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+        "src/**/*.{test,spec}.{js,jsx,ts,tsx}"
+      ],
+      "env": {
+        "jest/globals": true
+      },
+      "extends": ["plugin:jest/recommended", "plugin:jest/style"],
+      "plugins": ["jest"]
+    }
+  ]
 }
