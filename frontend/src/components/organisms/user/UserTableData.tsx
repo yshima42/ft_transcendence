@@ -23,9 +23,21 @@ export const UserTableData: FC<Props> = memo((props) => {
         <Td>{login}</Td>
         <Td>{photo}</Td>
         <Td>
-          <NavLink to={'/game'}>Game</NavLink>
+          <NavLink
+            to={'/game'}
+            state={{ loginUser: 'LoginUser', opponent: login }}
+          >
+            Game
+          </NavLink>
         </Td>
-        <Td>Message</Td>
+        <Td>
+          <NavLink
+            to={'/direct-message'}
+            state={{ loginUser: 'LoginUser', opponent: login }}
+          >
+            Message
+          </NavLink>
+        </Td>
       </Tr>
     </>
   );
