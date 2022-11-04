@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { ChatRoomList } from 'components/pages/ChatRoomList';
+import { DirectMessage } from 'components/pages/DirectMessage';
 import { Game } from 'components/pages/Game';
 import { GameSelect } from 'components/pages/GameSelect';
 import { UserList } from 'components/pages/UserList';
@@ -41,6 +42,14 @@ export const Router = (): React.ReactElement | null => {
         element={
           <HeaderLayout>
             <Game />
+          </HeaderLayout>
+        }
+      />
+      <Route
+        path="direct-message"
+        element={
+          <HeaderLayout>
+            <DirectMessage />
           </HeaderLayout>
         }
       />
