@@ -59,7 +59,9 @@
           "ts": "never",
           "controller": "always",
           "service": "always",
-          "module": "always"
+          "module": "always",
+          "dto": "always",
+          "interface": "always"
         }
       }
     ],
