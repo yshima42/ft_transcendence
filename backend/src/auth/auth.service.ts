@@ -8,7 +8,6 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
-import { Msg, Jwt } from './interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +17,7 @@ export class AuthService {
     private readonly config: ConfigService
   ) {}
 
-  async signUp(dto: AuthDto): Promise<Msg> {
+  async signUp(dto: AuthDto): Promise<{ message: string }> {
     try {
       await this.prisma.user.create({
         data: {
@@ -39,7 +38,7 @@ export class AuthService {
     }
   }
 
-  async login(dto: AuthDto): Promise<Jwt> {
+  async login(dto: AuthDto): Promise<{ accessToken: string }> {
     const user = await this.prisma.user.findUnique({
       where: {
         name: dto.name,
@@ -50,7 +49,10 @@ export class AuthService {
     return await this.generateJwt(user.id, user.name);
   }
 
-  async generateJwt(userId: string, name: string): Promise<Jwt> {
+  async generateJwt(
+    userId: string,
+    name: string
+  ): Promise<{ accessToken: string }> {
     const payload = {
       sub: userId,
       name,
