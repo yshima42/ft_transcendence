@@ -61,7 +61,7 @@ export class AuthService {
     if (secret === undefined) throw new InternalServerErrorException();
 
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '5m',
+      expiresIn: '1d',
       secret,
     });
 
