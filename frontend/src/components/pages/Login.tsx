@@ -1,6 +1,6 @@
 import { memo, FC } from 'react';
 import { Box, Button, Divider, Flex, Heading, Stack } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 export const Login: FC = memo(() => {
   return (
@@ -11,9 +11,10 @@ export const Login: FC = memo(() => {
         </Heading>
         <Divider />
         <Stack spacing={4} py={4} px={10}>
-          <Button>
-            <Link to="/user-list">42ユーザー認証</Link>
-          </Button>
+          <Link to="/login-page">
+            <Button>42ユーザー認証</Button>
+          </Link>
+          <Outlet />
           <Button>アドミンテスト1</Button>
           <Button>アドミンテスト2</Button>
           <Button>アドミンテスト3</Button>
