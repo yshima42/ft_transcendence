@@ -34,9 +34,7 @@ export class AuthController {
       path: '/',
     });
 
-    return {
-      message: 'ok',
-    };
+    return { message: 'ok' };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -52,8 +50,6 @@ export class AuthController {
       path: '/',
     });
 
-    return {
-      message: 'ok',
-    };
+    return { message: 'ok' };
   }
 }
