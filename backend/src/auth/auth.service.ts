@@ -15,8 +15,8 @@ import { CredentialsDto } from './dto/credentials.dto';
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwt: JwtService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
+    private readonly jwt: JwtService
   ) {}
 
   async signUp(dto: CreateUserDto): Promise<{ message: string }> {
