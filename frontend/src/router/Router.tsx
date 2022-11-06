@@ -127,7 +127,9 @@ export const Router = (): React.ReactElement | null => {
           path="chatroom-list"
           element={
             <HeaderLayout>
-              <ChatRoomList />
+              <RequireAuth>
+                <ChatRoomList />
+              </RequireAuth>
             </HeaderLayout>
           }
         />
@@ -145,7 +147,9 @@ export const Router = (): React.ReactElement | null => {
           path="game-select"
           element={
             <HeaderLayout>
-              <GameSelect />
+              <RequireAuth>
+                <GameSelect />
+              </RequireAuth>
             </HeaderLayout>
           }
         />
@@ -153,7 +157,9 @@ export const Router = (): React.ReactElement | null => {
           path="game"
           element={
             <HeaderLayout>
-              <Game />
+              <RequireAuth>
+                <Game />
+              </RequireAuth>
             </HeaderLayout>
           }
         />
@@ -161,7 +167,9 @@ export const Router = (): React.ReactElement | null => {
           path="direct-message"
           element={
             <HeaderLayout>
-              <DirectMessage />
+              <RequireAuth>
+                <DirectMessage />
+              </RequireAuth>
             </HeaderLayout>
           }
         />
