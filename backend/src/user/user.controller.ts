@@ -10,7 +10,7 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  getLoginUser(@GetUser() user: User): User {
-    return user;
+  async findAll(@GetUser() user: User): Promise<User[]> {
+    return await this.userService.findAll(user);
   }
 }
