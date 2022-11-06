@@ -10,6 +10,7 @@ import {
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/createUserDto.dto';
+import { CredentialsDto } from './dto/credentials.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +23,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() dto: CreateUserDto): Promise<{ accessToken: string }> {
+  async login(@Body() dto: CredentialsDto): Promise<{ accessToken: string }> {
     return await this.authService.login(dto);
   }
 
