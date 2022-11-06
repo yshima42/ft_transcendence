@@ -18,24 +18,24 @@ export class AuthService {
   ) {}
 
   async signUp(dto: AuthDto): Promise<{ message: string }> {
-    try {
-      await this.prisma.user.create({
+    await this.prisma.user
+      .create({
         data: {
           name: dto.name,
         },
+      })
+      .catch((error) => {
+        if (error instanceof PrismaClientKnownRequestError) {
+          if (error.code === 'p2002') {
+            throw new ForbiddenException('This name is already exist');
+          }
+        }
+        throw error;
       });
 
-      return {
-        message: 'ok',
-      };
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'p2002') {
-          throw new ForbiddenException('This name is already exist');
-        }
-      }
-      throw error;
-    }
+    return {
+      message: 'ok',
+    };
   }
 
   async login(dto: AuthDto): Promise<{ accessToken: string }> {
