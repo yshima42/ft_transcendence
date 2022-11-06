@@ -62,7 +62,8 @@
           "module": "always",
           "dto": "always",
           "interface": "always",
-          "strategy": "always"
+          "strategy": "always",
+          "guard": "always"
         }
       }
     ],
