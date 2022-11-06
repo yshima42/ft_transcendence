@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './providers/useAuthProvider';
+import { useAuth } from '../hooks/providers/useAuthProvider';
 
 export const PublicRoutes: FC = () => {
   const auth = useAuth();
