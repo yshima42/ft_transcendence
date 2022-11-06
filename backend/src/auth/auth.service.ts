@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto } from './dto/auth.dto';
+import { CreateUserDto } from './dto/createUserDto.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
     private readonly config: ConfigService
   ) {}
 
-  async signUp(dto: AuthDto): Promise<{ message: string }> {
+  async signUp(dto: CreateUserDto): Promise<{ message: string }> {
     const { name } = dto;
     await this.prisma.user
       .create({
@@ -37,7 +37,7 @@ export class AuthService {
     return { message: 'ok' };
   }
 
-  async login(dto: AuthDto): Promise<{ accessToken: string }> {
+  async login(dto: CreateUserDto): Promise<{ accessToken: string }> {
     const { name } = dto;
     const user = await this.prisma.user.findUnique({
       where: {
