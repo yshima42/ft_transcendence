@@ -84,13 +84,12 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const auth = useAuth();
 
   // 修正方法わからないため一旦eslint回避
   // ここの'/user-list'はチュートリアルでは'/'だったけど'/user-list'にすると想定通りの動きになった
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const from = Boolean(location.state?.from?.pathname) || '/user-list';
+  const to = '/user-list';
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,7 +98,7 @@ const LoginPage = () => {
     const username = formData.get('username') as string;
 
     auth.signin(username, () => {
-      navigate(from as string, { replace: true });
+      navigate(to as string, { replace: true });
     });
   }
 
