@@ -1,5 +1,6 @@
 import { memo, FC } from 'react';
 import { Flex, Heading, Box, useDisclosure } from '@chakra-ui/react';
+import { AuthStatus } from 'hooks/providers/useAuthProvider';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { MenuIconButton } from 'components/atoms/button/MenuIconButton';
 import { MenuDrawer } from 'components/molecules/MenuDrawer';
@@ -41,6 +42,7 @@ export const Header: FC = memo(() => {
           </Box>
           <NavLink to="/chatroom-list">チャットルーム</NavLink>
         </Flex>
+        <AuthStatus />
         <MenuIconButton onOpen={onOpen} />
       </Flex>
       <MenuDrawer onClose={onClose} isOpen={isOpen} />
