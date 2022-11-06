@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, FC, memo, useContext, useState } from 'react';
 import {
   Navigate,
   Route,
@@ -70,6 +70,28 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 const useAuth = () => {
   return useContext(AuthContext);
 };
+
+export const AuthStatus: FC = memo(() => {
+  const auth = useAuth();
+  const navigate = useNavigate();
+
+  if (auth.user === '') {
+    return <p>You are not logged in.</p>;
+  }
+
+  return (
+    <p>
+      Hello {auth.user}!{' '}
+      <button
+        onClick={() => {
+          auth.signout(() => navigate('/'));
+        }}
+      >
+        Sign out
+      </button>
+    </p>
+  );
+});
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const auth = useAuth();

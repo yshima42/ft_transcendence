@@ -3,6 +3,7 @@ import { Flex, Heading, Box, useDisclosure } from '@chakra-ui/react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { MenuIconButton } from 'components/atoms/button/MenuIconButton';
 import { MenuDrawer } from 'components/molecules/MenuDrawer';
+import { AuthStatus } from 'router/Router';
 
 export const Header: FC = memo(() => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -39,8 +40,11 @@ export const Header: FC = memo(() => {
           <Box pr={4}>
             <NavLink to="/game-select">ゲーム選択</NavLink>
           </Box>
-          <NavLink to="/chatroom-list">チャットルーム</NavLink>
+          <Box pr={4}>
+            <NavLink to="/chatroom-list">チャットルーム</NavLink>
+          </Box>
         </Flex>
+        <AuthStatus />
         <MenuIconButton onOpen={onOpen} />
       </Flex>
       <MenuDrawer onClose={onClose} isOpen={isOpen} />
