@@ -27,7 +27,7 @@ export class AuthService {
       })
       .catch((error) => {
         if (error instanceof PrismaClientKnownRequestError) {
-          if (error.code === 'p2002') {
+          if (error.code === 'P2002') {
             throw new ForbiddenException('This name is already exist');
           }
         }
