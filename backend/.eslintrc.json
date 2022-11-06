@@ -63,7 +63,8 @@
           "dto": "always",
           "interface": "always",
           "strategy": "always",
-          "guard": "always"
+          "guard": "always",
+          "decorator": "always"
         }
       }
     ],
