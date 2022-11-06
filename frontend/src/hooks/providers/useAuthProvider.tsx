@@ -1,5 +1,6 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, FC, memo, useContext, useState } from 'react';
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+import { useNavigate } from 'react-router-dom';
 
 type AuthContextType = {
   user: string;
@@ -60,3 +61,25 @@ export const AuthProvider = ({
 export const useAuth = (): AuthContextType => {
   return useContext(AuthContext);
 };
+
+export const AuthStatus: FC = memo(() => {
+  const auth = useAuth();
+  const navigate = useNavigate();
+
+  if (auth.user === '') {
+    return <p>You are not logged in.</p>;
+  }
+
+  return (
+    <p>
+      Hello {auth.user}!{' '}
+      <button
+        onClick={() => {
+          auth.signout(() => navigate('/'));
+        }}
+      >
+        Sign out
+      </button>
+    </p>
+  );
+});
