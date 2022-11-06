@@ -34,9 +34,7 @@ export class AuthService {
         throw error;
       });
 
-    return {
-      message: 'ok',
-    };
+    return { message: 'ok' };
   }
 
   async login(dto: AuthDto): Promise<{ accessToken: string }> {
@@ -67,8 +65,6 @@ export class AuthService {
       secret,
     });
 
-    return {
-      accessToken: token,
-    };
+    return { accessToken: token };
   }
 }
