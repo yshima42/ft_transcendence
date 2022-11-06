@@ -8,9 +8,9 @@ import { HeaderLayout } from 'components/templates/HeaderLayout';
 import { Login } from '../components/pages/Login';
 import { LoginPage } from '../components/pages/LoginPage';
 import { Page404 } from '../components/pages/Page404';
+import { AuthProvider } from '../hooks/providers/useAuthProvider';
 import { ProtectedRoutes } from './ProtectedRoutes';
 import { PublicRoutes } from './PublicRoutes';
-import { AuthProvider } from './providers/useAuthProvider';
 
 export const Router = (): React.ReactElement | null => {
   return (
