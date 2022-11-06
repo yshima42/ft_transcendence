@@ -18,10 +18,11 @@ export class AuthService {
   ) {}
 
   async signUp(dto: AuthDto): Promise<{ message: string }> {
+    const { name } = dto;
     await this.prisma.user
       .create({
         data: {
-          name: dto.name,
+          name,
         },
       })
       .catch((error) => {
@@ -39,9 +40,10 @@ export class AuthService {
   }
 
   async login(dto: AuthDto): Promise<{ accessToken: string }> {
+    const { name } = dto;
     const user = await this.prisma.user.findUnique({
       where: {
-        name: dto.name,
+        name,
       },
     });
     if (user == null) throw new ForbiddenException('Name incorrect');
