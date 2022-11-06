@@ -7,11 +7,10 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(user: User): Promise<User[]> {
-    const users = await this.prisma.user.findMany();
-    const ret = users.filter((u) => {
-      return u.name !== user.name;
+    const users = await this.prisma.user.findMany({
+      where: { id: { not: user.id } },
     });
 
-    return ret;
+    return users;
   }
 }
