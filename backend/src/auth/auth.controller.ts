@@ -16,7 +16,7 @@ export class AuthController {
   async ftOauthCallback(
     @GetIntraname() intraname: string
   ): Promise<{ accessToken: string }> {
-    console.log('Login', intraname, '!');
+    console.log(intraname, ' login !');
 
     return await this.authService.login(intraname);
   }
