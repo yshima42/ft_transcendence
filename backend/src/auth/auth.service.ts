@@ -33,24 +33,8 @@ export class AuthService {
         throw error;
       });
 
-    console.log(user);
-
     return user;
   }
-
-  // async signUp(dto: CreateUserDto): Promise<{ message: string }> {
-  //   const { name } = dto;
-  //   await this.prisma.user.create({ data: { name } }).catch((error) => {
-  //     if (error instanceof PrismaClientKnownRequestError) {
-  //       if (error.code === 'P2002') {
-  //         throw new ForbiddenException('This name is already exist');
-  //       }
-  //     }
-  //     throw error;
-  //   });
-
-  //   return { message: 'ok' };
-  // }
 
   async login(dto: CredentialsDto): Promise<{ accessToken: string }> {
     const { name } = dto;
