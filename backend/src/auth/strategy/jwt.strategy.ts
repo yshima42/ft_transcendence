@@ -12,7 +12,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly prisma: PrismaService
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       // code for cookie
       // jwtFromRequest: ExtractJwt.fromExtractors([
       //   (req) => {
@@ -23,12 +22,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       //     return jwt;
       //   },
       // ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: config.get('JWT_SECRET') as string,
     });
   }
 
-  async validate(payload: { id: string; name: string }): Promise<User> {
+  async validate(payload: { id: string }): Promise<{ user: User }> {
     const { id } = payload;
     const user = await this.prisma.user.findUnique({ where: { id } });
 
@@ -36,6 +36,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException();
     }
 
-    return user;
+    return { user };
   }
 }
