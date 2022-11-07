@@ -22,11 +22,6 @@ export class AuthController {
     return await this.authService.signUp(dto);
   }
 
-  // @Post('signup')
-  // async signUp(@Body() dto: CreateUserDto): Promise<{ message: string }> {
-  //   return await this.authService.signUp(dto);
-  // }
-
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() dto: CredentialsDto): Promise<{ accessToken: string }> {
