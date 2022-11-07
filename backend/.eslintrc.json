@@ -59,7 +59,12 @@
           "ts": "never",
           "controller": "always",
           "service": "always",
-          "module": "always"
+          "module": "always",
+          "dto": "always",
+          "interface": "always",
+          "strategy": "always",
+          "guard": "always",
+          "decorator": "always"
         }
       }
     ],
