@@ -7,6 +7,7 @@ import {
   // Res,
   // Req,
 } from '@nestjs/common';
+import { User } from '@prisma/client';
 // import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/createUserDto.dto';
@@ -17,9 +18,14 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  async signUp(@Body() dto: CreateUserDto): Promise<{ message: string }> {
+  async signUp(@Body() dto: CreateUserDto): Promise<User> {
     return await this.authService.signUp(dto);
   }
+
+  // @Post('signup')
+  // async signUp(@Body() dto: CreateUserDto): Promise<{ message: string }> {
+  //   return await this.authService.signUp(dto);
+  // }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
