@@ -24,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       //   },
       // ]),
       ignoreExpiration: false,
-      secretOrKey: config.get('JWT_SECRET'), // eslint-disable-line
+      secretOrKey: config.get('JWT_SECRET') as string,
     });
   }
 
