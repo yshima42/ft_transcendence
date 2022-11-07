@@ -29,6 +29,25 @@ export class AuthController {
   }
 
   // @HttpCode(HttpStatus.OK)
+  // @Post('login')
+  // async login(
+  //   @Body() dto: AuthDto,
+  //   @Res({ passthrough: true }) res: Response
+  // ): Promise<Msg> {
+  //   const jwt = await this.authService.login(dto);
+  //   res.cookie('access_token', jwt.accessToken, {
+  //     httpOnly: true,
+  //     secure: true,
+  //     sameSite: 'none',
+  //     path: '/',
+  //   });
+
+  //   return {
+  //     message: 'ok',
+  //   };
+  // }
+
+  // @HttpCode(HttpStatus.OK)
   // @Post('/logout')
   // logout(
   //   @Req() req: Request,
