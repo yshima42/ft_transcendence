@@ -40,22 +40,23 @@ export class AuthService {
     const { name } = dto;
     const user = await this.prisma.user.findUnique({ where: { name } });
 
-    if (user != null) {
-      return await this.generateJwt(user.id, user.name);
+    if (user === null) {
+      throw new UnauthorizedException('Name incorrect');
     }
-    throw new UnauthorizedException('Name incorrect');
+
+    return await this.generateJwt(user.id, user.name);
   }
 
   async generateJwt(
     userId: string,
     name: string
   ): Promise<{ accessToken: string }> {
-    const payload = {
-      sub: userId,
-      name,
-    };
+    const payload = { id: userId, name };
+
     const secret: string | undefined = this.config.get('JWT_SECRET');
-    if (secret === undefined) throw new InternalServerErrorException();
+    if (secret === undefined) {
+      throw new InternalServerErrorException();
+    }
 
     const token = await this.jwt.signAsync(payload, {
       expiresIn: '1d',
