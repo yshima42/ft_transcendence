@@ -4,10 +4,10 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  Res,
-  Req,
+  // Res,
+  // Req,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+// import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/createUserDto.dto';
 import { CredentialsDto } from './dto/credentials.dto';
@@ -27,19 +27,19 @@ export class AuthController {
     return await this.authService.login(dto);
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Post('/logout')
-  logout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
-  ): { message: string } {
-    res.cookie('access_token', '', {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'none',
-      path: '/',
-    });
+  // @HttpCode(HttpStatus.OK)
+  // @Post('/logout')
+  // logout(
+  //   @Req() req: Request,
+  //   @Res({ passthrough: true }) res: Response
+  // ): { message: string } {
+  //   res.cookie('access_token', '', {
+  //     httpOnly: true,
+  //     secure: false,
+  //     sameSite: 'none',
+  //     path: '/',
+  //   });
 
-    return { message: 'ok' };
-  }
+  //   return { message: 'ok' };
+  // }
 }
