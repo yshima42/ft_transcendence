@@ -1,31 +1,24 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-  // Res,
-  // Req,
-} from '@nestjs/common';
-import { User } from '@prisma/client';
-// import { Request, Response } from 'express';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/createUserDto.dto';
-import { CredentialsDto } from './dto/credentials.dto';
+import { GetIntraname } from './decorator/get-intraname.decorator';
+import { FtOauthGuard } from './guards/ft-oauth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
-  async signUp(@Body() dto: CreateUserDto): Promise<User> {
-    return await this.authService.signUp(dto);
-  }
+  @Get('login/42')
+  @UseGuards(FtOauthGuard)
+  ftOauth(): void {}
 
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  async login(@Body() dto: CredentialsDto): Promise<{ accessToken: string }> {
-    return await this.authService.login(dto);
+  @Get('login/42/return')
+  @UseGuards(FtOauthGuard)
+  async ftOauthCallback(
+    @GetIntraname() intraname: string
+  ): Promise<{ accessToken: string }> {
+    console.log(intraname, ' login !');
+
+    return await this.authService.login(intraname);
   }
 
   // @HttpCode(HttpStatus.OK)
