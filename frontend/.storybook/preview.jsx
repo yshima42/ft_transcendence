@@ -1,5 +1,5 @@
 import theme from '../src/theme/theme.ts';
-import { Box, ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 import '@storybook/addon-console';
 
 export const parameters = {
