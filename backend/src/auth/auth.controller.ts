@@ -1,4 +1,12 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetIntraname } from './decorator/get-intraname.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
@@ -19,6 +27,16 @@ export class AuthController {
     console.log(intraname, ' login !');
 
     return await this.authService.login(intraname);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('login/dummy')
+  async dummyLogin(
+    @Body() body: { name: string }
+  ): Promise<{ accessToken: string }> {
+    const { name } = body;
+
+    return await this.authService.dummyLogin(name);
   }
 
   // @HttpCode(HttpStatus.OK)
