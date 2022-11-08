@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../prisma/prisma.service';
-import { UserService } from './user.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { UserService } from '../user.service';
 
 const mockUser1 = {
   id: '1',
