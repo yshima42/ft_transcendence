@@ -1,5 +1,6 @@
 import theme from '../src/theme/theme.ts';
-import { ChakraProvider } from '@chakra-ui/react';
+import { Box, ChakraProvider } from '@chakra-ui/react';
+import '@storybook/addon-console';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -15,9 +16,7 @@ export const parameters = {
 export const decorators = [
   (Story) => (
     <ChakraProvider theme={theme}>
-      <center>
-        <Story />
-      </center>
+      <Story />
     </ChakraProvider>
   ),
 ];
