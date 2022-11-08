@@ -28,9 +28,7 @@ export class AuthService {
     return { accessToken };
   }
 
-  async dummyLogin(intraname: string): Promise<{ accessToken: string }> {
-    const name: string = intraname;
-
+  async dummyLogin(name: string): Promise<{ accessToken: string }> {
     const user = await this.prisma.user.findUnique({ where: { name } });
     if (user === null) {
       throw new UnauthorizedException('Name incorrect');

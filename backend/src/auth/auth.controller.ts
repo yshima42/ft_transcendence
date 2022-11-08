@@ -30,13 +30,13 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('dummyLogin')
+  @Post('login/dummy')
   async dummyLogin(
-    @Body() body: { intraname: string }
+    @Body() body: { name: string }
   ): Promise<{ accessToken: string }> {
-    const { intraname } = body;
+    const { name } = body;
 
-    return await this.authService.dummyLogin(intraname);
+    return await this.authService.dummyLogin(name);
   }
 
   // @HttpCode(HttpStatus.OK)
