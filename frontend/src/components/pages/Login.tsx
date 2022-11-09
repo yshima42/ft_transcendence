@@ -1,12 +1,13 @@
 import { memo, FC, useContext } from 'react';
 import { Box, Button, Divider, Flex, Heading, Stack } from '@chakra-ui/react';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { AccessTokenContext } from 'hooks/providers/useAccessTokenProvider';
 import { useAuth } from 'hooks/providers/useAuthProvider';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { AccessToken } from 'types/api/accessToken';
 
 export const Login: FC = memo(() => {
-  const { accessToken, setAccessToken } = useContext(AccessTokenContext);
+  const { token, setToken } = useContext(AccessTokenContext);
 
   const navigate = useNavigate();
   const auth = useAuth();
@@ -17,15 +18,14 @@ export const Login: FC = memo(() => {
     const params = new URLSearchParams();
     params.append('name', 'dummy1');
     axios
-      .post('http://localhost:3000/auth/login/dummy', params)
-      .then((result) => {
-        // const at: string = result.data as string;
-        // console.log(at);
-        // console.log(result.data as string);
-
-        setAccessToken(result.data as string);
-        console.log(accessToken);
-
+      .post<AccessToken[]>('http://localhost:3000/auth/login/dummy', params)
+      .then((result: AxiosResponse<AccessToken[]>) => {
+        // setToken(result.data.accessToken as string);
+        // 上の行は有効化
+        // 下２行コメントアウト
+        console.log(result);
+        setToken('');
+        console.log(token);
         auth.signin('dummy1', () => {
           navigate(to, { replace: true });
         });

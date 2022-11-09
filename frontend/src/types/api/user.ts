@@ -1,5 +1,6 @@
 export type User = {
-  id: number;
-  imageUrl: string;
-  login: string;
+  createdAt: string;
+  id: string;
+  name: string;
+  updatedAt: string;
 };

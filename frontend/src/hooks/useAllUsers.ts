@@ -1,17 +1,20 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import axios from 'axios';
 
-import { JsonUser } from '../types/api/jsonuser';
+import { User } from 'types/api/user';
+import { AccessTokenContext } from './providers/useAccessTokenProvider';
 
 export const useAllUsers = (): {
   getUsers: () => void;
-  users: JsonUser[];
+  users: User[];
 } => {
-  const [users, setUsers] = useState<JsonUser[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const { token } = useContext(AccessTokenContext);
 
   const getUsers = useCallback(() => {
+    axios.defaults.headers.common.Authorization = 'Bearer ' + token;
     axios
-      .get<JsonUser[]>('https://jsonplaceholder.typicode.com/users')
+      .get<User[]>('http://localhost:3000/user/all')
       .then((res) => setUsers(res.data))
       .catch(() => alert('error'));
   }, []);

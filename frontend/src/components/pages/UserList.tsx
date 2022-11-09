@@ -23,11 +23,11 @@ export const UserList: FC = memo(() => {
             <Tr></Tr>
           </Thead>
           <Tbody>
-            {users.map((jsonUsers) => (
+            {users.map((users) => (
               <UserTableData
-                key={jsonUsers.id}
-                login={jsonUsers.username}
-                photo={jsonUsers.website}
+                key={users.id}
+                login={users.name}
+                photo={users.id}
               />
             ))}
           </Tbody>
