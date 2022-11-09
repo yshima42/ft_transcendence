@@ -5,13 +5,13 @@ type Props = {
 };
 
 type AccessTokenContextType = {
-  accessToken: string;
-  setAccessToken: (accessToken: string) => void;
+  token: string;
+  setToken: (token: string) => void;
 };
 
 const defaultAccessTokenContext: AccessTokenContextType = {
-  accessToken: '',
-  setAccessToken: () => {}, // eslint-disable-line
+  token: '',
+  setToken: () => {}, // eslint-disable-line
 };
 
 export const AccessTokenContext = createContext<AccessTokenContextType>(
@@ -21,10 +21,10 @@ export const AccessTokenContext = createContext<AccessTokenContextType>(
 export const AccessTokenProvider: FC<Props> = (props) => {
   const { children } = props;
 
-  const [accessToken, setAccessToken] = useState('');
+  const [token, setToken] = useState('');
 
   return (
-    <AccessTokenContext.Provider value={{ accessToken, setAccessToken }}>
+    <AccessTokenContext.Provider value={{ token, setToken }}>
       {children}
     </AccessTokenContext.Provider>
   );
