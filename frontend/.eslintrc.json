@@ -28,7 +28,9 @@
         "react", 
         "jsx-a11y", 
         "react-hooks", 
-        "jest"
+        "jest",
+        "jest-dom",
+        "testing-library"
     ],
     "rules": {
       "padding-line-between-statements": [
@@ -126,7 +128,7 @@
             "jest/globals": true
         },
         "extends": ["plugin:jest/recommended", 
-        "plugin:jest/style"], "plugins": ["jest"]
+        "plugin:jest/style", "plugin:jest-dom/recommended", "plugin:testing-library/react"], "plugins": ["jest"]
       }
     ],
     "settings": {
