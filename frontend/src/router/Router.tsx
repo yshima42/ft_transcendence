@@ -1,3 +1,4 @@
+import { AccessTokenProvider } from 'hooks/providers/useAccessTokenProvider';
 import { Route, Routes } from 'react-router-dom';
 import { ChatRoomList } from 'components/pages/ChatRoomList';
 import { DirectMessage } from 'components/pages/DirectMessage';
@@ -15,28 +16,30 @@ import { PublicRoutes } from './PublicRoutes';
 export const Router = (): React.ReactElement | null => {
   return (
     <AuthProvider>
-      <Routes>
-        {/** Public Routes */}
-        {/** Wrap all Route under PublicRoutes element */}
-        <Route path="/" element={<PublicRoutes />}>
-          <Route path="/" element={<Login />}>
-            <Route path="/login-page" element={<LoginPage />} />
+      <AccessTokenProvider>
+        <Routes>
+          {/** Public Routes */}
+          {/** Wrap all Route under PublicRoutes element */}
+          <Route path="/" element={<PublicRoutes />}>
+            <Route path="/" element={<Login />}>
+              <Route path="/login-page" element={<LoginPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/** Protected Routes */}
-        {/** Wrap all Route under ProtectedRoutes element */}
-        <Route path="/" element={<ProtectedRoutes />}>
-          <Route path="/" element={<HeaderLayout />}>
-            <Route path="chatroom-list" element={<ChatRoomList />} />
-            <Route path="user-list" element={<UserList />} />
-            <Route path="game-select" element={<GameSelect />} />
-            <Route path="game" element={<Game />} />
-            <Route path="direct-message" element={<DirectMessage />} />
-            <Route path="*" element={<Page404 />} />
+          {/** Protected Routes */}
+          {/** Wrap all Route under ProtectedRoutes element */}
+          <Route path="/" element={<ProtectedRoutes />}>
+            <Route path="/" element={<HeaderLayout />}>
+              <Route path="chatroom-list" element={<ChatRoomList />} />
+              <Route path="user-list" element={<UserList />} />
+              <Route path="game-select" element={<GameSelect />} />
+              <Route path="game" element={<Game />} />
+              <Route path="direct-message" element={<DirectMessage />} />
+              <Route path="*" element={<Page404 />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </AccessTokenProvider>
     </AuthProvider>
   );
 };

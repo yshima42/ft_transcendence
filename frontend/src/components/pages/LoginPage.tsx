@@ -6,9 +6,6 @@ export const LoginPage: FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
-  // 修正方法わからないため一旦eslint回避
-  // ここの'/user-list'はチュートリアルでは'/'だったけど'/user-list'にすると想定通りの動きになった
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const to = '/user-list';
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -18,7 +15,7 @@ export const LoginPage: FC = () => {
     const username = formData.get('username') as string;
 
     auth.signin(username, () => {
-      navigate(to as string, { replace: true });
+      navigate(to, { replace: true });
     });
   }
 
