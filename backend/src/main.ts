@@ -6,10 +6,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  // app.enableCors({
-  //   credentials: true,
-  //   origin: ['http://localhost:5173'],
-  // });
+  app.enableCors({
+    credentials: true,
+    origin: ['http://localhost:5173'],
+  });
   // app.use(cookieParser());
   await app.listen(3000);
 }
