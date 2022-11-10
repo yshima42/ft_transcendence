@@ -1,13 +1,15 @@
-import { memo, FC, useContext } from 'react';
+import { memo, FC } from 'react';
+// import { memo, FC, useContext } from 'react';
 import { Box, Button, Divider, Flex, Heading, Stack } from '@chakra-ui/react';
-import axios, { AxiosResponse } from 'axios';
-import { AccessTokenContext } from 'hooks/providers/useAccessTokenProvider';
+import axios from 'axios';
+// import axios, { AxiosResponse } from 'axios';
+// import { AccessTokenContext } from 'hooks/providers/useAccessTokenProvider';
 import { useAuth } from 'hooks/providers/useAuthProvider';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { AccessToken } from 'types/api/accessToken';
 
 export const Login: FC = memo(() => {
-  const { token, setToken } = useContext(AccessTokenContext);
+  // const { token, setToken } = useContext(AccessTokenContext);
 
   const navigate = useNavigate();
   const auth = useAuth();
@@ -18,14 +20,17 @@ export const Login: FC = memo(() => {
     const params = new URLSearchParams();
     params.append('name', 'dummy1');
     axios
-      .post<AccessToken[]>('http://localhost:3000/auth/login/dummy', params)
-      .then((result: AxiosResponse<AccessToken[]>) => {
+      .post<AccessToken[]>('http://localhost:3000/auth/login/dummy', params, {
+        withCredentials: true,
+      })
+      .then(() => {
+        // .then((result: AxiosResponse<AccessToken[]>) => {
         // setToken(result.data.accessToken as string);
         // 上有効化
         // 下2行消す
-        console.log(result);
-        setToken('');
-        console.log(token);
+        // console.log(result);
+        // setToken('');
+        // console.log(token);
         auth.signin('dummy1', () => {
           navigate(to, { replace: true });
         });
@@ -34,6 +39,25 @@ export const Login: FC = memo(() => {
     // auth.signin('dummy1', () => {
     //   navigate(to, { replace: true });
     // });
+  };
+
+  const onClickDummy2 = () => {
+    axios
+      .get('http://localhost:3000/auth/login/42', {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .then((res) => console.log(res.data))
+      .catch(() => alert('error'));
+  };
+
+  const onClickDummy3 = () => {
+    axios
+      .get('http://localhost:3000/user/all', { withCredentials: true })
+      .then((res) => console.log(res.data))
+      .catch(() => alert('error'));
   };
 
   return (
@@ -49,8 +73,8 @@ export const Login: FC = memo(() => {
           </a>
           <Outlet />
           <Button onClick={onClickDummy1}>アドミンテスト1</Button>
-          <Button>アドミンテスト2</Button>
-          <Button>アドミンテスト3</Button>
+          <Button onClick={onClickDummy2}>アドミンテスト2</Button>
+          <Button onClick={onClickDummy3}>アドミンテスト3</Button>
         </Stack>
       </Box>
     </Flex>
