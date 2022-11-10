@@ -6,7 +6,10 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  Res,
+  Redirect,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetIntraname } from './decorator/get-intraname.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
@@ -19,24 +22,67 @@ export class AuthController {
   @UseGuards(FtOauthGuard)
   ftOauth(): void {}
 
+  // @Get('login/42/return')
+  // @UseGuards(FtOauthGuard)
+  // async ftOauthCallback(
+  //   @GetIntraname() intraname: string
+  // ): Promise<{ accessToken: string }> {
+  //   console.log(intraname, ' login !');
+
+  //   return await this.authService.login(intraname);
+  // }
+
   @Get('login/42/return')
   @UseGuards(FtOauthGuard)
+  @Redirect('http://localhost:5173/user-list')
   async ftOauthCallback(
-    @GetIntraname() intraname: string
-  ): Promise<{ accessToken: string }> {
+    @GetIntraname() intraname: string,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<{ message: string }> {
     console.log(intraname, ' login !');
 
-    return await this.authService.login(intraname);
+    const jwt = await this.authService.login(intraname);
+    res.cookie('access_token', jwt.accessToken, {
+      httpOnly: true,
+      secure: false,
+      // secure: false,
+      sameSite: 'none',
+      path: '/',
+    });
+
+    return {
+      message: 'ok',
+    };
   }
+
+  // @HttpCode(HttpStatus.OK)
+  // @Post('login/dummy')
+  // async dummyLogin(
+  //   @Body() body: { name: string }
+  // ): Promise<{ accessToken: string }> {
+  //   const { name } = body;
+
+  //   return await this.authService.dummyLogin(name);
+  // }
 
   @HttpCode(HttpStatus.OK)
   @Post('login/dummy')
   async dummyLogin(
-    @Body() body: { name: string }
-  ): Promise<{ accessToken: string }> {
-    const { name } = body;
+    @Body() body: { name: string },
+    @Res({ passthrough: true }) res: Response
+  ): Promise<{ message: string }> {
+    const jwt = await this.authService.login(body.name);
+    res.cookie('access_token', jwt.accessToken, {
+      httpOnly: true,
+      // secure: true,
+      secure: false,
+      sameSite: 'none',
+      path: '/',
+    });
 
-    return await this.authService.dummyLogin(name);
+    return {
+      message: 'ok',
+    };
   }
 
   // @HttpCode(HttpStatus.OK)

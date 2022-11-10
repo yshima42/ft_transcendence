@@ -13,16 +13,19 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       // code for cookie
-      // jwtFromRequest: ExtractJwt.fromExtractors([
-      //   (req) => {
-      //     let jwt = null;
-      //     if (req && req.cookies) {
-      //       jwt = req.cookies['access_token'];
-      //     }
-      //     return jwt;
-      //   },
-      // ]),
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req) => {
+          let jwt = '';
+          /* eslint-disable */
+          if (req && req.cookies) {
+            jwt = req.cookies.access_token;
+          }
+
+          return jwt;
+          /* eslint-disable */
+        },
+      ]),
+      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: config.get('JWT_SECRET') as string,
     });
