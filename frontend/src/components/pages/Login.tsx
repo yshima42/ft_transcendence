@@ -21,8 +21,8 @@ export const Login: FC = memo(() => {
       .post<AccessToken[]>('http://localhost:3000/auth/login/dummy', params)
       .then((result: AxiosResponse<AccessToken[]>) => {
         // setToken(result.data.accessToken as string);
-        // 上の行は有効化
-        // 下２行コメントアウト
+        // 上有効化
+        // 下2行消す
         console.log(result);
         setToken('');
         console.log(token);
@@ -31,6 +31,9 @@ export const Login: FC = memo(() => {
         });
       })
       .catch(() => console.log('error'));
+    // auth.signin('dummy1', () => {
+    //   navigate(to, { replace: true });
+    // });
   };
 
   return (
