@@ -1,7 +1,7 @@
 import { FC } from 'react';
 // import './App.css';
 import { AppProvider } from 'providers/app';
-import { AppRoutes } from 'router/Router';
+import { AppRoutes } from 'router/AppRoutes';
 
 const App: FC = () => {
   return (
