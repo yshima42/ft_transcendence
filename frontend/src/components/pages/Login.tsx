@@ -53,9 +53,19 @@ export const Login: FC = memo(() => {
       .catch(() => alert('error'));
   };
 
+  // const onClickDummy3 = () => {
+  //   axios
+  //     .get('http://localhost:3000/user/all', { withCredentials: true })
+  //     .then((res) => console.log(res.data))
+  //     .catch(() => alert('error'));
+  // };
+
   const onClickDummy3 = () => {
+    const params = new URLSearchParams();
     axios
-      .get('http://localhost:3000/user/all', { withCredentials: true })
+      .post('http://localhost:3000/auth/logout', params, {
+        withCredentials: true,
+      })
       .then((res) => console.log(res.data))
       .catch(() => alert('error'));
   };
