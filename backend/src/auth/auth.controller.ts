@@ -34,7 +34,7 @@ export class AuthController {
 
   @Get('login/42/return')
   @UseGuards(FtOauthGuard)
-  @Redirect('http://localhost:5173/user-list')
+  @Redirect('http://localhost:5173/')
   async ftOauthCallback(
     @GetIntraname() intraname: string,
     @Res({ passthrough: true }) res: Response
@@ -44,7 +44,7 @@ export class AuthController {
     const jwt = await this.authService.login(intraname);
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       // secure: false,
       sameSite: 'none',
       path: '/',
@@ -75,7 +75,7 @@ export class AuthController {
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
       // secure: true,
-      secure: false,
+      secure: true,
       sameSite: 'none',
       path: '/',
     });
