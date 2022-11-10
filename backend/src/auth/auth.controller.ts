@@ -6,10 +6,11 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  Req,
   Res,
   Redirect,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { GetIntraname } from './decorator/get-intraname.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
@@ -74,8 +75,8 @@ export class AuthController {
     const jwt = await this.authService.login(body.name);
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
-      // secure: true,
       secure: true,
+      // secure: false,
       sameSite: 'none',
       path: '/',
     });
@@ -104,19 +105,20 @@ export class AuthController {
   //   };
   // }
 
-  // @HttpCode(HttpStatus.OK)
-  // @Post('/logout')
-  // logout(
-  //   @Req() req: Request,
-  //   @Res({ passthrough: true }) res: Response
-  // ): { message: string } {
-  //   res.cookie('access_token', '', {
-  //     httpOnly: true,
-  //     secure: false,
-  //     sameSite: 'none',
-  //     path: '/',
-  //   });
+  @HttpCode(HttpStatus.OK)
+  @Post('/logout')
+  logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ): { message: string } {
+    res.cookie('access_token', '', {
+      httpOnly: true,
+      secure: true,
+      // secure: false,
+      sameSite: 'none',
+      path: '/',
+    });
 
-  //   return { message: 'ok' };
-  // }
+    return { message: 'ok' };
+  }
 }
