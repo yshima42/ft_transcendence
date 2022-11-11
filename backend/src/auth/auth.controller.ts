@@ -23,17 +23,7 @@ export class AuthController {
   @UseGuards(FtOauthGuard)
   ftOauth(): void {}
 
-  // @Get('login/42/return')
-  // @UseGuards(FtOauthGuard)
-  // async ftOauthCallback(
-  //   @GetIntraname() intraname: string
-  // ): Promise<{ accessToken: string }> {
-  //   console.log(intraname, ' login !');
-
-  //   return await this.authService.login(intraname);
-  // }
-
-  @Get('login/42/return')
+  @Get('login/42/callback')
   @UseGuards(FtOauthGuard)
   @Redirect('http://localhost:5173/user-list')
   async ftOauthCallback(
@@ -56,16 +46,6 @@ export class AuthController {
     };
   }
 
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login/dummy')
-  // async dummyLogin(
-  //   @Body() body: { name: string }
-  // ): Promise<{ accessToken: string }> {
-  //   const { name } = body;
-
-  //   return await this.authService.dummyLogin(name);
-  // }
-
   @HttpCode(HttpStatus.OK)
   @Post('login/dummy')
   async dummyLogin(
@@ -85,25 +65,6 @@ export class AuthController {
       message: 'ok',
     };
   }
-
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login')
-  // async login(
-  //   @Body() dto: AuthDto,
-  //   @Res({ passthrough: true }) res: Response
-  // ): Promise<Msg> {
-  //   const jwt = await this.authService.login(dto);
-  //   res.cookie('access_token', jwt.accessToken, {
-  //     httpOnly: true,
-  //     secure: true,
-  //     sameSite: 'none',
-  //     path: '/',
-  //   });
-
-  //   return {
-  //     message: 'ok',
-  //   };
-  // }
 
   @HttpCode(HttpStatus.OK)
   @Post('/logout')
