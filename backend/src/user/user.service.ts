@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -12,5 +12,15 @@ export class UserService {
     });
 
     return users;
+  }
+
+  async findOne(name: string): Promise<User> {
+    const found: User | null = await this.prisma.user.findUnique({
+      where: { name },
+    });
+
+    if (found === null) throw new UnauthorizedException('Name incorrect');
+
+    return found;
   }
 }
