@@ -53,19 +53,19 @@ export const Login: FC = memo(() => {
       .catch(() => alert('error'));
   };
 
-  // const onClickDummy3 = () => {
-  //   axios
-  //     .get('http://localhost:3000/user/all', { withCredentials: true })
-  //     .then((res) => console.log(res.data))
-  //     .catch(() => alert('error'));
-  // };
-
   const onClickDummy3 = () => {
     const params = new URLSearchParams();
     axios
       .post('http://localhost:3000/auth/logout', params, {
         withCredentials: true,
       })
+      .then((res) => console.log(res.data))
+      .catch(() => alert('error'));
+  };
+
+  const onClickDummy4 = () => {
+    axios
+      .get('http://localhost:3000/user/all', { withCredentials: true })
       .then((res) => console.log(res.data))
       .catch(() => alert('error'));
   };
@@ -85,6 +85,7 @@ export const Login: FC = memo(() => {
           <Button onClick={onClickDummy1}>アドミンテスト1</Button>
           <Button onClick={onClickDummy2}>アドミンテスト2</Button>
           <Button onClick={onClickDummy3}>アドミンテスト3</Button>
+          <Button onClick={onClickDummy4}>アドミンテスト4</Button>
         </Stack>
       </Box>
     </Flex>
