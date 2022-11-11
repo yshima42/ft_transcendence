@@ -1,10 +1,10 @@
 import { FC, memo } from 'react';
-import { Tr, Td } from '@chakra-ui/react';
+import { Tr, Td, Image } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
 
 type Props = {
   login: string;
-  photo: string;
+  imageUrl: string;
 };
 
 // const onClickGame = memo(() => {
@@ -15,13 +15,15 @@ type Props = {
 // });
 
 export const UserTableData: FC<Props> = memo((props) => {
-  const { login, photo } = props;
+  const { login, imageUrl } = props;
 
   return (
     <>
       <Tr>
+        <Td>
+          <Image boxSize="48px" src={imageUrl} alt={login} m="auto" />
+        </Td>
         <Td>{login}</Td>
-        <Td>{photo}</Td>
         <Td>
           <NavLink
             to={'/game'}

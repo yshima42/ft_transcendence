@@ -2,7 +2,7 @@ import { FC, memo, useState } from 'react';
 import { Box, Icon } from '@chakra-ui/react';
 import axios from 'axios';
 import { GrLogout } from 'react-icons/gr';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'types/api/user';
 
 export const AuthStatus: FC = memo(() => {
@@ -28,7 +28,9 @@ export const AuthStatus: FC = memo(() => {
 
   return (
     <>
-      <Box px={4}>{me}</Box>
+      <Link to="profile-page">
+        <Box px={4}>{me}</Box>
+      </Link>
       <Icon
         as={GrLogout}
         onClick={onClickLogout}
