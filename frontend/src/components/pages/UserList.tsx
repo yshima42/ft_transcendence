@@ -27,7 +27,7 @@ export const UserList: FC = memo(() => {
               <UserTableData
                 key={users.id}
                 login={users.name}
-                photo={users.id}
+                imageUrl="https://source.unsplash.com/random"
               />
             ))}
           </Tbody>
