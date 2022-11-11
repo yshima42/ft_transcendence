@@ -2,7 +2,7 @@ import { FC, memo } from 'react';
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import axios from 'axios';
 import { AiOutlineUser } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 type UserNavigationItem = {
   name: string;
@@ -48,7 +48,9 @@ export const UserNavigation: FC = memo(() => {
       </MenuButton>
       <MenuList>
         {userNavigation.map((item) => (
-          <MenuItem key={item.name}>{item.name}</MenuItem>
+          <Link key={item.name} to={item.to} onClick={item.onClick}>
+            <MenuItem>{item.name}</MenuItem>
+          </Link>
         ))}
       </MenuList>
     </Menu>
