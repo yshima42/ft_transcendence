@@ -5,7 +5,7 @@ import axios from 'axios';
 // import axios, { AxiosResponse } from 'axios';
 // import { AccessTokenContext } from 'hooks/providers/useAccessTokenProvider';
 // import { useAuth } from 'hooks/providers/useAuthProvider';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const Login: FC = memo(() => {
   // const { token, setToken } = useContext(AccessTokenContext);
@@ -13,7 +13,7 @@ export const Login: FC = memo(() => {
   const navigate = useNavigate();
   // const auth = useAuth();
 
-  const to = '/user-list';
+  const to = 'app/user-list';
 
   const onClickDummy1 = () => {
     const params = new URLSearchParams();
@@ -65,7 +65,6 @@ export const Login: FC = memo(() => {
           <a href="http://localhost:3000/auth/login/42">
             <Button>42ユーザー認証</Button>
           </a>
-          <Outlet />
           <Button onClick={onClickDummy1}>アドミンテスト1</Button>
           <Button onClick={onClickDummy2}>アドミンテスト2</Button>
           <Button onClick={onClickDummy3}>アドミンテスト3</Button>
