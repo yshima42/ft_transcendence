@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -18,5 +18,11 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   findMe(@GetUser() user: User): User {
     return user;
+  }
+
+  @Post('find')
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Body() body: { name: string }): Promise<User> {
+    return await this.userService.findOne(body.name);
   }
 }
