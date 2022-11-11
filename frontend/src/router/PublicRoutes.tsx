@@ -1,3 +1,4 @@
+import { Outlet } from 'react-router-dom';
 import { ChatRoomList } from 'components/pages/ChatRoomList';
 import { DirectMessage } from 'components/pages/DirectMessage';
 import { Game } from 'components/pages/Game';
@@ -6,7 +7,15 @@ import { Login } from 'components/pages/Login';
 import { Page404 } from 'components/pages/Page404';
 import { Profile } from 'components/pages/Profile';
 import { UserList } from 'components/pages/UserList';
-import { HeaderLayout } from 'components/templates/HeaderLayout';
+import { MainLayout } from 'components/templates/MainLayout';
+
+const App = () => {
+  return (
+    <MainLayout>
+      <Outlet />
+    </MainLayout>
+  );
+};
 
 export const publicRoutes = [
   // authを入れる場合は
@@ -14,9 +23,10 @@ export const publicRoutes = [
     path: '/',
     element: <Login />,
   },
+  { path: '*', element: <Page404 /> },
   {
-    path: '/',
-    element: <HeaderLayout />,
+    path: '/app',
+    element: <App />,
     children: [
       { path: 'user-list', element: <UserList /> },
       { path: 'chatroom-list', element: <ChatRoomList /> },
