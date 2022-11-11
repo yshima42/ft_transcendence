@@ -4,7 +4,7 @@ import { Game } from 'components/pages/Game';
 import { GameSelect } from 'components/pages/GameSelect';
 import { Login } from 'components/pages/Login';
 import { Page404 } from 'components/pages/Page404';
-import { ProfilePage } from 'components/pages/ProfilePage';
+import { Profile } from 'components/pages/Profile';
 import { UserList } from 'components/pages/UserList';
 import { HeaderLayout } from 'components/templates/HeaderLayout';
 
@@ -23,7 +23,7 @@ export const publicRoutes = [
       { path: 'game-select', element: <GameSelect /> },
       { path: 'game', element: <Game /> },
       { path: 'direct-message', element: <DirectMessage /> },
-      { path: 'profile-page', element: <ProfilePage /> },
+      { path: 'profile', element: <Profile /> },
       { path: '*', element: <Page404 /> },
     ],
   },
