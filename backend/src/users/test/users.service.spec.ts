@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
-import { UserService } from '../user.service';
+import { UsersService } from '../users.service';
 
 const mockUser1 = {
   id: '1',
@@ -24,16 +24,16 @@ const mockUser3 = {
   name: 'dummy3',
 };
 
-describe('UserServiceTest', () => {
-  let service: UserService;
+describe('UsersServiceTest', () => {
+  let service: UsersService;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ConfigService, UserService, PrismaService],
+      providers: [ConfigService, UsersService, PrismaService],
     }).compile();
 
-    service = module.get<UserService>(UserService);
+    service = module.get<UsersService>(UsersService);
     prisma = module.get<PrismaService>(PrismaService);
   });
 
