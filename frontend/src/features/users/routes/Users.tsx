@@ -7,10 +7,10 @@ import {
   Thead,
   TableContainer,
 } from '@chakra-ui/react';
-import { UserTableData } from 'components/organisms/user/UserTableData';
-import { useAllUsers } from '../../hooks/useAllUsers';
+import { UserTableData } from 'features/users/components/UserTableData';
+import { useAllUsers } from '../api/useAllUsers';
 
-export const UserList: FC = memo(() => {
+export const Users: FC = memo(() => {
   const { getUsers, users } = useAllUsers();
 
   useEffect(() => getUsers(), [getUsers]);
@@ -18,7 +18,7 @@ export const UserList: FC = memo(() => {
   return (
     <>
       <TableContainer>
-        <Table variant="striped" colorScheme="teal">
+        <Table variant="simple">
           <Thead>
             <Tr></Tr>
           </Thead>
@@ -26,8 +26,8 @@ export const UserList: FC = memo(() => {
             {users.map((users) => (
               <UserTableData
                 key={users.id}
-                login={users.name}
                 imageUrl="https://source.unsplash.com/random"
+                login={users.name}
               />
             ))}
           </Tbody>

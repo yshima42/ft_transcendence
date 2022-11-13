@@ -1,6 +1,6 @@
 import { FC, memo } from 'react';
 import { ChakraProvider, theme } from '@chakra-ui/react';
-import { AuthProvider } from 'hooks/providers/useAuthProvider';
+import { AuthProvider } from 'hooks/useAuthProvider';
 import { BrowserRouter } from 'react-router-dom';
 
 type Props = {

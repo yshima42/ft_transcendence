@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import axios from 'axios';
 
+import { User } from 'features/users/types/user';
 import { useNavigate } from 'react-router-dom';
-import { User } from 'types/api/user';
 
 export const useAllUsers = (): {
   getUsers: () => void;
@@ -16,8 +16,7 @@ export const useAllUsers = (): {
       .get<User[]>('http://localhost:3000/user/all', { withCredentials: true })
       .then((res) => setUsers(res.data))
       .catch(() => navigate('/', { replace: true }));
-    // .catch(() => alert('error'));
-  }, []);
+  }, [navigate]);
 
   return { getUsers, users };
 };
