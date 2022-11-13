@@ -44,9 +44,9 @@ export const UserNavigation: FC = memo(() => {
   return (
     <Menu>
       <MenuButton>
-        <AiOutlineUser size={30} />
+        <AiOutlineUser size={25} />
       </MenuButton>
-      <MenuList>
+      <MenuList color="gray.800">
         {userNavigation.map((item) => (
           <Link key={item.name} to={item.to} onClick={item.onClick}>
             <MenuItem>{item.name}</MenuItem>
@@ -54,19 +54,6 @@ export const UserNavigation: FC = memo(() => {
         ))}
       </MenuList>
     </Menu>
-    // <>
-    //   <Link to="profile">
-    //     <Box px={4}>{me}</Box>
-    //   </Link>
-    //   <Icon
-    //     as={GrLogout}
-    //     onClick={onClickLogout}
-    //     cursor="pointer"
-    //     _hover={{ opacity: 0.8 }}
-    //   >
-    //     logout
-    //   </Icon>
-    // </>
   );
   // const auth = useAuth();
   // const navigate = useNavigate();
