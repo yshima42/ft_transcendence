@@ -1,4 +1,4 @@
-import { useAuth } from 'hooks/providers/useAuthProvider';
+import { useAuth } from 'hooks/useAuthProvider';
 import { useRoutes } from 'react-router-dom';
 import { protectedRoutes } from './ProtectedRoutes';
 import { publicRoutes } from './PublicRoutes';

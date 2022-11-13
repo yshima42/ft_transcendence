@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { useMe } from 'hooks/providers/useMe';
+import { useMe } from 'hooks/useMe';
 
 type EntryProps = {
   label: string;

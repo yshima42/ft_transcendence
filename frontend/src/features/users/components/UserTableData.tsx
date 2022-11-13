@@ -1,6 +1,6 @@
 import { FC, memo } from 'react';
 import { Tr, Td, Image } from '@chakra-ui/react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 type Props = {
   login: string;
@@ -25,20 +25,17 @@ export const UserTableData: FC<Props> = memo((props) => {
         </Td>
         <Td>{login}</Td>
         <Td>
-          <NavLink
-            to={'/game'}
-            state={{ loginUser: 'LoginUser', opponent: login }}
-          >
+          <Link to={'game'} state={{ loginUser: 'LoginUser', opponent: login }}>
             Game
-          </NavLink>
+          </Link>
         </Td>
         <Td>
-          <NavLink
-            to={'/direct-message'}
+          <Link
+            to={'direct-message'}
             state={{ loginUser: 'LoginUser', opponent: login }}
           >
             Message
-          </NavLink>
+          </Link>
         </Td>
       </Tr>
     </>

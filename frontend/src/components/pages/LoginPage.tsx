@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/providers/useAuthProvider';
+import { useAuth } from '../../hooks/useAuthProvider';
 
 export const LoginPage: FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
-  const to = '/user-list';
+  const to = '/users';
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
