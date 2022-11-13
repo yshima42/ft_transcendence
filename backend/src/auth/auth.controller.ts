@@ -10,6 +10,7 @@ import {
   Res,
   Redirect,
 } from '@nestjs/common';
+import { CookieOptions } from 'csurf';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { GetIntraname } from './decorator/get-intraname.decorator';
@@ -18,6 +19,14 @@ import { FtOauthGuard } from './guards/ft-oauth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  readonly cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    // secure: false,
+    sameSite: 'none',
+    path: '/',
+  };
 
   @Get('login/42')
   @UseGuards(FtOauthGuard)
@@ -32,18 +41,10 @@ export class AuthController {
   ): Promise<{ message: string }> {
     console.log(intraname, ' login !');
 
-    const jwt = await this.authService.login(intraname);
-    res.cookie('access_token', jwt.accessToken, {
-      httpOnly: true,
-      secure: true,
-      // secure: false,
-      sameSite: 'none',
-      path: '/',
-    });
+    const { accessToken } = await this.authService.login(intraname);
+    res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return {
-      message: 'ok',
-    };
+    return { message: 'ok' };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -52,18 +53,10 @@ export class AuthController {
     @Body() body: { name: string },
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    const jwt = await this.authService.login(body.name);
-    res.cookie('access_token', jwt.accessToken, {
-      httpOnly: true,
-      secure: true,
-      // secure: false,
-      sameSite: 'none',
-      path: '/',
-    });
+    const { accessToken } = await this.authService.login(body.name);
+    res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return {
-      message: 'ok',
-    };
+    return { message: 'ok' };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -72,13 +65,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ): { message: string } {
-    res.cookie('access_token', '', {
-      httpOnly: true,
-      secure: true,
-      // secure: false,
-      sameSite: 'none',
-      path: '/',
-    });
+    res.cookie('access_token', '', this.cookieOptions);
 
     return { message: 'ok' };
   }
