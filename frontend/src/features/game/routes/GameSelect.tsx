@@ -1,13 +1,14 @@
 import { memo, FC } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Stack } from '@chakra-ui/react';
 
 export const GameSelect: FC = memo(() => {
   return (
     <>
-      <p>GameSelectページです</p>
-      <Button>ランダムマッチ</Button>
-      <Button>フレンドマッチ</Button>
-      <Button>ライブ観戦</Button>
+      <Stack spacing={4} py={4} px={10}>
+        <Button>ランダムマッチ</Button>
+        <Button>フレンドマッチ</Button>
+        <Button>観戦</Button>
+      </Stack>
     </>
   );
 });
