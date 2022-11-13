@@ -1,4 +1,5 @@
-import { Profile, UserList } from 'features/users/index';
+import { Profile } from 'features/users/index';
+import { UsersRoutes } from 'features/users/routes';
 import { Outlet } from 'react-router-dom';
 // import { DirectMessage } from 'components/pages/DirectMessage';
 // import { Game } from 'components/pages/Game';
@@ -27,7 +28,7 @@ export const publicRoutes = [
     path: '/app',
     element: <App />,
     children: [
-      { path: 'user-list', element: <UserList /> },
+      { path: 'users/*', element: <UsersRoutes /> },
       { path: 'chatroom-list', element: <ChatRoomList /> },
       { path: 'game-select', element: <GameSelect /> },
       // { path: 'game', element: <Game /> },

@@ -21,6 +21,7 @@ export const Login: FC = memo(() => {
           <a href="http://localhost:3000/auth/login/42">
             <Button>42ユーザー認証</Button>
           </a>
+          <Divider />
           <PrimaryButton loading={loading} onClick={onClickDummy1}>
             アドミンテスト1
           </PrimaryButton>
