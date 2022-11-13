@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/providers/useAuthProvider';
+import { useAuth } from '../../hooks/useAuthProvider';
 
 export const LoginPage: FC = () => {
   const navigate = useNavigate();

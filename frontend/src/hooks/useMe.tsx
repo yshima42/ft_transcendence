@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { User } from 'features/users/types/user';
 import { useNavigate } from 'react-router-dom';
-import { User } from 'types/api/user';
 
 export const useMe = (): string => {
   const [me, setMe] = useState('');
