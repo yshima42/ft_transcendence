@@ -35,12 +35,6 @@ export const UserNavigation: FC = memo(() => {
     },
   ].filter(Boolean) as UserNavigationItem[];
 
-  // axios
-  //   .get<User>('http://localhost:3000/user/me', { withCredentials: true })
-  //   .then((res) => {
-  //     setMe(res.data.name);
-  //   })
-  //   .catch(() => navigate('/', { replace: true }));
   return (
     <Menu>
       <MenuButton>
@@ -55,23 +49,4 @@ export const UserNavigation: FC = memo(() => {
       </MenuList>
     </Menu>
   );
-  // const auth = useAuth();
-  // const navigate = useNavigate();
-
-  // if (auth.user === '') {
-  //   return <p>You are not logged in.</p>;
-  // }
-
-  // return (
-  //   <p>
-  //     Hello {auth.user}!{' '}
-  //     <button
-  //       onClick={() => {
-  //         auth.signout(() => navigate('/'));
-  //       }}
-  //     >
-  //       Sign out
-  //     </button>
-  //   </p>
-  // );
 });

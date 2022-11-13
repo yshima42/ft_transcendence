@@ -1,12 +1,12 @@
 import { Profile, UserList } from 'features/users/index';
 import { Outlet } from 'react-router-dom';
-import { ChatRoomList } from 'components/pages/ChatRoomList';
 // import { DirectMessage } from 'components/pages/DirectMessage';
 // import { Game } from 'components/pages/Game';
-import { GameSelect } from 'components/pages/GameSelect';
-import { Login } from 'components/pages/Login';
 import { Page404 } from 'components/pages/Page404';
 import { MainLayout } from 'components/templates/MainLayout';
+import { Login } from 'features/auth/routes/Login';
+import { ChatRoomList } from 'features/chat/routes/ChatRoomList';
+import { GameSelect } from 'features/game/routes/GameSelect';
 
 const App = () => {
   return (

@@ -18,22 +18,16 @@ const Template: ComponentStory<typeof PrimaryButton> = (args) => (
 export const Success = Template.bind({});
 Success.args = {
   children: 'Success',
-  bg: 'teal.300',
-  color: 'white',
 };
 
 export const Danger = Template.bind({});
 Danger.args = {
   children: 'Danger',
-  bg: 'red.400',
-  color: 'white',
 };
 
 export const Log = Template.bind({});
 Log.args = {
   children: 'Log',
-  bg: 'green.400',
-  color: 'white',
   onClick: () => console.log('button clicked'),
 };
 
