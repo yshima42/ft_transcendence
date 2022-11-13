@@ -35,7 +35,7 @@ export class AuthController {
 
   @Get('login/42/return')
   @UseGuards(FtOauthGuard)
-  @Redirect('http://localhost:5173/app/user-list')
+  @Redirect('http://localhost:5173/app/users')
   async ftOauthCallback(
     @GetIntraname() intraname: string,
     @Res({ passthrough: true }) res: Response

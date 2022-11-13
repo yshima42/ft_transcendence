@@ -10,7 +10,7 @@ import {
 import { UserTableData } from 'features/users/components/UserTableData';
 import { useAllUsers } from '../api/useAllUsers';
 
-export const UserList: FC = memo(() => {
+export const Users: FC = memo(() => {
   const { getUsers, users } = useAllUsers();
 
   useEffect(() => getUsers(), [getUsers]);
@@ -18,7 +18,7 @@ export const UserList: FC = memo(() => {
   return (
     <>
       <TableContainer>
-        <Table variant="striped" colorScheme="teal">
+        <Table variant="simple">
           <Thead>
             <Tr></Tr>
           </Thead>

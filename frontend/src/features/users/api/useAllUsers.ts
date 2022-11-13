@@ -16,7 +16,6 @@ export const useAllUsers = (): {
       .get<User[]>('http://localhost:3000/user/all', { withCredentials: true })
       .then((res) => setUsers(res.data))
       .catch(() => navigate('/', { replace: true }));
-    // .catch(() => alert('error'));
   }, [navigate]);
 
   return { getUsers, users };

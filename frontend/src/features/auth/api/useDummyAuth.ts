@@ -7,7 +7,7 @@ export const useDummyAuth = (): {
   loading: boolean;
 } => {
   const navigate = useNavigate();
-  const to = 'app/user-list';
+  const to = 'app/users';
 
   const [loading, setLoading] = useState(false);
 

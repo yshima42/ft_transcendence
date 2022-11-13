@@ -1,2 +1,2 @@
-export * from './routes/UserList';
+export * from './routes/Users';
 export * from './routes/Profile';

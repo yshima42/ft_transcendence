@@ -6,7 +6,7 @@ export const LoginPage: FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
-  const to = '/user-list';
+  const to = '/users';
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
