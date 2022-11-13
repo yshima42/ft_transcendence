@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+import { axios } from '../../../lib/axios';
 
 export const useDummyAuth = (): {
   dummyLogin: (dummyId: string) => void;
@@ -18,9 +19,7 @@ export const useDummyAuth = (): {
       const params = new URLSearchParams();
       params.append('name', `${dummyId}`);
       axios
-        .post('http://localhost:3000/auth/login/dummy', params, {
-          withCredentials: true,
-        })
+        .post('/auth/login/dummy', params)
         .then(() => {
           navigate(to, { replace: true });
         })

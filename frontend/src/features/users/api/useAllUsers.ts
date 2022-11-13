@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
-import axios from 'axios';
-
 import { User } from 'features/users/types/user';
 import { useNavigate } from 'react-router-dom';
+
+import { axios } from '../../../lib/axios';
 
 export const useAllUsers = (): {
   getUsers: () => void;
@@ -13,7 +13,7 @@ export const useAllUsers = (): {
 
   const getUsers = useCallback(() => {
     axios
-      .get<User[]>('http://localhost:3000/user/all', { withCredentials: true })
+      .get<User[]>('/user/all')
       .then((res) => setUsers(res.data))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
