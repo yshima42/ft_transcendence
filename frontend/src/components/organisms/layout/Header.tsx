@@ -17,7 +17,7 @@ export const Header: FC = memo(() => {
         bg="teal.400"
         color="gray.50"
         align="center"
-        justify="space-batween"
+        justify="space-between"
         padding={{ base: 3, md: 5 }}
       >
         <Flex
