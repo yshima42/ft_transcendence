@@ -6,8 +6,11 @@ import { Outlet } from 'react-router-dom';
 import { Page404 } from 'components/pages/Page404';
 import { MainLayout } from 'components/templates/MainLayout';
 import { Login } from 'features/auth/routes/Login';
-import { ChatRoomList } from 'features/chat/routes/ChatRoomList';
-import { GameSelect } from 'features/game/routes/GameSelect';
+import { Chats } from 'features/chat/routes/Chats';
+import { GameTop } from 'features/game/routes/GameTop';
+import { Games } from 'features/game/routes/Games';
+import { Matching } from 'features/game/routes/Matching';
+import { Starting } from 'features/game/routes/Starting';
 
 const App = () => {
   return (
@@ -29,8 +32,14 @@ export const publicRoutes = [
     element: <App />,
     children: [
       { path: 'users/*', element: <UsersRoutes /> },
-      { path: 'chatroom-list', element: <ChatRoomList /> },
-      { path: 'game-select', element: <GameSelect /> },
+      { path: 'chats', element: <Chats /> },
+      { path: 'games', element: <Games /> },
+      { path: '', element: <GameTop /> },
+      {
+        path: 'matching',
+        element: <Matching />,
+        children: [{ path: 'starting', element: <Starting /> }],
+      },
       // { path: 'game', element: <Game /> },
       // { path: 'direct-message', element: <DirectMessage /> },
       { path: 'profile', element: <Profile /> },
