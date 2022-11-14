@@ -22,8 +22,8 @@ export class AuthController {
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,
-    secure: true,
-    // secure: false,
+    // secure: true,
+    secure: false,
     sameSite: 'none',
     path: '/',
   };
