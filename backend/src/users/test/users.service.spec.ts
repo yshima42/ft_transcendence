@@ -8,6 +8,7 @@ const mockUser1 = {
   createdAt: new Date('2022-11-01T04:34:22+09:00'),
   updatedAt: new Date('2022-11-01T04:34:22+09:00'),
   name: 'dummy1',
+  avatarPath: null,
 };
 
 const mockUser2 = {
@@ -15,6 +16,7 @@ const mockUser2 = {
   createdAt: new Date('2022-11-01T04:34:22+09:00'),
   updatedAt: new Date('2022-11-01T04:34:22+09:00'),
   name: 'dummy2',
+  avatarPath: null,
 };
 
 const mockUser3 = {
@@ -22,6 +24,7 @@ const mockUser3 = {
   createdAt: new Date('2022-11-01T04:34:22+09:00'),
   updatedAt: new Date('2022-11-01T04:34:22+09:00'),
   name: 'dummy3',
+  avatarPath: null,
 };
 
 describe('UsersServiceTest', () => {
