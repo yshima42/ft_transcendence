@@ -15,4 +15,34 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   name String @unique
+  followedBy User[]  @relation("UserFollows")
+  following  User[]  @relation("UserFollows")
+  // me User? @relation("Friends", fields: [id], references: [id])
+  // friends User[] @relation("Friends")
 }
+
+// model User {
+//   id String @id @default(uuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   name String @unique
+//   relationsFirst Relationship[] @relation("first")
+//   relationsSecond Relationship[] @relation("second")
+// }
+
+// model Relationship {
+//   id String @id @default(uuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   userFirst User @relation("first",fields: [userFirstId], references: [id])
+//   userFirstId String
+//   userSecond User @relation("second", fields: [userSecondId], references: [id])
+//   userSecondId String
+//   type RelationshipType
+// }
+
+// enum RelationshipType {
+//   Friend
+//   UserFirstRequesting
+//   UserSecondRequesting
+// }
