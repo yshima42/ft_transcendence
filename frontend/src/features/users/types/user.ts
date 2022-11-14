@@ -3,4 +3,5 @@ export type User = {
   id: string;
   name: string;
   updatedAt: string;
+  imageUrl: 'https://source.unsplash.com/random';
 };
