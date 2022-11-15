@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { createReadStream } from 'fs';
+import {
+  BadRequestException,
+  Injectable,
+  StreamableFile,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateUserColums } from './interfaces/users.interface';
+import { UpdateUserColumns } from './interfaces/update-user-columns.interface';
 
 @Injectable()
 export class UsersService {
@@ -15,14 +20,25 @@ export class UsersService {
     return users;
   }
 
-  async update(id: string, colums: UpdateUserColums): Promise<User> {
-    console.log(colums);
-
+  async update(
+    user: User,
+    id: string,
+    columns: UpdateUserColumns
+  ): Promise<User> {
+    if (user.id !== id) {
+      throw new BadRequestException('他人の情報は更新できません');
+    }
     const updateUser = await this.prisma.user.update({
       where: { id },
-      data: colums,
+      data: columns,
     });
 
     return updateUser;
+  }
+
+  streamAvatar(path: string): StreamableFile {
+    const file = createReadStream(path);
+
+    return new StreamableFile(file);
   }
 }
