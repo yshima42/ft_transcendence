@@ -25,7 +25,7 @@ export const Header: FC = memo(() => {
           as="a"
           mr={8}
           _hover={{ cursor: 'pointer' }}
-          onClick={() => navigate('users', { replace: true })}
+          onClick={() => navigate('', { replace: true })}
         >
           <Heading as="h1" fontSize={{ base: 'md', md: 'lg' }}>
             TransPong
@@ -38,9 +38,14 @@ export const Header: FC = memo(() => {
           display={{ base: 'none', md: 'flex' }}
         >
           <Box pr={4}>
-            <Link to="game-select">ゲーム選択</Link>
+            <Link to="users">ユーザー一覧</Link>
           </Box>
-          <Link to="chatroom-list">チャットルーム</Link>
+          <Box pr={4}>
+            <Link to="games">ゲーム一覧</Link>
+          </Box>
+          <Box pr={4}>
+            <Link to="chats">チャットルーム</Link>
+          </Box>
         </Flex>
         <UserNavigation />
         <MenuIconButton onOpen={onOpen} />
