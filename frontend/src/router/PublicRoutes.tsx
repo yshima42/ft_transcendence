@@ -1,4 +1,4 @@
-import { Profile } from 'features/users/index';
+import { Stats } from 'features/users/index';
 import { UsersRoutes } from 'features/users/routes';
 import { Outlet } from 'react-router-dom';
 // import { DirectMessage } from 'components/pages/DirectMessage';
@@ -42,7 +42,7 @@ export const publicRoutes = [
       },
       // { path: 'game', element: <Game /> },
       // { path: 'direct-message', element: <DirectMessage /> },
-      { path: 'profile', element: <Profile /> },
+      { path: 'profile', element: <Stats /> },
       { path: '*', element: <Page404 /> },
     ],
   },

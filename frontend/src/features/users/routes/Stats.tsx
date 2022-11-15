@@ -21,7 +21,7 @@ import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
 // };
 
 // Database
-type UserData = {
+type UserStats = {
   id: string;
   imagePath: string;
   total: number;
@@ -30,7 +30,7 @@ type UserData = {
   ratio: number;
 };
 
-const mockUserData: UserData = {
+const mockUserData: UserStats = {
   id: 'dummy1',
   imagePath: '/random',
   total: 100,
@@ -67,7 +67,7 @@ const mockMatchHistory: MatchHistory[] = [
   },
 ];
 
-export const Profile: FC = memo(() => {
+export const Stats: FC = memo(() => {
   // const { userId } = useParams();
   const { id, imagePath } = mockUserData;
   const imageBaseUrl = 'https://source.unsplash.com';
@@ -86,7 +86,7 @@ export const Profile: FC = memo(() => {
       />
       <br />
 
-      <PrimaryTable<UserData>
+      <PrimaryTable<UserStats>
         data={[mockUserData]}
         columns={[
           {
