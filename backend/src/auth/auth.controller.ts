@@ -13,8 +13,9 @@ import {
 import { CookieOptions } from 'csurf';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
-import { GetIntraname } from './decorator/get-intraname.decorator';
+import { GetFtProfile } from './decorator/get-ft-profile.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
+import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -36,12 +37,14 @@ export class AuthController {
   @UseGuards(FtOauthGuard)
   @Redirect('http://localhost:5173/user-list')
   async ftOauthCallback(
-    @GetIntraname() intraname: string,
+    @GetFtProfile() ftProfile: FtProfile,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    console.log(intraname, ' login !');
+    console.log(ftProfile.intraName, ' login !');
 
-    const { accessToken } = await this.authService.login(intraname);
+    const name = ftProfile.intraName;
+    const signupUser = { name, avatarUrl: ftProfile.imageUrl };
+    const { accessToken } = await this.authService.login(name, signupUser);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     return { message: 'ok' };

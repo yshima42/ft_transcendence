@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { SignupUser } from './interfaces/signup-user.interface';
 
 @Injectable()
 export class AuthService {
@@ -11,19 +12,16 @@ export class AuthService {
     private readonly jwt: JwtService
   ) {}
 
-  async login(name: string): Promise<{ accessToken: string }> {
+  async login(
+    name: string,
+    signupUser?: SignupUser
+  ): Promise<{ accessToken: string }> {
     let user = await this.prisma.user.findUnique({ where: { name } });
     if (user === null) {
-      user = await this.prisma.user.create({ data: { name } });
-    }
-
-    return await this.generateJwt(user.id, user.name);
-  }
-
-  async dummyLogin(name: string): Promise<{ accessToken: string }> {
-    const user = await this.prisma.user.findUnique({ where: { name } });
-    if (user === null) {
-      throw new UnauthorizedException('Name incorrect');
+      if (signupUser === undefined) {
+        throw new UnauthorizedException('Name incorrect');
+      }
+      user = await this.prisma.user.create({ data: signupUser });
     }
 
     return await this.generateJwt(user.id, user.name);
