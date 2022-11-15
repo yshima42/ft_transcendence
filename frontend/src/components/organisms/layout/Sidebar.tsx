@@ -15,6 +15,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { MenuDrawer } from 'components/molecules/MenuDrawer';
+import { UserNavigation } from 'components/molecules/UserNavigation';
 import { NavItem } from './NavItem';
 import '../../../App.css';
 
@@ -89,6 +90,7 @@ export const Sidebar: FC = memo(() => {
               ml={4}
               display={navSize === 'small' ? 'none' : 'flex'}
             ></Flex>
+            <UserNavigation />
           </Flex>
         </Flex>
       </Flex>

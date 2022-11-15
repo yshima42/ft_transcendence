@@ -38,7 +38,7 @@ export const UsersList: FC = memo(() => {
             return (
               <Link to={`../dm/${name}`}>
                 {' '}
-                <Button>メッセージ</Button>
+                <Button>Message</Button>
               </Link>
             );
           },

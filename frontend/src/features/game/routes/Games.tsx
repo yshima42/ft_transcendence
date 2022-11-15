@@ -4,7 +4,7 @@ import { GamesList } from '../components/GamesList';
 
 export const Games: FC = memo(() => {
   return (
-    <ContentLayout title="ゲーム一覧">
+    <ContentLayout title="Games">
       <GamesList />
     </ContentLayout>
   );

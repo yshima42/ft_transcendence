@@ -7,21 +7,21 @@ import { ContentLayout } from 'components/templates/ContentLayout';
 export const Users: FC = memo(() => {
   return (
     <>
-      <ContentLayout title="ユーザー一覧">
+      <ContentLayout title="Users">
         <Center>
           <Flex>
             <Link to="">
-              <Button size="sm">フレンド</Button>
+              <Button size="sm">Friends</Button>
             </Link>
           </Flex>
           <Flex>
             <Link to="all">
-              <Button size="sm">ユーザー</Button>
+              <Button size="sm">Users</Button>
             </Link>
           </Flex>
           <Flex>
             <Link to="block">
-              <Button size="sm">ブロック</Button>
+              <Button size="sm">Block</Button>
             </Link>
           </Flex>
         </Center>
