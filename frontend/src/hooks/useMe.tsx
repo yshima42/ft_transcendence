@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User } from 'features/users/types/user';
+import { User } from '@prisma/client';
 import { useNavigate } from 'react-router-dom';
 
 import { axios } from '../lib/axios';
