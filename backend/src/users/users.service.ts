@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Relationship, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -15,11 +15,14 @@ export class UsersService {
   }
 
   // targetUser起点のisFriendsをupdateする必要がある。微妙な気がする。
-  // 自分との関係作れてそう
+  // そもそも長すぎる
   async createRelationship(
     userId: string,
     targetUserId: string
   ): Promise<Relationship> {
+    if (userId === targetUserId) {
+      throw new BadRequestException("can't create relation with myself");
+    }
     const isFollowdBy = await this.prisma.relationship.findUnique({
       where: {
         userId_targetUserId: {
