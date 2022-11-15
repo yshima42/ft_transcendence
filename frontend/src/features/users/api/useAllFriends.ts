@@ -14,7 +14,7 @@ export const useAllFriends = (): {
   const getFriends = useCallback(() => {
     // ここをfriend取得のAPIに変える
     axios
-      .get<User[]>('/user/all')
+      .get<User[]>('/users/all')
       .then((res) => setFriends(res.data))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);

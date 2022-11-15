@@ -9,7 +9,7 @@ export const useMe = (): string => {
   const navigate = useNavigate();
 
   axios
-    .get<User>('/user/me')
+    .get<User>('/users/me')
     .then((res) => {
       setMe(res.data.name);
     })

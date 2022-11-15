@@ -13,7 +13,7 @@ export const useAllUsers = (): {
 
   const getUsers = useCallback(() => {
     axios
-      .get<User[]>('/user/all')
+      .get<User[]>('/users/all')
       .then((res) => setUsers(res.data))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);

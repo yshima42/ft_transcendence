@@ -14,7 +14,7 @@ export const useAllBlock = (): {
   const getBlock = useCallback(() => {
     // ここをfriend取得のAPIに変える
     axios
-      .get<User[]>('/user/all')
+      .get<User[]>('/users/all')
       .then((res) => setBlock(res.data))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
