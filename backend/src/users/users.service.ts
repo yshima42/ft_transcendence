@@ -47,13 +47,19 @@ export class UsersService {
       });
     }
 
-    return await this.prisma.relationship.create({
-      data: {
-        userId,
-        targetUserId,
-        isFriends,
-      },
-    });
+    try {
+      return await this.prisma.relationship.create({
+        data: {
+          userId,
+          targetUserId,
+          isFriends,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException(
+        'relation already exists. or something wrong'
+      );
+    }
   }
 
   // 関数名がしっくりこない
