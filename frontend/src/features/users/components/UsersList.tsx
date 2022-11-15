@@ -36,19 +36,10 @@ export const UsersList: FC = memo(() => {
           title: '',
           Cell({ entry: { name } }) {
             return (
-              <Button>
-                <Link to={`../game/${name}`}>対戦</Link>
-              </Button>
-            );
-          },
-        },
-        {
-          title: '',
-          Cell({ entry: { name } }) {
-            return (
-              <Button>
-                <Link to={`../dm/${name}`}>メッセージ</Link>
-              </Button>
+              <Link to={`../dm/${name}`}>
+                {' '}
+                <Button>メッセージ</Button>
+              </Link>
             );
           },
         },
