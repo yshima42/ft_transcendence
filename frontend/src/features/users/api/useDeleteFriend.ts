@@ -6,7 +6,7 @@ export const useDeleteFriend = (): { deleteFriend: (id: string) => void } => {
     alert(`${id}を削除！`);
     // ここにidを使ってフレンド削除するapiを入れる
     // axios
-    //   .delete<User[]>('/user/all')
+    //   .delete<User[]>('/users/all')
     //   .then((res) => setUsers(res.data))
     //   .catch(() => navigate('/', { replace: true }));
   }, []);
