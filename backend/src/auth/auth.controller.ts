@@ -6,12 +6,11 @@ import {
   HttpStatus,
   Post,
   UseGuards,
-  Req,
   Res,
   Redirect,
 } from '@nestjs/common';
 import { CookieOptions } from 'csurf';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
@@ -40,12 +39,13 @@ export class AuthController {
     @GetFtProfile() ftProfile: FtProfile,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    console.log(ftProfile.intraName, ' login !');
-
     const name = ftProfile.intraName;
     const signupUser = { name, avatarUrl: ftProfile.imageUrl };
     const { accessToken } = await this.authService.login(name, signupUser);
     res.cookie('access_token', accessToken, this.cookieOptions);
+
+    console.log(ftProfile.intraName, ' login !');
+    console.log(accessToken);
 
     return { message: 'ok' };
   }
@@ -64,10 +64,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/logout')
-  logout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
-  ): { message: string } {
+  logout(@Res({ passthrough: true }) res: Response): { message: string } {
     res.cookie('access_token', '', this.cookieOptions);
 
     return { message: 'ok' };
