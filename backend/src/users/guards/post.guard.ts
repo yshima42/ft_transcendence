@@ -10,6 +10,6 @@ export class PostGuard implements CanActivate {
     const urlUserId = req.params.id;
     const cookieUserId = req.user.user.id;
 
-    return req.method === 'POST' && urlUserId === cookieUserId;
+    return req.method !== 'POST' || urlUserId === cookieUserId;
   }
 }
