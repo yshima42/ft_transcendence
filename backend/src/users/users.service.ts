@@ -14,8 +14,7 @@ export class UsersService {
     return users;
   }
 
-  // あとでリファクタ
-  // 登録済みのものをもう一度createしようとすると例外投げている
+  // targetUser起点のisFriendsをupdateする必要がある。微妙な気がする。
   // 自分との関係作れてそう
   async createRelationship(
     userId: string,
@@ -54,51 +53,37 @@ export class UsersService {
     });
   }
 
-  async findFollowing(userId: string): Promise<User[]> {
-    const users = await this.prisma.relationship.findMany({
+  // 関数名がしっくりこない
+  async findFollowingUsers(userId: string): Promise<User[]> {
+    const followingRelations = await this.prisma.relationship.findMany({
       where: { userId, isFriends: false },
       select: {
         targetUser: true,
       },
     });
 
-    const following: User[] = [];
-    for (const user of users) {
-      following.push(user.targetUser);
-    }
-
-    return following;
+    return followingRelations.map((relation) => relation.targetUser);
   }
 
-  async findFollowedBy(userId: string): Promise<User[]> {
-    const users = await this.prisma.relationship.findMany({
+  async findPendingUsers(userId: string): Promise<User[]> {
+    const pendingRelations = await this.prisma.relationship.findMany({
       where: { targetUserId: userId, isFriends: false },
       select: {
         user: true,
       },
     });
 
-    const followedBy: User[] = [];
-    for (const user of users) {
-      followedBy.push(user.user);
-    }
-
-    return followedBy;
+    return pendingRelations.map((relation) => relation.user);
   }
 
   async findFriends(userId: string): Promise<User[]> {
-    const users = await this.prisma.relationship.findMany({
+    const friendRelations = await this.prisma.relationship.findMany({
       where: { userId, isFriends: true },
       select: {
         targetUser: true,
       },
     });
 
-    const friends: User[] = [];
-    for (const user of users) {
-      friends.push(user.targetUser);
-    }
-
-    return friends;
+    return friendRelations.map((relation) => relation.targetUser);
   }
 }
