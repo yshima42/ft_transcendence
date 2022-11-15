@@ -1,9 +1,9 @@
 import { FC, memo, useEffect } from 'react';
 import { Image, Button } from '@chakra-ui/react';
+import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
 import { useAllBlock } from '../api/useAllBlock';
-import { User } from '../types/user';
 
 export const BlockList: FC = memo(() => {
   const { getBlock, block } = useAllBlock();
@@ -19,6 +19,7 @@ export const BlockList: FC = memo(() => {
           Cell({ entry: { name } }) {
             return (
               <Image
+                borderRadius="full"
                 boxSize="48px"
                 src="https://source.unsplash.com/random"
                 alt={name}

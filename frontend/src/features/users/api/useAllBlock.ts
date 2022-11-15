@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
+import { User } from '@prisma/client';
 import { useNavigate } from 'react-router-dom';
 
 import { axios } from '../../../lib/axios';
-import { User } from '../types/user';
 
 export const useAllBlock = (): {
   getBlock: () => void;
