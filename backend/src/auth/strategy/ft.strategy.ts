@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-42';
+import { FtProfile } from '../interfaces/ft-profile.interface';
 
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy, '42') {
@@ -17,9 +18,11 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     accessToken: string,
     refreshToken: string,
     profile: Profile
-  ): { intraname: string } {
-    const intraname: string = profile.username;
+  ): { ftProfile: FtProfile } {
+    const intraName = profile.username;
+    const imageUrl = profile.photos[0].value;
+    const ftProfile = { intraName, imageUrl };
 
-    return { intraname };
+    return { ftProfile };
   }
 }
