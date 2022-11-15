@@ -15,7 +15,7 @@ export const UsersList: FC = memo(() => {
       data={users}
       columns={[
         {
-          title: 'image',
+          title: '',
           Cell({ entry: { name } }) {
             return (
               <Image
@@ -27,13 +27,13 @@ export const UsersList: FC = memo(() => {
           },
         },
         {
-          title: 'name',
+          title: '',
           Cell({ entry: { name } }) {
             return <Link to={`./${name}`}>{name}</Link>;
           },
         },
         {
-          title: 'game',
+          title: '',
           Cell({ entry: { name } }) {
             return (
               <Button>
@@ -43,14 +43,19 @@ export const UsersList: FC = memo(() => {
           },
         },
         {
-          title: 'Chat',
+          title: '',
           Cell({ entry: { name } }) {
             return (
               <Button>
-                {' '}
                 <Link to={`../dm/${name}`}>メッセージ</Link>
               </Button>
             );
+          },
+        },
+        {
+          title: '',
+          Cell({ entry: { name } }) {
+            return <Button about={name}>友達追加</Button>;
           },
         },
       ]}
