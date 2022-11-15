@@ -1,9 +1,6 @@
-import { createReadStream } from 'fs';
-import {
-  BadRequestException,
-  Injectable,
-  StreamableFile,
-} from '@nestjs/common';
+import { createReadStream, existsSync, unlinkSync } from 'fs';
+import { extname } from 'path';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserColumns } from './interfaces/update-user-columns.interface';
@@ -20,14 +17,7 @@ export class UsersService {
     return users;
   }
 
-  async update(
-    user: User,
-    id: string,
-    columns: UpdateUserColumns
-  ): Promise<User> {
-    if (user.id !== id) {
-      throw new BadRequestException('他人の情報は更新できません');
-    }
+  async update(id: string, columns: UpdateUserColumns): Promise<User> {
     const updateUser = await this.prisma.user.update({
       where: { id },
       data: columns,
@@ -40,5 +30,15 @@ export class UsersService {
     const file = createReadStream(path);
 
     return new StreamableFile(file);
+  }
+
+  deleteOldFile(newFilename: string, user: User): void {
+    const oldExtname = extname(user.avatarUrl);
+    if (oldExtname !== extname(newFilename)) {
+      const oldFilePath = `./upload/${user.id}/${user.name}${oldExtname}`;
+      if (existsSync(oldFilePath)) {
+        unlinkSync(oldFilePath);
+      }
+    }
   }
 }

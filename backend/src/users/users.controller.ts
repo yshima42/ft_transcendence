@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, unlinkSync } from 'fs';
+import { existsSync, mkdirSync } from 'fs';
 import { extname } from 'path';
 import {
   Controller,
@@ -21,6 +21,7 @@ import { Request } from 'express';
 import { diskStorage } from 'multer';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PostGuard } from './guards/post.guard';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -63,23 +64,19 @@ export class UsersController {
     });
 
   @Post(':id/avatar')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PostGuard)
   @UseInterceptors(FileInterceptor('file', UsersController.multerOptions()))
   async uploadFile(
     @GetUser() user: User,
-    @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile(UsersController.parseFilePipe()) file: Express.Multer.File
   ): Promise<User> {
-    const oldExtname = extname(user.avatarUrl);
-    if (oldExtname !== extname(file.filename)) {
-      unlinkSync(`./upload/${id}/${user.name}${oldExtname}`);
-    }
+    this.usersService.deleteOldFile(file.filename, user);
 
     const updateColums = {
-      avatarUrl: `http://localhost:3000/users/${id}/avatar/${file.filename}`,
+      avatarUrl: `http://localhost:3000/users/${user.id}/avatar/${file.filename}`,
     };
 
-    return await this.usersService.update(user, id, updateColums);
+    return await this.usersService.update(user.id, updateColums);
   }
 
   @Get(':id/avatar/:filename')
