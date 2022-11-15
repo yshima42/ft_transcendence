@@ -38,13 +38,13 @@ export const Header: FC = memo(() => {
           display={{ base: 'none', md: 'flex' }}
         >
           <Box pr={4}>
-            <Link to="users">ユーザー一覧</Link>
+            <Link to="users">Users</Link>
           </Box>
           <Box pr={4}>
-            <Link to="games">ゲーム一覧</Link>
+            <Link to="games">Games</Link>
           </Box>
           <Box pr={4}>
-            <Link to="chats">チャットルーム</Link>
+            <Link to="chats">Chat-Rooms</Link>
           </Box>
         </Flex>
         <UserNavigation />

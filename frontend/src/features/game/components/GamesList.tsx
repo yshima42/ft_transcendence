@@ -43,7 +43,7 @@ export const GamesList: FC = memo(() => {
           Cell({ entry: { id } }) {
             return (
               <Link to={`${id}`}>
-                <Button>watch</Button>
+                <Button>観戦</Button>
               </Link>
             );
           },
