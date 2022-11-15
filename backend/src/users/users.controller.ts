@@ -72,11 +72,11 @@ export class UsersController {
   ): Promise<User> {
     this.usersService.deleteOldFile(file.filename, user);
 
-    const updateColums = {
+    const updateColumns = {
       avatarUrl: `http://localhost:3000/users/${user.id}/avatar/${file.filename}`,
     };
 
-    return await this.usersService.update(user.id, updateColums);
+    return await this.usersService.update(user.id, updateColumns);
   }
 
   @Get(':id/avatar/:filename')
