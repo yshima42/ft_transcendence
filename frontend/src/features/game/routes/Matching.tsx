@@ -20,19 +20,29 @@ export const Matching: FC = memo(() => {
     <>
       <Flex align="center" justify="center" height="40vh">
         <Box bg="white" w="sm" p={4} borderRadius="md" shadow="md">
-          <Heading as="h1" size="lg" textAlign="center">
-            マッチング中
-          </Heading>
+          {matched ? (
+            <Heading as="h1" size="lg" textAlign="center">
+              対戦準備中
+            </Heading>
+          ) : (
+            <Heading as="h1" size="lg" textAlign="center">
+              マッチング中
+            </Heading>
+          )}
           <Divider />
           <Stack spacing={4} py={4} px={10} align="center">
             {matched ? <Box>3秒で始まります</Box> : <Spinner />}
-            <PrimaryButton
-              onClick={onClickMatch}
-              loading={matched}
-              disabled={matched}
-            >
-              マッチングしたと仮定する
-            </PrimaryButton>
+            {matched ? (
+              <></>
+            ) : (
+              <PrimaryButton
+                onClick={onClickMatch}
+                loading={matched}
+                disabled={matched}
+              >
+                マッチングしたと仮定する
+              </PrimaryButton>
+            )}
             <PrimaryButton onClick={onClickCancel} disabled={matched}>
               キャンセル
             </PrimaryButton>
