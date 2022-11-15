@@ -1,4 +1,4 @@
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, Relationship, User } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const date = new Date('2022-11-01T04:34:22+09:00');
@@ -36,6 +36,53 @@ const userData: User[] = [
   },
 ];
 
+const relationshipData: Relationship[] = [
+  // friend
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[0].id,
+    targetUserId: userData[1].id,
+    isFriends: true,
+  },
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[1].id,
+    targetUserId: userData[0].id,
+    isFriends: true,
+  },
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[0].id,
+    targetUserId: userData[2].id,
+    isFriends: true,
+  },
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[2].id,
+    targetUserId: userData[0].id,
+    isFriends: true,
+  },
+  // not friend
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[0].id,
+    targetUserId: userData[3].id,
+    isFriends: false,
+  },
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[4].id,
+    targetUserId: userData[0].id,
+    isFriends: false,
+  },
+];
+
 const createUsers = async () => {
   const users = [];
   for (const u of userData) {
@@ -48,33 +95,23 @@ const createUsers = async () => {
   return await prisma.$transaction(users);
 };
 
-// const updateUsers = async () => {
-//   const firstIndex = 0;
-//   const lastIndex = userData.length - 1;
-//   for (let i = 1; i < lastIndex; i++) {
-//     await prisma.user.update({
-//       where: { id: userData[i].id },
-//       data: {
-//         updatedAt: new Date(),
-//         following: {
-//           connect: [
-//             { id: userData[i - 1].id },
-//             { id: userData[firstIndex].id },
-//           ],
-//         },
-//         followedBy: {
-//           connect: [{ id: userData[i - 1].id }, { id: userData[lastIndex].id }],
-//         },
-//       },
-//     });
-//   }
-// };
+const createRelationships = async () => {
+  const relations = [];
+  for (const r of relationshipData) {
+    const relation = prisma.relationship.create({
+      data: r,
+    });
+    relations.push(relation);
+  }
+
+  return await prisma.$transaction(relations);
+};
 
 const main = async () => {
   console.log(`Start seeding ...`);
 
   await createUsers();
-  // await updateUsers();
+  await createRelationships();
 
   console.log(`Seeding finished.`);
 };
