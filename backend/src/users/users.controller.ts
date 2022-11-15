@@ -22,7 +22,7 @@ export class UsersController {
 
   @Post(':id/friends')
   @UseGuards(JwtAuthGuard)
-  async sendFriendRequest(
+  async createRelationship(
     @Param('id') id: string,
     @GetUser() user: User
   ): Promise<Relationship> {
@@ -31,14 +31,14 @@ export class UsersController {
 
   @Get(':id/following')
   @UseGuards(JwtAuthGuard)
-  async findFollowing(@Param('id') id: string): Promise<User[]> {
-    return await this.usersService.findFollowing(id);
+  async findFollowingUsers(@Param('id') id: string): Promise<User[]> {
+    return await this.usersService.findFollowingUsers(id);
   }
 
   @Get(':id/followedBy')
   @UseGuards(JwtAuthGuard)
-  async findFollowedBy(@Param('id') id: string): Promise<User[]> {
-    return await this.usersService.findFollowedBy(id);
+  async findPendingUsers(@Param('id') id: string): Promise<User[]> {
+    return await this.usersService.findPendingUsers(id);
   }
 
   @Get(':id/friends')
