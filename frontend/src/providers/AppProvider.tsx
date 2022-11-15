@@ -11,12 +11,10 @@ export const AppProvider: FC<Props> = memo((props) => {
   const { children } = props;
 
   return (
-    <div className="App">
-      <ChakraProvider theme={theme}>
-        <AuthProvider>
-          <BrowserRouter>{children}</BrowserRouter>
-        </AuthProvider>
-      </ChakraProvider>
-    </div>
+    <ChakraProvider theme={theme}>
+      <AuthProvider>
+        <BrowserRouter>{children}</BrowserRouter>
+      </AuthProvider>
+    </ChakraProvider>
   );
 });
