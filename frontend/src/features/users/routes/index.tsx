@@ -6,7 +6,7 @@ export const UsersRoutes = (): React.ReactElement => {
   return (
     <Routes>
       <Route path="" element={<Users />} />
-      <Route path="me" element={<Profile />} />
+      <Route path=":userId" element={<Profile />} />
     </Routes>
   );
 };
