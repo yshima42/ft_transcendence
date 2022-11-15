@@ -1,6 +1,7 @@
 import { FC, memo } from 'react';
-// import { Outlet } from 'react-router-dom';
+// import { Flex } from '@chakra-ui/react';
 import { Header } from 'components/organisms/layout/Header';
+// import { Sidebar } from 'components/organisms/layout/Sidebar';
 
 type Props = {
   children: React.ReactNode;
