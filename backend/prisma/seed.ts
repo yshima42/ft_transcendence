@@ -48,33 +48,33 @@ const createUsers = async () => {
   return await prisma.$transaction(users);
 };
 
-const updateUsers = async () => {
-  const firstIndex = 0;
-  const lastIndex = userData.length - 1;
-  for (let i = 1; i < lastIndex; i++) {
-    await prisma.user.update({
-      where: { id: userData[i].id },
-      data: {
-        updatedAt: new Date(),
-        following: {
-          connect: [
-            { id: userData[i - 1].id },
-            { id: userData[firstIndex].id },
-          ],
-        },
-        followedBy: {
-          connect: [{ id: userData[i - 1].id }, { id: userData[lastIndex].id }],
-        },
-      },
-    });
-  }
-};
+// const updateUsers = async () => {
+//   const firstIndex = 0;
+//   const lastIndex = userData.length - 1;
+//   for (let i = 1; i < lastIndex; i++) {
+//     await prisma.user.update({
+//       where: { id: userData[i].id },
+//       data: {
+//         updatedAt: new Date(),
+//         following: {
+//           connect: [
+//             { id: userData[i - 1].id },
+//             { id: userData[firstIndex].id },
+//           ],
+//         },
+//         followedBy: {
+//           connect: [{ id: userData[i - 1].id }, { id: userData[lastIndex].id }],
+//         },
+//       },
+//     });
+//   }
+// };
 
 const main = async () => {
   console.log(`Start seeding ...`);
 
   await createUsers();
-  await updateUsers();
+  // await updateUsers();
 
   console.log(`Seeding finished.`);
 };

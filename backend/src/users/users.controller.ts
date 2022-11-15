@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Relationship, User } from '@prisma/client';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UsersService } from './users.service';
@@ -25,8 +25,8 @@ export class UsersController {
   async sendFriendRequest(
     @Param('id') id: string,
     @GetUser() user: User
-  ): Promise<User> {
-    return await this.usersService.sendFriendRequest(id, user);
+  ): Promise<Relationship> {
+    return await this.usersService.createRelationship(user.id, id);
   }
 
   @Get(':id/following')
@@ -46,27 +46,4 @@ export class UsersController {
   async findFriends(@Param('id') id: string): Promise<User[]> {
     return await this.usersService.findFriends(id);
   }
-
-  // @Post(':id/friends')
-  // @UseGuards(JwtAuthGuard)
-  // sendFriendRequest(@Param('id') id: string, @GetUser() user: User): string {
-  //   console.log(id);
-  //   console.log(user);
-
-  //   return `${user.name} follows ${id}`;
-  // }
-
-  // @Get(':id')
-  // @UseGuards(JwtAuthGuard)
-  // displayId(@Param('id') id: string): string {
-  //   return this.usersService.displayId(id);
-  // }
-
-  // @Get('follow/:id')
-  // @UseGuards(JwtAuthGuard)
-  // displayFollowId(@Param('id') id: string): string {
-  //   console.log(`follow ${id}`);
-
-  //   return `followed`;
-  // }
 }

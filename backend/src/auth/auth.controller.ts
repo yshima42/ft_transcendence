@@ -35,8 +35,8 @@ export class AuthController {
     const jwt = await this.authService.login(intraname);
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
-      secure: true,
-      // secure: false,
+      // secure: true,
+      secure: false,
       sameSite: 'none',
       path: '/',
     });
@@ -55,8 +55,8 @@ export class AuthController {
     const jwt = await this.authService.login(body.name);
     res.cookie('access_token', jwt.accessToken, {
       httpOnly: true,
-      secure: true,
-      // secure: false,
+      // secure: true,
+      secure: false,
       sameSite: 'none',
       path: '/',
     });
