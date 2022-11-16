@@ -6,14 +6,14 @@ CREATE TABLE "Relationship" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
-    "targetUserId" TEXT NOT NULL,
+    "peerId" TEXT NOT NULL,
     "type" "RelationshipType" NOT NULL,
 
-    CONSTRAINT "Relationship_pkey" PRIMARY KEY ("userId","targetUserId")
+    CONSTRAINT "Relationship_pkey" PRIMARY KEY ("userId","peerId")
 );
 
 -- AddForeignKey
 ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_targetUserId_fkey" FOREIGN KEY ("targetUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Relationship" ADD CONSTRAINT "Relationship_peerId_fkey" FOREIGN KEY ("peerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

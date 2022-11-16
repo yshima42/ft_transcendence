@@ -24,8 +24,6 @@ export class UsersService {
     return updateUser;
   }
 
-  // peer起点のisFriendsをupdateする必要がある。微妙な気がする。
-  // そもそも長すぎる
   async request(userId: string, peerId: string): Promise<Relationship> {
     const relation1 = await this.prisma.relationship.create({
       data: {
@@ -76,18 +74,16 @@ export class UsersService {
     if (userId === peerId) {
       throw new BadRequestException("can't create relation with myself");
     }
-    const user = await this.prisma.relationship.findFirst({
+    const relation = await this.prisma.relationship.findUnique({
       where: {
-        userId,
-        peerId,
-      },
-      select: {
-        type: true,
+        userId_peerId: {
+          userId,
+          peerId,
+        },
       },
     });
-    const relationType = user?.type;
 
-    switch (relationType) {
+    switch (relation?.type) {
       case undefined:
         return await this.request(userId, peerId);
       case 'FRIEND':
@@ -126,18 +122,16 @@ export class UsersService {
     if (userId === peerId) {
       throw new BadRequestException("can't create relation with myself");
     }
-    const user = await this.prisma.relationship.findFirst({
+    const relation = await this.prisma.relationship.findUnique({
       where: {
-        userId,
-        peerId,
-      },
-      select: {
-        type: true,
+        userId_peerId: {
+          userId,
+          peerId,
+        },
       },
     });
-    const relationType = user?.type;
 
-    switch (relationType) {
+    switch (relation?.type) {
       case undefined:
         throw new BadRequestException(
           'You are not friend with target and do not send to friend-request'
@@ -153,7 +147,6 @@ export class UsersService {
     }
   }
 
-  // 関数名がしっくりこない
   async findRequesting(userId: string): Promise<User[]> {
     const followingRelations = await this.prisma.relationship.findMany({
       where: { userId, type: 'OUTGOING' },
