@@ -101,6 +101,58 @@ export class UsersService {
     }
   }
 
+  async deleteRelation(userId: string, peerId: string): Promise<Relationship> {
+    const deleteRelation1 = await this.prisma.relationship.delete({
+      where: {
+        userId_peerId: {
+          userId,
+          peerId,
+        },
+      },
+    });
+    const _deleteRelation2 = await this.prisma.relationship.delete({
+      where: {
+        userId_peerId: {
+          userId: peerId,
+          peerId: userId,
+        },
+      },
+    });
+
+    return deleteRelation1;
+  }
+
+  async deleteFriend(userId: string, peerId: string): Promise<Relationship> {
+    if (userId === peerId) {
+      throw new BadRequestException("can't create relation with myself");
+    }
+    const user = await this.prisma.relationship.findFirst({
+      where: {
+        userId,
+        peerId,
+      },
+      select: {
+        type: true,
+      },
+    });
+    const relationType = user?.type;
+
+    switch (relationType) {
+      case undefined:
+        throw new BadRequestException(
+          'You are not friend with target and do not send to friend-request'
+        );
+      case 'FRIEND':
+        return await this.deleteRelation(userId, peerId);
+      case 'INCOMING':
+        return await this.deleteRelation(userId, peerId);
+      case 'OUTGOING':
+        return await this.deleteRelation(userId, peerId);
+      default:
+        throw new BadRequestException('Unexpected error in deleteFriend');
+    }
+  }
+
   // 関数名がしっくりこない
   async findRequesting(userId: string): Promise<User[]> {
     const followingRelations = await this.prisma.relationship.findMany({
