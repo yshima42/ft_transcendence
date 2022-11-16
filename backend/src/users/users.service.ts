@@ -1,6 +1,4 @@
-import { createReadStream, existsSync, unlinkSync } from 'fs';
-import { extname } from 'path';
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserColumns } from './interfaces/update-user-columns.interface';
@@ -24,21 +22,5 @@ export class UsersService {
     });
 
     return updateUser;
-  }
-
-  streamAvatar(path: string): StreamableFile {
-    const file = createReadStream(path);
-
-    return new StreamableFile(file);
-  }
-
-  deleteOldFile(newFilename: string, user: User): void {
-    const oldExtname = extname(user.avatarUrl);
-    if (oldExtname !== extname(newFilename)) {
-      const oldFilePath = `./upload/${user.id}/${user.name}${oldExtname}`;
-      if (existsSync(oldFilePath)) {
-        unlinkSync(oldFilePath);
-      }
-    }
   }
 }
