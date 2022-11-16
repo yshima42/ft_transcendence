@@ -57,20 +57,6 @@ const relationshipData: Relationship[] = [
     targetUserId: userData[0].id,
     isFriends: true,
   },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[0].id,
-    targetUserId: userData[2].id,
-    isFriends: true,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[2].id,
-    targetUserId: userData[0].id,
-    isFriends: true,
-  },
   // not friend
   {
     createdAt: new Date(date),

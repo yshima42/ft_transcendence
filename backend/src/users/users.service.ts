@@ -26,11 +26,60 @@ export class UsersService {
 
   // targetUser起点のisFriendsをupdateする必要がある。微妙な気がする。
   // そもそも長すぎる
+  async request(userId: string, targetUserId: string): Promise<Relationship> {
+    const relation1 = await this.prisma.relationship.create({
+      data: {
+        userId,
+        targetUserId,
+        isFriends: false,
+      },
+    });
+    const _relation2 = await this.prisma.relationship.create({
+      data: {
+        userId: targetUserId,
+        targetUserId: userId,
+        isFriends: false,
+      },
+    });
+
+    return relation1;
+  }
+
+  async acceptRequest(
+    userId: string,
+    targetUserId: string
+  ): Promise<Relationship> {
+    const relation1 = await this.prisma.relationship.update({
+      where: {
+        userId_targetUserId: {
+          userId,
+          targetUserId,
+        },
+      },
+      data: {
+        isFriends: true,
+      },
+    });
+    const _relation2 = await this.prisma.relationship.update({
+      where: {
+        userId_targetUserId: {
+          userId: targetUserId,
+          targetUserId: userId,
+        },
+      },
+      data: {
+        isFriends: true,
+      },
+    });
+
+    return relation1;
+  }
+
   async addFriend(userId: string, targetUserId: string): Promise<Relationship> {
     if (userId === targetUserId) {
       throw new BadRequestException("can't create relation with myself");
     }
-    const isFollowdBy = await this.prisma.relationship.findUnique({
+    const targetUser = await this.prisma.relationship.findUnique({
       where: {
         userId_targetUserId: {
           userId: targetUserId,
@@ -39,33 +88,10 @@ export class UsersService {
       },
     });
 
-    const isFriends = isFollowdBy != null;
-    if (isFriends) {
-      await this.prisma.relationship.update({
-        where: {
-          userId_targetUserId: {
-            userId: targetUserId,
-            targetUserId: userId,
-          },
-        },
-        data: {
-          isFriends: true,
-        },
-      });
-    }
-
-    try {
-      return await this.prisma.relationship.create({
-        data: {
-          userId,
-          targetUserId,
-          isFriends,
-        },
-      });
-    } catch (error) {
-      throw new BadRequestException(
-        'relation already exists. or something wrong'
-      );
+    if (targetUser == null) {
+      return await this.request(userId, targetUserId);
+    } else {
+      return await this.acceptRequest(userId, targetUserId);
     }
   }
 
