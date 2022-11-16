@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
+import { User } from '@prisma/client';
 import { useNavigate } from 'react-router-dom';
 
 import { axios } from '../../../lib/axios';
-import { User } from '../types/user';
 
 export const useAllBlock = (): {
   getBlock: () => void;
@@ -14,7 +14,7 @@ export const useAllBlock = (): {
   const getBlock = useCallback(() => {
     // ここをfriend取得のAPIに変える
     axios
-      .get<User[]>('/user/all')
+      .get<User[]>('/users/all')
       .then((res) => setBlock(res.data))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);

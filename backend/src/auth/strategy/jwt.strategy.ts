@@ -12,21 +12,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly prisma: PrismaService
   ) {
     super({
-      // code for cookie
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: { cookies: { access_token: string } }) => {
-          let jwt = '';
-          if (req?.cookies != null) {
-            jwt = req.cookies.access_token;
-          }
-          // if (req && req.cookies) {
-          //   jwt = req.cookies.access_token;
-          // }
+        (req: { cookies?: { access_token?: string } }) => {
+          const jwt = req?.cookies?.access_token ?? '';
 
           return jwt;
         },
       ]),
-      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: config.get('JWT_SECRET') as string,
     });

@@ -1,6 +1,7 @@
 import { memo, FC } from 'react';
 import { Image } from '@chakra-ui/react';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
+import { ContentLayout } from 'components/templates/ContentLayout';
 // import { useMe } from 'hooks/useMe';
 // import { useParams } from 'react-router-dom';
 
@@ -73,7 +74,7 @@ export const Stats: FC = memo(() => {
   const imageBaseUrl = 'https://source.unsplash.com';
 
   return (
-    <>
+    <ContentLayout>
       <p>{`${id}`}</p>
       <br />
 
@@ -145,6 +146,6 @@ export const Stats: FC = memo(() => {
           },
         ]}
       />
-    </>
+    </ContentLayout>
   );
 });
