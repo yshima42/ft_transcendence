@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -38,23 +39,23 @@ export class UsersController {
 
   @Post(':id/friends')
   @UseGuards(JwtAuthGuard)
-  async createRelationship(
+  async addFriend(
     @Param('id') id: string,
-    @GetUser() user: User
+    @Body('targetId') targetId: string
   ): Promise<Relationship> {
-    return await this.usersService.createRelationship(user.id, id);
+    return await this.usersService.addFriend(id, targetId);
   }
 
-  @Get(':id/following')
+  @Get(':id/requesting')
   @UseGuards(JwtAuthGuard)
-  async findFollowingUsers(@Param('id') id: string): Promise<User[]> {
-    return await this.usersService.findFollowingUsers(id);
+  async findRequesting(@Param('id') id: string): Promise<User[]> {
+    return await this.usersService.findRequesting(id);
   }
 
-  @Get(':id/followedBy')
+  @Get(':id/pending')
   @UseGuards(JwtAuthGuard)
-  async findPendingUsers(@Param('id') id: string): Promise<User[]> {
-    return await this.usersService.findPendingUsers(id);
+  async findPending(@Param('id') id: string): Promise<User[]> {
+    return await this.usersService.findPending(id);
   }
 
   @Get(':id/friends')

@@ -26,10 +26,7 @@ export class UsersService {
 
   // targetUser起点のisFriendsをupdateする必要がある。微妙な気がする。
   // そもそも長すぎる
-  async createRelationship(
-    userId: string,
-    targetUserId: string
-  ): Promise<Relationship> {
+  async addFriend(userId: string, targetUserId: string): Promise<Relationship> {
     if (userId === targetUserId) {
       throw new BadRequestException("can't create relation with myself");
     }
@@ -73,7 +70,7 @@ export class UsersService {
   }
 
   // 関数名がしっくりこない
-  async findFollowingUsers(userId: string): Promise<User[]> {
+  async findRequesting(userId: string): Promise<User[]> {
     const followingRelations = await this.prisma.relationship.findMany({
       where: { userId, isFriends: false },
       select: {
@@ -84,7 +81,7 @@ export class UsersService {
     return followingRelations.map((relation) => relation.targetUser);
   }
 
-  async findPendingUsers(userId: string): Promise<User[]> {
+  async findPending(userId: string): Promise<User[]> {
     const pendingRelations = await this.prisma.relationship.findMany({
       where: { targetUserId: userId, isFriends: false },
       select: {
