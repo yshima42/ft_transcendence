@@ -24,15 +24,18 @@ export class UsersService {
     return updateUser;
   }
 
-  async request(userId: string, peerId: string): Promise<Relationship> {
-    const relation1 = await this.prisma.relationship.create({
+  async request(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    const createRelation1 = await this.prisma.relationship.create({
       data: {
         userId,
         peerId,
         type: 'OUTGOING',
       },
     });
-    const _relation2 = await this.prisma.relationship.create({
+    const createRelation2 = await this.prisma.relationship.create({
       data: {
         userId: peerId,
         peerId: userId,
@@ -40,11 +43,14 @@ export class UsersService {
       },
     });
 
-    return relation1;
+    return [createRelation1, createRelation2];
   }
 
-  async acceptRequest(userId: string, peerId: string): Promise<Relationship> {
-    const relation1 = await this.prisma.relationship.update({
+  async acceptRequest(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    const updateRelation1 = await this.prisma.relationship.update({
       where: {
         userId_peerId: {
           userId,
@@ -55,7 +61,7 @@ export class UsersService {
         type: 'FRIEND',
       },
     });
-    const _relation2 = await this.prisma.relationship.update({
+    const updateRelation2 = await this.prisma.relationship.update({
       where: {
         userId_peerId: {
           userId: peerId,
@@ -67,10 +73,13 @@ export class UsersService {
       },
     });
 
-    return relation1;
+    return [updateRelation1, updateRelation2];
   }
 
-  async addFriend(userId: string, peerId: string): Promise<Relationship> {
+  async addFriend(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
     if (userId === peerId) {
       throw new BadRequestException("can't create relation with myself");
     }
@@ -97,7 +106,10 @@ export class UsersService {
     }
   }
 
-  async deleteRelation(userId: string, peerId: string): Promise<Relationship> {
+  async deleteRelation(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
     const deleteRelation1 = await this.prisma.relationship.delete({
       where: {
         userId_peerId: {
@@ -115,10 +127,13 @@ export class UsersService {
       },
     });
 
-    return deleteRelation1;
+    return [deleteRelation1, _deleteRelation2];
   }
 
-  async deleteFriend(userId: string, peerId: string): Promise<Relationship> {
+  async deleteFriend(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
     if (userId === peerId) {
       throw new BadRequestException("can't create relation with myself");
     }
