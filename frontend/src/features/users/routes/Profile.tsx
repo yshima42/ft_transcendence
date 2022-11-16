@@ -10,6 +10,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
+import { ContentLayout } from 'components/templates/ContentLayout';
 
 export const Profile: FC = memo(() => {
   const mockUser = {
@@ -27,7 +28,7 @@ export const Profile: FC = memo(() => {
   const onClickChangeNickname = () => alert('change nickname');
 
   return (
-    <>
+    <ContentLayout title="Profile">
       <Flex justify="center" padding={{ base: 5, md: 7 }}>
         <Stack align="center" w={100} m={4}>
           <Image
@@ -69,6 +70,6 @@ export const Profile: FC = memo(() => {
           </Stack>
         </Box>
       </Flex>
-    </>
+    </ContentLayout>
   );
 });
