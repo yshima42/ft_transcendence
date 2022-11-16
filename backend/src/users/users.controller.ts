@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -44,6 +45,15 @@ export class UsersController {
     @Body('peerId') peerId: string
   ): Promise<Relationship> {
     return await this.usersService.addFriend(id, peerId);
+  }
+
+  @Delete(':id/friends')
+  @UseGuards(JwtAuthGuard)
+  async deleteFriend(
+    @Param('id') id: string,
+    @Body('peerId') peerId: string
+  ): Promise<Relationship> {
+    return await this.usersService.deleteFriend(id, peerId);
   }
 
   @Get(':id/requesting')
