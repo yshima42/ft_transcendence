@@ -15,6 +15,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   name String @unique
+  avatarUrl String
   following Relationship[] @relation("following")
   followedBy Relationship[] @relation("followedBy")
 }

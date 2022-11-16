@@ -12,6 +12,7 @@ const mockUser1 = {
   updatedAt: new Date(date),
 
   name: 'dummy1',
+  avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
 };
 
 const mockUser2 = {
@@ -19,6 +20,7 @@ const mockUser2 = {
   createdAt: new Date(date),
   updatedAt: new Date(date),
   name: 'dummy2',
+  avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
 };
 
 const mockUser3 = {
@@ -26,6 +28,7 @@ const mockUser3 = {
   createdAt: new Date(date),
   updatedAt: new Date(date),
   name: 'dummy3',
+  avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
 };
 
 describe('UsersServiceTest', () => {
