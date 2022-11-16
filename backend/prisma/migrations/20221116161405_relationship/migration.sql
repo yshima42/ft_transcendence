@@ -1,10 +1,13 @@
+-- CreateEnum
+CREATE TYPE "RelationshipType" AS ENUM ('FRIEND', 'INCOMING', 'OUTGOING');
+
 -- CreateTable
 CREATE TABLE "Relationship" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "targetUserId" TEXT NOT NULL,
-    "isFriends" BOOLEAN NOT NULL,
+    "type" "RelationshipType" NOT NULL,
 
     CONSTRAINT "Relationship_pkey" PRIMARY KEY ("userId","targetUserId")
 );

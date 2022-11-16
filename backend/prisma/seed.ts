@@ -48,14 +48,14 @@ const relationshipData: Relationship[] = [
     updatedAt: new Date(date),
     userId: userData[0].id,
     targetUserId: userData[1].id,
-    isFriends: true,
+    type: 'FRIEND',
   },
   {
     createdAt: new Date(date),
     updatedAt: new Date(date),
     userId: userData[1].id,
     targetUserId: userData[0].id,
-    isFriends: true,
+    type: 'FRIEND',
   },
   // not friend
   {
@@ -63,14 +63,28 @@ const relationshipData: Relationship[] = [
     updatedAt: new Date(date),
     userId: userData[0].id,
     targetUserId: userData[3].id,
-    isFriends: false,
+    type: 'OUTGOING',
+  },
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[3].id,
+    targetUserId: userData[0].id,
+    type: 'INCOMING',
   },
   {
     createdAt: new Date(date),
     updatedAt: new Date(date),
     userId: userData[4].id,
     targetUserId: userData[0].id,
-    isFriends: false,
+    type: 'OUTGOING',
+  },
+  {
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+    userId: userData[0].id,
+    targetUserId: userData[4].id,
+    type: 'INCOMING',
   },
 ];
 
