@@ -59,7 +59,7 @@ export const useAllGames = (): {
   const getGames = useCallback(() => {
     // ここをGamesゲットしてきてmockGamesを入れ替える
     axios
-      .get<Game[]>('/user/all')
+      .get<Game[]>('/users/all')
       .then(() => setGames(mockGames))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);

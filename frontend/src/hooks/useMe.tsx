@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User } from 'features/users/types/user';
+import { User } from '@prisma/client';
 import { useNavigate } from 'react-router-dom';
 
 import { axios } from '../lib/axios';
@@ -9,7 +9,7 @@ export const useMe = (): string => {
   const navigate = useNavigate();
 
   axios
-    .get<User>('/user/me')
+    .get<User>('/users/me')
     .then((res) => {
       setMe(res.data.name);
     })
