@@ -1,5 +1,9 @@
 import { memo, FC } from 'react';
-import { HamburgerIcon } from '@chakra-ui/icons';
+import {
+  ArrowForwardIcon,
+  HamburgerIcon,
+  InfoOutlineIcon,
+} from '@chakra-ui/icons';
 import {
   IconButton,
   Menu,
@@ -8,7 +12,8 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import { SideNavigationItem } from 'components/organisms/layout/Sidebar';
 
 type Props = {
@@ -17,6 +22,18 @@ type Props = {
 
 export const MenuIconButton: FC<Props> = memo((props) => {
   const { items } = props;
+
+  // ここをサイドバーと共通化させたい
+  const navigate = useNavigate();
+  const onClickLogout = () => {
+    const params = new URLSearchParams();
+    axios
+      .post('http://localhost:3000/auth/logout', params, {
+        withCredentials: true,
+      })
+      .then(() => navigate('/'))
+      .catch(() => alert('error'));
+  };
 
   return (
     <Menu>
@@ -34,8 +51,12 @@ export const MenuIconButton: FC<Props> = memo((props) => {
           </Link>
         ))}
         <MenuDivider />
-        <MenuItem>Profile</MenuItem>
-        <MenuItem>Logout</MenuItem>
+        <Link to="/app/users/profile">
+          <MenuItem icon={<InfoOutlineIcon />}>Profile</MenuItem>
+        </Link>
+        <MenuItem icon={<ArrowForwardIcon />} onClick={onClickLogout}>
+          Logout
+        </MenuItem>
       </MenuList>
     </Menu>
   );

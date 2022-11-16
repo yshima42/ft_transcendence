@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { DeleteFilled } from '@ant-design/icons';
+import { Button } from '@chakra-ui/react';
 import { useDeleteFriend } from '../api/useDeleteFriend';
 
 type Props = {
@@ -14,10 +14,5 @@ export const DeleteFriend: FC<Props> = (props) => {
     deleteFriend(id);
   };
 
-  return (
-    <DeleteFilled
-      style={{ fontSize: '20px', color: '#08c' }}
-      onClick={onClickDeleteFriend}
-    />
-  );
+  return <Button onClick={onClickDeleteFriend}>Unfriend</Button>;
 };
