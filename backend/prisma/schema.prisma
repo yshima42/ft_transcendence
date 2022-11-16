@@ -27,6 +27,12 @@ model Relationship {
   userId String
   targetUser User @relation("followedBy", fields: [targetUserId], references: [id])
   targetUserId String
-  isFriends Boolean
+  type RelationshipType
   @@id([userId, targetUserId])
+}
+
+enum RelationshipType {
+  FRIEND
+  INCOMING
+  OUTGOING
 }
