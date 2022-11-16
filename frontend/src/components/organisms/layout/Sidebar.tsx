@@ -1,98 +1,102 @@
-import { memo, FC, useState } from 'react';
+import { memo, FC } from 'react';
 import {
   StarIcon,
   ChatIcon,
   CheckCircleIcon,
-  HamburgerIcon,
   RepeatIcon,
   SettingsIcon,
 } from '@chakra-ui/icons';
-import {
-  Flex,
-  useDisclosure,
-  Divider,
-  Avatar,
-  IconButton,
-} from '@chakra-ui/react';
-import { MenuDrawer } from 'components/molecules/MenuDrawer';
+import { Flex, Divider, Avatar } from '@chakra-ui/react';
+import { MenuIconButton } from 'components/atoms/button/MenuIconButton';
+import { UserNavigation } from 'components/molecules/UserNavigation';
 import { NavItem } from './NavItem';
-import '../../../App.css';
+
+export type SideNavigationItem = {
+  title: string;
+  to: string;
+  icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+  iconComponent: React.ReactElement;
+};
 
 export const Sidebar: FC = memo(() => {
-  const { isOpen, onClose } = useDisclosure();
-
-  const [navSize, changeNavSize] = useState('large');
+  const navigation = [
+    {
+      title: 'TransPong',
+      to: '.',
+      icon: StarIcon,
+      iconComponent: <StarIcon />,
+    },
+    {
+      title: 'Users',
+      to: 'users',
+      icon: RepeatIcon,
+      iconComponent: <RepeatIcon />,
+    },
+    {
+      title: 'Games',
+      to: 'games',
+      icon: CheckCircleIcon,
+      iconComponent: <CheckCircleIcon />,
+    },
+    {
+      title: 'Chats',
+      to: 'chats',
+      icon: ChatIcon,
+      iconComponent: <ChatIcon />,
+    },
+    {
+      title: 'Settings',
+      to: 'settings',
+      icon: SettingsIcon,
+      iconComponent: <SettingsIcon />,
+    },
+  ].filter(Boolean) as SideNavigationItem[];
 
   return (
     <>
       <Flex
         pos="sticky"
-        left="5"
-        h="95vh"
-        marginTop="2.5vh"
-        boxShadow="0 4px 12px 0 rgba(0,0,0,0.05)"
-        borderRadius={navSize === 'small' ? '15px' : '30px'}
-        w={navSize === 'small' ? '75px' : '200px'}
+        h="100vh"
+        marginTop="0"
+        boxShadow="0 4px 12px 0 rgba(0,0,0,0.15)"
+        minW="200px"
+        maxW="200px"
         flexDir="column"
         justifyContent="space-between"
+        display={{ base: 'none', md: 'flex' }}
       >
         <Flex p="5%" flexDir="column" w="100%" alignItems="flex-start" as="nav">
-          <IconButton
-            aria-label="メニューボタン"
-            background="non"
-            mt={5}
-            _hover={{ background: 'none' }}
-            icon={<HamburgerIcon />}
-            onClick={() => {
-              if (navSize === 'small') changeNavSize('large');
-              else changeNavSize('small');
-            }}
-          />
-          <NavItem to="." navSize={navSize} icon={StarIcon} title="TransPong" />
-          <NavItem
-            to="users"
-            navSize={navSize}
-            icon={RepeatIcon}
-            title="Users"
-          />
-          <NavItem
-            to="games"
-            navSize={navSize}
-            icon={CheckCircleIcon}
-            title="Game"
-          />
-          <NavItem
-            to="chats"
-            navSize={navSize}
-            icon={ChatIcon}
-            title="Chat Room"
-          />
-          <NavItem
-            to="setting"
-            navSize={navSize}
-            icon={SettingsIcon}
-            title="Setting"
-          />
+          {navigation.map((item) => (
+            <NavItem
+              key={item.title}
+              title={item.title}
+              to={item.to}
+              icon={item.icon}
+            />
+          ))}
         </Flex>
-        <Flex
-          p="5%"
-          flexDir="column"
-          w="100%"
-          alignItems={navSize === 'small' ? 'none' : 'flex'}
-          mb={4}
-        >
+        <Flex p="5%" flexDir="column" w="100%" mb={4}>
           <Flex mt={4} align="center">
+            <UserNavigation />
             <Avatar size="sm" src="https://source.unsplash.com/random" />
-            <Divider display={navSize === 'small' ? 'none' : 'flex'} />
-            <Flex
-              flexDir="column"
-              ml={4}
-              display={navSize === 'small' ? 'none' : 'flex'}
-            ></Flex>
+            <Divider />
+            <Flex flexDir="column" ml={4}></Flex>
           </Flex>
         </Flex>
       </Flex>
-      <MenuDrawer onClose={onClose} isOpen={isOpen} />
+      <MenuIconButton items={navigation} />
+
+      {/* <IconButton
+        aria-label="Menu Button"
+        background="non"
+        mt={5}
+        _hover={{ background: 'none' }}
+        icon={<HamburgerIcon />}
+        onClick={() => {
+          navSize === 'small' ? setNavSize('large') : setNavSize('small');
+        }}
+        display={{ base: 'flex', md: 'none' }}
+      /> */}
     </>
   );
 });

@@ -53,7 +53,7 @@ export const useAllChats = (): {
   const getChats = useCallback(() => {
     // ここをChatsゲットしてきてmockChatsを入れ替える
     axios
-      .get<Chat[]>('/user/all')
+      .get<Chat[]>('/users/all')
       .then(() => setChats(mockChats))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
