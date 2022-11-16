@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { StarIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { HamburgerIcon } from '@chakra-ui/icons';
 import {
   IconButton,
   Menu,
@@ -23,14 +23,14 @@ export const MenuIconButton: FC<Props> = memo((props) => {
       <MenuButton
         as={IconButton}
         aria-label="Options"
-        icon={<HamburgerIcon />}
+        icon={<HamburgerIcon w={6} h={6} />}
         variant="none"
         display={{ base: 'flex', md: 'none' }}
       />
       <MenuList>
         {items.map((item) => (
           <Link key={item.title} to={item.to}>
-            <MenuItem icon={<StarIcon />}>{item.title}</MenuItem>
+            <MenuItem icon={item.iconComponent}>{item.title}</MenuItem>
           </Link>
         ))}
         <MenuDivider />
