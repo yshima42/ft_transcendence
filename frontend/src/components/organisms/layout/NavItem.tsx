@@ -1,32 +1,18 @@
 import { memo, FC } from 'react';
-import {
-  ComponentWithAs,
-  Flex,
-  Icon,
-  IconProps,
-  Menu,
-  MenuButton,
-  Text,
-} from '@chakra-ui/react';
+import { Flex, Icon, Menu, MenuButton, Text } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
 type Props = {
-  navSize: string;
   title: string;
   to: string;
-  icon: ComponentWithAs<'svg', IconProps>;
+  icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
 };
 
 export const NavItem: FC<Props> = memo((props) => {
-  const { navSize, title, icon, to } = props;
+  const { title, icon, to } = props;
 
   return (
-    <Flex
-      mt={30}
-      flexDir="column"
-      w="100%"
-      alignItems={navSize === 'small' ? 'center' : 'flex-start'}
-    >
+    <Flex mt={30} flexDir="column" w="100%" alignItems="flex-start">
       <Menu placement="right">
         <Link to={to}>
           <Flex
@@ -40,9 +26,7 @@ export const NavItem: FC<Props> = memo((props) => {
             >
               <Flex>
                 <Icon as={icon} fontSize="xl" color={'gray.700'} />
-                <Text ml={5} display={navSize === 'small' ? 'none' : 'flex'}>
-                  {title}
-                </Text>
+                <Text ml={5}>{title}</Text>
               </Flex>
             </MenuButton>
           </Flex>

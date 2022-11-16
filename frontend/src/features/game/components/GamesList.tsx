@@ -39,11 +39,11 @@ export const GamesList: FC = memo(() => {
           },
         },
         {
-          title: '観戦',
+          title: 'Watch',
           Cell({ entry: { id } }) {
             return (
               <Link to={`${id}`}>
-                <Button>watch</Button>
+                <Button>Watch</Button>
               </Link>
             );
           },

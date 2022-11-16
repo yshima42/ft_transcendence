@@ -3,25 +3,26 @@ import { Image, Button } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllUsers } from '../api/useAllUsers';
+import { useAllFriends } from '../api/useAllFriends';
+import { DeleteFriend } from './DeleteFriend';
 
-export const UsersList: FC = memo(() => {
-  const { getUsers, users } = useAllUsers();
+export const FriendsList: FC = memo(() => {
+  const { getFriends, friends } = useAllFriends();
 
-  useEffect(() => getUsers(), [getUsers]);
+  useEffect(() => getFriends(), [getFriends]);
 
   return (
     <PrimaryTable<User>
-      data={users}
+      data={friends}
       columns={[
         {
           title: '',
-          Cell({ entry: { name } }) {
+          Cell({ entry: { name, avatarUrl } }) {
             return (
               <Image
                 borderRadius="full"
                 boxSize="48px"
-                src="https://source.unsplash.com/random"
+                src={avatarUrl}
                 alt={name}
               />
             );
@@ -47,7 +48,7 @@ export const UsersList: FC = memo(() => {
         {
           title: '',
           Cell({ entry: { name } }) {
-            return <Button about={name}>友達追加</Button>;
+            return <DeleteFriend id={name} />;
           },
         },
       ]}

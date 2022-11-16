@@ -1,12 +1,11 @@
 import { memo, FC } from 'react';
 import { Flex, Heading, Box, useDisclosure } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MenuIconButton } from 'components/atoms/button/MenuIconButton';
 import { MenuDrawer } from 'components/molecules/MenuDrawer';
 import { UserNavigation } from 'components/molecules/UserNavigation';
 
 export const Header: FC = memo(() => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onClose } = useDisclosure();
 
   const navigate = useNavigate();
 
@@ -38,17 +37,16 @@ export const Header: FC = memo(() => {
           display={{ base: 'none', md: 'flex' }}
         >
           <Box pr={4}>
-            <Link to="users">ユーザー一覧</Link>
+            <Link to="users">Users</Link>
           </Box>
           <Box pr={4}>
-            <Link to="games">ゲーム一覧</Link>
+            <Link to="games">Games</Link>
           </Box>
           <Box pr={4}>
-            <Link to="chats">チャットルーム</Link>
+            <Link to="chats">Chat-Rooms</Link>
           </Box>
         </Flex>
         <UserNavigation />
-        <MenuIconButton onOpen={onOpen} />
       </Flex>
       <MenuDrawer onClose={onClose} isOpen={isOpen} />
     </>

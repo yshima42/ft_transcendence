@@ -4,19 +4,20 @@ import { useNavigate } from 'react-router-dom';
 
 import { axios } from '../../../lib/axios';
 
-export const useAllUsers = (): {
-  getUsers: () => void;
-  users: User[];
+export const useAllFriends = (): {
+  getFriends: () => void;
+  friends: User[];
 } => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [friends, setFriends] = useState<User[]>([]);
   const navigate = useNavigate();
 
-  const getUsers = useCallback(() => {
+  const getFriends = useCallback(() => {
+    // ここをfriend取得のAPIに変える
     axios
       .get<User[]>('/users/all')
-      .then((res) => setUsers(res.data))
+      .then((res) => setFriends(res.data))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
 
-  return { getUsers, users };
+  return { getFriends, friends };
 };

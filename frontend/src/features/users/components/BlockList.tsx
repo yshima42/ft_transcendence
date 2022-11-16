@@ -3,16 +3,16 @@ import { Image, Button } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllUsers } from '../api/useAllUsers';
+import { useAllBlock } from '../api/useAllBlock';
 
-export const UsersList: FC = memo(() => {
-  const { getUsers, users } = useAllUsers();
+export const BlockList: FC = memo(() => {
+  const { getBlock, block } = useAllBlock();
 
-  useEffect(() => getUsers(), [getUsers]);
+  useEffect(() => getBlock(), [getBlock]);
 
   return (
     <PrimaryTable<User>
-      data={users}
+      data={block}
       columns={[
         {
           title: '',
@@ -36,18 +36,7 @@ export const UsersList: FC = memo(() => {
         {
           title: '',
           Cell({ entry: { name } }) {
-            return (
-              <Link to={`../dm/${name}`}>
-                {' '}
-                <Button>Message</Button>
-              </Link>
-            );
-          },
-        },
-        {
-          title: '',
-          Cell({ entry: { name } }) {
-            return <Button about={name}>友達追加</Button>;
+            return <Button about={name}>ブロック解除</Button>;
           },
         },
       ]}
