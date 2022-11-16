@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import axios from 'axios';
-import { useMe } from 'hooks/useMe';
+// import { useMe } from 'hooks/useMe';
 import { AiOutlineUser } from 'react-icons/ai';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -14,7 +14,7 @@ type UserNavigationItem = {
 export const UserNavigation: FC = memo(() => {
   // const [me, setMe] = useState('');
   const navigate = useNavigate();
-  const me = useMe();
+  // const me = useMe();
 
   const onClickLogout = () => {
     const params = new URLSearchParams();
@@ -27,7 +27,8 @@ export const UserNavigation: FC = memo(() => {
   };
 
   const userNavigation = [
-    { name: 'Your Profile', to: `./users/${me}` },
+    { name: 'Your Profile', to: `./users/profile` },
+    // { name: 'Your Profile', to: `./users/${me}` },
     {
       name: 'Sign out',
       to: '',
