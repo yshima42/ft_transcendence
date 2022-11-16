@@ -1,11 +1,11 @@
 import { Stats } from 'features/users/index';
 import { UsersRoutes } from 'features/users/routes';
 import { Outlet } from 'react-router-dom';
-// import { DirectMessage } from 'components/pages/DirectMessage';
 import { Page404 } from 'components/pages/Page404';
 import { MainLayout } from 'components/templates/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Chats } from 'features/chat/routes/Chats';
+import { DirectMessage } from 'features/dm/routes/DirectMessage';
 import { Game } from 'features/game/routes/Game';
 import { GameTop } from 'features/game/routes/GameTop';
 import { Games } from 'features/game/routes/Games';
@@ -36,7 +36,7 @@ export const publicRoutes = [
       { path: '', element: <GameTop /> },
       { path: 'matching', element: <Matching /> },
       { path: 'game', element: <Game /> },
-      // { path: 'direct-message', element: <DirectMessage /> },
+      { path: 'dm/*', element: <DirectMessage /> },
       { path: 'profile', element: <Stats /> },
       { path: '*', element: <Page404 /> },
     ],

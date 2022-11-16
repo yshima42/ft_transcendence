@@ -1,9 +1,10 @@
 import { FC, memo, useEffect } from 'react';
-import { Image, Button } from '@chakra-ui/react';
+import { Image } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
 import { useAllBlock } from '../api/useAllBlock';
+import { UnblockUser } from './UnblockUser';
 
 export const BlockList: FC = memo(() => {
   const { getBlock, block } = useAllBlock();
@@ -16,12 +17,12 @@ export const BlockList: FC = memo(() => {
       columns={[
         {
           title: '',
-          Cell({ entry: { name } }) {
+          Cell({ entry: { name, avatarUrl } }) {
             return (
               <Image
                 borderRadius="full"
                 boxSize="48px"
-                src="https://source.unsplash.com/random"
+                src={avatarUrl}
                 alt={name}
               />
             );
@@ -30,13 +31,13 @@ export const BlockList: FC = memo(() => {
         {
           title: '',
           Cell({ entry: { name } }) {
-            return <Link to={`./${name}`}>{name}</Link>;
+            return <Link to={`../${name}`}>{name}</Link>;
           },
         },
         {
           title: '',
           Cell({ entry: { name } }) {
-            return <Button about={name}>ブロック解除</Button>;
+            return <UnblockUser id={name} />;
           },
         },
       ]}
