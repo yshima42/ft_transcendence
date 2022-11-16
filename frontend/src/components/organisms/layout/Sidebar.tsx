@@ -15,15 +15,41 @@ export type SideNavigationItem = {
   title: string;
   to: string;
   icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+  iconComponent: React.ReactElement;
 };
 
 export const Sidebar: FC = memo(() => {
   const navigation = [
-    { title: 'TransPong', to: '.', icon: StarIcon },
-    { title: 'Users', to: 'users', icon: RepeatIcon },
-    { title: 'Games', to: 'games', icon: CheckCircleIcon },
-    { title: 'Chats', to: 'chats', icon: ChatIcon },
-    { title: 'Settings', to: 'settings', icon: SettingsIcon },
+    {
+      title: 'TransPong',
+      to: '.',
+      icon: StarIcon,
+      iconComponent: <StarIcon />,
+    },
+    {
+      title: 'Users',
+      to: 'users',
+      icon: RepeatIcon,
+      iconComponent: <RepeatIcon />,
+    },
+    {
+      title: 'Games',
+      to: 'games',
+      icon: CheckCircleIcon,
+      iconComponent: <CheckCircleIcon />,
+    },
+    {
+      title: 'Chats',
+      to: 'chats',
+      icon: ChatIcon,
+      iconComponent: <ChatIcon />,
+    },
+    {
+      title: 'Settings',
+      to: 'settings',
+      icon: SettingsIcon,
+      iconComponent: <SettingsIcon />,
+    },
   ].filter(Boolean) as SideNavigationItem[];
 
   return (
