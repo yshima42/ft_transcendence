@@ -43,7 +43,7 @@ export class UsersController {
   async addFriend(
     @Param('id') id: string,
     @Body('peerId') peerId: string
-  ): Promise<Relationship> {
+  ): Promise<[Relationship, Relationship]> {
     return await this.usersService.addFriend(id, peerId);
   }
 
@@ -52,7 +52,7 @@ export class UsersController {
   async deleteFriend(
     @Param('id') id: string,
     @Body('peerId') peerId: string
-  ): Promise<Relationship> {
+  ): Promise<[Relationship, Relationship]> {
     return await this.usersService.deleteFriend(id, peerId);
   }
 
