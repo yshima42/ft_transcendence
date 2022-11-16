@@ -1,75 +1,93 @@
-import { memo, FC, ChangeEvent, useState } from 'react';
-import {
-  Box,
-  Flex,
-  HStack,
-  Image,
-  Input,
-  Spacer,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
-import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
+import React, { memo, FC, useState } from 'react';
+import { Flex } from '@chakra-ui/react';
+import { User } from '@prisma/client';
+import { AxiosError } from 'axios';
 import { ContentLayout } from 'components/templates/ContentLayout';
+import { axios } from '../../../lib/axios';
+import { AvatarWithUploadButton } from '../components/AvatarWithUploadButton';
+import { ProfileCard } from '../components/ProfileCard';
 
 export const Profile: FC = memo(() => {
-  const mockUser = {
-    name: 'rmiyagi',
-    nickname: 'ryochin',
+  const [file, setFile] = useState<File | null>(null);
+
+  const onChangeFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files?.[0] != null) {
+      setFile(files[0]);
+    }
+
+    if (file === null) {
+      return;
+    }
+
+    let id = '';
+    await axios.get<User>('/users/me').then((res) => {
+      id = res.data.id;
+    });
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    await axios
+      .post(`/users/${id}/avatar`, formData)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e: AxiosError) => {
+        console.error(e);
+      });
   };
 
-  const [nickname, setNickname] = useState(mockUser.nickname);
+  const onClickSubmit = async () => {
+    if (file === null) {
+      return;
+    }
 
-  const onClickChangeAvatar = () => alert('change avatar');
+    let id = '';
+    await axios.get<User>('/users/me').then((res) => {
+      id = res.data.id;
+    });
 
-  const onChangeNickname = (e: ChangeEvent<HTMLInputElement>) =>
-    setNickname(e.target.value);
+    const formData = new FormData();
+    formData.append('file', file);
 
-  const onClickChangeNickname = () => alert('change nickname');
+    await axios
+      .post(`/users/${id}/avatar`, formData)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e: AxiosError) => {
+        console.error(e);
+      });
+  };
 
   return (
     <ContentLayout title="Profile">
       <Flex justify="center" padding={{ base: 5, md: 7 }}>
-        <Stack align="center" w={100} m={4}>
-          <Image
-            borderRadius="full"
-            boxSize="100px"
-            src="https://source.unsplash.com/random"
-            alt={mockUser.name}
-            m={4}
-          />
-          <PrimaryButton onClick={onClickChangeAvatar}>UPLOAD</PrimaryButton>
-        </Stack>
-        <Box as={'dl'} bg="gray.100" borderRadius="md" w={500} p={8}>
-          <Stack>
-            <Flex>
-              <Text w={100} as={'dt'} fontSize="lg" fontWeight="bold">
-                Intra Name
-              </Text>
-              <Text as={'dd'} pl={4} align="center">
-                {mockUser.name}
-              </Text>
-            </Flex>
-            <Flex>
-              <HStack>
-                <Text w={100} as={'dt'} fontSize="lg" fontWeight="bold">
-                  Nickname
-                </Text>
-                <Spacer />
-                <Input
-                  placeholder={mockUser.nickname}
-                  value={nickname}
-                  onChange={onChangeNickname}
-                />
-                <Spacer />
-                <PrimaryButton onClick={onClickChangeNickname}>
-                  edit
-                </PrimaryButton>
-              </HStack>
-            </Flex>
-          </Stack>
-        </Box>
+        <AvatarWithUploadButton
+          name="marvin"
+          avatarUrl="https://source.unsplash.com/random"
+        />
+        <ProfileCard name="yuuyuu" nickname="hakusho" />
       </Flex>
+
+      <div className="App">
+        <div className="App-form">
+          <input
+            name="file"
+            type="file"
+            accept="image/*"
+            onChange={onChangeFile}
+          />
+
+          <input
+            type="button"
+            disabled={file == null}
+            value="送信"
+            onClick={onClickSubmit}
+          />
+        </div>
+      </div>
     </ContentLayout>
   );
 });
