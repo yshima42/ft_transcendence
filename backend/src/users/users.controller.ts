@@ -41,9 +41,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async addFriend(
     @Param('id') id: string,
-    @Body('targetId') targetId: string
+    @Body('peerId') peerId: string
   ): Promise<Relationship> {
-    return await this.usersService.addFriend(id, targetId);
+    return await this.usersService.addFriend(id, peerId);
   }
 
   @Get(':id/requesting')

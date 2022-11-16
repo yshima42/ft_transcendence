@@ -24,20 +24,20 @@ export class UsersService {
     return updateUser;
   }
 
-  // targetUser起点のisFriendsをupdateする必要がある。微妙な気がする。
+  // peer起点のisFriendsをupdateする必要がある。微妙な気がする。
   // そもそも長すぎる
-  async request(userId: string, targetUserId: string): Promise<Relationship> {
+  async request(userId: string, peerId: string): Promise<Relationship> {
     const relation1 = await this.prisma.relationship.create({
       data: {
         userId,
-        targetUserId,
+        peerId,
         type: 'OUTGOING',
       },
     });
     const _relation2 = await this.prisma.relationship.create({
       data: {
-        userId: targetUserId,
-        targetUserId: userId,
+        userId: peerId,
+        peerId: userId,
         type: 'INCOMING',
       },
     });
@@ -45,15 +45,12 @@ export class UsersService {
     return relation1;
   }
 
-  async acceptRequest(
-    userId: string,
-    targetUserId: string
-  ): Promise<Relationship> {
+  async acceptRequest(userId: string, peerId: string): Promise<Relationship> {
     const relation1 = await this.prisma.relationship.update({
       where: {
-        userId_targetUserId: {
+        userId_peerId: {
           userId,
-          targetUserId,
+          peerId,
         },
       },
       data: {
@@ -62,9 +59,9 @@ export class UsersService {
     });
     const _relation2 = await this.prisma.relationship.update({
       where: {
-        userId_targetUserId: {
-          userId: targetUserId,
-          targetUserId: userId,
+        userId_peerId: {
+          userId: peerId,
+          peerId: userId,
         },
       },
       data: {
@@ -75,14 +72,14 @@ export class UsersService {
     return relation1;
   }
 
-  async addFriend(userId: string, targetUserId: string): Promise<Relationship> {
-    if (userId === targetUserId) {
+  async addFriend(userId: string, peerId: string): Promise<Relationship> {
+    if (userId === peerId) {
       throw new BadRequestException("can't create relation with myself");
     }
     const user = await this.prisma.relationship.findFirst({
       where: {
         userId,
-        targetUserId,
+        peerId,
       },
       select: {
         type: true,
@@ -92,11 +89,11 @@ export class UsersService {
 
     switch (relationType) {
       case undefined:
-        return await this.request(userId, targetUserId);
+        return await this.request(userId, peerId);
       case 'FRIEND':
         throw new BadRequestException('Already friend with target');
       case 'INCOMING':
-        return await this.acceptRequest(userId, targetUserId);
+        return await this.acceptRequest(userId, peerId);
       case 'OUTGOING':
         throw new BadRequestException('Already send friend-request for target');
       default:
@@ -109,32 +106,32 @@ export class UsersService {
     const followingRelations = await this.prisma.relationship.findMany({
       where: { userId, type: 'OUTGOING' },
       select: {
-        targetUser: true,
+        peer: true,
       },
     });
 
-    return followingRelations.map((relation) => relation.targetUser);
+    return followingRelations.map((relation) => relation.peer);
   }
 
   async findPending(userId: string): Promise<User[]> {
     const pendingRelations = await this.prisma.relationship.findMany({
       where: { userId, type: 'INCOMING' },
       select: {
-        targetUser: true,
+        peer: true,
       },
     });
 
-    return pendingRelations.map((relation) => relation.targetUser);
+    return pendingRelations.map((relation) => relation.peer);
   }
 
   async findFriends(userId: string): Promise<User[]> {
     const friendRelations = await this.prisma.relationship.findMany({
       where: { userId, type: 'FRIEND' },
       select: {
-        targetUser: true,
+        peer: true,
       },
     });
 
-    return friendRelations.map((relation) => relation.targetUser);
+    return friendRelations.map((relation) => relation.peer);
   }
 }
