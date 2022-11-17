@@ -3,56 +3,52 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   ParseUUIDPipe,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { Relationship, User } from '@prisma/client';
+import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { DeleteGuard } from 'src/users/guards/delete.guard';
-import { PostGuard } from 'src/users/guards/post.guard';
 import { FriendshipsService } from './friendships.service';
 
 @Controller('friendships')
 export class FriendshipsController {
   constructor(private readonly friendShipsService: FriendshipsService) {}
 
-  @Post(':id/friends')
-  @UseGuards(JwtAuthGuard, PostGuard)
+  @Post('request')
+  @UseGuards(JwtAuthGuard)
   async addFriend(
-    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser() user: User,
     @Body('peerId', ParseUUIDPipe) peerId: string
   ): Promise<[Relationship, Relationship]> {
-    return await this.friendShipsService.addFriend(id, peerId);
+    return await this.friendShipsService.addFriend(user.id, peerId);
   }
 
-  @Delete(':id/friends')
-  @UseGuards(JwtAuthGuard, DeleteGuard)
+  @Delete('destroy')
+  @UseGuards(JwtAuthGuard)
   async deleteFriend(
-    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser() user: User,
     @Body('peerId', ParseUUIDPipe) peerId: string
   ): Promise<[Relationship, Relationship]> {
-    return await this.friendShipsService.deleteFriend(id, peerId);
+    return await this.friendShipsService.deleteFriend(user.id, peerId);
   }
 
-  @Get(':id/requesting')
+  @Get('outgoing')
   @UseGuards(JwtAuthGuard)
-  async findRequesting(
-    @Param('id', ParseUUIDPipe) id: string
-  ): Promise<User[]> {
-    return await this.friendShipsService.findRequesting(id);
+  async findOutgoing(@GetUser() user: User): Promise<User[]> {
+    return await this.friendShipsService.findOutgoing(user.id);
   }
 
-  @Get(':id/pending')
+  @Get('incoming')
   @UseGuards(JwtAuthGuard)
-  async findPending(@Param('id', ParseUUIDPipe) id: string): Promise<User[]> {
-    return await this.friendShipsService.findPending(id);
+  async findIncoming(@GetUser() user: User): Promise<User[]> {
+    return await this.friendShipsService.findIncoming(user.id);
   }
 
-  @Get(':id/friends')
+  @Get('')
   @UseGuards(JwtAuthGuard)
-  async findFriends(@Param('id', ParseUUIDPipe) id: string): Promise<User[]> {
-    return await this.friendShipsService.findFriends(id);
+  async findFriends(@GetUser() user: User): Promise<User[]> {
+    return await this.friendShipsService.findFriends(user.id);
   }
 }

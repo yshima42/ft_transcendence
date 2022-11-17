@@ -137,7 +137,7 @@ export class FriendshipsService {
     }
   }
 
-  async findRequesting(userId: string): Promise<User[]> {
+  async findOutgoing(userId: string): Promise<User[]> {
     const followingRelations = await this.prisma.relationship.findMany({
       where: { userId, type: 'OUTGOING' },
       select: {
@@ -148,7 +148,7 @@ export class FriendshipsService {
     return followingRelations.map((relation) => relation.peer);
   }
 
-  async findPending(userId: string): Promise<User[]> {
+  async findIncoming(userId: string): Promise<User[]> {
     const pendingRelations = await this.prisma.relationship.findMany({
       where: { userId, type: 'INCOMING' },
       select: {
