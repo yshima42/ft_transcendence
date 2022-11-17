@@ -15,6 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MatchResult, Relationship, User } from '@prisma/client';
 import { FileService } from 'src/file/file.service';
 import { GameService } from 'src/game/game.service';
+import { GameStats } from 'src/game/interfaces/game-stats.interface';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DeleteGuard } from './guards/delete.guard';
@@ -112,5 +113,13 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<MatchResult[]> {
     return await this.gameService.findMatchHistory(id);
+  }
+
+  @Get(':id/game/stats')
+  @UseGuards(JwtAuthGuard)
+  async findGameStats(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<GameStats> {
+    return await this.gameService.findStats(id);
   }
 }

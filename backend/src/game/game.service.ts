@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { MatchResult } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MatchResultDto } from './dto/match-result.dto';
+import { GameStats } from './interfaces/game-stats.interface';
 
 @Injectable()
 export class GameService {
@@ -45,5 +46,15 @@ export class GameService {
     });
 
     return matchResults;
+  }
+
+  async findStats(userId: string): Promise<GameStats> {
+    const matchResults = await this.prisma.matchResult.findMany({
+      where: { userId },
+    });
+    const matchNum = matchResults.length;
+    const winNum = matchResults.filter((match) => match.win).length;
+
+    return { winNum, loseNum: matchNum - winNum };
   }
 }
