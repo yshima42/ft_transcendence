@@ -1,19 +1,54 @@
 import { FC, memo } from 'react';
+import { AtSignIcon, ChatIcon, EmailIcon, ViewIcon } from '@chakra-ui/icons';
 import { Flex } from '@chakra-ui/react';
 // import { Header } from 'components/organisms/layout/Header';
-import { Sidebar } from 'components/organisms/layout/Sidebar';
+import { SpMenu } from 'components/organisms/layout/SpMenu';
+import { WebSidebarMenu } from 'components/organisms/layout/WebSidebarMenu';
 
 type Props = {
   children: React.ReactNode;
 };
 
-// ヘッダーに戻す場合は<Sidebar />を<Header />にして<Flex>を<>にする
+export type NavigationItem = {
+  title: string;
+  to: string;
+  icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
+  iconComponent: React.ReactElement;
+};
+
 export const MainLayout: FC<Props> = memo((props) => {
   const { children } = props;
+  const navigation = [
+    {
+      title: 'Users',
+      to: 'users',
+      icon: AtSignIcon,
+      iconComponent: <AtSignIcon />,
+    },
+    {
+      title: 'DM',
+      to: 'dm',
+      icon: EmailIcon,
+      iconComponent: <EmailIcon />,
+    },
+    {
+      title: 'Chat',
+      to: 'chats',
+      icon: ChatIcon,
+      iconComponent: <ChatIcon />,
+    },
+    {
+      title: 'Watch',
+      to: 'games',
+      icon: ViewIcon,
+      iconComponent: <ViewIcon />,
+    },
+  ].filter(Boolean) as NavigationItem[];
 
   return (
     <Flex>
-      <Sidebar />
+      <WebSidebarMenu items={navigation} />
+      <SpMenu items={navigation} />
       {children}
     </Flex>
   );
