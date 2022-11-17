@@ -96,11 +96,10 @@ export class UsersService {
       case undefined:
         return await this.request(userId, peerId);
       case 'FRIEND':
-        throw new BadRequestException('Already friend with target');
+      case 'OUTGOING':
+        throw new BadRequestException('Already take action for friend-request');
       case 'INCOMING':
         return await this.acceptRequest(userId, peerId);
-      case 'OUTGOING':
-        throw new BadRequestException('Already send friend-request for target');
       default:
         throw new BadRequestException('Unexpected error in addFriend');
     }
@@ -151,14 +150,8 @@ export class UsersService {
         throw new BadRequestException(
           'You are not friend with target and do not send to friend-request'
         );
-      case 'FRIEND':
-        return await this.deleteRelation(userId, peerId);
-      case 'INCOMING':
-        return await this.deleteRelation(userId, peerId);
-      case 'OUTGOING':
-        return await this.deleteRelation(userId, peerId);
       default:
-        throw new BadRequestException('Unexpected error in deleteFriend');
+        return await this.deleteRelation(userId, peerId);
     }
   }
 
