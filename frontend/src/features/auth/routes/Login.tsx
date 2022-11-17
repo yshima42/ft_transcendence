@@ -1,10 +1,16 @@
-import { memo, FC } from 'react';
+import { memo, FC, useState } from 'react';
 import { Box, Button, Divider, Flex, Heading, Stack } from '@chakra-ui/react';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
-import { useDummyAuth } from '../api/useDummyAuth';
+import { useDummyAuth } from '../hooks/useDummyAuth';
 
 export const Login: FC = memo(() => {
   const { dummyLogin, loading } = useDummyAuth();
+
+  const [loading42, setLoading42] = useState(false);
+
+  const onClick42 = () => {
+    setLoading42(true);
+  };
 
   const onClickDummy1 = () => dummyLogin('dummy1');
   const onClickDummy2 = () => dummyLogin('dummy2');
@@ -18,18 +24,26 @@ export const Login: FC = memo(() => {
         </Heading>
         <Divider />
         <Stack spacing={4} py={4} px={10}>
-          <a href="http://localhost:3000/auth/login/42">
-            <Button>42ユーザー認証</Button>
-          </a>
+          <Button
+            bg="teal.900"
+            color="white"
+            isLoading={loading42}
+            loadingText="Loading"
+            onClick={onClick42}
+            as="a"
+            href="http://localhost:3000/auth/login/42"
+          >
+            42 Auth
+          </Button>
           <Divider />
           <PrimaryButton loading={loading} onClick={onClickDummy1}>
-            アドミンテスト1
+            Admin Test 1
           </PrimaryButton>
           <PrimaryButton loading={loading} onClick={onClickDummy2}>
-            アドミンテスト2
+            Admin Test 2
           </PrimaryButton>
           <PrimaryButton loading={loading} onClick={onClickDummy3}>
-            アドミンテスト3
+            Admin Test 3
           </PrimaryButton>
         </Stack>
       </Box>

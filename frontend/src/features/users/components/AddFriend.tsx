@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Button } from '@chakra-ui/react';
-import { useAddFriend } from '../api/useAddFriend';
+import { useAddFriend } from '../hooks/useAddFriend';
 
 type Props = {
   id: string;

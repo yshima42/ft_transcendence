@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Button } from '@chakra-ui/react';
-import { useDeleteFriend } from '../api/useDeleteFriend';
+import { useDeleteFriend } from '../hooks/useDeleteFriend';
 
 type Props = {
   id: string;

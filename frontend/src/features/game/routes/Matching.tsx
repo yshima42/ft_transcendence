@@ -42,7 +42,7 @@ export const Matching: FC = memo(() => {
                   loading={matched}
                   disabled={matched}
                 >
-                  マッチングしたと仮定する
+                  Assume matching!
                 </PrimaryButton>
               )}
               <PrimaryButton onClick={onClickCancel} disabled={matched}>

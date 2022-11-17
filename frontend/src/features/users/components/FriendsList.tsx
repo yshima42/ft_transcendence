@@ -1,9 +1,9 @@
 import { FC, memo, useEffect } from 'react';
-import { Image } from '@chakra-ui/react';
+import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllFriends } from '../api/useAllFriends';
+import { useAllFriends } from '../hooks/useAllFriends';
 import { DirectMessageButton } from './DirectMessageButton';
 
 export const FriendsList: FC = memo(() => {
@@ -17,14 +17,11 @@ export const FriendsList: FC = memo(() => {
       columns={[
         {
           title: '',
-          Cell({ entry: { name, avatarUrl } }) {
+          Cell({ entry: { avatarUrl } }) {
             return (
-              <Image
-                borderRadius="full"
-                boxSize="48px"
-                src={avatarUrl}
-                alt={name}
-              />
+              <Avatar src={avatarUrl}>
+                <AvatarBadge boxSize="1.1em" bg="green.500" />
+              </Avatar>
             );
           },
         },
