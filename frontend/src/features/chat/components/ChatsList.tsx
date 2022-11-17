@@ -33,7 +33,7 @@ export const ChatsList: FC = memo(() => {
           },
         },
         {
-          title: '参加',
+          title: 'Join',
           Cell({ entry: { id } }) {
             return (
               <Link to={`${id}`}>
