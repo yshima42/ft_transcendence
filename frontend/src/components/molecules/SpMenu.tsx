@@ -20,7 +20,7 @@ type Props = {
   items: SideNavigationItem[];
 };
 
-export const MenuIconButton: FC<Props> = memo((props) => {
+export const SpMenu: FC<Props> = memo((props) => {
   const { items } = props;
 
   // ここをサイドバーと共通化させたい
@@ -43,6 +43,7 @@ export const MenuIconButton: FC<Props> = memo((props) => {
         icon={<HamburgerIcon w={6} h={6} />}
         variant="none"
         display={{ base: 'flex', md: 'none' }}
+        position="absolute"
       />
       <MenuList>
         {items.map((item) => (

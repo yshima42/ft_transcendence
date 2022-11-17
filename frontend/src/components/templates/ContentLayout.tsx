@@ -10,7 +10,7 @@ export const ContentLayout: FC<Props> = (props) => {
   const { children, title = '' } = props;
 
   return (
-    <Container maxW="980px" p={8}>
+    <Container maxW="980px" px={{ base: 4, md: 8 }} py={{ base: 12, md: 8 }}>
       <Heading as="h2" size="md">
         {title}
       </Heading>

@@ -1,9 +1,9 @@
 import { Stats } from 'features/users/index';
 import { UsersRoutes } from 'features/users/routes';
 import { Outlet } from 'react-router-dom';
-import { Page404 } from 'components/pages/Page404';
 import { MainLayout } from 'components/templates/MainLayout';
 import { Login } from 'features/auth/routes/Login';
+import { Page404 } from 'features/auth/routes/Page404';
 import { Chats } from 'features/chat/routes/Chats';
 import { DirectMessage } from 'features/dm/routes/DirectMessage';
 import { Game } from 'features/game/routes/Game';
@@ -25,6 +25,7 @@ export const publicRoutes = [
     path: '/',
     element: <Login />,
   },
+  { path: '/app/game', element: <Game /> },
   { path: '*', element: <Page404 /> },
   {
     path: '/app',
@@ -35,7 +36,6 @@ export const publicRoutes = [
       { path: 'games', element: <Games /> },
       { path: '', element: <GameTop /> },
       { path: 'matching', element: <Matching /> },
-      { path: 'game', element: <Game /> },
       { path: 'dm/*', element: <DirectMessage /> },
       { path: 'profile', element: <Stats /> },
       { path: '*', element: <Page404 /> },

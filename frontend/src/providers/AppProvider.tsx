@@ -1,7 +1,8 @@
 import { FC, memo } from 'react';
-import { ChakraProvider, theme } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 import { AuthProvider } from 'hooks/useAuthProvider';
 import { BrowserRouter } from 'react-router-dom';
+import theme from '../theme/theme';
 
 type Props = {
   children: React.ReactNode;
