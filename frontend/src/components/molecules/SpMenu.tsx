@@ -12,8 +12,8 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from 'features/auth/hooks/useAuth';
+import { Link } from 'react-router-dom';
 import { SideNavigationItem } from 'components/organisms/layout/Sidebar';
 
 type Props = {
@@ -22,18 +22,7 @@ type Props = {
 
 export const SpMenu: FC<Props> = memo((props) => {
   const { items } = props;
-
-  // ここをサイドバーと共通化させたい
-  const navigate = useNavigate();
-  const onClickLogout = () => {
-    const params = new URLSearchParams();
-    axios
-      .post('http://localhost:3000/auth/logout', params, {
-        withCredentials: true,
-      })
-      .then(() => navigate('/'))
-      .catch(() => alert('error'));
-  };
+  const { logout } = useAuth();
 
   return (
     <Menu>
@@ -55,7 +44,7 @@ export const SpMenu: FC<Props> = memo((props) => {
         <Link to="/app/users/profile">
           <MenuItem icon={<InfoOutlineIcon />}>Profile</MenuItem>
         </Link>
-        <MenuItem icon={<ArrowForwardIcon />} onClick={onClickLogout}>
+        <MenuItem icon={<ArrowForwardIcon />} onClick={logout}>
           Logout
         </MenuItem>
       </MenuList>
