@@ -26,7 +26,9 @@ export const NavItem: FC<Props> = memo((props) => {
             >
               <Flex>
                 <Icon as={icon} fontSize="xl" color={'gray.700'} />
-                <Text ml={5}>{title}</Text>
+                <Text ml={5} display={{ base: 'none', md: 'flex' }}>
+                  {title}
+                </Text>
               </Flex>
             </MenuButton>
           </Flex>

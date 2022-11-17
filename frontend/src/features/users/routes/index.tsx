@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import { BlockList } from '../components/BlockList';
+import { BlockList } from '../components/BlockUsersList';
 import { FriendsList } from '../components/FriendsList';
 import { UsersList } from '../components/UsersList';
 import { Profile } from './Profile';

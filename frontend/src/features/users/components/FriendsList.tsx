@@ -1,10 +1,10 @@
 import { FC, memo, useEffect } from 'react';
-import { Image, Button } from '@chakra-ui/react';
+import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllFriends } from '../api/useAllFriends';
-import { DeleteFriend } from './DeleteFriend';
+import { useAllFriends } from '../hooks/useAllFriends';
+import { DirectMessageButton } from './DirectMessageButton';
 
 export const FriendsList: FC = memo(() => {
   const { getFriends, friends } = useAllFriends();
@@ -17,14 +17,11 @@ export const FriendsList: FC = memo(() => {
       columns={[
         {
           title: '',
-          Cell({ entry: { name, avatarUrl } }) {
+          Cell({ entry: { avatarUrl } }) {
             return (
-              <Image
-                borderRadius="full"
-                boxSize="48px"
-                src={avatarUrl}
-                alt={name}
-              />
+              <Avatar src={avatarUrl}>
+                <AvatarBadge boxSize="1.1em" bg="green.500" />
+              </Avatar>
             );
           },
         },
@@ -37,18 +34,7 @@ export const FriendsList: FC = memo(() => {
         {
           title: '',
           Cell({ entry: { name } }) {
-            return (
-              <Link to={`../dm/${name}`}>
-                {' '}
-                <Button>Message</Button>
-              </Link>
-            );
-          },
-        },
-        {
-          title: '',
-          Cell({ entry: { name } }) {
-            return <DeleteFriend id={name} />;
+            return <DirectMessageButton id={name} />;
           },
         },
       ]}

@@ -1,13 +1,8 @@
 import { memo, FC } from 'react';
-import {
-  StarIcon,
-  ChatIcon,
-  CheckCircleIcon,
-  RepeatIcon,
-  SettingsIcon,
-} from '@chakra-ui/icons';
-import { Flex, Divider, Avatar } from '@chakra-ui/react';
-import { MenuIconButton } from 'components/atoms/button/MenuIconButton';
+import { ChatIcon, AtSignIcon, ViewIcon, EmailIcon } from '@chakra-ui/icons';
+import { Flex, Divider } from '@chakra-ui/react';
+import { LogoButton } from 'components/atoms/button/LogoButton';
+import { SpMenu } from 'components/molecules/SpMenu';
 import { UserNavigation } from 'components/molecules/UserNavigation';
 import { NavItem } from './NavItem';
 
@@ -21,34 +16,28 @@ export type SideNavigationItem = {
 export const Sidebar: FC = memo(() => {
   const navigation = [
     {
-      title: 'TransPong',
-      to: '.',
-      icon: StarIcon,
-      iconComponent: <StarIcon />,
-    },
-    {
       title: 'Users',
       to: 'users',
-      icon: RepeatIcon,
-      iconComponent: <RepeatIcon />,
+      icon: AtSignIcon,
+      iconComponent: <AtSignIcon />,
     },
     {
-      title: 'Games',
-      to: 'games',
-      icon: CheckCircleIcon,
-      iconComponent: <CheckCircleIcon />,
+      title: 'DM',
+      to: 'dm',
+      icon: EmailIcon,
+      iconComponent: <EmailIcon />,
     },
     {
-      title: 'Chats',
+      title: 'Chat',
       to: 'chats',
       icon: ChatIcon,
       iconComponent: <ChatIcon />,
     },
     {
-      title: 'Settings',
-      to: 'settings',
-      icon: SettingsIcon,
-      iconComponent: <SettingsIcon />,
+      title: 'Watch',
+      to: 'games',
+      icon: ViewIcon,
+      iconComponent: <ViewIcon />,
     },
   ].filter(Boolean) as SideNavigationItem[];
 
@@ -59,13 +48,16 @@ export const Sidebar: FC = memo(() => {
         h="100vh"
         marginTop="0"
         boxShadow="0 4px 12px 0 rgba(0,0,0,0.15)"
-        minW="200px"
-        maxW="200px"
+        minW={{ base: '50px', md: '180px' }}
+        maxW={{ base: '50px', md: '180px' }}
         flexDir="column"
         justifyContent="space-between"
         display={{ base: 'none', md: 'flex' }}
       >
         <Flex p="5%" flexDir="column" w="100%" alignItems="flex-start" as="nav">
+          <Flex mt={5} flexDir="column" w="100%" alignItems="flex-start">
+            <LogoButton />
+          </Flex>
           {navigation.map((item) => (
             <NavItem
               key={item.title}
@@ -75,28 +67,20 @@ export const Sidebar: FC = memo(() => {
             />
           ))}
         </Flex>
-        <Flex p="5%" flexDir="column" w="100%" mb={4}>
-          <Flex mt={4} align="center">
-            <UserNavigation />
-            <Avatar size="sm" src="https://source.unsplash.com/random" />
-            <Divider />
-            <Flex flexDir="column" ml={4}></Flex>
-          </Flex>
+        <Flex p="5%" flexDir="column" w="100%" mb={4} as="nav">
+          <Divider />
+          <UserNavigation />
         </Flex>
       </Flex>
-      <MenuIconButton items={navigation} />
-
-      {/* <IconButton
-        aria-label="Menu Button"
-        background="non"
-        mt={5}
-        _hover={{ background: 'none' }}
-        icon={<HamburgerIcon />}
-        onClick={() => {
-          navSize === 'small' ? setNavSize('large') : setNavSize('small');
-        }}
+      <SpMenu items={navigation} />
+      <Flex
         display={{ base: 'flex', md: 'none' }}
-      /> */}
+        position="absolute"
+        left={8}
+        top={0.5}
+      >
+        <LogoButton />
+      </Flex>
     </>
   );
 });
