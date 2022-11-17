@@ -38,4 +38,12 @@ export class GameService {
 
     return matchResult;
   }
+
+  async findMatchHistory(userId: string): Promise<MatchResult[]> {
+    const matchResults = await this.prisma.matchResult.findMany({
+      where: { userId },
+    });
+
+    return matchResults;
+  }
 }
