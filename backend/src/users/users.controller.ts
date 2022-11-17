@@ -16,6 +16,7 @@ import { Relationship, User } from '@prisma/client';
 import { FileService } from 'src/file/file.service';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { DeleteGuard } from './guards/delete.guard';
 import { PostGuard } from './guards/post.guard';
 import { UsersService } from './users.service';
 
@@ -39,7 +40,7 @@ export class UsersController {
   }
 
   @Post(':id/friends')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PostGuard)
   async addFriend(
     @Param('id') id: string,
     @Body('peerId') peerId: string
@@ -48,7 +49,7 @@ export class UsersController {
   }
 
   @Delete(':id/friends')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, DeleteGuard)
   async deleteFriend(
     @Param('id') id: string,
     @Body('peerId') peerId: string
