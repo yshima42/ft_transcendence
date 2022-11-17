@@ -12,8 +12,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Relationship, User } from '@prisma/client';
+import { MatchResult, Relationship, User } from '@prisma/client';
 import { FileService } from 'src/file/file.service';
+import { GameService } from 'src/game/game.service';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DeleteGuard } from './guards/delete.guard';
@@ -24,7 +25,8 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly fileService: FileService
+    private readonly fileService: FileService,
+    private readonly gameService: GameService
   ) {}
 
   @Get('all')
@@ -102,5 +104,13 @@ export class UsersController {
     const path = `./upload/${id}/${filename}`;
 
     return this.fileService.streamFile(path);
+  }
+
+  @Get(':id/game/matches')
+  @UseGuards(JwtAuthGuard)
+  async findMatchHistory(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<MatchResult[]> {
+    return await this.gameService.findMatchHistory(id);
   }
 }
