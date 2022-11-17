@@ -1,5 +1,7 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -10,10 +12,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { User } from '@prisma/client';
+import { Relationship, User } from '@prisma/client';
 import { FileService } from 'src/file/file.service';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { DeleteGuard } from './guards/delete.guard';
 import { PostGuard } from './guards/post.guard';
 import { UsersService } from './users.service';
 
@@ -34,6 +37,44 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   findMe(@GetUser() user: User): User {
     return user;
+  }
+
+  @Post(':id/friends')
+  @UseGuards(JwtAuthGuard, PostGuard)
+  async addFriend(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('peerId', ParseUUIDPipe) peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    return await this.usersService.addFriend(id, peerId);
+  }
+
+  @Delete(':id/friends')
+  @UseGuards(JwtAuthGuard, DeleteGuard)
+  async deleteFriend(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('peerId', ParseUUIDPipe) peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    return await this.usersService.deleteFriend(id, peerId);
+  }
+
+  @Get(':id/requesting')
+  @UseGuards(JwtAuthGuard)
+  async findRequesting(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<User[]> {
+    return await this.usersService.findRequesting(id);
+  }
+
+  @Get(':id/pending')
+  @UseGuards(JwtAuthGuard)
+  async findPending(@Param('id', ParseUUIDPipe) id: string): Promise<User[]> {
+    return await this.usersService.findPending(id);
+  }
+
+  @Get(':id/friends')
+  @UseGuards(JwtAuthGuard)
+  async findFriends(@Param('id', ParseUUIDPipe) id: string): Promise<User[]> {
+    return await this.usersService.findFriends(id);
   }
 
   @Post(':id/avatar')
