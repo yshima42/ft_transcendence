@@ -18,7 +18,7 @@ export const useMe = (): {
         setMe(res.data);
       })
       .catch(() => navigate('/', { replace: true }));
-  }, []);
+  }, [navigate]);
 
   return { getMe, me };
 };
