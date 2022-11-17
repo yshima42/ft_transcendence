@@ -1,9 +1,9 @@
 import { FC, memo, useEffect } from 'react';
-import { Image } from '@chakra-ui/react';
+import { Avatar } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllBlock } from '../api/useAllBlock';
+import { useAllBlock } from '../hooks/useAllBlock';
 import { UnblockUser } from './UnblockUser';
 
 export const BlockList: FC = memo(() => {
@@ -17,15 +17,8 @@ export const BlockList: FC = memo(() => {
       columns={[
         {
           title: '',
-          Cell({ entry: { name, avatarUrl } }) {
-            return (
-              <Image
-                borderRadius="full"
-                boxSize="48px"
-                src={avatarUrl}
-                alt={name}
-              />
-            );
+          Cell({ entry: { avatarUrl } }) {
+            return <Avatar size="md" src={avatarUrl} />;
           },
         },
         {
