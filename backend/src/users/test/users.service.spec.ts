@@ -57,7 +57,7 @@ describe('UsersServiceTest', () => {
   // FriendAPIのjestによるユニットテストはしない。
   describe('findFriends', () => {
     it('正常系:フレンドが見つかる', async () => {
-      const expectedFindMany = [{ targetUser: mockUser2 }];
+      const expectedFindMany = [{ peer: mockUser2 }];
       const expectedFindFriends = [mockUser2];
       prisma.relationship.findMany = jest
         .fn()
