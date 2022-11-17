@@ -1,21 +1,9 @@
-import { memo, FC, useState } from 'react';
-import { Box, Button, Divider, Flex, Heading, Stack } from '@chakra-ui/react';
-import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
-import { useDummyAuth } from '../hooks/useDummyAuth';
+import { memo, FC } from 'react';
+import { Box, Divider, Flex, Heading, Stack } from '@chakra-ui/react';
+import { Auth42Button } from '../components/Auth42Button';
+import { DummyAuthButton } from '../components/DummyAuthButton';
 
 export const Login: FC = memo(() => {
-  const { dummyLogin, loading } = useDummyAuth();
-
-  const [loading42, setLoading42] = useState(false);
-
-  const onClick42 = () => {
-    setLoading42(true);
-  };
-
-  const onClickDummy1 = () => dummyLogin('dummy1');
-  const onClickDummy2 = () => dummyLogin('dummy2');
-  const onClickDummy3 = () => dummyLogin('dummy3');
-
   return (
     <Flex align="center" justify="center" height="100vh">
       <Box bg="white" w="sm" p={4} borderRadius="md" shadow="md">
@@ -24,27 +12,11 @@ export const Login: FC = memo(() => {
         </Heading>
         <Divider />
         <Stack spacing={4} py={4} px={10}>
-          <Button
-            bg="teal.900"
-            color="white"
-            isLoading={loading42}
-            loadingText="Loading"
-            onClick={onClick42}
-            as="a"
-            href="http://localhost:3000/auth/login/42"
-          >
-            42 Auth
-          </Button>
+          <Auth42Button />
           <Divider />
-          <PrimaryButton loading={loading} onClick={onClickDummy1}>
-            Admin Test 1
-          </PrimaryButton>
-          <PrimaryButton loading={loading} onClick={onClickDummy2}>
-            Admin Test 2
-          </PrimaryButton>
-          <PrimaryButton loading={loading} onClick={onClickDummy3}>
-            Admin Test 3
-          </PrimaryButton>
+          <DummyAuthButton dummyId="dummy1" />
+          <DummyAuthButton dummyId="dummy2" />
+          <DummyAuthButton dummyId="dummy3" />
         </Stack>
       </Box>
     </Flex>

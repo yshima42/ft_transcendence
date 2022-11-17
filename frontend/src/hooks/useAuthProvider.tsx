@@ -1,3 +1,5 @@
+// 現在は使っていない
+
 import { createContext, useContext, useState } from 'react';
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
 
