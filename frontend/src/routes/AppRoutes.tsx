@@ -1,12 +1,13 @@
-import { useAuth } from 'hooks/useAuthProvider';
+// import { useAuth } from 'hooks/useAuthProvider';
 import { useRoutes } from 'react-router-dom';
-import { protectedRoutes } from './ProtectedRoutes';
+// import { protectedRoutes } from './ProtectedRoutes';
 import { publicRoutes } from './PublicRoutes';
 
 export const AppRoutes = (): React.ReactElement | null => {
-  const auth = useAuth();
-
-  const routes = auth.user !== '' ? protectedRoutes : publicRoutes;
+  // フロントでログイン判定する場合はこちらの方法で処理
+  // const auth = useAuth();
+  // const routes = auth.user !== '' ? protectedRoutes : publicRoutes;
+  const routes = publicRoutes;
 
   const element = useRoutes([...routes]);
 
