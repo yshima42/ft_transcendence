@@ -2,7 +2,7 @@ import { FC, memo, useEffect } from 'react';
 import { Box, Button } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllChats } from '../api/useAllChats';
+import { useAllChats } from '../hooks/useAllChats';
 import { Chat } from '../types/chat';
 
 export const ChatsList: FC = memo(() => {
@@ -33,7 +33,7 @@ export const ChatsList: FC = memo(() => {
           },
         },
         {
-          title: '参加',
+          title: 'Join',
           Cell({ entry: { id } }) {
             return (
               <Link to={`${id}`}>

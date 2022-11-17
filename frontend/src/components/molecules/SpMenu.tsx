@@ -1,5 +1,9 @@
 import { memo, FC } from 'react';
-import { HamburgerIcon } from '@chakra-ui/icons';
+import {
+  ArrowForwardIcon,
+  HamburgerIcon,
+  InfoOutlineIcon,
+} from '@chakra-ui/icons';
 import {
   IconButton,
   Menu,
@@ -8,6 +12,7 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
+import { useAuth } from 'features/auth/hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { SideNavigationItem } from 'components/organisms/layout/Sidebar';
 
@@ -15,8 +20,9 @@ type Props = {
   items: SideNavigationItem[];
 };
 
-export const MenuIconButton: FC<Props> = memo((props) => {
+export const SpMenu: FC<Props> = memo((props) => {
   const { items } = props;
+  const { logout } = useAuth();
 
   return (
     <Menu>
@@ -26,6 +32,7 @@ export const MenuIconButton: FC<Props> = memo((props) => {
         icon={<HamburgerIcon w={6} h={6} />}
         variant="none"
         display={{ base: 'flex', md: 'none' }}
+        position="absolute"
       />
       <MenuList>
         {items.map((item) => (
@@ -34,8 +41,12 @@ export const MenuIconButton: FC<Props> = memo((props) => {
           </Link>
         ))}
         <MenuDivider />
-        <MenuItem>Profile</MenuItem>
-        <MenuItem>Logout</MenuItem>
+        <Link to="/app/users/profile">
+          <MenuItem icon={<InfoOutlineIcon />}>Profile</MenuItem>
+        </Link>
+        <MenuItem icon={<ArrowForwardIcon />} onClick={logout}>
+          Logout
+        </MenuItem>
       </MenuList>
     </Menu>
   );

@@ -1,55 +1,32 @@
-import { FC, memo } from 'react';
-import { Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
-import axios from 'axios';
-// import { useMe } from 'hooks/useMe';
-import { AiOutlineUser } from 'react-icons/ai';
-import { Link, useNavigate } from 'react-router-dom';
-
-type UserNavigationItem = {
-  name: string;
-  to: string;
-  onClick: () => void;
-};
+import { FC, memo, useEffect } from 'react';
+import { Avatar, AvatarBadge, Button, Flex, Heading } from '@chakra-ui/react';
+import { useAuth } from 'features/auth/hooks/useAuth';
+import { useMe } from 'hooks/useMe';
+import { Link } from 'react-router-dom';
 
 export const UserNavigation: FC = memo(() => {
-  // const [me, setMe] = useState('');
-  const navigate = useNavigate();
-  // const me = useMe();
+  const { logout } = useAuth();
 
-  const onClickLogout = () => {
-    const params = new URLSearchParams();
-    axios
-      .post('http://localhost:3000/auth/logout', params, {
-        withCredentials: true,
-      })
-      .then(() => navigate('/', { replace: true }))
-      .catch(() => alert('error'));
-  };
-
-  const userNavigation = [
-    { name: 'Your Profile', to: `./users/profile` },
-    // { name: 'Your Profile', to: `./users/${me}` },
-    {
-      name: 'Sign out',
-      to: '',
-      onClick: () => {
-        onClickLogout();
-      },
-    },
-  ].filter(Boolean) as UserNavigationItem[];
+  const { getMe, me } = useMe();
+  useEffect(() => getMe(), [getMe]);
 
   return (
-    <Menu>
-      <MenuButton>
-        <AiOutlineUser size={25} />
-      </MenuButton>
-      <MenuList color="gray.800">
-        {userNavigation.map((item) => (
-          <Link key={item.name} to={item.to} onClick={item.onClick}>
-            <MenuItem>{item.name}</MenuItem>
-          </Link>
-        ))}
-      </MenuList>
-    </Menu>
+    <Flex p="5%" mt={4} align="center">
+      <Link to="/app/users/profile">
+        <Avatar size="sm" src={me?.avatarUrl}>
+          <AvatarBadge boxSize="1.1em" bg="green.500" />
+        </Avatar>
+      </Link>
+      <Flex flexDir="column" ml={4}>
+        <Link to="/app/users/profile">
+          <Heading as="h3" size="sm">
+            {me?.name}
+          </Heading>
+        </Link>
+        <Button size="xs" rounded="lg" onClick={logout} color="gray">
+          Logout
+        </Button>
+      </Flex>
+    </Flex>
   );
 });

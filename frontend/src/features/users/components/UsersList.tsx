@@ -1,9 +1,11 @@
 import { FC, memo, useEffect } from 'react';
-import { Image, Button } from '@chakra-ui/react';
+import { Avatar } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllUsers } from '../api/useAllUsers';
+import { useAllUsers } from '../hooks/useAllUsers';
+import { AddFriend } from './AddFriend';
+import { DirectMessageButton } from './DirectMessageButton';
 
 export const UsersList: FC = memo(() => {
   const { getUsers, users } = useAllUsers();
@@ -16,38 +18,26 @@ export const UsersList: FC = memo(() => {
       columns={[
         {
           title: '',
-          Cell({ entry: { name } }) {
-            return (
-              <Image
-                borderRadius="full"
-                boxSize="48px"
-                src="https://source.unsplash.com/random"
-                alt={name}
-              />
-            );
+          Cell({ entry: { avatarUrl } }) {
+            return <Avatar size="md" src={avatarUrl} />;
           },
         },
         {
           title: '',
           Cell({ entry: { name } }) {
-            return <Link to={`./${name}`}>{name}</Link>;
+            return <Link to={`../${name}`}>{name}</Link>;
           },
         },
         {
           title: '',
           Cell({ entry: { name } }) {
-            return (
-              <Link to={`../dm/${name}`}>
-                {' '}
-                <Button>Message</Button>
-              </Link>
-            );
+            return <DirectMessageButton id={name} />;
           },
         },
         {
           title: '',
           Cell({ entry: { name } }) {
-            return <Button about={name}>友達追加</Button>;
+            return <AddFriend id={name} />;
           },
         },
       ]}

@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
-import { ChakraProvider, theme } from '@chakra-ui/react';
-import { AuthProvider } from 'hooks/useAuthProvider';
+import { ChakraProvider } from '@chakra-ui/react';
 import { BrowserRouter } from 'react-router-dom';
+import theme from '../theme/theme';
 
 type Props = {
   children: React.ReactNode;
@@ -12,9 +12,7 @@ export const AppProvider: FC<Props> = memo((props) => {
 
   return (
     <ChakraProvider theme={theme}>
-      <AuthProvider>
-        <BrowserRouter>{children}</BrowserRouter>
-      </AuthProvider>
+      <BrowserRouter>{children}</BrowserRouter>
     </ChakraProvider>
   );
 });
