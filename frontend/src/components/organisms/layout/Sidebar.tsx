@@ -1,13 +1,8 @@
 import { memo, FC } from 'react';
-import {
-  StarIcon,
-  ChatIcon,
-  AtSignIcon,
-  ViewIcon,
-  EmailIcon,
-} from '@chakra-ui/icons';
+import { ChatIcon, AtSignIcon, ViewIcon, EmailIcon } from '@chakra-ui/icons';
 import { Flex, Divider } from '@chakra-ui/react';
-import { MenuIconButton } from 'components/atoms/button/MenuIconButton';
+import { LogoButton } from 'components/atoms/button/LogoButton';
+import { SpMenu } from 'components/molecules/SpMenu';
 import { UserNavigation } from 'components/molecules/UserNavigation';
 import { NavItem } from './NavItem';
 
@@ -20,12 +15,6 @@ export type SideNavigationItem = {
 
 export const Sidebar: FC = memo(() => {
   const navigation = [
-    {
-      title: 'TransPong',
-      to: '.',
-      icon: StarIcon,
-      iconComponent: <StarIcon />,
-    },
     {
       title: 'Users',
       to: 'users',
@@ -66,6 +55,9 @@ export const Sidebar: FC = memo(() => {
         display={{ base: 'none', md: 'flex' }}
       >
         <Flex p="5%" flexDir="column" w="100%" alignItems="flex-start" as="nav">
+          <Flex mt={5} flexDir="column" w="100%" alignItems="flex-start">
+            <LogoButton />
+          </Flex>
           {navigation.map((item) => (
             <NavItem
               key={item.title}
@@ -80,7 +72,15 @@ export const Sidebar: FC = memo(() => {
           <UserNavigation />
         </Flex>
       </Flex>
-      <MenuIconButton items={navigation} />
+      <SpMenu items={navigation} />
+      <Flex
+        display={{ base: 'flex', md: 'none' }}
+        position="absolute"
+        left={8}
+        top={0.5}
+      >
+        <LogoButton />
+      </Flex>
     </>
   );
 });

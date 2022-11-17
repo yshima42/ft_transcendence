@@ -1,5 +1,5 @@
 import { FC, memo, useEffect } from 'react';
-import { Avatar, Button, Flex, Heading } from '@chakra-ui/react';
+import { Avatar, AvatarBadge, Button, Flex, Heading } from '@chakra-ui/react';
 import axios from 'axios';
 import { useMe } from 'hooks/useMe';
 import { Link, useNavigate } from 'react-router-dom';
@@ -23,7 +23,9 @@ export const UserNavigation: FC = memo(() => {
   return (
     <Flex p="5%" mt={4} align="center">
       <Link to="/app/users/profile">
-        <Avatar size="sm" src={me?.avatarUrl} />
+        <Avatar size="sm" src={me?.avatarUrl}>
+          <AvatarBadge boxSize="1.1em" bg="green.500" />
+        </Avatar>
       </Link>
       <Flex flexDir="column" ml={4}>
         <Link to="/app/users/profile">

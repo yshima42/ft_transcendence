@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { Login } from '../../../features/auth/routes/Login';
+import { Login } from '../Login';
 
 describe('Test Login Component', () => {
   it('renders 42auth in page', () => {

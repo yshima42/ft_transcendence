@@ -8,7 +8,7 @@ export const DirectMessage: FC = memo(() => {
     <>
       {/* <DmSidebar /> */}
       <ContentLayout>
-        <p>Direct Messageです</p>
+        <p>Direct Message Page</p>
       </ContentLayout>
     </>
   );

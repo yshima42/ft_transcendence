@@ -2,7 +2,7 @@ import { FC, memo, useEffect } from 'react';
 import { Box, Button } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
-import { useAllGames } from '../api/useAllGames';
+import { useAllGames } from '../hooks/useAllGames';
 import { Game } from '../types/game';
 
 export const GamesList: FC = memo(() => {

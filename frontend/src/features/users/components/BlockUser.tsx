@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Button } from '@chakra-ui/react';
-import { useBlockUser } from '../api/useBlockUser';
+import { useBlockUser } from '../hooks/useBlockUser';
 
 type Props = {
   id: string;
