@@ -77,7 +77,7 @@ export class UsersController {
   @Post(':id/avatar')
   @UseGuards(JwtAuthGuard, PostGuard)
   @UseInterceptors(FileInterceptor('file', FileService.multerOptions()))
-  async uploadFile(
+  async uploadAvatar(
     @GetUser() user: User,
     @UploadedFile(FileService.parseFilePipe()) file: Express.Multer.File
   ): Promise<User> {
