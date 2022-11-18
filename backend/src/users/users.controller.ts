@@ -4,6 +4,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   StreamableFile,
   UploadedFile,
   UseGuards,
@@ -16,6 +17,7 @@ import { GameService } from 'src/game/game.service';
 import { GameStats } from 'src/game/interfaces/game-stats.interface';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserDto } from './dto/user.dto';
 import { PostGuard } from './guards/post.guard';
 import { UsersService } from './users.service';
 
@@ -33,10 +35,13 @@ export class UsersController {
     return await this.usersService.findAll(user);
   }
 
-  @Get('me')
+  @Get(':id/profile')
   @UseGuards(JwtAuthGuard)
-  findMe(@GetUser() user: User): User {
-    return user;
+  async find(
+    @Param('id') id: string,
+    @Query('fields') fields: string
+  ): Promise<UserDto> {
+    return await this.usersService.find(id, fields);
   }
 
   @Post(':id/avatar')
