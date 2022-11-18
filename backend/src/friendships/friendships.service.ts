@@ -10,6 +10,25 @@ export class FriendshipsService {
     userId: string,
     peerId: string
   ): Promise<[Relationship, Relationship]> {
+    const relation = await this.findByUserAndPeer(userId, peerId);
+
+    switch (relation?.type) {
+      // この部分Incomingもrequest送るで良いのか再度確認
+      case undefined:
+      case 'INCOMING':
+        return await this.requestFriend(userId, peerId);
+      case 'FRIEND':
+      case 'OUTGOING':
+        throw new BadRequestException('Already take action for friend-request');
+      default:
+        throw new BadRequestException('Unexpected error in addFriend');
+    }
+  }
+
+  async requestFriend(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
     const createRelation1 = await this.prisma.relationship.create({
       data: {
         userId,
@@ -26,6 +45,25 @@ export class FriendshipsService {
     });
 
     return [createRelation1, createRelation2];
+  }
+
+  async accept(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    const relation = await this.findByUserAndPeer(userId, peerId);
+
+    switch (relation?.type) {
+      case undefined:
+        throw new BadRequestException('Has not received friend-request');
+      case 'FRIEND':
+      case 'OUTGOING':
+        throw new BadRequestException('Already take action for friend-request');
+      case 'INCOMING':
+        return await this.acceptRequest(userId, peerId);
+      default:
+        throw new BadRequestException('Unexpected error in addFriend');
+    }
   }
 
   async acceptRequest(
@@ -58,74 +96,11 @@ export class FriendshipsService {
     return [updateRelation1, updateRelation2];
   }
 
-  async addFriend(
-    userId: string,
-    peerId: string
-  ): Promise<[Relationship, Relationship]> {
-    if (userId === peerId) {
-      throw new BadRequestException("can't create relation with myself");
-    }
-    const relation = await this.prisma.relationship.findUnique({
-      where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-    });
-
-    switch (relation?.type) {
-      case undefined:
-        return await this.request(userId, peerId);
-      case 'FRIEND':
-      case 'OUTGOING':
-        throw new BadRequestException('Already take action for friend-request');
-      case 'INCOMING':
-        return await this.acceptRequest(userId, peerId);
-      default:
-        throw new BadRequestException('Unexpected error in addFriend');
-    }
-  }
-
-  async deleteRelation(
-    userId: string,
-    peerId: string
-  ): Promise<[Relationship, Relationship]> {
-    const deleteRelation1 = await this.prisma.relationship.delete({
-      where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-    });
-    const _deleteRelation2 = await this.prisma.relationship.delete({
-      where: {
-        userId_peerId: {
-          userId: peerId,
-          peerId: userId,
-        },
-      },
-    });
-
-    return [deleteRelation1, _deleteRelation2];
-  }
-
   async deleteFriend(
     userId: string,
     peerId: string
   ): Promise<[Relationship, Relationship]> {
-    if (userId === peerId) {
-      throw new BadRequestException("can't create relation with myself");
-    }
-    const relation = await this.prisma.relationship.findUnique({
-      where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-    });
+    const relation = await this.findByUserAndPeer(userId, peerId);
 
     switch (relation?.type) {
       case undefined:
@@ -135,6 +110,16 @@ export class FriendshipsService {
       default:
         return await this.deleteRelation(userId, peerId);
     }
+  }
+
+  async deleteRelation(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    const deleteRelation1 = await this.deleteByUserAndPeer(userId, peerId);
+    const deleteRelation2 = await this.deleteByUserAndPeer(peerId, userId);
+
+    return [deleteRelation1, deleteRelation2];
   }
 
   async findOutgoing(userId: string): Promise<User[]> {
@@ -168,5 +153,38 @@ export class FriendshipsService {
     });
 
     return friendRelations.map((relation) => relation.peer);
+  }
+
+  // utils
+  async findByUserAndPeer(
+    userId: string,
+    peerId: string
+  ): Promise<Relationship | null> {
+    if (userId === peerId) {
+      throw new BadRequestException("can't create relation with myself");
+    }
+
+    return await this.prisma.relationship.findUnique({
+      where: {
+        userId_peerId: {
+          userId,
+          peerId,
+        },
+      },
+    });
+  }
+
+  async deleteByUserAndPeer(
+    userId: string,
+    peerId: string
+  ): Promise<Relationship> {
+    return await this.prisma.relationship.delete({
+      where: {
+        userId_peerId: {
+          userId,
+          peerId,
+        },
+      },
+    });
   }
 }

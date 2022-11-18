@@ -22,12 +22,39 @@ export class FriendshipsController {
     @GetUser() user: User,
     @Body('peerId', ParseUUIDPipe) peerId: string
   ): Promise<[Relationship, Relationship]> {
-    return await this.friendShipsService.addFriend(user.id, peerId);
+    return await this.friendShipsService.request(user.id, peerId);
+  }
+
+  @Post('accept')
+  @UseGuards(JwtAuthGuard)
+  async acceptFriend(
+    @GetUser() user: User,
+    @Body('peerId', ParseUUIDPipe) peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    return await this.friendShipsService.accept(user.id, peerId);
   }
 
   @Delete('destroy')
   @UseGuards(JwtAuthGuard)
   async deleteFriend(
+    @GetUser() user: User,
+    @Body('peerId', ParseUUIDPipe) peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    return await this.friendShipsService.deleteFriend(user.id, peerId);
+  }
+
+  @Delete('cancel')
+  @UseGuards(JwtAuthGuard)
+  async cancelFriend(
+    @GetUser() user: User,
+    @Body('peerId', ParseUUIDPipe) peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    return await this.friendShipsService.deleteFriend(user.id, peerId);
+  }
+
+  @Delete('reject')
+  @UseGuards(JwtAuthGuard)
+  async rejectFriend(
     @GetUser() user: User,
     @Body('peerId', ParseUUIDPipe) peerId: string
   ): Promise<[Relationship, Relationship]> {
