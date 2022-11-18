@@ -13,13 +13,12 @@ export class FriendshipsService {
     const relation = await this.findByUserAndPeer(userId, peerId);
 
     switch (relation?.type) {
-      // この部分Incomingもrequest送るで良いのか再度確認
       case undefined:
-      case 'INCOMING':
         return await this.requestFriend(userId, peerId);
       case 'FRIEND':
       case 'OUTGOING':
         throw new BadRequestException('Already take action for friend-request');
+      case 'INCOMING':
       default:
         throw new BadRequestException('Unexpected error in addFriend');
     }
