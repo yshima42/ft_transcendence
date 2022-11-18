@@ -1,4 +1,5 @@
-import { IsDate, IsString, IsUUID } from 'class-validator';
+import { OnlineStatus } from '@prisma/client';
+import { IsDate, IsEnum, IsString, IsUUID } from 'class-validator';
 
 export class UserDto {
   @IsUUID()
@@ -15,4 +16,10 @@ export class UserDto {
 
   @IsString()
   avatarUrl?: string;
+
+  @IsString()
+  nickname?: string;
+
+  @IsEnum(OnlineStatus)
+  onlineStatus?: OnlineStatus;
 }
