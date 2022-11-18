@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateUserColumns } from './interfaces/update-user-columns.interface';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,12 +15,48 @@ export class UsersService {
     return users;
   }
 
-  async update(id: string, columns: UpdateUserColumns): Promise<User> {
-    const updateUser = await this.prisma.user.update({
-      where: { id },
-      data: columns,
-    });
+  findMe(user: User): User {
+    return user;
+  }
 
-    return updateUser;
+  async find(id: string, fields: string | undefined): Promise<UserDto> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (user == null) {
+      throw new BadRequestException('invalid userId');
+    }
+
+    let userDto: UserDto = {};
+    if (fields === undefined) {
+      userDto = user;
+    } else {
+      const attrs = fields.split(',');
+      if (attrs.includes('id')) {
+        userDto.id = user?.id;
+      }
+      if (attrs.includes('createdAt')) {
+        userDto.createdAt = user.createdAt;
+      }
+      if (attrs.includes('updatedAt')) {
+        userDto.updatedAt = user.updatedAt;
+      }
+      if (attrs.includes('name')) {
+        userDto.name = user.name;
+      }
+      if (attrs.includes('avatarUrl')) {
+        userDto.avatarUrl = user.avatarUrl;
+      }
+      if (attrs.includes('nickname')) {
+        userDto.nickname = user.nickname;
+      }
+      if (attrs.includes('onlineStatus')) {
+        userDto.onlineStatus = user.onlineStatus;
+      }
+    }
+
+    return userDto;
   }
 }
