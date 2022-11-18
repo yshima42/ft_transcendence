@@ -16,10 +16,18 @@ model User {
   updatedAt       DateTime       @updatedAt
   name            String         @unique
   avatarUrl       String
+  nickname        String         @unique @default("")
+  onlineStatus    OnlineStatus   @default(ONLINE)
   following       Relationship[] @relation("following")
   followedBy      Relationship[] @relation("followedBy")
   matchedUser     MatchResult[]  @relation("matchedUser")
   matchedOpponent MatchResult[]  @relation("matchedOpponent")
+}
+
+enum OnlineStatus {
+  ONLINE
+  OFFLINE
+  INGAME
 }
 
 model Relationship {
