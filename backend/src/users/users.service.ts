@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserDto } from './dto/user.dto';
-import { UpdateUserColumns } from './interfaces/update-user-columns.interface';
 
 @Injectable()
 export class UsersService {
@@ -59,14 +58,5 @@ export class UsersService {
     }
 
     return userDto;
-  }
-
-  async update(id: string, columns: UpdateUserColumns): Promise<User> {
-    const updateUser = await this.prisma.user.update({
-      where: { id },
-      data: columns,
-    });
-
-    return updateUser;
   }
 }

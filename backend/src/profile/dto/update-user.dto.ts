@@ -4,6 +4,10 @@ import { IsEnum, IsOptional, IsString } from 'class-validator';
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
+  avatarUrl?: string;
+
+  @IsString()
+  @IsOptional()
   nickname?: string;
 
   @IsEnum(OnlineStatus)
