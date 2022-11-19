@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MatchResult, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -7,6 +8,7 @@ import { GameService } from './game.service';
 import { GameStats } from './interfaces/game-stats.interface';
 
 @Controller('game')
+@ApiTags('game')
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 

@@ -7,12 +7,14 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Relationship, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FriendshipsService } from './friendships.service';
 
 @Controller('friendships')
+@ApiTags('friendships')
 export class FriendshipsController {
   constructor(private readonly friendShipsService: FriendshipsService) {}
 
