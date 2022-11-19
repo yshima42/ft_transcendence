@@ -9,6 +9,7 @@ import {
   Res,
   Redirect,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CookieOptions } from 'csurf';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -17,6 +18,7 @@ import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

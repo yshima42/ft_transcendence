@@ -11,6 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -21,6 +22,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profile')
+@ApiTags('profile')
 export class ProfileController {
   constructor(
     private readonly profileService: ProfileService,

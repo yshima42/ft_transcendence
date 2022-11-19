@@ -7,6 +7,7 @@ import {
   StreamableFile,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MatchResult, User } from '@prisma/client';
 import { FileService } from 'src/file/file.service';
 import { GameService } from 'src/game/game.service';
@@ -17,6 +18,7 @@ import { UserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
+@ApiTags('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
