@@ -1,3 +1,6 @@
+import { Suspense } from 'react';
+import { Spinner } from '@chakra-ui/react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Route, Routes } from 'react-router-dom';
 import { BlockList } from '../components/BlockUsersList';
 import { FriendsList } from '../components/FriendsList';
@@ -10,7 +13,16 @@ export const UsersRoutes = (): React.ReactElement => {
   return (
     <Routes>
       <Route path="" element={<Users />}>
-        <Route path="" element={<FriendsList />} />
+        <Route
+          path=""
+          element={
+            <ErrorBoundary fallback={<p>Error</p>}>
+              <Suspense fallback={<Spinner />}>
+                <FriendsList />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
         <Route path="all" element={<UsersList />} />
         <Route path="block" element={<BlockList />} />
       </Route>
