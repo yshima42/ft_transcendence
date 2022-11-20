@@ -1,23 +1,37 @@
-import { useCallback, useState } from 'react';
 import { User } from '@prisma/client';
-import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 import { axios } from '../../../lib/axios';
 
-export const useAllFriends = (): {
-  getFriends: () => void;
-  friends: User[];
-} => {
-  const [friends, setFriends] = useState<User[]>([]);
-  const navigate = useNavigate();
+const fetchFriends = async () => {
+  const result = await axios.get<User[]>('/users/all');
 
-  const getFriends = useCallback(() => {
-    // ここをfriend取得のAPIに変える
-    axios
-      .get<User[]>('/users/all')
-      .then((res) => setFriends(res.data))
-      .catch(() => navigate('/', { replace: true }));
-  }, [navigate]);
-
-  return { getFriends, friends };
+  return result.data;
 };
+
+export const useAllFriends = (): User[] | undefined => {
+  const { data } = useQuery<User[]>(['friends'], fetchFriends);
+
+  return data;
+};
+
+// import { useCallback, useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+
+// export const useAllFriends = (): {
+//   getFriends: () => void;
+//   friends: User[];
+// } => {
+//   const [friends, setFriends] = useState<User[]>([]);
+//   const navigate = useNavigate();
+
+//   const getFriends = useCallback(() => {
+//     // ここをfriend取得のAPIに変える
+//     axios
+//       .get<User[]>('/users/all')
+//       .then((res) => setFriends(res.data))
+//       .catch(() => navigate('/', { replace: true }));
+//   }, [navigate]);
+
+//   return { getFriends, friends };
+// };
