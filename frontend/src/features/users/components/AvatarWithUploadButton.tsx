@@ -2,7 +2,7 @@ import { memo, FC, useRef } from 'react';
 import { Image, Stack } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { AxiosError } from 'axios';
-import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
+import { PrimaryButton } from 'components/button/PrimaryButton';
 import { axios } from '../../../lib/axios';
 
 type Props = {

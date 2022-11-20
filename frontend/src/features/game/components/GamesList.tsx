@@ -1,7 +1,7 @@
 import { FC, memo, useEffect } from 'react';
 import { Box, Button } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
+import { PrimaryTable } from 'components/table/PrimaryTable';
 import { useAllGames } from '../hooks/useAllGames';
 import { Game } from '../types/game';
 

@@ -3,7 +3,7 @@ import { FC, memo } from 'react';
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
-import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
+import { PrimaryTable } from 'components/table/PrimaryTable';
 import { useAllFriends } from '../hooks/useAllFriends';
 import { DirectMessageButton } from './DirectMessageButton';
 

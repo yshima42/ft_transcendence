@@ -8,7 +8,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
+import { PrimaryButton } from 'components/button/PrimaryButton';
 
 type Props = {
   name: string;

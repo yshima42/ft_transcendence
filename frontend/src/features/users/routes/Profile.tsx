@@ -1,6 +1,6 @@
 import { memo, FC } from 'react';
 import { Flex } from '@chakra-ui/react';
-import { ContentLayout } from 'components/templates/ContentLayout';
+import { ContentLayout } from 'components/layout/ContentLayout';
 import { AvatarWithUploadButton } from '../components/AvatarWithUploadButton';
 import { ProfileCard } from '../components/ProfileCard';
 

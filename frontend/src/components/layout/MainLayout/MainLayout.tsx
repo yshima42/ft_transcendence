@@ -2,8 +2,8 @@ import { FC, memo } from 'react';
 import { AtSignIcon, ChatIcon, EmailIcon, ViewIcon } from '@chakra-ui/icons';
 import { Flex } from '@chakra-ui/react';
 // import { Header } from 'components/organisms/layout/Header';
-import { SpMenu } from 'components/organisms/layout/SpMenu';
-import { WebSidebarMenu } from 'components/organisms/layout/WebSidebarMenu';
+import { SpMenu } from 'components/layout/MainLayout/SpMenu';
+import { WebSidebarMenu } from 'components/layout/MainLayout/WebSidebarMenu';
 
 type Props = {
   children: React.ReactNode;

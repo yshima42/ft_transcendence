@@ -1,6 +1,6 @@
 import { FC, Suspense, useState, useTransition } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ContentLayout } from 'components/templates/ContentLayout';
+import { ContentLayout } from 'components/layout/ContentLayout';
 import { BlockList } from '../components/BlockUsersList';
 import { FriendsList } from '../components/FriendsList';
 import { UsersList } from '../components/UsersList';
