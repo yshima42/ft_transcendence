@@ -1,10 +1,10 @@
-import { Suspense } from 'react';
-import { Spinner } from '@chakra-ui/react';
-import { ErrorBoundary } from 'react-error-boundary';
+// import { Suspense } from 'react';
+// import { Spinner } from '@chakra-ui/react';
+// import { ErrorBoundary } from 'react-error-boundary';
 import { Route, Routes } from 'react-router-dom';
-import { BlockList } from '../components/BlockUsersList';
-import { FriendsList } from '../components/FriendsList';
-import { UsersList } from '../components/UsersList';
+// import { BlockList } from '../components/BlockUsersList';
+// import { FriendsList } from '../components/FriendsList';
+// import { UsersList } from '../components/UsersList';
 import { Profile } from './Profile';
 import { Stats } from './Stats';
 import { Users } from './Users';
@@ -12,8 +12,8 @@ import { Users } from './Users';
 export const UsersRoutes = (): React.ReactElement => {
   return (
     <Routes>
-      <Route path="" element={<Users />}>
-        <Route
+      <Route path="" element={<Users />} />
+      {/* <Route
           path=""
           element={
             <ErrorBoundary fallback={<p>Error</p>}>
@@ -42,8 +42,8 @@ export const UsersRoutes = (): React.ReactElement => {
               </Suspense>
             </ErrorBoundary>
           }
-        />
-      </Route>
+        /> */}
+      {/* </Route> */}
       <Route path="profile" element={<Profile />} />
       <Route path=":userId" element={<Stats />} />
     </Routes>
