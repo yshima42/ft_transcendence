@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { MatchResult, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { MatchResultDto } from './dto/match-result.dto';
+import { GameStatsEntity } from './entities/game-stats.entity';
+import { MatchResultEntity } from './entities/match-result.entity';
 import { GameService } from './game.service';
 import { GameStats } from './interfaces/game-stats.interface';
 
@@ -14,6 +16,7 @@ export class GameController {
 
   @Post('matches')
   @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: MatchResultEntity })
   async addMatchResult(
     @GetUser() user: User,
     @Body() matchResultDto: MatchResultDto
@@ -23,12 +26,14 @@ export class GameController {
 
   @Get('matches')
   @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: MatchResultEntity, isArray: true })
   async findMatchHistory(@GetUser() user: User): Promise<MatchResult[]> {
     return await this.gameService.findMatchHistory(user.id);
   }
 
   @Get('stats')
   @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: GameStatsEntity })
   async findGameStats(@GetUser() user: User): Promise<GameStats> {
     return await this.gameService.findStats(user.id);
   }
