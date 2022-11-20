@@ -23,8 +23,26 @@ export const UsersRoutes = (): React.ReactElement => {
             </ErrorBoundary>
           }
         />
-        <Route path="all" element={<UsersList />} />
-        <Route path="block" element={<BlockList />} />
+        <Route
+          path="all"
+          element={
+            <ErrorBoundary fallback={<p>Error</p>}>
+              <Suspense fallback={<Spinner />}>
+                <UsersList />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="block"
+          element={
+            <ErrorBoundary fallback={<p>Error</p>}>
+              <Suspense fallback={<Spinner />}>
+                <BlockList />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
       </Route>
       <Route path="profile" element={<Profile />} />
       <Route path=":userId" element={<Stats />} />
