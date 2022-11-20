@@ -9,14 +9,17 @@ import {
   Res,
   Redirect,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CookieOptions } from 'csurf';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
+import { DummyLoginDto } from './dto/dummy-login.dto';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -53,10 +56,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login/dummy')
   async dummyLogin(
-    @Body() body: { name: string },
+    @Body() dummyLoginDto: DummyLoginDto,
+    // @Body() body: { name: string },
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    const { accessToken } = await this.authService.login(body.name);
+    const { accessToken } = await this.authService.login(dummyLoginDto.name);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     return { message: 'ok' };
