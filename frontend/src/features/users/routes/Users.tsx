@@ -77,7 +77,7 @@ export const Users: FC = () => {
           <Button
             size="sm"
             mr={2}
-            bg={selectedTab === 'users' ? 'teal.100' : 'gray.100'}
+            bg={selectedTab === 'block' ? 'teal.100' : 'gray.100'}
             borderRadius="5px"
             opacity={isPending ? 0.5 : 1}
             onClick={() => onClickTabButton('block')}
