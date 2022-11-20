@@ -12,25 +12,6 @@ export const Users: FC = () => {
   const [selectedTab, setSelectedTab] = useState<Tabs>('friends');
   const [isPending, startTransition] = useTransition();
 
-  // const buttonStyle = {
-  //   padding: '12px',
-  //   fontSize: '16px',
-  //   border: 'none',
-  //   opacity: isPending ? 0.5 : 1,
-  // };
-
-  // const friendsButtonStyle = {
-  //   ...buttonStyle,
-  //   backgroundColor: selectedTab === 'friends' ? 'royalblue' : 'white',
-  //   color: selectedTab === 'friends' ? 'white' : 'black',
-  // };
-
-  // const usersButtonStyle = {
-  //   ...buttonStyle,
-  //   backgroundColor: selectedTab === 'users' ? 'royalblue' : 'white',
-  //   color: selectedTab === 'users' ? 'white' : 'black',
-  // };
-
   const onClickTabButton = (tab: Tabs) => {
     startTransition(() => {
       setSelectedTab(tab);
@@ -41,19 +22,6 @@ export const Users: FC = () => {
     <ContentLayout title="Users">
       <ErrorBoundary fallback={<h1>Error</h1>}>
         <Suspense fallback={<p>Now loading...</p>}>
-          {/* <button
-                style={friendsButtonStyle}
-                onClick={() => onClickTabButton('friends')}
-              >
-                Todo
-              </button>
-              <button
-                style={usersButtonStyle}
-                onClick={() => onClickTabButton('users')}
-              >
-                Album
-              </button> */}
-
           <Button
             size="sm"
             mr={2}
