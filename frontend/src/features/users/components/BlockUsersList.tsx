@@ -1,4 +1,5 @@
-import { FC, memo, useEffect } from 'react';
+import { FC, memo } from 'react';
+// import { FC, memo, useEffect } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
@@ -7,13 +8,17 @@ import { useAllBlock } from '../hooks/useAllBlock';
 import { UnblockUser } from './UnblockUser';
 
 export const BlockList: FC = memo(() => {
-  const { getBlock, block } = useAllBlock();
+  // const { getBlock, block } = useAllBlock();
 
-  useEffect(() => getBlock(), [getBlock]);
+  // useEffect(() => getBlock(), [getBlock]);
+  const data = useAllBlock();
+
+  if (data === undefined) return <></>;
 
   return (
     <PrimaryTable<User>
-      data={block}
+      data={data}
+      // data={block}
       columns={[
         {
           title: '',
