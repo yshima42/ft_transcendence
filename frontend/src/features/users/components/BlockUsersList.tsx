@@ -3,7 +3,7 @@ import { FC, memo } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
-import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
+import { PrimaryTable } from 'components/table/PrimaryTable';
 import { useAllBlock } from '../hooks/useAllBlock';
 import { UnblockUser } from './UnblockUser';
 

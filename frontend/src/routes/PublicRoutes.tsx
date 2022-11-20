@@ -1,7 +1,7 @@
 import { Stats } from 'features/users/index';
 import { UsersRoutes } from 'features/users/routes';
 import { Outlet } from 'react-router-dom';
-import { MainLayout } from 'components/templates/MainLayout';
+import { MainLayout } from 'components/layout/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { Chats } from 'features/chat/routes/Chats';

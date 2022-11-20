@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Box, Button, Center, Stack } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { ContentLayout } from 'components/templates/ContentLayout';
+import { ContentLayout } from 'components/layout/ContentLayout';
 
 export const GameTop: FC = memo(() => {
   return (
