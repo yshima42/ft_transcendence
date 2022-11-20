@@ -1,10 +1,10 @@
 import { FC, Suspense, useState, useTransition } from 'react';
-import { Button } from '@chakra-ui/react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ContentLayout } from 'components/templates/ContentLayout';
 import { BlockList } from '../components/BlockUsersList';
 import { FriendsList } from '../components/FriendsList';
 import { UsersList } from '../components/UsersList';
+import { UsersTabButton } from '../components/UsersTabButton';
 
 type Tabs = 'friends' | 'users' | 'block';
 
@@ -22,36 +22,27 @@ export const Users: FC = () => {
     <ContentLayout title="Users">
       <ErrorBoundary fallback={<h1>Error</h1>}>
         <Suspense fallback={<p>Now loading...</p>}>
-          <Button
-            size="sm"
-            mr={2}
-            bg={selectedTab === 'friends' ? 'teal.100' : 'gray.100'}
-            borderRadius="5px"
-            opacity={isPending ? 0.5 : 1}
+          <UsersTabButton
+            isSelect={selectedTab === 'friends'}
+            isPending={isPending}
             onClick={() => onClickTabButton('friends')}
           >
             Friends
-          </Button>
-          <Button
-            size="sm"
-            mr={2}
-            bg={selectedTab === 'users' ? 'teal.100' : 'gray.100'}
-            borderRadius="5px"
-            opacity={isPending ? 0.5 : 1}
+          </UsersTabButton>
+          <UsersTabButton
+            isSelect={selectedTab === 'users'}
+            isPending={isPending}
             onClick={() => onClickTabButton('users')}
           >
             Users
-          </Button>
-          <Button
-            size="sm"
-            mr={2}
-            bg={selectedTab === 'block' ? 'teal.100' : 'gray.100'}
-            borderRadius="5px"
-            opacity={isPending ? 0.5 : 1}
+          </UsersTabButton>
+          <UsersTabButton
+            isSelect={selectedTab === 'block'}
+            isPending={isPending}
             onClick={() => onClickTabButton('block')}
           >
             Block
-          </Button>
+          </UsersTabButton>
 
           {selectedTab === 'friends' ? (
             <FriendsList />
