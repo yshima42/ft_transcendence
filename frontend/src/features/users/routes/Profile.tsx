@@ -1,8 +1,9 @@
-import { memo, FC } from 'react';
+import { memo, FC, Suspense } from 'react';
 import { Flex } from '@chakra-ui/react';
 import { ContentLayout } from 'components/templates/ContentLayout';
 import { AvatarWithUploadButton } from '../components/AvatarWithUploadButton';
 import { ProfileCard } from '../components/ProfileCard';
+import { ReactQuery } from './ReactQuery';
 
 export const Profile: FC = memo(() => {
   return (
@@ -14,6 +15,9 @@ export const Profile: FC = memo(() => {
         />
         <ProfileCard name="yuuyuu" nickname="hakusho" />
       </Flex>
+      <Suspense fallback={<p>Now loading...</p>}>
+        <ReactQuery />
+      </Suspense>
     </ContentLayout>
   );
 });
