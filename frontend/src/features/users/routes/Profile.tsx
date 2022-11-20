@@ -1,5 +1,6 @@
 import { memo, FC, Suspense } from 'react';
 import { Flex } from '@chakra-ui/react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { ContentLayout } from 'components/templates/ContentLayout';
 import { AvatarWithUploadButton } from '../components/AvatarWithUploadButton';
 import { ProfileCard } from '../components/ProfileCard';
@@ -15,9 +16,11 @@ export const Profile: FC = memo(() => {
         />
         <ProfileCard name="yuuyuu" nickname="hakusho" />
       </Flex>
-      <Suspense fallback={<p>Now loading...</p>}>
-        <ReactQuery />
-      </Suspense>
+      <ErrorBoundary fallback={<p>Error!!</p>}>
+        <Suspense fallback={<p>Now loading...</p>}>
+          <ReactQuery />
+        </Suspense>
+      </ErrorBoundary>
     </ContentLayout>
   );
 });

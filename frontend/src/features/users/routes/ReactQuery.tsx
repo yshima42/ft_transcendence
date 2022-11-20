@@ -19,8 +19,6 @@ const fetchAlbums = async () => {
 export const ReactQuery: FC = () => {
   const { data } = useQuery<Album[]>(['albums'], fetchAlbums);
 
-  // if (error) return <p>error</p>;
-  // if (isLoading) return <p>now loading</p>;
   return (
     <div>
       <p>React Query</p>
