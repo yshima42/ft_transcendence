@@ -3,6 +3,7 @@ import { extname } from 'path';
 import {
   FileTypeValidator,
   Injectable,
+  InternalServerErrorException,
   MaxFileSizeValidator,
   ParseFilePipe,
   StreamableFile,
@@ -17,14 +18,20 @@ export class FileService {
   static multerOptions = (): MulterOptions => ({
     storage: diskStorage({
       destination: (req: Request & { user?: { user?: User } }, file, cb) => {
-        const dir = `./upload/${req.user?.user?.id ?? ''}/`;
+        if (req.user?.user === undefined) {
+          throw new InternalServerErrorException('Error in multerOptions');
+        }
+        const dir = `./upload/${req.user.user.id}/`;
         if (!existsSync(dir)) {
           mkdirSync(dir, { recursive: true });
         }
         cb(null, dir);
       },
       filename: (req: Request & { user?: { user?: User } }, file, cb) => {
-        cb(null, `${req.user?.user?.name ?? ''}${extname(file.originalname)}`);
+        if (req.user?.user === undefined) {
+          throw new InternalServerErrorException('Error in multerOptions');
+        }
+        cb(null, `${req.user.user.name}${extname(file.originalname)}`);
       },
     }),
   });

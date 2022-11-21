@@ -1,15 +1,16 @@
-import { Stats } from 'features/users/index';
-import { UsersRoutes } from 'features/users/routes';
 import { Outlet } from 'react-router-dom';
-import { MainLayout } from 'components/templates/MainLayout';
+import { MainLayout } from 'components/layout/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { Chats } from 'features/chat/routes/Chats';
 import { DirectMessage } from 'features/dm/routes/DirectMessage';
+import { Users } from 'features/friends/routes/Users';
 import { Game } from 'features/game/routes/Game';
 import { GameTop } from 'features/game/routes/GameTop';
 import { Games } from 'features/game/routes/Games';
 import { Matching } from 'features/game/routes/Matching';
+import { Profile } from 'features/profile/routes/Profile';
+import { Stats } from 'features/users/routes/Stats';
 
 const App = () => {
   return (
@@ -31,13 +32,14 @@ export const publicRoutes = [
     path: '/app',
     element: <App />,
     children: [
-      { path: 'users/*', element: <UsersRoutes /> },
+      { path: 'users', element: <Users /> },
       { path: 'chats', element: <Chats /> },
       { path: 'games', element: <Games /> },
       { path: '', element: <GameTop /> },
       { path: 'matching', element: <Matching /> },
       { path: 'dm/*', element: <DirectMessage /> },
-      { path: 'profile', element: <Stats /> },
+      { path: 'users/profile', element: <Profile /> },
+      { path: 'users/:id', element: <Stats /> },
       { path: '*', element: <Page404 /> },
     ],
   },
