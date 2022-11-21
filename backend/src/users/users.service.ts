@@ -1,11 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { Relationship, User } from '@prisma/client';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateUserColumns } from './interfaces/update-user-columns.interface';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -19,186 +15,48 @@ export class UsersService {
     return users;
   }
 
-  async findOne(name: string): Promise<User> {
-    const found: User | null = await this.prisma.user.findUnique({
-      where: { name },
-    });
-
-    if (found === null) throw new UnauthorizedException('Name incorrect');
-
-    return found;
+  findMe(user: User): User {
+    return user;
   }
 
-  async update(id: string, columns: UpdateUserColumns): Promise<User> {
-    const updateUser = await this.prisma.user.update({
-      where: { id },
-      data: columns,
-    });
-
-    return updateUser;
-  }
-
-  async request(
-    userId: string,
-    peerId: string
-  ): Promise<[Relationship, Relationship]> {
-    const createRelation1 = await this.prisma.relationship.create({
-      data: {
-        userId,
-        peerId,
-        type: 'OUTGOING',
-      },
-    });
-    const createRelation2 = await this.prisma.relationship.create({
-      data: {
-        userId: peerId,
-        peerId: userId,
-        type: 'INCOMING',
-      },
-    });
-
-    return [createRelation1, createRelation2];
-  }
-
-  async acceptRequest(
-    userId: string,
-    peerId: string
-  ): Promise<[Relationship, Relationship]> {
-    const updateRelation1 = await this.prisma.relationship.update({
+  async find(id: string, fields: string | undefined): Promise<UserDto> {
+    const user = await this.prisma.user.findUnique({
       where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-      data: {
-        type: 'FRIEND',
+        id,
       },
     });
-    const updateRelation2 = await this.prisma.relationship.update({
-      where: {
-        userId_peerId: {
-          userId: peerId,
-          peerId: userId,
-        },
-      },
-      data: {
-        type: 'FRIEND',
-      },
-    });
-
-    return [updateRelation1, updateRelation2];
-  }
-
-  async addFriend(
-    userId: string,
-    peerId: string
-  ): Promise<[Relationship, Relationship]> {
-    if (userId === peerId) {
-      throw new BadRequestException("can't create relation with myself");
+    if (user == null) {
+      throw new BadRequestException('invalid userId');
     }
-    const relation = await this.prisma.relationship.findUnique({
-      where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-    });
 
-    switch (relation?.type) {
-      case undefined:
-        return await this.request(userId, peerId);
-      case 'FRIEND':
-      case 'OUTGOING':
-        throw new BadRequestException('Already take action for friend-request');
-      case 'INCOMING':
-        return await this.acceptRequest(userId, peerId);
-      default:
-        throw new BadRequestException('Unexpected error in addFriend');
+    let userDto: UserDto = {};
+    if (fields === undefined) {
+      userDto = user;
+    } else {
+      const attrs = fields.split(',');
+      if (attrs.includes('id')) {
+        userDto.id = user?.id;
+      }
+      if (attrs.includes('createdAt')) {
+        userDto.createdAt = user.createdAt;
+      }
+      if (attrs.includes('updatedAt')) {
+        userDto.updatedAt = user.updatedAt;
+      }
+      if (attrs.includes('name')) {
+        userDto.name = user.name;
+      }
+      if (attrs.includes('avatarUrl')) {
+        userDto.avatarUrl = user.avatarUrl;
+      }
+      if (attrs.includes('nickname')) {
+        userDto.nickname = user.nickname;
+      }
+      if (attrs.includes('onlineStatus')) {
+        userDto.onlineStatus = user.onlineStatus;
+      }
     }
-  }
 
-  async deleteRelation(
-    userId: string,
-    peerId: string
-  ): Promise<[Relationship, Relationship]> {
-    const deleteRelation1 = await this.prisma.relationship.delete({
-      where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-    });
-    const _deleteRelation2 = await this.prisma.relationship.delete({
-      where: {
-        userId_peerId: {
-          userId: peerId,
-          peerId: userId,
-        },
-      },
-    });
-
-    return [deleteRelation1, _deleteRelation2];
-  }
-
-  async deleteFriend(
-    userId: string,
-    peerId: string
-  ): Promise<[Relationship, Relationship]> {
-    if (userId === peerId) {
-      throw new BadRequestException("can't create relation with myself");
-    }
-    const relation = await this.prisma.relationship.findUnique({
-      where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-    });
-
-    switch (relation?.type) {
-      case undefined:
-        throw new BadRequestException(
-          'You are not friend with target and do not send to friend-request'
-        );
-      default:
-        return await this.deleteRelation(userId, peerId);
-    }
-  }
-
-  async findRequesting(userId: string): Promise<User[]> {
-    const followingRelations = await this.prisma.relationship.findMany({
-      where: { userId, type: 'OUTGOING' },
-      select: {
-        peer: true,
-      },
-    });
-
-    return followingRelations.map((relation) => relation.peer);
-  }
-
-  async findPending(userId: string): Promise<User[]> {
-    const pendingRelations = await this.prisma.relationship.findMany({
-      where: { userId, type: 'INCOMING' },
-      select: {
-        peer: true,
-      },
-    });
-
-    return pendingRelations.map((relation) => relation.peer);
-  }
-
-  async findFriends(userId: string): Promise<User[]> {
-    const friendRelations = await this.prisma.relationship.findMany({
-      where: { userId, type: 'FRIEND' },
-      select: {
-        peer: true,
-      },
-    });
-
-    return friendRelations.map((relation) => relation.peer);
+    return userDto;
   }
 }

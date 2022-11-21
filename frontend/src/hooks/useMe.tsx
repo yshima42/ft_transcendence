@@ -13,7 +13,7 @@ export const useMe = (): {
 
   const getMe = useCallback(() => {
     axios
-      .get<User>('/users/me')
+      .get<User>('/profile')
       .then((res) => {
         setMe(res.data);
       })
