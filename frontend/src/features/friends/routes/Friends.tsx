@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
 import { ContentLayout } from 'components/layout/ContentLayout';
-import { BlockList } from '../components/BlockUsersList';
 import { FriendsList } from '../components/FriendsList';
+import { RequestList } from '../components/RequestList';
 import { UsersList } from '../components/UsersList';
 import { UsersTabButton } from '../components/UsersTabButton';
 
-type Tabs = 'friends' | 'users' | 'block';
+type Tabs = 'friends' | 'request' | 'block' | 'users';
 
 export const Friends: FC = () => {
   const [selectedTab, setSelectedTab] = useState<Tabs>('friends');
@@ -23,24 +23,30 @@ export const Friends: FC = () => {
         Friends
       </UsersTabButton>
       <UsersTabButton
+        isSelect={selectedTab === 'request'}
+        onClick={() => onClickTabButton('request')}
+      >
+        Request
+      </UsersTabButton>
+      {/* <UsersTabButton
+        isSelect={selectedTab === 'block'}
+        onClick={() => onClickTabButton('block')}
+      >
+        Block
+      </UsersTabButton> */}
+      <UsersTabButton
         isSelect={selectedTab === 'users'}
         onClick={() => onClickTabButton('users')}
       >
         Users
       </UsersTabButton>
-      <UsersTabButton
-        isSelect={selectedTab === 'block'}
-        onClick={() => onClickTabButton('block')}
-      >
-        Block
-      </UsersTabButton>
 
       {selectedTab === 'friends' ? (
         <FriendsList />
-      ) : selectedTab === 'users' ? (
-        <UsersList />
+      ) : selectedTab === 'request' ? (
+        <RequestList />
       ) : (
-        <BlockList />
+        <UsersList />
       )}
     </ContentLayout>
   );
