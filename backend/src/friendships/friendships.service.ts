@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Relationship, User } from '@prisma/client';
+import { Relationship, RelationshipType, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateRelationshipDto } from './dto/create-relationship.dto';
 
 @Injectable()
 export class FriendshipsService {
@@ -15,6 +16,8 @@ export class FriendshipsService {
     switch (relation?.type) {
       case undefined:
         return await this.requestFriend(userId, peerId);
+      case 'NONE':
+        return await this.requestFriendWithNone(userId, peerId);
       case 'FRIEND':
       case 'OUTGOING':
         throw new BadRequestException('Already take action for friend-request');
@@ -24,26 +27,46 @@ export class FriendshipsService {
     }
   }
 
+  // transactionやる
+  async createRelationships(
+    createRelationshipDto: CreateRelationshipDto[]
+  ): Promise<[Relationship, Relationship]> {
+    const rel1 = await this.create(createRelationshipDto[0]);
+    const rel2 = await this.create(createRelationshipDto[1]);
+
+    return [rel1, rel2];
+  }
+
   async requestFriend(
     userId: string,
     peerId: string
   ): Promise<[Relationship, Relationship]> {
-    const createRelation1 = await this.prisma.relationship.create({
-      data: {
+    const createRelationshipDto: CreateRelationshipDto[] = [
+      {
         userId,
         peerId,
         type: 'OUTGOING',
+        isBlocking: false,
       },
-    });
-    const createRelation2 = await this.prisma.relationship.create({
-      data: {
+      {
         userId: peerId,
         peerId: userId,
         type: 'INCOMING',
+        isBlocking: false,
       },
-    });
+    ];
 
-    return [createRelation1, createRelation2];
+    return await this.createRelationships(createRelationshipDto);
+  }
+
+  async requestFriendWithNone(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship]> {
+    const updateRelation1 = await this.updateType(userId, peerId, 'OUTGOING');
+    const updateRelation2 = await this.updateType(userId, peerId, 'INCOMING');
+
+    return [updateRelation1, updateRelation2];
   }
 
   async accept(
@@ -69,28 +92,8 @@ export class FriendshipsService {
     userId: string,
     peerId: string
   ): Promise<[Relationship, Relationship]> {
-    const updateRelation1 = await this.prisma.relationship.update({
-      where: {
-        userId_peerId: {
-          userId,
-          peerId,
-        },
-      },
-      data: {
-        type: 'FRIEND',
-      },
-    });
-    const updateRelation2 = await this.prisma.relationship.update({
-      where: {
-        userId_peerId: {
-          userId: peerId,
-          peerId: userId,
-        },
-      },
-      data: {
-        type: 'FRIEND',
-      },
-    });
+    const updateRelation1 = await this.updateType(userId, peerId, 'FRIEND');
+    const updateRelation2 = await this.updateType(peerId, userId, 'FRIEND');
 
     return [updateRelation1, updateRelation2];
   }
@@ -117,6 +120,8 @@ export class FriendshipsService {
   ): Promise<[Relationship, Relationship]> {
     const deleteRelation1 = await this.deleteByUserAndPeer(userId, peerId);
     const deleteRelation2 = await this.deleteByUserAndPeer(peerId, userId);
+    // const deleteRelation1 = await this.updateType(userId, peerId, 'NONE');
+    // const deleteRelation2 = await this.updateType(peerId, userId, 'NONE');
 
     return [deleteRelation1, deleteRelation2];
   }
@@ -154,7 +159,118 @@ export class FriendshipsService {
     return friendRelations.map((relation) => relation.peer);
   }
 
+  async block(
+    userId: string,
+    peerId: string
+    // ここnullにして良いか？
+  ): Promise<[Relationship, Relationship | null]> {
+    const relation = await this.findByUserAndPeer(userId, peerId);
+
+    const blockRelations: CreateRelationshipDto[] = [
+      {
+        userId,
+        peerId,
+        type: 'NONE',
+        isBlocking: true,
+      },
+      {
+        userId: peerId,
+        peerId: userId,
+        type: 'NONE',
+        isBlocking: false,
+      },
+    ];
+
+    if (relation?.isBlocking === true)
+      throw new BadRequestException('Already Blocked');
+
+    switch (relation?.type) {
+      case undefined:
+        return await this.createRelationships(blockRelations);
+      case 'FRIEND':
+      case 'OUTGOING':
+      case 'INCOMING':
+      case 'NONE':
+      default: {
+        const updateRelation = await this.updateIsBlocking(
+          userId,
+          peerId,
+          true
+        );
+        // ここ相手のrelation返す必要あるか
+        const peerRelation = await this.findByUserAndPeer(peerId, userId);
+
+        return [updateRelation, peerRelation];
+      }
+    }
+  }
+
+  async findBlocking(userId: string): Promise<User[]> {
+    const blockingRelations = await this.prisma.relationship.findMany({
+      where: { userId, isBlocking: true },
+      select: {
+        peer: true,
+      },
+    });
+
+    return blockingRelations.map((relation) => relation.peer);
+  }
+
+  async cancelBlocking(
+    userId: string,
+    peerId: string
+  ): Promise<[Relationship, Relationship | null]> {
+    const updateRelation = await this.updateIsBlocking(userId, peerId, false);
+    const peerRelation = await this.findByUserAndPeer(peerId, userId);
+
+    return [updateRelation, peerRelation];
+  }
+
   // utils
+  async updateIsBlocking(
+    userId: string,
+    peerId: string,
+    updateIsBlocking: boolean
+  ): Promise<Relationship> {
+    return await this.prisma.relationship.update({
+      where: {
+        userId_peerId: {
+          userId,
+          peerId,
+        },
+      },
+      data: {
+        isBlocking: updateIsBlocking,
+      },
+    });
+  }
+
+  async updateType(
+    userId: string,
+    peerId: string,
+    updateType: RelationshipType
+  ): Promise<Relationship> {
+    return await this.prisma.relationship.update({
+      where: {
+        userId_peerId: {
+          userId,
+          peerId,
+        },
+      },
+      data: {
+        type: updateType,
+      },
+    });
+  }
+
+  async create(
+    createRelationshipDto: CreateRelationshipDto
+  ): Promise<Relationship> {
+    return await this.prisma.relationship.create({
+      data: createRelationshipDto,
+    });
+  }
+
   async findByUserAndPeer(
     userId: string,
     peerId: string
