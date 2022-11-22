@@ -1,5 +1,4 @@
-import { FC, memo } from 'react';
-// import { FC, memo, useEffect } from 'react';
+import { FC, memo, useEffect } from 'react';
 import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
@@ -8,17 +7,12 @@ import { useAllFriends } from '../hooks/useAllFriends';
 import { DirectMessageButton } from './DirectMessageButton';
 
 export const FriendsList: FC = memo(() => {
-  // const { getFriends, friends } = useAllFriends();
-  // useEffect(() => getFriends(), [getFriends]);
-
-  const data = useAllFriends();
-
-  if (data === undefined) return <></>;
+  const { getFriends, friends } = useAllFriends();
+  useEffect(() => getFriends(), [getFriends]);
 
   return (
     <PrimaryTable<User>
-      // data={friends}
-      data={data}
+      data={friends}
       columns={[
         {
           title: '',

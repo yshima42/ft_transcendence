@@ -1,26 +1,20 @@
-import { FC, memo } from 'react';
-// import { FC, memo, useEffect } from 'react';
+import { FC, memo, useEffect } from 'react';
 import { Avatar } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { Link } from 'react-router-dom';
 import { PrimaryTable } from 'components/table/PrimaryTable';
-import { useAllFriends } from '../hooks/useAllFriends';
-// import { useAllUsers } from '../hooks/useAllUsers';
+import { useAllUsers } from '../hooks/useAllUsers';
 import { AddFriend } from './AddFriend';
 import { DirectMessageButton } from './DirectMessageButton';
 
 export const UsersList: FC = memo(() => {
-  // const { getUsers, users } = useAllUsers();
+  const { getUsers, users } = useAllUsers();
 
-  // useEffect(() => getUsers(), [getUsers]);
-  const data = useAllFriends();
-
-  if (data === undefined) return <></>;
+  useEffect(() => getUsers(), [getUsers]);
 
   return (
     <PrimaryTable<User>
-      data={data}
-      // data={users}
+      data={users}
       columns={[
         {
           title: '',

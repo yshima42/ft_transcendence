@@ -1,5 +1,4 @@
-import { FC, Suspense, useState, useTransition } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { FC, useState } from 'react';
 import { ContentLayout } from 'components/layout/ContentLayout';
 import { BlockList } from '../components/BlockUsersList';
 import { FriendsList } from '../components/FriendsList';
@@ -10,49 +9,39 @@ type Tabs = 'friends' | 'users' | 'block';
 
 export const Users: FC = () => {
   const [selectedTab, setSelectedTab] = useState<Tabs>('friends');
-  const [isPending, startTransition] = useTransition();
 
   const onClickTabButton = (tab: Tabs) => {
-    startTransition(() => {
-      setSelectedTab(tab);
-    });
+    setSelectedTab(tab);
   };
 
   return (
     <ContentLayout title="Users">
-      <ErrorBoundary fallback={<h1>Error</h1>}>
-        <Suspense fallback={<p>Now loading...</p>}>
-          <UsersTabButton
-            isSelect={selectedTab === 'friends'}
-            isPending={isPending}
-            onClick={() => onClickTabButton('friends')}
-          >
-            Friends
-          </UsersTabButton>
-          <UsersTabButton
-            isSelect={selectedTab === 'users'}
-            isPending={isPending}
-            onClick={() => onClickTabButton('users')}
-          >
-            Users
-          </UsersTabButton>
-          <UsersTabButton
-            isSelect={selectedTab === 'block'}
-            isPending={isPending}
-            onClick={() => onClickTabButton('block')}
-          >
-            Block
-          </UsersTabButton>
+      <UsersTabButton
+        isSelect={selectedTab === 'friends'}
+        onClick={() => onClickTabButton('friends')}
+      >
+        Friends
+      </UsersTabButton>
+      <UsersTabButton
+        isSelect={selectedTab === 'users'}
+        onClick={() => onClickTabButton('users')}
+      >
+        Users
+      </UsersTabButton>
+      <UsersTabButton
+        isSelect={selectedTab === 'block'}
+        onClick={() => onClickTabButton('block')}
+      >
+        Block
+      </UsersTabButton>
 
-          {selectedTab === 'friends' ? (
-            <FriendsList />
-          ) : selectedTab === 'users' ? (
-            <UsersList />
-          ) : (
-            <BlockList />
-          )}
-        </Suspense>
-      </ErrorBoundary>
+      {selectedTab === 'friends' ? (
+        <FriendsList />
+      ) : selectedTab === 'users' ? (
+        <UsersList />
+      ) : (
+        <BlockList />
+      )}
     </ContentLayout>
   );
 };
