@@ -7,7 +7,7 @@ import { UsersTabButton } from '../components/UsersTabButton';
 
 type Tabs = 'friends' | 'users' | 'block';
 
-export const Users: FC = () => {
+export const Friends: FC = () => {
   const [selectedTab, setSelectedTab] = useState<Tabs>('friends');
 
   const onClickTabButton = (tab: Tabs) => {
@@ -15,7 +15,7 @@ export const Users: FC = () => {
   };
 
   return (
-    <ContentLayout title="Users">
+    <ContentLayout title="Friends">
       <UsersTabButton
         isSelect={selectedTab === 'friends'}
         onClick={() => onClickTabButton('friends')}

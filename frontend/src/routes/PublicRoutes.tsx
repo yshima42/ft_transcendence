@@ -4,7 +4,7 @@ import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { Chats } from 'features/chat/routes/Chats';
 import { DirectMessage } from 'features/dm/routes/DirectMessage';
-import { Users } from 'features/friends/routes/Users';
+import { Friends } from 'features/friends/routes/Friends';
 import { Game } from 'features/game/routes/Game';
 import { GameTop } from 'features/game/routes/GameTop';
 import { Games } from 'features/game/routes/Games';
@@ -32,7 +32,7 @@ export const publicRoutes = [
     path: '/app',
     element: <App />,
     children: [
-      { path: 'users', element: <Users /> },
+      { path: 'users', element: <Friends /> },
       { path: 'chats', element: <Chats /> },
       { path: 'games', element: <Games /> },
       { path: '', element: <GameTop /> },
