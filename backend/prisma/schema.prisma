@@ -38,6 +38,7 @@ model Relationship {
   peer      User             @relation("followedBy", fields: [peerId], references: [id])
   peerId    String
   type      RelationshipType
+  isBlocking Boolean @default(false)
 
   @@id([userId, peerId])
 }
@@ -46,6 +47,7 @@ enum RelationshipType {
   FRIEND
   INCOMING
   OUTGOING
+  NONE
 }
 
 model MatchResult {

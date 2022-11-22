@@ -16,4 +16,7 @@ export class RelationshipEntity implements Relationship {
 
   @ApiProperty({ default: 'FRIEND' })
   type!: RelationshipType;
+
+  @ApiProperty({ default: false })
+  isBlocking!: boolean;
 }
