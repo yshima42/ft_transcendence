@@ -105,8 +105,6 @@ export class FriendshipsController {
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findFriends(@GetUser() user: User): Promise<User[]> {
-    console.log('hi');
-
     return await this.friendShipsService.findFriends(user.id);
   }
 
