@@ -64,7 +64,7 @@ export class FriendshipsService {
     peerId: string
   ): Promise<[Relationship, Relationship]> {
     const updateRelation1 = await this.updateType(userId, peerId, 'OUTGOING');
-    const updateRelation2 = await this.updateType(userId, peerId, 'INCOMING');
+    const updateRelation2 = await this.updateType(peerId, userId, 'INCOMING');
 
     return [updateRelation1, updateRelation2];
   }
@@ -118,10 +118,10 @@ export class FriendshipsService {
     userId: string,
     peerId: string
   ): Promise<[Relationship, Relationship]> {
-    const deleteRelation1 = await this.deleteByUserAndPeer(userId, peerId);
-    const deleteRelation2 = await this.deleteByUserAndPeer(peerId, userId);
-    // const deleteRelation1 = await this.updateType(userId, peerId, 'NONE');
-    // const deleteRelation2 = await this.updateType(peerId, userId, 'NONE');
+    // const deleteRelation1 = await this.deleteByUserAndPeer(userId, peerId);
+    // const deleteRelation2 = await this.deleteByUserAndPeer(peerId, userId);
+    const deleteRelation1 = await this.updateType(userId, peerId, 'NONE');
+    const deleteRelation2 = await this.updateType(peerId, userId, 'NONE');
 
     return [deleteRelation1, deleteRelation2];
   }
