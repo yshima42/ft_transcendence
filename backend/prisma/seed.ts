@@ -59,6 +59,7 @@ const relationshipData: Relationship[] = [
     userId: userData[0].id,
     peerId: userData[1].id,
     type: 'FRIEND',
+    isBlocking: false,
   },
   {
     createdAt: new Date(date),
@@ -66,6 +67,7 @@ const relationshipData: Relationship[] = [
     userId: userData[1].id,
     peerId: userData[0].id,
     type: 'FRIEND',
+    isBlocking: false,
   },
   // not friend
   {
@@ -74,6 +76,7 @@ const relationshipData: Relationship[] = [
     userId: userData[0].id,
     peerId: userData[3].id,
     type: 'OUTGOING',
+    isBlocking: false,
   },
   {
     createdAt: new Date(date),
@@ -81,6 +84,7 @@ const relationshipData: Relationship[] = [
     userId: userData[3].id,
     peerId: userData[0].id,
     type: 'INCOMING',
+    isBlocking: false,
   },
   {
     createdAt: new Date(date),
@@ -88,6 +92,7 @@ const relationshipData: Relationship[] = [
     userId: userData[4].id,
     peerId: userData[0].id,
     type: 'OUTGOING',
+    isBlocking: false,
   },
   {
     createdAt: new Date(date),
@@ -95,6 +100,7 @@ const relationshipData: Relationship[] = [
     userId: userData[0].id,
     peerId: userData[4].id,
     type: 'INCOMING',
+    isBlocking: false,
   },
 ];
 

@@ -105,6 +105,45 @@ export class FriendshipsController {
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findFriends(@GetUser() user: User): Promise<User[]> {
+    console.log('hi');
+
     return await this.friendShipsService.findFriends(user.id);
+  }
+
+  @Post('blocking')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({
+    description: '',
+  })
+  async blockUser(
+    @GetUser() user: User,
+    @Body() updateRelationshipDto: UpdateRelationshipDto
+  ): Promise<[Relationship, Relationship | null]> {
+    return await this.friendShipsService.block(
+      user.id,
+      updateRelationshipDto.peerId
+    );
+  }
+
+  @Get('blocking')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async findBlocking(@GetUser() user: User): Promise<User[]> {
+    return await this.friendShipsService.findBlocking(user.id);
+  }
+
+  @Delete('blocking')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'Relationshipが2つ入ったタプルが返ります',
+  })
+  async cancelBlocking(
+    @GetUser() user: User,
+    @Body() updateRelationshipDto: UpdateRelationshipDto
+  ): Promise<[Relationship, Relationship | null]> {
+    return await this.friendShipsService.cancelBlocking(
+      user.id,
+      updateRelationshipDto.peerId
+    );
   }
 }
