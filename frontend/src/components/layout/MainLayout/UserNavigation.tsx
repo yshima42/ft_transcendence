@@ -12,13 +12,13 @@ export const UserNavigation: FC = memo(() => {
 
   return (
     <Flex p="5%" mt={4} align="center">
-      <Link to="/app/users/profile">
+      <Link to="/app/profile">
         <Avatar size="sm" src={me?.avatarUrl}>
           <AvatarBadge boxSize="1.1em" bg="green.500" />
         </Avatar>
       </Link>
       <Flex flexDir="column" ml={4}>
-        <Link to="/app/users/profile">
+        <Link to="/app/profile">
           <Heading as="h3" size="sm">
             {me?.name}
           </Heading>
