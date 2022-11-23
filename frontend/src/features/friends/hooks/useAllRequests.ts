@@ -12,7 +12,7 @@ export const useAllRequests = (): {
 
   const getRequests = useCallback(() => {
     axios
-      .get<User[]>('/users/all')
+      .get<User[]>('/friendships/outgoing')
       .then((res) => setRequests(res.data))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
