@@ -3,7 +3,7 @@ import { ContentLayout } from 'components/layout/ContentLayout';
 import { FriendsList } from '../components/FriendsList';
 import { PendingList } from '../components/PendingList';
 import { RequestList } from '../components/RequestList';
-import { UsersList } from '../components/UsersList';
+import { UserSearch } from '../components/UserSearch';
 import { UsersTabButton } from '../components/UsersTabButton';
 
 type Tabs = 'friends' | 'request' | 'pending' | 'block' | 'users';
@@ -55,7 +55,8 @@ export const Friends: FC = () => {
       ) : selectedTab === 'pending' ? (
         <PendingList />
       ) : (
-        <UsersList />
+        <UserSearch />
+        // <UsersList />
       )}
     </ContentLayout>
   );
