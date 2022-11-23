@@ -1,5 +1,6 @@
 import { FC, memo, useEffect } from 'react';
 import { Wrap, WrapItem } from '@chakra-ui/react';
+import { axios } from '../../../lib/axios';
 import { useAllUsers } from '../hooks/useAllUsers';
 import { FriendCard } from './FriendCard';
 
@@ -8,9 +9,14 @@ export const UsersList: FC = memo(() => {
 
   useEffect(() => getUsers(), [getUsers]);
 
-  const onClickAddFriend = (index: number) => {
+  const onClickAddFriend = async (index: number) => {
     const newUsers = [...users];
+
     newUsers.splice(index, 1);
+    const params = new URLSearchParams();
+    params.append('peerId', `${users[index].id}`);
+
+    await axios.post('/friendships/request', params);
 
     setUsers(newUsers);
   };
@@ -24,7 +30,7 @@ export const UsersList: FC = memo(() => {
             avatarUrl={obj.avatarUrl}
             name={obj.name}
             button="Add"
-            onClick={() => onClickAddFriend(index)}
+            onClick={async () => await onClickAddFriend(index)}
           />
         </WrapItem>
       ))}
