@@ -8,6 +8,7 @@ export const ProfileCardBase: FC<PropsWithChildren> = memo((props) => {
 
   return (
     // TODO: alert 出したい。あとContentLayout に入れてもいいかも
+    // 開発中、勝手にページ遷移されるため、"."にしてます
     <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
       <Suspense
         fallback={
