@@ -6,29 +6,34 @@ import { UsersService } from '../users.service';
 
 const date = new Date('2022-11-01T04:34:22+09:00');
 
-const mockUser1 = {
-  id: '1',
+const mockUser1: User = {
+  id: '21514d8b-e6af-490c-bc51-d0c7a359a267',
   createdAt: new Date(date),
   updatedAt: new Date(date),
-
   name: 'dummy1',
   avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
+  nickname: 'nickname1',
+  onlineStatus: 'ONLINE',
 };
 
-const mockUser2 = {
-  id: '2',
+const mockUser2: User = {
+  id: '40e8b4b4-9b39-4b7e-8e31-78e31975d320',
   createdAt: new Date(date),
   updatedAt: new Date(date),
   name: 'dummy2',
   avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
+  nickname: 'nickname2',
+  onlineStatus: 'OFFLINE',
 };
 
-const mockUser3 = {
-  id: '3',
+const mockUser3: User = {
+  id: '5001da8b-0316-411e-a34f-1db29d4d4c4b',
   createdAt: new Date(date),
   updatedAt: new Date(date),
   name: 'dummy3',
   avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
+  nickname: 'nickname3',
+  onlineStatus: 'INGAME',
 };
 
 describe('UsersServiceTest', () => {
@@ -49,32 +54,6 @@ describe('UsersServiceTest', () => {
       const expected = [mockUser1, mockUser3];
       prisma.user.findMany = jest.fn().mockReturnValueOnce(expected);
       expect(await service.findAll(mockUser2)).toEqual(expected);
-    });
-  });
-
-  // 必要ないテスト。
-  // なぜなら、処理がシンプルでモック関数の戻り値とexpectedがほぼ同じだから。
-  // FriendAPIのjestによるユニットテストはしない。
-  describe('findFriends', () => {
-    it('正常系:フレンドが見つかる', async () => {
-      const expectedFindMany = [{ peer: mockUser2 }];
-      const expectedFindFriends = [mockUser2];
-      prisma.relationship.findMany = jest
-        .fn()
-        .mockReturnValueOnce(expectedFindMany);
-      expect(await service.findFriends(mockUser1.id)).toEqual(
-        expectedFindFriends
-      );
-    });
-    it('正常系:フレンドが見つからない', async () => {
-      const expectedFindMany: Array<{ targetUser: User }> = [];
-      const expectedFindFriends: User[] = [];
-      prisma.relationship.findMany = jest
-        .fn()
-        .mockReturnValueOnce(expectedFindMany);
-      expect(await service.findFriends(mockUser3.id)).toEqual(
-        expectedFindFriends
-      );
     });
   });
 });
