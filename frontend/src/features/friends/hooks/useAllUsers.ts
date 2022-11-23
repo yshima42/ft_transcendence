@@ -7,6 +7,7 @@ import { axios } from '../../../lib/axios';
 export const useAllUsers = (): {
   getUsers: () => void;
   users: User[];
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
 } => {
   const [users, setUsers] = useState<User[]>([]);
   const navigate = useNavigate();
@@ -18,5 +19,5 @@ export const useAllUsers = (): {
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
 
-  return { getUsers, users };
+  return { getUsers, users, setUsers };
 };

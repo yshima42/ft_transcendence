@@ -4,24 +4,27 @@ import { useAllUsers } from '../hooks/useAllUsers';
 import { FriendCard } from './FriendCard';
 
 export const UsersList: FC = memo(() => {
-  const { getUsers, users } = useAllUsers();
+  const { getUsers, users, setUsers } = useAllUsers();
 
   useEffect(() => getUsers(), [getUsers]);
 
-  const onClickAddFriend = () => {
-    alert('onClickAddFriend');
+  const onClickAddFriend = (index: number) => {
+    const newUsers = [...users];
+    newUsers.splice(index, 1);
+
+    setUsers(newUsers);
   };
 
   return (
     <Wrap p={{ base: 4, md: 10 }}>
-      {users.map((obj) => (
+      {users.map((obj, index) => (
         <WrapItem key={obj.id} mx="auto">
           <FriendCard
             id={obj.id}
             avatarUrl={obj.avatarUrl}
             name={obj.name}
             button="Add"
-            onClick={onClickAddFriend}
+            onClick={() => onClickAddFriend(index)}
           />
         </WrapItem>
       ))}
