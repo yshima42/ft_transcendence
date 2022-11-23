@@ -1,11 +1,10 @@
-import { memo, FC, Suspense } from 'react';
-import { Flex, Grid, GridItem, Spinner } from '@chakra-ui/react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { Navigate } from 'react-router-dom';
+import { memo, FC } from 'react';
+import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import { ContentLayout } from 'components/layout/ContentLayout';
 import { MatchHistoryCard } from '../components/MatchHistoryCard';
-import { ProfileCard } from '../components/ProfileCard';
+import { ProfileCardBase } from '../components/ProfileCardBase';
 import { StatsCard } from '../components/StatsCard';
+import { UserInfoCard } from '../components/UserInfoCard';
 
 export const Profile: FC = memo(() => {
   return (
@@ -34,17 +33,19 @@ export const Profile: FC = memo(() => {
           gap={5}
         >
           <GridItem bg="gray" area="profile">
-            <ErrorBoundary fallback={<Navigate to="/" replace={true} />}>
-              <Suspense fallback={<Spinner />}>
-                <ProfileCard />
-              </Suspense>
-            </ErrorBoundary>
+            <ProfileCardBase>
+              <UserInfoCard />
+            </ProfileCardBase>
           </GridItem>
           <GridItem bg="gray" area="stats">
-            <StatsCard />
+            <ProfileCardBase>
+              <StatsCard />
+            </ProfileCardBase>
           </GridItem>
           <GridItem bg="gray" area="history">
-            <MatchHistoryCard />
+            <ProfileCardBase>
+              <MatchHistoryCard />
+            </ProfileCardBase>
           </GridItem>
         </Grid>
       </Flex>

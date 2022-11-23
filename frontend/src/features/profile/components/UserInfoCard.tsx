@@ -57,10 +57,42 @@
 // });
 
 import { memo, FC } from 'react';
+import { Button, Flex, Image, Spacer, Text } from '@chakra-ui/react';
 import { useProfile } from '../hooks/useProfile';
 
-export const ProfileCard: FC = memo(() => {
+// とりあえず、自分だけ
+export const UserInfoCard: FC = memo(() => {
   const { user } = useProfile();
 
-  return <p>{user.id}</p>;
+  return (
+    <Flex
+      w="100%"
+      h="100%"
+      bg="gray.200"
+      borderRadius="20px"
+      shadow="md"
+      p={4}
+      direction="column"
+      align="center"
+    >
+      <Image
+        borderRadius="full"
+        boxSize="100px"
+        src={user.avatarUrl}
+        alt={user.nickname}
+        m="auto"
+      />
+      <Text fontSize="md" fontWeight="bold" pt="2">
+        {user.nickname}
+      </Text>
+      <Text fontSize="xs" color="gray">
+        {user.name}
+      </Text>
+      <Text fontSize="sm" pt="2">
+        two factor
+      </Text>
+      <Spacer />
+      <Button size="sm">Edit</Button>
+    </Flex>
+  );
 });

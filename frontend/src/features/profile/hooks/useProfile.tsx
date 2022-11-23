@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { axios } from '../../../lib/axios';
 
 export const fetchProfile = async (): Promise<User> => {
-  const result = await axios.get<User>('/prof');
+  const result = await axios.get<User>('/profile');
 
   return result.data;
 };
