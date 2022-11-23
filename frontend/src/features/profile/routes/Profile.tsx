@@ -12,10 +12,11 @@ export const Profile: FC = memo(() => {
       <Flex justify="center">
         <Grid
           w={{ base: '500px', md: '800px' }}
-          h="600px"
+          h={{ base: '900px', md: '600px' }}
           templateAreas={{
             base: `"profile stats"
                    "profile stats"
+                   "history history"
                    "history history"
                    "history history"
                    "history history"`,
@@ -23,7 +24,7 @@ export const Profile: FC = memo(() => {
                  "stats   stats   history history history"`,
           }}
           gridTemplateRows={{
-            base: `1fr 1fr 1fr 1fr 1fr`,
+            base: `1fr 1fr 1fr 1fr 1fr 1fr`,
             md: '1fr 1fr',
           }}
           gridTemplateColumns={{
