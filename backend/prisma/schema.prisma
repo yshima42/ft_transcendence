@@ -20,6 +20,8 @@ model User {
   onlineStatus    OnlineStatus   @default(ONLINE)
   following       Relationship[] @relation("following")
   followedBy      Relationship[] @relation("followedBy")
+  creator       FriendRequest[] @relation("creator")
+  receiver      FriendRequest[] @relation("receiver")
   matchedUser     MatchResult[]  @relation("matchedUser")
   matchedOpponent MatchResult[]  @relation("matchedOpponent")
 }
@@ -48,6 +50,24 @@ enum RelationshipType {
   INCOMING
   OUTGOING
   NONE
+}
+
+model FriendRequest {
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  creator      User             @relation("creator", fields: [creatorId], references: [id])
+  creatorId    String
+  receiver      User             @relation("receiver", fields: [receiverId], references: [id])
+  receiverId    String
+  status      FriendRequestStatus
+
+  @@id([creatorId, receiverId])
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }
 
 model MatchResult {
