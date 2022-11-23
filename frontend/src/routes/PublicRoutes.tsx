@@ -38,7 +38,7 @@ export const publicRoutes = [
       { path: '', element: <GameTop /> },
       { path: 'matching', element: <Matching /> },
       { path: 'dm/*', element: <DirectMessage /> },
-      { path: 'users/profile', element: <Profile /> },
+      { path: 'profile', element: <Profile /> },
       { path: 'users/:id', element: <Stats /> },
       { path: '*', element: <Page404 /> },
     ],
