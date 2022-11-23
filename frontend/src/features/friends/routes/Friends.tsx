@@ -1,11 +1,12 @@
 import { FC, useState } from 'react';
 import { ContentLayout } from 'components/layout/ContentLayout';
 import { FriendsList } from '../components/FriendsList';
+import { PendingList } from '../components/PendingList';
 import { RequestList } from '../components/RequestList';
 import { UsersList } from '../components/UsersList';
 import { UsersTabButton } from '../components/UsersTabButton';
 
-type Tabs = 'friends' | 'request' | 'block' | 'users';
+type Tabs = 'friends' | 'request' | 'pending' | 'block' | 'users';
 
 export const Friends: FC = () => {
   const [selectedTab, setSelectedTab] = useState<Tabs>('friends');
@@ -28,6 +29,12 @@ export const Friends: FC = () => {
       >
         Request
       </UsersTabButton>
+      <UsersTabButton
+        isSelect={selectedTab === 'pending'}
+        onClick={() => onClickTabButton('pending')}
+      >
+        Pending
+      </UsersTabButton>
       {/* <UsersTabButton
         isSelect={selectedTab === 'block'}
         onClick={() => onClickTabButton('block')}
@@ -45,6 +52,8 @@ export const Friends: FC = () => {
         <FriendsList />
       ) : selectedTab === 'request' ? (
         <RequestList />
+      ) : selectedTab === 'pending' ? (
+        <PendingList />
       ) : (
         <UsersList />
       )}
