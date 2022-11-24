@@ -1,37 +1,21 @@
+import { useState, useEffect } from 'react';
 import { User } from '@prisma/client';
-import { useQuery } from '@tanstack/react-query';
+import { axios } from 'lib/axios';
 
-import { axios } from '../../../lib/axios';
+// curl http://localhost:3000/friendships -H 'Content-Type: application/x-www-form-urlencoded' \
+//    -H 'Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIxNTE0ZDhiLWU2YWYtNDkwYy1iYzUxLWQwYzdhMzU5YTI2NyIsIm5hbWUiOiJkdW1teTEiLCJpYXQiOjE2NjkxNzM0MDQsImV4cCI6MTY2OTI1OTgwNH0.yQl6MQWLd3LnvLe9_RHemA-6Gs2tlPEZogD5XbwPFAA'
 
-const fetchFriends = async () => {
-  const result = await axios.get<User[]>('/users/all');
+export const useAllFriends = (): { friends: User[] } => {
+  const [friends, setFriends] = useState<User[]>([]);
 
-  return result.data;
+  async function fetchFriends(): Promise<void> {
+    const result = await axios.get<User[]>('/friendships');
+    setFriends(result.data);
+  }
+
+  useEffect(() => {
+    fetchFriends().catch(console.error);
+  }, []);
+
+  return { friends };
 };
-
-export const useAllFriends = (): User[] | undefined => {
-  const { data } = useQuery<User[]>(['friends'], fetchFriends);
-
-  return data;
-};
-
-// import { useCallback, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-
-// export const useAllFriends = (): {
-//   getFriends: () => void;
-//   friends: User[];
-// } => {
-//   const [friends, setFriends] = useState<User[]>([]);
-//   const navigate = useNavigate();
-
-//   const getFriends = useCallback(() => {
-//     // ここをfriend取得のAPIに変える
-//     axios
-//       .get<User[]>('/users/all')
-//       .then((res) => setFriends(res.data))
-//       .catch(() => navigate('/', { replace: true }));
-//   }, [navigate]);
-
-//   return { getFriends, friends };
-// };
