@@ -2,8 +2,8 @@ import { memo, FC, useRef } from 'react';
 import { Image, Stack } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { AxiosError } from 'axios';
+import { axios } from 'lib/axios';
 import { PrimaryButton } from 'components/button/PrimaryButton';
-import { axios } from '../../../lib/axios';
 
 type Props = {
   name: string;
