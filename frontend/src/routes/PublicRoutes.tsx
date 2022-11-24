@@ -10,7 +10,8 @@ import { GameTop } from 'features/game/routes/GameTop';
 import { Games } from 'features/game/routes/Games';
 import { Matching } from 'features/game/routes/Matching';
 import { Profile } from 'features/profile/routes/Profile';
-import { Stats } from 'features/users/routes/Stats';
+import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
+import { UserProfile } from 'features/users/routes/UserProfile';
 
 const App = () => {
   return (
@@ -39,7 +40,8 @@ export const publicRoutes = [
       { path: 'matching', element: <Matching /> },
       { path: 'dm/*', element: <DirectMessage /> },
       { path: 'profile', element: <Profile /> },
-      { path: 'users/:id', element: <Stats /> },
+      { path: 'profile/edit', element: <ProfileEdit /> },
+      { path: 'users/:id', element: <UserProfile /> },
       { path: '*', element: <Page404 /> },
     ],
   },
