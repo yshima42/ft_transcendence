@@ -1,10 +1,10 @@
 import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import { ContentLayout } from 'components/layout/ContentLayout';
-import { MatchHistoryCard } from '../components/MatchHistoryCard';
 import { ProfileCardBase } from '../components/ProfileCardBase';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
+import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
 
 export const Profile: FC = memo(() => {
   return (
