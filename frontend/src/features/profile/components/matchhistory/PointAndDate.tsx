@@ -3,7 +3,7 @@ import { Box, Text, VStack } from '@chakra-ui/react';
 
 type Props = {
   point: string;
-  date: string;
+  date: Date;
 };
 
 export const PointAndDate: FC<Props> = memo((props) => {
@@ -16,7 +16,7 @@ export const PointAndDate: FC<Props> = memo((props) => {
           {point}
         </Text>
         <Text h="8px" fontSize="xs">
-          {date}
+          {date.toDateString()}
         </Text>
       </VStack>
     </Box>
