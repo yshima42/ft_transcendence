@@ -1,78 +1,104 @@
-import { FC, Suspense, useState, useTransition } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { memo, FC, useState, useMemo, useEffect } from 'react';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { User } from '@prisma/client';
+import { axios } from 'lib/axios';
 import { ContentLayout } from 'components/layout/ContentLayout';
-import { BlockList } from '../components/BlockUsersList';
-import { FriendsList } from '../components/FriendsList';
-import { UsersList } from '../components/UsersList';
-import { UsersTabButton } from '../components/UsersTabButton';
+import { BlockedList } from 'features/friends/components/organisms/BlockedList';
+import { FriendsList } from 'features/friends/components/organisms/FriendsList';
+import { PendingList } from 'features/friends/components/organisms/PendingList';
+import { RecognitionList } from 'features/friends/components/organisms/RecognitionList';
+import { UsersList } from 'features/friends/components/organisms/UsersList';
 
-type Tabs = 'friends' | 'users' | 'block';
+const tabs = ['Friends', 'Pending', 'Recognition', 'Blocked', 'Users'];
 
-export const Users: FC = () => {
-  const [selectedTab, setSelectedTab] = useState<Tabs>('friends');
-  const [isPending, startTransition] = useTransition();
+export const Users: FC = memo(() => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [friends, setFriends] = useState<User[]>([]);
+  const [pending, setPending] = useState<User[]>([]);
+  const [recognition, setRecognition] = useState<User[]>([]);
+  const [blocked, setBlocked] = useState<User[]>([]);
+  const [tabIndex, setTabIndex] = useState(0);
 
-  const onClickTabButton = (tab: Tabs) => {
-    startTransition(() => {
-      setSelectedTab(tab);
-    });
-  };
+  const initialTab = useMemo(() => {
+    if (typeof location === 'undefined') return 0;
+
+    return Math.max(tabs.indexOf(location.hash.slice(1)), 0);
+  }, []);
+
+  async function getAllUsers(): Promise<void> {
+    const res: { data: User[] } = await axios.get('/users/all');
+    setUsers(res.data);
+  }
+  useEffect(() => {
+    getAllUsers().catch((err) => console.error(err));
+  }, [tabIndex]);
+  // TODO ここはSearchに置き換わる
+  async function getFriends(): Promise<void> {
+    const res: { data: User[] } = await axios.get('/friendships');
+    setFriends(res.data);
+  }
+  useEffect(() => {
+    getFriends().catch((err) => console.error(err));
+  }, [tabIndex]);
+  // pending
+  async function getPending(): Promise<void> {
+    const res: { data: User[] } = await axios.get('/friendships/outgoing');
+    setPending(res.data);
+  }
+  useEffect(() => {
+    getPending().catch((err) => console.error(err));
+  }, [tabIndex]);
+  // recognition
+  async function getRecognition(): Promise<void> {
+    const res: { data: User[] } = await axios.get('/friendships/incoming');
+    setRecognition(res.data);
+  }
+  useEffect(() => {
+    getRecognition().catch((err) => console.error(err));
+  }, [tabIndex]);
+  // blocked
+  async function getBlocked(): Promise<void> {
+    // TODO: api実装待ち
+    const res: { data: User[] } = await axios.get('/users/all');
+    setBlocked(res.data);
+  }
+  useEffect(() => {
+    getBlocked().catch((err) => console.error(err));
+  }, [tabIndex]);
 
   return (
     <ContentLayout title="Users">
-      <ErrorBoundary fallback={<h1>Error</h1>}>
-        <Suspense fallback={<p>Now loading...</p>}>
-          <UsersTabButton
-            isSelect={selectedTab === 'friends'}
-            isPending={isPending}
-            onClick={() => onClickTabButton('friends')}
-          >
-            Friends
-          </UsersTabButton>
-          <UsersTabButton
-            isSelect={selectedTab === 'users'}
-            isPending={isPending}
-            onClick={() => onClickTabButton('users')}
-          >
-            Users
-          </UsersTabButton>
-          <UsersTabButton
-            isSelect={selectedTab === 'block'}
-            isPending={isPending}
-            onClick={() => onClickTabButton('block')}
-          >
-            Block
-          </UsersTabButton>
-
-          {selectedTab === 'friends' ? (
-            <FriendsList />
-          ) : selectedTab === 'users' ? (
-            <UsersList />
-          ) : (
-            <BlockList />
-          )}
-        </Suspense>
-      </ErrorBoundary>
+      <Tabs
+        variant="soft-rounded"
+        onChange={(index) => {
+          setTabIndex(index);
+          location.hash = `#${tabs[index]}`;
+        }}
+        defaultIndex={initialTab}
+      >
+        <TabList>
+          {tabs.map((tab) => (
+            <Tab key={tab}>{tab}</Tab>
+          ))}
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <FriendsList users={friends} />
+          </TabPanel>
+          <TabPanel>
+            <PendingList users={pending} />
+          </TabPanel>
+          <TabPanel>
+            <RecognitionList users={recognition} />
+          </TabPanel>
+          <TabPanel>
+            <BlockedList users={blocked} />
+          </TabPanel>
+          <TabPanel>
+            <UsersList users={users} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </ContentLayout>
   );
-};
-
-// import { memo, FC } from 'react';
-
-// import { Center } from '@chakra-ui/react';
-// import { Outlet } from 'react-router-dom';
-// import { ContentLayout } from 'components/templates/ContentLayout';
-// import { UsersTopTab } from '../components/UsersTopTab';
-
-// export const Users: FC = memo(() => {
-//   return (
-//     <>
-//       <ContentLayout title="Users">
-//         <Center>
-//           <UsersTopTab />
-//         </Center>
-//         <Outlet />
-//       </ContentLayout>
-//     </>
-//   );
-// });
+});
