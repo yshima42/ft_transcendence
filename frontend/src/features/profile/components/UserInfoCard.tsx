@@ -58,11 +58,11 @@
 
 import { memo, FC } from 'react';
 import { Avatar, Button, Flex, Spacer, Tag, Text } from '@chakra-ui/react';
-import { useMe } from '../hooks/useMe';
+import { useProfile } from '../hooks/useProfile';
 
 // とりあえず自分用
 export const UserInfoCard: FC = memo(() => {
-  const { user } = useMe();
+  const { user } = useProfile();
 
   return (
     <Flex
@@ -71,8 +71,8 @@ export const UserInfoCard: FC = memo(() => {
       bg="gray.200"
       borderRadius="20px"
       shadow="md"
-      pt={2}
-      pb={3}
+      p={3}
+      pt={5}
       direction="column"
       align="center"
     >
