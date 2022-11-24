@@ -48,7 +48,7 @@ export const StatsCard: FC = memo(() => {
       <Flex justify="center" align="center" pt="4">
         <CircularProgress
           value={winRate}
-          // 微妙かもなので保留
+          // 彩度調節したい
           // color={colorScaleRYG(winRate)}
           size="200px"
         >
