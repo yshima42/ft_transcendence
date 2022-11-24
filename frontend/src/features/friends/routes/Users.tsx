@@ -25,6 +25,7 @@ export const Users: FC = memo(() => {
     return Math.max(tabs.indexOf(location.hash.slice(1)), 0);
   }, []);
 
+  // TODO ここはSearchに置き換わる
   async function getAllUsers(): Promise<void> {
     const res: { data: User[] } = await axios.get('/users/all');
     setUsers(res.data);
@@ -32,7 +33,7 @@ export const Users: FC = memo(() => {
   useEffect(() => {
     getAllUsers().catch((err) => console.error(err));
   }, [tabIndex]);
-  // TODO ここはSearchに置き換わる
+
   async function getFriends(): Promise<void> {
     const res: { data: User[] } = await axios.get('/friendships');
     setFriends(res.data);
@@ -40,6 +41,7 @@ export const Users: FC = memo(() => {
   useEffect(() => {
     getFriends().catch((err) => console.error(err));
   }, [tabIndex]);
+
   // pending
   async function getPending(): Promise<void> {
     const res: { data: User[] } = await axios.get('/friendships/outgoing');
@@ -48,6 +50,7 @@ export const Users: FC = memo(() => {
   useEffect(() => {
     getPending().catch((err) => console.error(err));
   }, [tabIndex]);
+
   // recognition
   async function getRecognition(): Promise<void> {
     const res: { data: User[] } = await axios.get('/friendships/incoming');
@@ -56,6 +59,7 @@ export const Users: FC = memo(() => {
   useEffect(() => {
     getRecognition().catch((err) => console.error(err));
   }, [tabIndex]);
+
   // blocked
   async function getBlocked(): Promise<void> {
     // TODO: api実装待ち
