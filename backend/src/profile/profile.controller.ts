@@ -1,10 +1,8 @@
 import {
-  // Body,
   Controller,
   Get,
   Param,
   Post,
-  // Query,
   StreamableFile,
   UploadedFile,
   UseGuards,
@@ -17,17 +15,14 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
-  // ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FileService } from 'src/file/file.service';
-// import { UserDto } from 'src/users/dto/user.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-// import { UpdateUserDto } from './dto/update-user.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profile')
@@ -38,30 +33,6 @@ export class ProfileController {
     private readonly usersService: UsersService,
     private readonly fileService: FileService
   ) {}
-
-  // @Get('')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiOkResponse({ type: UserEntity })
-  // @ApiQuery({
-  //   name: 'fields',
-  //   required: false,
-  // })
-  // async find(
-  //   @GetUser() user: User,
-  //   @Query('fields') fields: string
-  // ): Promise<UserDto> {
-  //   return await this.usersService.find(user.id, fields);
-  // }
-
-  // @Post('')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiCreatedResponse({ type: UserEntity })
-  // async update(
-  //   @GetUser() user: User,
-  //   @Body() updateUserDto: UpdateUserDto
-  // ): Promise<User> {
-  //   return await this.profileService.update(user.id, updateUserDto);
-  // }
 
   @Get('avatar/:filename')
   @UseGuards(JwtAuthGuard)
