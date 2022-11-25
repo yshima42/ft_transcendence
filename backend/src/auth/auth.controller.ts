@@ -43,7 +43,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
     const name = ftProfile.intraName;
-    const signupUser = { name, avatarUrl: ftProfile.imageUrl };
+    const signupUser = { name, avatarImageUrl: ftProfile.imageUrl };
     const { accessToken } = await this.authService.login(name, signupUser);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
