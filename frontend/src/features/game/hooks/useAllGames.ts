@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
+import { axios } from 'lib/axios';
 import { useNavigate } from 'react-router-dom';
 
-import { axios } from '../../../lib/axios';
 import { Game } from '../types/game';
 
 const mockGames: Game[] = [
