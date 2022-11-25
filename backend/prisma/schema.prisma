@@ -11,19 +11,21 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(uuid())
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  name            String         @unique
+  id              String          @id @default(uuid())
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  name            String          @unique
   avatarUrl       String
-  nickname        String         @unique @default("")
-  onlineStatus    OnlineStatus   @default(ONLINE)
-  following       Relationship[] @relation("following")
-  followedBy      Relationship[] @relation("followedBy")
-  creator       FriendRequest[] @relation("creator")
-  receiver      FriendRequest[] @relation("receiver")
-  matchedUser     MatchResult[]  @relation("matchedUser")
-  matchedOpponent MatchResult[]  @relation("matchedOpponent")
+  nickname        String          @unique @default("")
+  onlineStatus    OnlineStatus    @default(ONLINE)
+  following       Relationship[]  @relation("following")
+  followedBy      Relationship[]  @relation("followedBy")
+  creator         FriendRequest[] @relation("creator")
+  receiver        FriendRequest[] @relation("receiver")
+  blocking        Block[]         @relation("blocking")
+  blockedBy       Block[]         @relation("blockedBy")
+  matchedUser     MatchResult[]   @relation("matchedUser")
+  matchedOpponent MatchResult[]   @relation("matchedOpponent")
 }
 
 enum OnlineStatus {
@@ -33,14 +35,14 @@ enum OnlineStatus {
 }
 
 model Relationship {
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  user      User             @relation("following", fields: [userId], references: [id])
-  userId    String
-  peer      User             @relation("followedBy", fields: [peerId], references: [id])
-  peerId    String
-  type      RelationshipType
-  isBlocking Boolean @default(false)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  user       User             @relation("following", fields: [userId], references: [id])
+  userId     String
+  peer       User             @relation("followedBy", fields: [peerId], references: [id])
+  peerId     String
+  type       RelationshipType
+  isBlocking Boolean          @default(false)
 
   @@id([userId, peerId])
 }
@@ -53,13 +55,13 @@ enum RelationshipType {
 }
 
 model FriendRequest {
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  creator      User             @relation("creator", fields: [creatorId], references: [id])
-  creatorId    String
-  receiver      User             @relation("receiver", fields: [receiverId], references: [id])
-  receiverId    String
-  status      FriendRequestStatus
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  creator    User                @relation("creator", fields: [creatorId], references: [id])
+  creatorId  String
+  receiver   User                @relation("receiver", fields: [receiverId], references: [id])
+  receiverId String
+  status     FriendRequestStatus
 
   @@id([creatorId, receiverId])
 }
@@ -68,6 +70,17 @@ enum FriendRequestStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+model Block {
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  blocking    User     @relation("blocking", fields: [blockingId], references: [id])
+  blockingId  String
+  blockedBy   User     @relation("blockedBy", fields: [blockedById], references: [id])
+  blockedById String
+
+  @@id([blockingId, blockedById])
 }
 
 model MatchResult {
