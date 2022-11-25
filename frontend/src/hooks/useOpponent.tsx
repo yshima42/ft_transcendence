@@ -15,6 +15,7 @@ export const useOpponent = (): {
 
   const getOpponent = useCallback(
     (opponentId: string) => {
+      setOpponentLoading(true);
       axios
         .get<User>(`/users/${opponentId}/profile`)
         .then((res) => setOpponent(res.data))

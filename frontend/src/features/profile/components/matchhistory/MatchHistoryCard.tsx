@@ -8,8 +8,6 @@ export const MatchHistoryCard: FC = memo(() => {
   const { getMatches, loading, matches } = useAllMatches();
   useEffect(() => getMatches(), [getMatches]);
 
-  console.log(matches);
-
   return (
     <>
       {loading ? (
@@ -19,18 +17,17 @@ export const MatchHistoryCard: FC = memo(() => {
       ) : (
         <Box>
           <Stack>
-            <Box bg="teal.200" p={2}>
+            <Box p={2}>
               <Text as="b">Match History</Text>
             </Box>
-            <VStack bg="teal.200" justify="center" align="center">
-              {matches.map((obj) => (
-                <Box key={obj.id}>
+            <VStack justify="center">
+              {matches.map((match) => (
+                <Box key={match.id}>
                   <GameResultCard
-                    opponentId={obj.opponentId}
-                    userScore={obj.userScore}
-                    opponentScore={obj.opponentScore}
-                    createdAt={obj.createdAt}
-                    win={obj.win}
+                    opponentId={match.opponentId}
+                    score={`${match.userScore} - ${match.opponentScore}`}
+                    createdAt={match.createdAt}
+                    win={match.win}
                   />
                 </Box>
               ))}

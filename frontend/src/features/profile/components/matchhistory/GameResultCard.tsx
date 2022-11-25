@@ -3,18 +3,17 @@ import { Box, Center, HStack, Spinner, Text } from '@chakra-ui/react';
 import { useMe } from 'hooks/useMe';
 import { useOpponent } from 'hooks/useOpponent';
 import { AvatarWithName } from './AvatarWithName';
-import { PointAndDate } from './PointAndDate';
+import { ScoreAndDate } from './ScoreAndDate';
 
 type Props = {
   opponentId: string;
-  userScore: number;
-  opponentScore: number;
+  score: string;
   createdAt: Date;
   win: boolean;
 };
 
 export const GameResultCard: FC<Props> = memo((props) => {
-  const { opponentId, userScore, opponentScore, createdAt, win } = props;
+  const { opponentId, score, createdAt, win } = props;
   const { getMe, meLoading, me } = useMe();
   const { getOpponent, opponentLoading, opponent } = useOpponent();
   useEffect(() => getMe(), [getMe]);
@@ -24,21 +23,18 @@ export const GameResultCard: FC<Props> = memo((props) => {
 
   return (
     <>
-      {meLoading && opponentLoading ? (
+      {meLoading || opponentLoading ? (
         <Center h="100vh">
           <Spinner color="teal.200" />
         </Center>
       ) : (
         <Box h="90px" bg="gray.200" borderRadius={20} px={4}>
-          <HStack justify="center" align="center">
-            <AvatarWithName name={me?.nickname} avatarUrl={me?.avatarUrl} />
-            <PointAndDate
-              point={`${userScore}-${opponentScore}`}
-              createdAt={createdAt}
-            />
+          <HStack>
+            <AvatarWithName name={me.nickname} avatarUrl={me.avatarUrl} />
+            <ScoreAndDate score={score} createdAt={createdAt} />
             <AvatarWithName
-              name={opponent?.nickname}
-              avatarUrl={opponent?.avatarUrl}
+              name={opponent.nickname}
+              avatarUrl={opponent.avatarUrl}
             />
             <Box w="50px">
               <Center>
