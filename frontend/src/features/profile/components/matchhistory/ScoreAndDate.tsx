@@ -2,12 +2,12 @@ import { memo, FC } from 'react';
 import { Box, Text, VStack } from '@chakra-ui/react';
 
 type Props = {
-  point: string;
+  score: string;
   createdAt: Date;
 };
 
-export const PointAndDate: FC<Props> = memo((props) => {
-  const { point, createdAt } = props;
+export const ScoreAndDate: FC<Props> = memo((props) => {
+  const { score, createdAt } = props;
 
   const date = new Date(createdAt);
 
@@ -20,8 +20,8 @@ export const PointAndDate: FC<Props> = memo((props) => {
   return (
     <Box>
       <VStack>
-        <Text h="32px" fontSize="24px" mb={1}>
-          {point}
+        <Text h="32px" fontSize="24px" mb={2}>
+          {score}
         </Text>
         <Text h="8px" fontSize="4px">
           {`${year}/${month}/${day} ${hour}:${minute}`}
