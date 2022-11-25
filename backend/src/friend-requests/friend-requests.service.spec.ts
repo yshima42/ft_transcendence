@@ -65,7 +65,7 @@ describe('FriendRequestsService', () => {
     },
   ];
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
       providers: [FriendRequestsService],
@@ -75,7 +75,9 @@ describe('FriendRequestsService', () => {
     friendRequestsService = module.get<FriendRequestsService>(
       FriendRequestsService
     );
+  });
 
+  beforeEach(async () => {
     await prisma.user.createMany({
       data: mockUsers,
     });

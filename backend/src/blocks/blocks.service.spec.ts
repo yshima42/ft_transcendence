@@ -38,7 +38,7 @@ describe('BlocksService', () => {
     },
   ];
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
       providers: [BlocksService],
@@ -46,7 +46,9 @@ describe('BlocksService', () => {
 
     prisma = module.get<PrismaService>(PrismaService);
     blocksService = module.get<BlocksService>(BlocksService);
+  });
 
+  beforeEach(async () => {
     await prisma.user.createMany({
       data: mockUsers,
     });
