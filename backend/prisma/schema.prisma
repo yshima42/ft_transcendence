@@ -18,12 +18,13 @@ model User {
   avatarUrl       String
   nickname        String          @unique @default("")
   onlineStatus    OnlineStatus    @default(ONLINE)
+
   following       Relationship[]  @relation("following")
   followedBy      Relationship[]  @relation("followedBy")
   creator         FriendRequest[] @relation("creator")
   receiver        FriendRequest[] @relation("receiver")
-  blocking        Block[]         @relation("blocking")
-  blockedBy       Block[]         @relation("blockedBy")
+  blocking        Block[]         @relation("source")
+  blockedBy       Block[]         @relation("target")
   matchedUser     MatchResult[]   @relation("matchedUser")
   matchedOpponent MatchResult[]   @relation("matchedOpponent")
 }
@@ -75,12 +76,12 @@ enum FriendRequestStatus {
 model Block {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  blocking    User     @relation("blocking", fields: [blockingId], references: [id])
-  blockingId  String
-  blockedBy   User     @relation("blockedBy", fields: [blockedById], references: [id])
-  blockedById String
+  source    User     @relation("source", fields: [sourceId], references: [id])
+  sourceId  String
+  target   User     @relation("target", fields: [targetId], references: [id])
+  targetId String
 
-  @@id([blockingId, blockedById])
+  @@id([sourceId, targetId])
 }
 
 model MatchResult {
