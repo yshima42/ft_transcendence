@@ -82,3 +82,12 @@ model MatchResult {
   opponentScore Int
   win           Boolean
 }
+
+// model Game {
+//   id String @id @default(uuid())
+//   createdAt     DateTime @default(now())
+//   winnter User @relation("matchedUser", fields: [winnerId], references: [id])
+//   winnerId String
+//   loser      User     @relation("matchedOpponent", fields: [loserId], references: [id])
+//   loserId String
+// }
