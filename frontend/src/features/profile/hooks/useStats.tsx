@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { axios } from '../../../lib/axios';
 
 export interface Stats {
@@ -15,10 +14,9 @@ export const fetchStats = async (): Promise<Stats> => {
 
 export const useStats = (): { stats: Stats } => {
   const { data: stats } = useQuery<Stats>(['stats'], fetchStats);
-  const navigate = useNavigate();
 
+  // TODO エラーの場合、useQuery内で例外が投げられるので、ここにはいつ入るかわかってない。
   if (stats === undefined) {
-    navigate('/', { replace: true });
     throw new Error('Error in userProfile');
   }
 
