@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
+import { axios } from 'lib/axios';
 import { useNavigate } from 'react-router-dom';
 
-import { axios } from '../../../lib/axios';
 import { Chat } from '../types/chat';
 
 const mockChats: Chat[] = [
