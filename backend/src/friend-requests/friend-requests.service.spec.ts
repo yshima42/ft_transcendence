@@ -134,7 +134,8 @@ describe('FriendRequestsService', () => {
     expect(updatedRequest).toHaveProperty('status', 'DECLINED');
   });
 
-  it('should remove accepted request', async () => {
+  // あとでremoveとremoveFriendでわける。describe
+  it('should remove accepted a request', async () => {
     const _newRequest = await prisma.friendRequest.create({
       data: {
         creatorId: mockUsers[0].id,
@@ -149,8 +150,75 @@ describe('FriendRequestsService', () => {
     );
     const recordCountAfter = await prisma.friendRequest.count();
 
-    expect(deletedRequest).toHaveProperty('status', 'ACCEPTED');
+    expect(deletedRequest).toHaveProperty('creatorId', mockUsers[0].id);
     expect(recordCountBefore).toBe(1);
+    expect(recordCountAfter).toBe(0);
+  });
+
+  it('should remove accepted a request from myself', async () => {
+    const _newRequest = await prisma.friendRequest.create({
+      data: {
+        creatorId: mockUsers[0].id,
+        receiverId: mockUsers[1].id,
+        status: 'ACCEPTED',
+      },
+    });
+    const recordCountBefore = await prisma.friendRequest.count();
+    const deletedRequestCount = await service.removeFriend(
+      mockUsers[0].id,
+      mockUsers[1].id
+    );
+    const recordCountAfter = await prisma.friendRequest.count();
+
+    expect(deletedRequestCount).toHaveProperty('count', 1);
+    expect(recordCountBefore).toBe(1);
+    expect(recordCountAfter).toBe(0);
+  });
+
+  it('should remove accepted a request from others', async () => {
+    const _newRequest = await prisma.friendRequest.create({
+      data: {
+        creatorId: mockUsers[1].id,
+        receiverId: mockUsers[0].id,
+        status: 'ACCEPTED',
+      },
+    });
+    const recordCountBefore = await prisma.friendRequest.count();
+    const deletedRequestCount = await service.removeFriend(
+      mockUsers[0].id,
+      mockUsers[1].id
+    );
+    const recordCountAfter = await prisma.friendRequest.count();
+
+    expect(deletedRequestCount).toHaveProperty('count', 1);
+    expect(recordCountBefore).toBe(1);
+    expect(recordCountAfter).toBe(0);
+  });
+
+  it('should remove requests including declined request', async () => {
+    const _newRequest = await prisma.friendRequest.createMany({
+      data: [
+        {
+          creatorId: mockUsers[1].id,
+          receiverId: mockUsers[0].id,
+          status: 'DECLINED',
+        },
+        {
+          creatorId: mockUsers[0].id,
+          receiverId: mockUsers[1].id,
+          status: 'ACCEPTED',
+        },
+      ],
+    });
+    const recordCountBefore = await prisma.friendRequest.count();
+    const deletedRequestCount = await service.removeFriend(
+      mockUsers[0].id,
+      mockUsers[1].id
+    );
+    const recordCountAfter = await prisma.friendRequest.count();
+
+    expect(deletedRequestCount).toHaveProperty('count', 2);
+    expect(recordCountBefore).toBe(2);
     expect(recordCountAfter).toBe(0);
   });
 
@@ -274,5 +342,26 @@ describe('FriendRequestsService', () => {
 
     // expect(pendingRequests).toEqual([mockUsers[1], mockUsers[2], mockUsers[5]]);
     expect(pendingRequests).toHaveLength(3);
+  });
+
+  it('should not find friends', async () => {
+    const _newRequests = await prisma.friendRequest.createMany({
+      data: [
+        {
+          creatorId: mockUsers[0].id,
+          receiverId: mockUsers[1].id,
+          status: 'PENDING',
+        },
+        {
+          creatorId: mockUsers[2].id,
+          receiverId: mockUsers[0].id,
+          status: 'PENDING',
+        },
+      ],
+    });
+    const acceptedRequests = await service.findFriends(mockUsers[0].id);
+
+    // expect(pendingRequests).toEqual([mockUsers[1], mockUsers[2], mockUsers[5]]);
+    expect(acceptedRequests).toHaveLength(0);
   });
 });
