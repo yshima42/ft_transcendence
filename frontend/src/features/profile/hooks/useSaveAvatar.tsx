@@ -3,11 +3,13 @@ import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
 export interface AvatarFormData {
-  file?: File;
+  file: File;
 }
 
 const postAvatar = async (avatarFormData: AvatarFormData) => {
-  const result = await axios.post<User>('/profile/avatar', avatarFormData);
+  const formData = new FormData();
+  formData.append('file', avatarFormData.file);
+  const result = await axios.post<User>('/profile/avatar', formData);
 
   return result.data;
 };
