@@ -1,14 +1,18 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
+  Post,
   Query,
   StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { MatchResult, User } from '@prisma/client';
+import { Block, MatchResult, User } from '@prisma/client';
+import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
 import { GameStatsEntity } from 'src/game/entities/game-stats.entity';
 import { MatchResultEntity } from 'src/game/entities/match-result.entity';
@@ -26,7 +30,8 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly fileService: FileService,
-    private readonly gameService: GameService
+    private readonly gameService: GameService,
+    private readonly blocksService: BlocksService
   ) {}
 
   @Get('all')
@@ -80,5 +85,33 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<GameStats> {
     return await this.gameService.findStats(id);
+  }
+
+  // 自分（ログインユーザーに関するエンドポイント)
+  // meコントローラー作りたい
+  // 関数多いから
+  // https://github.dev/JUNNETWORKS/42-ft_transcendence
+  @Post('me/blocks')
+  @UseGuards(JwtAuthGuard)
+  async block(
+    @GetUser() user: User,
+    @Body('targetId', ParseUUIDPipe) targetId: string
+  ): Promise<Block> {
+    return await this.blocksService.create(user.id, targetId);
+  }
+
+  @Delete('me/blocks/:id')
+  @UseGuards(JwtAuthGuard)
+  async unblock(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) targetId: string
+  ): Promise<Block> {
+    return await this.blocksService.remove(user.id, targetId);
+  }
+
+  @Get('me/blocks')
+  @UseGuards(JwtAuthGuard)
+  async findBlockedUsers(@GetUser() user: User): Promise<User[]> {
+    return await this.blocksService.findBlockedUsers(user.id);
   }
 }
