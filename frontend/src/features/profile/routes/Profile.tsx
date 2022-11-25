@@ -1,10 +1,10 @@
 import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import { ContentLayout } from 'components/layout/ContentLayout';
-import { MatchHistoryCard } from '../components/MatchHistoryCard';
 import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
+import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
 import { useProfile } from '../hooks/useProfile';
 import { useStats } from '../hooks/useStats';
 
