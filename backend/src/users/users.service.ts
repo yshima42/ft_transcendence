@@ -46,8 +46,8 @@ export class UsersService {
       if (attrs.includes('name')) {
         userDto.name = user.name;
       }
-      if (attrs.includes('avatarUrl')) {
-        userDto.avatarUrl = user.avatarUrl;
+      if (attrs.includes('avatarImageUrl')) {
+        userDto.avatarImageUrl = user.avatarImageUrl;
       }
       if (attrs.includes('nickname')) {
         userDto.nickname = user.nickname;

@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { BlocksService } from './blocks.service';
 
 describe('BlocksService', () => {
-  let service: BlocksService;
+  let blocksService: BlocksService;
   let prisma: PrismaService;
   const date = new Date('2022-11-01T04:34:22+09:00');
   const mockUsers: User[] = [
@@ -14,7 +14,7 @@ describe('BlocksService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'blockDummy1',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
       nickname: 'nickname1',
       onlineStatus: 'ONLINE',
     },
@@ -23,7 +23,7 @@ describe('BlocksService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'blockDummy2',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
       nickname: 'nickname2',
       onlineStatus: 'OFFLINE',
     },
@@ -32,7 +32,7 @@ describe('BlocksService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'blockDummy3',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
       nickname: 'nickname3',
       onlineStatus: 'INGAME',
     },
@@ -45,7 +45,7 @@ describe('BlocksService', () => {
     }).compile();
 
     prisma = module.get<PrismaService>(PrismaService);
-    service = module.get<BlocksService>(BlocksService);
+    blocksService = module.get<BlocksService>(BlocksService);
 
     await prisma.user.createMany({
       data: mockUsers,
@@ -61,11 +61,14 @@ describe('BlocksService', () => {
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(blocksService).toBeDefined();
   });
 
   it('should create block', async () => {
-    const newBlock = await service.create(mockUsers[0].id, mockUsers[1].id);
+    const newBlock = await blocksService.create(
+      mockUsers[0].id,
+      mockUsers[1].id
+    );
 
     expect(newBlock).toHaveProperty('sourceId', mockUsers[0].id);
     expect(newBlock).toHaveProperty('targetId', mockUsers[1].id);
@@ -79,7 +82,7 @@ describe('BlocksService', () => {
       },
     });
     const recordCountBefore = await prisma.block.count();
-    const deletedRequest = await service.remove(
+    const deletedRequest = await blocksService.remove(
       mockUsers[0].id,
       mockUsers[1].id
     );
@@ -111,7 +114,7 @@ describe('BlocksService', () => {
         },
       ],
     });
-    const blockedUsers = await service.findBlockedUsers(mockUsers[0].id);
+    const blockedUsers = await blocksService.findBlockedUsers(mockUsers[0].id);
 
     expect(blockedUsers).toHaveLength(1);
     expect(blockedUsers).toEqual([mockUsers[1]]);
@@ -138,7 +141,7 @@ describe('BlocksService', () => {
         },
       ],
     });
-    const blockedUsers = await service.findBlockedUsers(mockUsers[2].id);
+    const blockedUsers = await blocksService.findBlockedUsers(mockUsers[2].id);
 
     expect(blockedUsers).toHaveLength(2);
     expect(blockedUsers).toContainEqual(mockUsers[0]);

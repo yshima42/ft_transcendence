@@ -11,13 +11,13 @@ datasource db {
 }
 
 model User {
-  id           String       @id @default(uuid())
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  name         String       @unique
-  avatarUrl    String
-  nickname     String       @unique @default("")
-  onlineStatus OnlineStatus @default(ONLINE)
+  id             String       @id @default(uuid())
+  name           String       @unique
+  avatarImageUrl String
+  nickname       String       @unique @default("")
+  onlineStatus   OnlineStatus @default(ONLINE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   creator         FriendRequest[] @relation("creator")
   receiver        FriendRequest[] @relation("receiver")
@@ -34,13 +34,13 @@ enum OnlineStatus {
 }
 
 model FriendRequest {
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
   creator    User                @relation("creator", fields: [creatorId], references: [id])
   creatorId  String
   receiver   User                @relation("receiver", fields: [receiverId], references: [id])
   receiverId String
   status     FriendRequestStatus
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
 
   @@id([creatorId, receiverId])
 }
@@ -52,20 +52,16 @@ enum FriendRequestStatus {
 }
 
 model Block {
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  source    User     @relation("source", fields: [sourceId], references: [id])
-  sourceId  String
-  target    User     @relation("target", fields: [targetId], references: [id])
-  targetId  String
+  source   User   @relation("source", fields: [sourceId], references: [id])
+  sourceId String
+  target   User   @relation("target", fields: [targetId], references: [id])
+  targetId String
 
   @@id([sourceId, targetId])
 }
 
 model MatchResult {
   id            String   @id @default(uuid())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
   user          User     @relation("matchedUser", fields: [userId], references: [id])
   userId        String
   opponent      User     @relation("matchedOpponent", fields: [opponentId], references: [id])
@@ -73,4 +69,6 @@ model MatchResult {
   userScore     Int
   opponentScore Int
   win           Boolean
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
