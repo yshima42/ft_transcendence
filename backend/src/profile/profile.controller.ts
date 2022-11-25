@@ -101,7 +101,7 @@ export class ProfileController {
     this.fileService.deleteOldFile(file.filename, user);
 
     const UpdateUserDto = {
-      avatarUrl: `http://localhost:3000/users/${user.id}/profile/avatar/${file.filename}`,
+      avatarImageUrl: `http://localhost:3000/users/${user.id}/profile/avatar/${file.filename}`,
     };
 
     return await this.profileService.update(user.id, UpdateUserDto);

@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { FriendRequestsService } from './friend-requests.service';
 
 describe('FriendRequestsService', () => {
-  let service: FriendRequestsService;
+  let friendRequestsService: FriendRequestsService;
   let prisma: PrismaService;
   const date = new Date('2022-11-01T04:34:22+09:00');
   const mockUsers: User[] = [
@@ -14,7 +14,7 @@ describe('FriendRequestsService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy1',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
       nickname: 'nickname1',
       onlineStatus: 'ONLINE',
     },
@@ -23,7 +23,7 @@ describe('FriendRequestsService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy2',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
       nickname: 'nickname2',
       onlineStatus: 'OFFLINE',
     },
@@ -32,7 +32,7 @@ describe('FriendRequestsService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy3',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
       nickname: 'nickname3',
       onlineStatus: 'INGAME',
     },
@@ -41,7 +41,7 @@ describe('FriendRequestsService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy4',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
       nickname: 'nickname4',
       onlineStatus: 'OFFLINE',
     },
@@ -50,7 +50,7 @@ describe('FriendRequestsService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy5',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
       nickname: 'nickname5',
       onlineStatus: 'OFFLINE',
     },
@@ -59,7 +59,7 @@ describe('FriendRequestsService', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy6',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
       nickname: 'nickname6',
       onlineStatus: 'OFFLINE',
     },
@@ -72,7 +72,9 @@ describe('FriendRequestsService', () => {
     }).compile();
 
     prisma = module.get<PrismaService>(PrismaService);
-    service = module.get<FriendRequestsService>(FriendRequestsService);
+    friendRequestsService = module.get<FriendRequestsService>(
+      FriendRequestsService
+    );
 
     await prisma.user.createMany({
       data: mockUsers,
@@ -88,11 +90,14 @@ describe('FriendRequestsService', () => {
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(friendRequestsService).toBeDefined();
   });
 
   it('should create friend-request', async () => {
-    const newRequest = await service.create(mockUsers[0].id, mockUsers[1].id);
+    const newRequest = await friendRequestsService.create(
+      mockUsers[0].id,
+      mockUsers[1].id
+    );
 
     expect(newRequest).toHaveProperty('creatorId', mockUsers[0].id);
     expect(newRequest).toHaveProperty('receiverId', mockUsers[1].id);
@@ -107,7 +112,7 @@ describe('FriendRequestsService', () => {
       },
     });
 
-    const updatedRequest = await service.update({
+    const updatedRequest = await friendRequestsService.update({
       creatorId: mockUsers[0].id,
       receiverId: mockUsers[1].id,
       status: 'ACCEPTED',
@@ -125,7 +130,7 @@ describe('FriendRequestsService', () => {
       },
     });
 
-    const updatedRequest = await service.update({
+    const updatedRequest = await friendRequestsService.update({
       creatorId: mockUsers[0].id,
       receiverId: mockUsers[1].id,
       status: 'DECLINED',
@@ -144,7 +149,7 @@ describe('FriendRequestsService', () => {
       },
     });
     const recordCountBefore = await prisma.friendRequest.count();
-    const deletedRequest = await service.remove(
+    const deletedRequest = await friendRequestsService.remove(
       mockUsers[0].id,
       mockUsers[1].id
     );
@@ -164,7 +169,7 @@ describe('FriendRequestsService', () => {
       },
     });
     const recordCountBefore = await prisma.friendRequest.count();
-    const deletedRequestCount = await service.removeFriend(
+    const deletedRequestCount = await friendRequestsService.removeFriend(
       mockUsers[0].id,
       mockUsers[1].id
     );
@@ -184,7 +189,7 @@ describe('FriendRequestsService', () => {
       },
     });
     const recordCountBefore = await prisma.friendRequest.count();
-    const deletedRequestCount = await service.removeFriend(
+    const deletedRequestCount = await friendRequestsService.removeFriend(
       mockUsers[0].id,
       mockUsers[1].id
     );
@@ -211,7 +216,7 @@ describe('FriendRequestsService', () => {
       ],
     });
     const recordCountBefore = await prisma.friendRequest.count();
-    const deletedRequestCount = await service.removeFriend(
+    const deletedRequestCount = await friendRequestsService.removeFriend(
       mockUsers[0].id,
       mockUsers[1].id
     );
@@ -258,7 +263,9 @@ describe('FriendRequestsService', () => {
       ],
     });
 
-    const incomingRequests = await service.findIncomingRequest(mockUsers[0].id);
+    const incomingRequests = await friendRequestsService.findIncomingRequest(
+      mockUsers[0].id
+    );
 
     expect(incomingRequests).toEqual([mockUsers[1], mockUsers[2]]);
   });
@@ -298,7 +305,9 @@ describe('FriendRequestsService', () => {
         },
       ],
     });
-    const outgoingRequests = await service.findOutgoingRequest(mockUsers[0].id);
+    const outgoingRequests = await friendRequestsService.findOutgoingRequest(
+      mockUsers[0].id
+    );
 
     expect(outgoingRequests).toEqual([mockUsers[1], mockUsers[2]]);
   });
@@ -338,7 +347,9 @@ describe('FriendRequestsService', () => {
         },
       ],
     });
-    const pendingRequests = await service.findFriends(mockUsers[0].id);
+    const pendingRequests = await friendRequestsService.findFriends(
+      mockUsers[0].id
+    );
 
     // expect(pendingRequests).toEqual([mockUsers[1], mockUsers[2], mockUsers[5]]);
     expect(pendingRequests).toHaveLength(3);
@@ -359,7 +370,9 @@ describe('FriendRequestsService', () => {
         },
       ],
     });
-    const acceptedRequests = await service.findFriends(mockUsers[0].id);
+    const acceptedRequests = await friendRequestsService.findFriends(
+      mockUsers[0].id
+    );
 
     // expect(pendingRequests).toEqual([mockUsers[1], mockUsers[2], mockUsers[5]]);
     expect(acceptedRequests).toHaveLength(0);
