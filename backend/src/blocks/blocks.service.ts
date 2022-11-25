@@ -7,11 +7,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BlocksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(blockingId: string, blockedById: string): Promise<Block> {
+  async create(sourceId: string, targetId: string): Promise<Block> {
     return await this.prisma.block.create({
       data: {
-        blockingId,
-        blockedById,
+        sourceId,
+        targetId,
       },
     });
   }
@@ -21,19 +21,19 @@ export class BlocksService {
       where: {
         blockedBy: {
           some: {
-            blockingId: id,
+            sourceId: id,
           },
         },
       },
     });
   }
 
-  async remove(blockingId: string, blockedById: string): Promise<Block> {
+  async remove(sourceId: string, targetId: string): Promise<Block> {
     return await this.prisma.block.delete({
       where: {
-        blockingId_blockedById: {
-          blockingId,
-          blockedById,
+        sourceId_targetId: {
+          sourceId,
+          targetId,
         },
       },
     });

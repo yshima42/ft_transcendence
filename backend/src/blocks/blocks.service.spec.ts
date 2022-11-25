@@ -67,15 +67,15 @@ describe('BlocksService', () => {
   it('should create block', async () => {
     const newBlock = await service.create(mockUsers[0].id, mockUsers[1].id);
 
-    expect(newBlock).toHaveProperty('blockingId', mockUsers[0].id);
-    expect(newBlock).toHaveProperty('blockedById', mockUsers[1].id);
+    expect(newBlock).toHaveProperty('sourceId', mockUsers[0].id);
+    expect(newBlock).toHaveProperty('targetId', mockUsers[1].id);
   });
 
   it('should remove block', async () => {
     const _newBlock = await prisma.block.create({
       data: {
-        blockingId: mockUsers[0].id,
-        blockedById: mockUsers[1].id,
+        sourceId: mockUsers[0].id,
+        targetId: mockUsers[1].id,
       },
     });
     const recordCountBefore = await prisma.block.count();
@@ -85,7 +85,7 @@ describe('BlocksService', () => {
     );
     const recordCountAfter = await prisma.block.count();
 
-    expect(deletedRequest).toHaveProperty('blockingId', mockUsers[0].id);
+    expect(deletedRequest).toHaveProperty('sourceId', mockUsers[0].id);
     expect(recordCountBefore).toBe(1);
     expect(recordCountAfter).toBe(0);
   });
@@ -94,20 +94,20 @@ describe('BlocksService', () => {
     const _newBlocks = await prisma.block.createMany({
       data: [
         {
-          blockingId: mockUsers[0].id,
-          blockedById: mockUsers[1].id,
+          sourceId: mockUsers[0].id,
+          targetId: mockUsers[1].id,
         },
         {
-          blockingId: mockUsers[1].id,
-          blockedById: mockUsers[2].id,
+          sourceId: mockUsers[1].id,
+          targetId: mockUsers[2].id,
         },
         {
-          blockingId: mockUsers[2].id,
-          blockedById: mockUsers[1].id,
+          sourceId: mockUsers[2].id,
+          targetId: mockUsers[1].id,
         },
         {
-          blockingId: mockUsers[2].id,
-          blockedById: mockUsers[0].id,
+          sourceId: mockUsers[2].id,
+          targetId: mockUsers[0].id,
         },
       ],
     });
@@ -121,20 +121,20 @@ describe('BlocksService', () => {
     const _newBlocks = await prisma.block.createMany({
       data: [
         {
-          blockingId: mockUsers[0].id,
-          blockedById: mockUsers[1].id,
+          sourceId: mockUsers[0].id,
+          targetId: mockUsers[1].id,
         },
         {
-          blockingId: mockUsers[1].id,
-          blockedById: mockUsers[2].id,
+          sourceId: mockUsers[1].id,
+          targetId: mockUsers[2].id,
         },
         {
-          blockingId: mockUsers[2].id,
-          blockedById: mockUsers[1].id,
+          sourceId: mockUsers[2].id,
+          targetId: mockUsers[1].id,
         },
         {
-          blockingId: mockUsers[2].id,
-          blockedById: mockUsers[0].id,
+          sourceId: mockUsers[2].id,
+          targetId: mockUsers[0].id,
         },
       ],
     });
