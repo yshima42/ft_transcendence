@@ -6,19 +6,20 @@ import { axios } from '../lib/axios';
 
 export const useMe = (): {
   getMe: () => void;
+  meLoading: boolean;
   me: User | undefined;
 } => {
+  const [meLoading, setMeLoading] = useState(false);
   const [me, setMe] = useState<User>();
   const navigate = useNavigate();
 
   const getMe = useCallback(() => {
     axios
       .get<User>('/profile')
-      .then((res) => {
-        setMe(res.data);
-      })
-      .catch(() => navigate('/', { replace: true }));
+      .then((res) => setMe(res.data))
+      .catch(() => navigate('/', { replace: true }))
+      .finally(() => setMeLoading(false));
   }, [navigate]);
 
-  return { getMe, me };
+  return { getMe, meLoading, me };
 };
