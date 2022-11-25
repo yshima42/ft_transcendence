@@ -7,7 +7,7 @@ import {
   Heading,
   Text,
 } from '@chakra-ui/react';
-import { Stats } from '../hooks/useStats';
+import { useStats } from '../hooks/useStats';
 
 // const colorScaleRYG = (rate: number) => {
 //   if (rate < 50) {
@@ -21,12 +21,8 @@ import { Stats } from '../hooks/useStats';
 //   }
 // };
 
-type Props = {
-  stats: Stats;
-};
-
-export const StatsCard: FC<Props> = memo((props) => {
-  const { stats } = props;
+export const StatsCard: FC = memo(() => {
+  const { stats } = useStats();
   const { winNum, loseNum } = stats;
 
   const winRate = Math.floor((winNum / (winNum + loseNum)) * 100);

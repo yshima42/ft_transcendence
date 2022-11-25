@@ -1,14 +1,10 @@
 import { memo, FC } from 'react';
 import { Avatar, Button, Flex, Spacer, Tag, Text } from '@chakra-ui/react';
-import { User } from '@prisma/client';
 import { useNavigate } from 'react-router-dom';
+import { useProfile } from '../hooks/useProfile';
 
-type Props = {
-  user: User;
-};
-
-export const UserInfoCard: FC<Props> = memo((props) => {
-  const { user } = props;
+export const UserInfoCard: FC = memo(() => {
+  const { user } = useProfile();
   const navigate = useNavigate();
 
   return (
