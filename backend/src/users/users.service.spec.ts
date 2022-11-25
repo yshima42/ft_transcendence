@@ -16,7 +16,7 @@ describe('UsersServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy1',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
       nickname: 'nickname1',
       onlineStatus: 'ONLINE',
     },
@@ -25,7 +25,7 @@ describe('UsersServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy2',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
       nickname: 'nickname2',
       onlineStatus: 'OFFLINE',
     },
@@ -34,7 +34,7 @@ describe('UsersServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy3',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
       nickname: 'nickname3',
       onlineStatus: 'INGAME',
     },
@@ -43,7 +43,7 @@ describe('UsersServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy4',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
       nickname: 'nickname4',
       onlineStatus: 'OFFLINE',
     },
@@ -52,7 +52,7 @@ describe('UsersServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy5',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
       nickname: 'nickname5',
       onlineStatus: 'OFFLINE',
     },
@@ -61,7 +61,7 @@ describe('UsersServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy6',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
       nickname: 'nickname6',
       onlineStatus: 'OFFLINE',
     },
@@ -139,14 +139,16 @@ describe('UsersServiceTest', () => {
       expect(nameByService).toEqual(nameAtExpected);
     });
 
-    it("should get one user's avatarUrl", async () => {
-      const avatarUrlByService = await userService.find(
+    it("should get one user's avatarImageUrl", async () => {
+      const avatarImageUrlByService = await userService.find(
         mockUsers[0].id,
-        'avatarUrl'
+        'avatarImageUrl'
       );
-      const avatarUrlExpected = { avatarUrl: mockUsers[0].avatarUrl };
+      const avatarImageUrlExpected = {
+        avatarImageUrl: mockUsers[0].avatarImageUrl,
+      };
 
-      expect(avatarUrlByService).toEqual(avatarUrlExpected);
+      expect(avatarImageUrlByService).toEqual(avatarImageUrlExpected);
     });
 
     it("should get one user's nickname", async () => {
