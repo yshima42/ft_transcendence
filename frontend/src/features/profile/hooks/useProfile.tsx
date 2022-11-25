@@ -11,7 +11,7 @@ export const fetchProfile = async (): Promise<User> => {
 export const useProfile = (): { user: User } => {
   const { data: user } = useQuery<User>(['profile'], fetchProfile);
 
-  // エラーの場合、useQuery内で例外が投げられるので、ここにはいつ入るかわかってない。
+  // TODO エラーの場合、useQuery内で例外が投げられるので、ここにはいつ入るかわかってない。
   if (user === undefined) {
     // このthrowがないと、下のreturn まで行き、User|undefined で返さないといけなくなる。
     throw new Error('Error in userProfile');
