@@ -5,13 +5,8 @@ import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
 import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
-import { useProfile } from '../hooks/useProfile';
-import { useStats } from '../hooks/useStats';
 
 export const Profile: FC = memo(() => {
-  const { user } = useProfile();
-  const { stats } = useStats();
-
   return (
     <ContentLayout title="Profile">
       <Flex justify="center">
@@ -40,12 +35,12 @@ export const Profile: FC = memo(() => {
         >
           <GridItem bg="gray" area="profile">
             <ProfileCardWrapper>
-              <UserInfoCard user={user} />
+              <UserInfoCard />
             </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="stats">
             <ProfileCardWrapper>
-              <StatsCard stats={stats} />
+              <StatsCard />
             </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="history">
