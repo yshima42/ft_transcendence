@@ -49,7 +49,7 @@ const mockMatchHistory: MatchHistory[] = [
   },
 ];
 
-export const Stats: FC = memo(() => {
+export const UserProfile: FC = memo(() => {
   // const { userId } = useParams();
   const { id, imagePath } = mockUserData;
   const imageBaseUrl = 'https://source.unsplash.com';
