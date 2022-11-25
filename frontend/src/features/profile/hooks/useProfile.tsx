@@ -1,6 +1,5 @@
 import { User } from '@prisma/client';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import { axios } from '../../../lib/axios';
 
 export const fetchProfile = async (): Promise<User> => {
@@ -11,10 +10,10 @@ export const fetchProfile = async (): Promise<User> => {
 
 export const useProfile = (): { user: User } => {
   const { data: user } = useQuery<User>(['profile'], fetchProfile);
-  const navigate = useNavigate();
 
+  // エラーの場合、useQuery内で例外が投げられるので、ここにはいつ入るかわかってない。
   if (user === undefined) {
-    navigate('/', { replace: true });
+    // このthrowがないと、下のreturn まで行き、User|undefined で返さないといけなくなる。
     throw new Error('Error in userProfile');
   }
 
