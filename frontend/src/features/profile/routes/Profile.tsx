@@ -2,7 +2,7 @@ import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import { ContentLayout } from 'components/layout/ContentLayout';
 import { MatchHistoryCard } from '../components/MatchHistoryCard';
-import { ProfileCardBase } from '../components/ProfileCardBase';
+import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
 
@@ -34,19 +34,19 @@ export const Profile: FC = memo(() => {
           gap={5}
         >
           <GridItem bg="gray" area="profile">
-            <ProfileCardBase>
+            <ProfileCardWrapper>
               <UserInfoCard />
-            </ProfileCardBase>
+            </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="stats">
-            <ProfileCardBase>
+            <ProfileCardWrapper>
               <StatsCard />
-            </ProfileCardBase>
+            </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="history">
-            <ProfileCardBase>
+            <ProfileCardWrapper>
               <MatchHistoryCard />
-            </ProfileCardBase>
+            </ProfileCardWrapper>
           </GridItem>
         </Grid>
       </Flex>

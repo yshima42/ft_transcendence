@@ -3,7 +3,7 @@ import { Center, Spinner } from '@chakra-ui/react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Navigate } from 'react-router-dom';
 
-export const ProfileCardBase: FC<PropsWithChildren> = memo((props) => {
+export const ProfileCardWrapper: FC<PropsWithChildren> = memo((props) => {
   const { children } = props;
 
   return (
