@@ -23,14 +23,17 @@ export const MatchHistoryCard: FC = memo(() => {
               <Text as="b">Match History</Text>
             </Box>
             <VStack bg="teal.200" justify="center" align="center">
-              <GameResultCard
-                name="name"
-                avatarUrl="https://source.unsplash.com/random"
-                userScore={matches[0].userScore}
-                opponentScore={matches[0].opponentScore}
-                createdAt={matches[0].createdAt}
-                win={matches[0].win}
-              />
+              {matches.map((obj) => (
+                <Box key={obj.id}>
+                  <GameResultCard
+                    opponentId={obj.opponentId}
+                    userScore={obj.userScore}
+                    opponentScore={obj.opponentScore}
+                    createdAt={obj.createdAt}
+                    win={obj.win}
+                  />
+                </Box>
+              ))}
             </VStack>
             <PrevAndNextButton />
           </Stack>
