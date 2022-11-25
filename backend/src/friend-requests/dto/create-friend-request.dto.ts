@@ -13,6 +13,6 @@ export class CreateFriendRequestDto {
   @ApiProperty({ default: '40e8b4b4-9b39-4b7e-8e31-78e31975d320' })
   receiverId!: string;
 
-  @ApiProperty({ default: '40e8b4b4-9b39-4b7e-8e31-78e31975d320' })
+  @ApiProperty({ default: 'Pending' })
   status!: FriendRequestStatus;
 }

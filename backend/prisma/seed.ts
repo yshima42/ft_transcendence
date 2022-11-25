@@ -1,4 +1,4 @@
-import { PrismaClient, Relationship, User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const date = new Date('2022-11-01T04:34:22+09:00');
@@ -9,7 +9,7 @@ const userData: User[] = [
     createdAt: new Date(date),
     updatedAt: new Date(date),
     name: 'dummy1',
-    avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
+    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
     nickname: 'nickname1',
     onlineStatus: 'ONLINE',
   },
@@ -18,7 +18,7 @@ const userData: User[] = [
     createdAt: new Date(date),
     updatedAt: new Date(date),
     name: 'dummy2',
-    avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
+    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
     nickname: 'nickname2',
     onlineStatus: 'OFFLINE',
   },
@@ -27,7 +27,7 @@ const userData: User[] = [
     createdAt: new Date(date),
     updatedAt: new Date(date),
     name: 'dummy3',
-    avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
+    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
     nickname: 'nickname3',
     onlineStatus: 'INGAME',
   },
@@ -36,7 +36,7 @@ const userData: User[] = [
     createdAt: new Date(date),
     updatedAt: new Date(date),
     name: 'dummy4',
-    avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
+    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
     nickname: 'nickname4',
     onlineStatus: 'OFFLINE',
   },
@@ -45,62 +45,9 @@ const userData: User[] = [
     createdAt: new Date(date),
     updatedAt: new Date(date),
     name: 'dummy5',
-    avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
+    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
     nickname: 'nickname5',
     onlineStatus: 'OFFLINE',
-  },
-];
-
-const relationshipData: Relationship[] = [
-  // friend
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[0].id,
-    peerId: userData[1].id,
-    type: 'FRIEND',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[1].id,
-    peerId: userData[0].id,
-    type: 'FRIEND',
-    isBlocking: false,
-  },
-  // not friend
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[0].id,
-    peerId: userData[3].id,
-    type: 'OUTGOING',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[3].id,
-    peerId: userData[0].id,
-    type: 'INCOMING',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[4].id,
-    peerId: userData[0].id,
-    type: 'OUTGOING',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[0].id,
-    peerId: userData[4].id,
-    type: 'INCOMING',
-    isBlocking: false,
   },
 ];
 
@@ -116,23 +63,10 @@ const createUsers = async () => {
   return await prisma.$transaction(users);
 };
 
-const createRelationships = async () => {
-  const relations = [];
-  for (const r of relationshipData) {
-    const relation = prisma.relationship.create({
-      data: r,
-    });
-    relations.push(relation);
-  }
-
-  return await prisma.$transaction(relations);
-};
-
 const main = async () => {
   console.log(`Start seeding ...`);
 
   await createUsers();
-  await createRelationships();
 
   console.log(`Seeding finished.`);
 };

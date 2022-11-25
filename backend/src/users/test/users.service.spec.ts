@@ -11,7 +11,7 @@ const mockUser1: User = {
   createdAt: new Date(date),
   updatedAt: new Date(date),
   name: 'dummy1',
-  avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
+  avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
   nickname: 'nickname1',
   onlineStatus: 'ONLINE',
 };
@@ -21,7 +21,7 @@ const mockUser2: User = {
   createdAt: new Date(date),
   updatedAt: new Date(date),
   name: 'dummy2',
-  avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
+  avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
   nickname: 'nickname2',
   onlineStatus: 'OFFLINE',
 };
@@ -31,7 +31,7 @@ const mockUser3: User = {
   createdAt: new Date(date),
   updatedAt: new Date(date),
   name: 'dummy3',
-  avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
+  avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
   nickname: 'nickname3',
   onlineStatus: 'INGAME',
 };
