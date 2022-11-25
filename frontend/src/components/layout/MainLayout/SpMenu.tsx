@@ -44,7 +44,7 @@ export const SpMenu: FC<Props> = memo((props) => {
             </Link>
           ))}
           <MenuDivider />
-          <Link to="/app/users/profile">
+          <Link to="/app/profile">
             <MenuItem icon={<InfoOutlineIcon />}>Profile</MenuItem>
           </Link>
           <MenuItem icon={<ArrowForwardIcon />} onClick={logout}>
