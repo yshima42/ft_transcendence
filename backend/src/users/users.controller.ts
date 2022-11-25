@@ -4,16 +4,30 @@ import {
   Delete,
   Get,
   Param,
+  ParseEnumPipe,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   StreamableFile,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Block, MatchResult, User } from '@prisma/client';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  Block,
+  FriendRequest,
+  FriendRequestStatus,
+  MatchResult,
+  User,
+} from '@prisma/client';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
+import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
 import { GameStatsEntity } from 'src/game/entities/game-stats.entity';
 import { MatchResultEntity } from 'src/game/entities/match-result.entity';
 import { GameService } from 'src/game/game.service';
@@ -31,7 +45,8 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly fileService: FileService,
     private readonly gameService: GameService,
-    private readonly blocksService: BlocksService
+    private readonly blocksService: BlocksService,
+    private readonly friendRequestService: FriendRequestsService
   ) {}
 
   @Get('all')
@@ -91,6 +106,9 @@ export class UsersController {
   // meコントローラー作りたい
   // 関数多いから
   // https://github.dev/JUNNETWORKS/42-ft_transcendence
+  /******************************
+   * ブロック関係
+   ******************************/
   @Post('me/blocks')
   @UseGuards(JwtAuthGuard)
   async block(
@@ -113,5 +131,76 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async findBlockedUsers(@GetUser() user: User): Promise<User[]> {
     return await this.blocksService.findBlockedUsers(user.id);
+  }
+
+  /******************************
+   * フレンド関係
+   ******************************/
+  @Post('me/friend-requests')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: UserEntity })
+  async sendFriendRequest(
+    @GetUser() user: User,
+    @Body('receiverId', ParseUUIDPipe) receiverId: string
+  ): Promise<FriendRequest> {
+    return await this.friendRequestService.create(user.id, receiverId);
+  }
+
+  @Patch('me/friend-requests/incoming')
+  @UseGuards(JwtAuthGuard)
+  async respondFriendRequest(
+    @GetUser() user: User,
+    @Body('creatorId', ParseUUIDPipe) creatorId: string,
+    @Body('status', new ParseEnumPipe(FriendRequestStatus))
+    status: FriendRequestStatus
+  ): Promise<FriendRequest> {
+    return await this.friendRequestService.update({
+      creatorId,
+      receiverId: user.id,
+      status,
+    });
+  }
+
+  @Delete('me/friends/:id')
+  @UseGuards(JwtAuthGuard)
+  async unfriend(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) friendId: string
+  ): Promise<{ count: number }> {
+    return await this.friendRequestService.removeFriend(user.id, friendId);
+  }
+
+  @Delete('me/friend-requests/:id')
+  @UseGuards(JwtAuthGuard)
+  async cancelFriendRequest(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) friendId: string
+  ): Promise<FriendRequest> {
+    return await this.friendRequestService.remove(user.id, friendId);
+  }
+
+  @Get('me/friends')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: UserEntity, isArray: true })
+  async findFriends(@GetUser() user: User): Promise<User[]> {
+    console.log('hello');
+
+    return await this.friendRequestService.findFriends(user.id);
+  }
+
+  @Get('me/friend-requests/outgoing')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: UserEntity, isArray: true })
+  async findOutgoingrequest(@GetUser() user: User): Promise<User[]> {
+    return await this.friendRequestService.findOutgoingRequest(user.id);
+  }
+
+  @Get('me/friend-requests/incoming')
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: UserEntity, isArray: true })
+  async findIncomingRequest(@GetUser() user: User): Promise<User[]> {
+    console.log('hello');
+
+    return await this.friendRequestService.findIncomingRequest(user.id);
   }
 }

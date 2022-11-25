@@ -24,14 +24,9 @@ export class FriendRequestsService {
     return await this.prisma.user.findMany({
       where: {
         creator: {
-          every: {
+          some: {
             receiverId: id,
             status: 'PENDING',
-          },
-        },
-        receiver: {
-          none: {
-            creatorId: id,
           },
         },
       },
@@ -42,13 +37,8 @@ export class FriendRequestsService {
   async findOutgoingRequest(id: string): Promise<User[]> {
     return await this.prisma.user.findMany({
       where: {
-        creator: {
-          none: {
-            receiverId: id,
-          },
-        },
         receiver: {
-          every: {
+          some: {
             creatorId: id,
             status: 'PENDING',
           },
@@ -60,18 +50,24 @@ export class FriendRequestsService {
   async findFriends(id: string): Promise<User[]> {
     return await this.prisma.user.findMany({
       where: {
-        creator: {
-          every: {
-            receiverId: id,
-            status: 'ACCEPTED',
+        OR: [
+          {
+            creator: {
+              some: {
+                receiverId: id,
+                status: 'ACCEPTED',
+              },
+            },
           },
-        },
-        receiver: {
-          every: {
-            creatorId: id,
-            status: 'ACCEPTED',
+          {
+            receiver: {
+              some: {
+                creatorId: id,
+                status: 'ACCEPTED',
+              },
+            },
           },
-        },
+        ],
       },
     });
   }
@@ -90,6 +86,7 @@ export class FriendRequestsService {
     });
   }
 
+  // 一つ消す
   async remove(creatorId: string, receiverId: string): Promise<FriendRequest> {
     return await this.prisma.friendRequest.delete({
       where: {
@@ -97,6 +94,27 @@ export class FriendRequestsService {
           creatorId,
           receiverId,
         },
+      },
+    });
+  }
+
+  // 2つ消す
+  async removeFriend(
+    userId: string,
+    friendId: string
+  ): Promise<{ count: number }> {
+    return await this.prisma.friendRequest.deleteMany({
+      where: {
+        OR: [
+          {
+            creatorId: userId,
+            receiverId: friendId,
+          },
+          {
+            creatorId: friendId,
+            receiverId: userId,
+          },
+        ],
       },
     });
   }

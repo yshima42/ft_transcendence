@@ -1,4 +1,4 @@
-import { PrismaClient, Relationship, User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const date = new Date('2022-11-01T04:34:22+09:00');
@@ -51,59 +51,6 @@ const userData: User[] = [
   },
 ];
 
-const relationshipData: Relationship[] = [
-  // friend
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[0].id,
-    peerId: userData[1].id,
-    type: 'FRIEND',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[1].id,
-    peerId: userData[0].id,
-    type: 'FRIEND',
-    isBlocking: false,
-  },
-  // not friend
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[0].id,
-    peerId: userData[3].id,
-    type: 'OUTGOING',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[3].id,
-    peerId: userData[0].id,
-    type: 'INCOMING',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[4].id,
-    peerId: userData[0].id,
-    type: 'OUTGOING',
-    isBlocking: false,
-  },
-  {
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    userId: userData[0].id,
-    peerId: userData[4].id,
-    type: 'INCOMING',
-    isBlocking: false,
-  },
-];
-
 const createUsers = async () => {
   const users = [];
   for (const u of userData) {
@@ -116,23 +63,10 @@ const createUsers = async () => {
   return await prisma.$transaction(users);
 };
 
-const createRelationships = async () => {
-  const relations = [];
-  for (const r of relationshipData) {
-    const relation = prisma.relationship.create({
-      data: r,
-    });
-    relations.push(relation);
-  }
-
-  return await prisma.$transaction(relations);
-};
-
 const main = async () => {
   console.log(`Start seeding ...`);
 
   await createUsers();
-  await createRelationships();
 
   console.log(`Seeding finished.`);
 };
