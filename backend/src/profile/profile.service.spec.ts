@@ -16,7 +16,7 @@ describe('ProfileServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy1',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
       nickname: 'nickname1',
       onlineStatus: 'ONLINE',
     },
@@ -25,7 +25,7 @@ describe('ProfileServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy2',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
       nickname: 'nickname2',
       onlineStatus: 'OFFLINE',
     },
@@ -34,7 +34,7 @@ describe('ProfileServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy3',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
       nickname: 'nickname3',
       onlineStatus: 'INGAME',
     },
@@ -43,7 +43,7 @@ describe('ProfileServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy4',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
       nickname: 'nickname4',
       onlineStatus: 'OFFLINE',
     },
@@ -52,7 +52,7 @@ describe('ProfileServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy5',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
       nickname: 'nickname5',
       onlineStatus: 'OFFLINE',
     },
@@ -61,7 +61,7 @@ describe('ProfileServiceTest', () => {
       createdAt: new Date(date),
       updatedAt: new Date(date),
       name: 'dummy6',
-      avatarUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
+      avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
       nickname: 'nickname6',
       onlineStatus: 'OFFLINE',
     },
@@ -87,14 +87,14 @@ describe('ProfileServiceTest', () => {
   });
 
   describe('update', () => {
-    it('should update dummy1 avatarUrl to dummy2 avatarUrl', async () => {
+    it('should update dummy1 avatarImageUrl to dummy2 avatarImageUrl', async () => {
       const updateByService = await profileService.update(mockUsers[0].id, {
-        avatarUrl: mockUsers[1].avatarUrl,
+        avatarImageUrl: mockUsers[1].avatarImageUrl,
       });
 
       expect(updateByService).toHaveProperty(
-        'avatarUrl',
-        mockUsers[1].avatarUrl
+        'avatarImageUrl',
+        mockUsers[1].avatarImageUrl
       );
     });
 
@@ -116,12 +116,12 @@ describe('ProfileServiceTest', () => {
 
     it("should update dummy2's all data", async () => {
       const updateByService = await profileService.update(mockUsers[1].id, {
-        avatarUrl: 'google.com',
+        avatarImageUrl: 'google.com',
         nickname: 'updated2',
         onlineStatus: 'INGAME',
       });
 
-      expect(updateByService).toHaveProperty('avatarUrl', 'google.com');
+      expect(updateByService).toHaveProperty('avatarImageUrl', 'google.com');
       expect(updateByService).toHaveProperty('nickname', 'updated2');
       expect(updateByService).toHaveProperty('onlineStatus', 'INGAME');
     });
