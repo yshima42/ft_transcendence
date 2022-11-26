@@ -6,7 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from './users.service';
 
 describe('UsersServiceTest', () => {
-  let userService: UsersService;
+  let usersService: UsersService;
   let prisma: PrismaService;
 
   const date = new Date('2022-11-01T04:34:22+09:00');
@@ -73,7 +73,7 @@ describe('UsersServiceTest', () => {
       providers: [ConfigService, UsersService, PrismaService],
     }).compile();
 
-    userService = module.get<UsersService>(UsersService);
+    usersService = module.get<UsersService>(UsersService);
     prisma = module.get<PrismaService>(PrismaService);
 
     await prisma.user.createMany({
@@ -91,7 +91,7 @@ describe('UsersServiceTest', () => {
 
   describe('findAll', () => {
     it('should get all users', async () => {
-      const allUsersByService = await userService.findAll(mockUsers[0]);
+      const allUsersByService = await usersService.findAll(mockUsers[0]);
       const allUsersByDatabase = await prisma.user.findMany({
         where: {
           name: {
@@ -106,14 +106,14 @@ describe('UsersServiceTest', () => {
 
   describe('find', () => {
     it("should get one user's id", async () => {
-      const idByService = await userService.find(mockUsers[0].id, 'id');
+      const idByService = await usersService.find(mockUsers[0].id, 'id');
       const idExpected = { id: mockUsers[0].id };
 
       expect(idByService).toEqual(idExpected);
     });
 
     it("should get one user's createdAt", async () => {
-      const createdAtByService = await userService.find(
+      const createdAtByService = await usersService.find(
         mockUsers[0].id,
         'createdAt'
       );
@@ -123,7 +123,7 @@ describe('UsersServiceTest', () => {
     });
 
     it("should get one user's updatedAt", async () => {
-      const updatedAtByService = await userService.find(
+      const updatedAtByService = await usersService.find(
         mockUsers[0].id,
         'updatedAt'
       );
@@ -133,14 +133,14 @@ describe('UsersServiceTest', () => {
     });
 
     it("should get one user's name", async () => {
-      const nameByService = await userService.find(mockUsers[0].id, 'name');
+      const nameByService = await usersService.find(mockUsers[0].id, 'name');
       const nameAtExpected = { name: mockUsers[0].name };
 
       expect(nameByService).toEqual(nameAtExpected);
     });
 
     it("should get one user's avatarImageUrl", async () => {
-      const avatarImageUrlByService = await userService.find(
+      const avatarImageUrlByService = await usersService.find(
         mockUsers[0].id,
         'avatarImageUrl'
       );
@@ -152,7 +152,7 @@ describe('UsersServiceTest', () => {
     });
 
     it("should get one user's nickname", async () => {
-      const nicknameByService = await userService.find(
+      const nicknameByService = await usersService.find(
         mockUsers[0].id,
         'nickname'
       );
@@ -161,6 +161,47 @@ describe('UsersServiceTest', () => {
       };
 
       expect(nicknameByService).toEqual(nicknameExpected);
+    });
+  });
+
+  describe('update', () => {
+    it('should update dummy1 avatarImageUrl to dummy2 avatarImageUrl', async () => {
+      const updateByService = await usersService.update(mockUsers[0].id, {
+        avatarImageUrl: mockUsers[1].avatarImageUrl,
+      });
+
+      expect(updateByService).toHaveProperty(
+        'avatarImageUrl',
+        mockUsers[1].avatarImageUrl
+      );
+    });
+
+    it('should update dummy1 nickname to updated1', async () => {
+      const updateByService = await usersService.update(mockUsers[0].id, {
+        nickname: 'updated1',
+      });
+
+      expect(updateByService).toHaveProperty('nickname', 'updated1');
+    });
+
+    it('should update dummy1 onlineStatus to OFFLINE', async () => {
+      const updateByService = await usersService.update(mockUsers[0].id, {
+        onlineStatus: 'OFFLINE',
+      });
+
+      expect(updateByService).toHaveProperty('onlineStatus', 'OFFLINE');
+    });
+
+    it("should update dummy2's all data", async () => {
+      const updateByService = await usersService.update(mockUsers[1].id, {
+        avatarImageUrl: 'google.com',
+        nickname: 'updated2',
+        onlineStatus: 'INGAME',
+      });
+
+      expect(updateByService).toHaveProperty('avatarImageUrl', 'google.com');
+      expect(updateByService).toHaveProperty('nickname', 'updated2');
+      expect(updateByService).toHaveProperty('onlineStatus', 'INGAME');
     });
   });
 });

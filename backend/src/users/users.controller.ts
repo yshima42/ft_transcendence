@@ -10,9 +10,14 @@ import {
   Post,
   Query,
   StreamableFile,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -33,11 +38,12 @@ import { GameStatsEntity } from 'src/game/entities/game-stats.entity';
 import { MatchResultEntity } from 'src/game/entities/match-result.entity';
 import { GameService } from 'src/game/game.service';
 import { GameStats } from 'src/game/interfaces/game-stats.interface';
-import { UpdateUserDto } from 'src/profile/dto/update-user.dto';
-import { ProfileService } from 'src/profile/profile.service';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserDto } from './dto/user.dto';
+import { BlockEntity } from './entities/block.entity';
+import { FriendRequestEntity } from './entities/friendRequest.entity';
 import { UserEntity } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -48,14 +54,15 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly fileService: FileService,
     private readonly gameService: GameService,
-    private readonly profileService: ProfileService,
     private readonly blocksService: BlocksService,
     private readonly friendRequestService: FriendRequestsService
   ) {}
 
   @Get('all')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'ユーザーを全員取得', description: '細かい説明' })
+  @ApiOperation({
+    summary: '自分以外のユーザー情報を取得',
+  })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll(@GetUser() user: User): Promise<User[]> {
     return await this.usersService.findAll(user);
@@ -63,7 +70,11 @@ export class UsersController {
 
   @Get('me/profile')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: '自分のユーザー情報取得' })
+  @ApiOperation({
+    summary: '自分のユーザー情報取得',
+    description:
+      'queryによって取得データを指定可(id, name, nickname, onlineStatus, createdAt, updatedAt)</br>queryが設定されていない場合は全て取得',
+  })
   @ApiOkResponse({ type: UserEntity })
   @ApiQuery({
     name: 'fields',
@@ -78,19 +89,27 @@ export class UsersController {
 
   @Post('me/profile')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: '自分のユーザー情報更新' })
+  @ApiOperation({
+    summary: '自分のユーザー情報更新',
+    description:
+      'bodyでavatarImageUrl, nickname, onlineStatusを設定することで自分のユーザー情報更新</br>一つずつ、全て同時に更新、共に可',
+  })
   @ApiCreatedResponse({ type: UserEntity })
   async update(
     @GetUser() user: User,
     @Body() updateUserDto: UpdateUserDto
   ): Promise<User> {
-    return await this.profileService.update(user.id, updateUserDto);
+    return await this.usersService.update(user.id, updateUserDto);
   }
 
   @Get(':id/profile')
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: UserEntity })
-  @ApiOperation({ summary: '他ユーザー情報取得' })
+  @ApiOperation({
+    summary: '各ユーザー情報取得',
+    description:
+      'queryによって取得データを指定可(id, name, nickname, onlineStatus, createdAt, updatedAt)</br>queryが設定されていない場合は全て取得',
+  })
   @ApiQuery({
     name: 'fields',
     required: false,
@@ -102,9 +121,12 @@ export class UsersController {
     return await this.usersService.find(id, fields);
   }
 
-  @Get(':id/profile/avatar/:filename')
+  @Get(':id/avatar/:filename')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: '他ユーザーのアバター取得' })
+  @ApiOperation({
+    summary: '各ユーザーのアバター取得',
+    description: 'このエンドポイントを各ユーザー情報のavatarImageUrlに設定',
+  })
   @ApiOkResponse({
     description: 'picture in binary',
   })
@@ -117,9 +139,58 @@ export class UsersController {
     return this.fileService.streamFile(path);
   }
 
+  @Get('avatar/:filename')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'アバターの取得',
+  })
+  @ApiOkResponse({
+    description: 'picture in binary',
+  })
+  streamMyAvatar(
+    @GetUser() user: User,
+    @Param('filename') filename: string
+  ): StreamableFile {
+    const path = `./upload/${user.id}/${filename}`;
+
+    return this.fileService.streamFile(path);
+  }
+
+  @Post('me/avatar')
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'アバターの更新' })
+  @UseInterceptors(FileInterceptor('file', FileService.multerOptions()))
+  @ApiCreatedResponse({ type: UserEntity })
+  // 本当はデコレータを別ファイルに分けたい。難しそうなのでとりあえずここで
+  @ApiBody({
+    description: 'The image to upload',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadAvatar(
+    @GetUser() user: User,
+    @UploadedFile(FileService.parseFilePipe()) file: Express.Multer.File
+  ): Promise<User> {
+    this.fileService.deleteOldFile(file.filename, user);
+
+    const UpdateUserDto = {
+      avatarImageUrl: `http://localhost:3000/users/${user.id}/avatar/${file.filename}`,
+    };
+
+    return await this.usersService.update(user.id, UpdateUserDto);
+  }
+
   @Get(':id/game/matches')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: '他ユーザーのMatchHistory取得' })
+  @ApiOperation({ summary: '各ユーザーのMatchHistory取得' })
   @ApiOkResponse({ type: MatchResultEntity, isArray: true })
   async findMatchHistory(
     @Param('id', ParseUUIDPipe) id: string
@@ -129,7 +200,7 @@ export class UsersController {
 
   @Get(':id/game/stats')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: '他ユーザーのStats取得' })
+  @ApiOperation({ summary: '各ユーザーのStats取得' })
   @ApiOkResponse({ type: GameStatsEntity })
   async findGameStats(
     @Param('id', ParseUUIDPipe) id: string
@@ -146,6 +217,20 @@ export class UsersController {
    ******************************/
   @Post('me/blocks')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'ユーザーをブロック' })
+  @ApiBody({
+    description: 'ブロックするユーザーのUUIDをtargetIdとして設定',
+    schema: {
+      type: 'object',
+      properties: {
+        targetId: {
+          type: 'UUID',
+          example: '40e8b4b4-9b39-4b7e-8e31-78e31975d320',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({ type: BlockEntity })
   async block(
     @GetUser() user: User,
     @Body('targetId', ParseUUIDPipe) targetId: string
@@ -155,6 +240,12 @@ export class UsersController {
 
   @Delete('me/blocks/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'ユーザーのブロックを解除',
+    description:
+      'ブロックを解除するユーザーのUUIDをpathで渡す</br>bodyで渡さないのはメソッドがDELETEのため',
+  })
+  @ApiOkResponse({ type: BlockEntity })
   async unblock(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) targetId: string
@@ -164,6 +255,8 @@ export class UsersController {
 
   @Get('me/blocks')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'ブロックしているユーザーの一覧取得' })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   async findBlockedUsers(@GetUser() user: User): Promise<User[]> {
     return await this.blocksService.findBlockedUsers(user.id);
   }
@@ -173,6 +266,19 @@ export class UsersController {
    ******************************/
   @Post('me/friend-requests')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'フレンドリクエストの送信' })
+  @ApiBody({
+    description: 'フレンドリクエストを送る相手のUUIDをreceiverIdに設定',
+    schema: {
+      type: 'object',
+      properties: {
+        receiverId: {
+          type: 'UUID',
+          example: '40e8b4b4-9b39-4b7e-8e31-78e31975d320',
+        },
+      },
+    },
+  })
   @ApiCreatedResponse({ type: UserEntity })
   async sendFriendRequest(
     @GetUser() user: User,
@@ -183,6 +289,25 @@ export class UsersController {
 
   @Patch('me/friend-requests/incoming')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'フレンドリクエストの承認・拒否',
+    description:
+      'フレンドリクエストが自分に来ている相手に対してのみ使用可</br>承認する時はACCEPTED、拒否する時はDECLINEをstatusに設定する',
+  })
+  @ApiBody({
+    description: 'statusは承認(ACCEPTED)または拒否(DECLINE)',
+    schema: {
+      type: 'object',
+      properties: {
+        creatorId: {
+          type: 'UUID',
+          example: '21514d8b-e6af-490c-bc51-d0c7a359a267',
+        },
+        status: { type: 'FriendRequestStatus', example: 'ACCEPTED' },
+      },
+    },
+  })
+  @ApiOkResponse({ type: FriendRequestEntity })
   async respondFriendRequest(
     @GetUser() user: User,
     @Body('creatorId', ParseUUIDPipe) creatorId: string,
@@ -196,8 +321,14 @@ export class UsersController {
     });
   }
 
+  // numberがレスポンスとして返ってくるのは修正するべきでは
+  // 上記検討次第swagger対応予定
   @Delete('me/friends/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'フレンド解除',
+    description: 'フレンドを解除するユーザーのUUIDをpathで渡す',
+  })
   async unfriend(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) friendId: string
@@ -205,8 +336,15 @@ export class UsersController {
     return await this.friendRequestService.removeFriend(user.id, friendId);
   }
 
+  // フレンドリクエストをキャンセルした場合FriendRequestが返ってくるべきなのか
+  // Postmanで試すと'PENDING'が返ってくるが正しい挙動か
+  // 上記検討次第swagger対応予定
   @Delete('me/friend-requests/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'フレンドリクエストキャンセル',
+    description: 'フレンドリクエストをキャンセルするユーザーのUUIDをpathで渡す',
+  })
   async cancelFriendRequest(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) friendId: string
@@ -216,7 +354,8 @@ export class UsersController {
 
   @Get('me/friends')
   @UseGuards(JwtAuthGuard)
-  @ApiCreatedResponse({ type: UserEntity, isArray: true })
+  @ApiOperation({ summary: 'フレンド一覧取得' })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   async findFriends(@GetUser() user: User): Promise<User[]> {
     console.log('hello');
 
@@ -225,6 +364,9 @@ export class UsersController {
 
   @Get('me/friend-requests/outgoing')
   @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: '自分から(自分→他ユーザー)のフレンドリクエスト一覧取得',
+  })
   @ApiCreatedResponse({ type: UserEntity, isArray: true })
   async findOutgoingrequest(@GetUser() user: User): Promise<User[]> {
     return await this.friendRequestService.findOutgoingRequest(user.id);
@@ -232,7 +374,10 @@ export class UsersController {
 
   @Get('me/friend-requests/incoming')
   @UseGuards(JwtAuthGuard)
-  @ApiCreatedResponse({ type: UserEntity, isArray: true })
+  @ApiOperation({
+    summary: '他ユーザーから(他ユーザー→自分)のフレンドリクエスト一覧取得',
+  })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   async findIncomingRequest(@GetUser() user: User): Promise<User[]> {
     console.log('hello');
 
