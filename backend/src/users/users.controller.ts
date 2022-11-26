@@ -367,7 +367,7 @@ export class UsersController {
   @ApiOperation({
     summary: '自分から(自分→他ユーザー)のフレンドリクエスト一覧取得',
   })
-  @ApiCreatedResponse({ type: UserEntity, isArray: true })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   async findOutgoingrequest(@GetUser() user: User): Promise<User[]> {
     return await this.friendRequestService.findOutgoingRequest(user.id);
   }
