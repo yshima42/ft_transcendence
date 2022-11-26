@@ -19,12 +19,12 @@ model User {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  creator         FriendRequest[] @relation("creator")
-  receiver        FriendRequest[] @relation("receiver")
-  blocking        Block[]         @relation("source")
-  blockedBy       Block[]         @relation("target")
-  matchedUser     MatchResult[]   @relation("matchedUser")
-  matchedOpponent MatchResult[]   @relation("matchedOpponent")
+  creator   FriendRequest[] @relation("creator")
+  receiver  FriendRequest[] @relation("receiver")
+  blocking  Block[]         @relation("source")
+  blockedBy Block[]         @relation("target")
+  playerOne MatchResult[]   @relation("playerOne")
+  playerTwo MatchResult[]   @relation("playerTwo")
 }
 
 enum OnlineStatus {
@@ -62,22 +62,13 @@ model Block {
 
 model MatchResult {
   id            String   @id @default(uuid())
-  user          User     @relation("matchedUser", fields: [userId], references: [id])
-  userId        String
-  opponent      User     @relation("matchedOpponent", fields: [opponentId], references: [id])
-  opponentId    String
+  playerOne     User     @relation("playerOne", fields: [playerOneId], references: [id])
+  playerOneId   String
+  playerTwo     User     @relation("playerTwo", fields: [playerTwoId], references: [id])
+  playerTwoId   String
   userScore     Int
   opponentScore Int
-  win           Boolean
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  // win           Boolean
+  startedAt     DateTime @default(now())
+  finishededAt  DateTime @updatedAt
 }
-
-// model Game {
-//   id String @id @default(uuid())
-//   createdAt     DateTime @default(now())
-//   winnter User @relation("matchedUser", fields: [winnerId], references: [id])
-//   winnerId String
-//   loser      User     @relation("matchedOpponent", fields: [loserId], references: [id])
-//   loserId String
-// }
