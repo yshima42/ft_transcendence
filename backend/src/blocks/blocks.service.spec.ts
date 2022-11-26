@@ -1,5 +1,6 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { User } from '@prisma/client';
+import { Block, User } from '@prisma/client';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BlocksService } from './blocks.service';
@@ -76,6 +77,27 @@ describe('BlocksService', () => {
     expect(newBlock).toHaveProperty('targetId', mockUsers[1].id);
   });
 
+  it('should not block myself', async () => {
+    const createFunc = async () => {
+      return await blocksService.create(mockUsers[0].id, mockUsers[0].id);
+    };
+
+    await expect(createFunc()).rejects.toThrow(BadRequestException);
+  });
+
+  it('should not create duplicated block', async () => {
+    const createFunc = async () => {
+      return await blocksService.create(mockUsers[0].id, mockUsers[1].id);
+    };
+    const newBlock: Block = {
+      sourceId: mockUsers[0].id,
+      targetId: mockUsers[1].id,
+    };
+
+    await expect(createFunc()).resolves.toStrictEqual(newBlock);
+    await expect(createFunc()).rejects.toThrow(BadRequestException);
+  });
+
   it('should remove block', async () => {
     const _newBlock = await prisma.block.create({
       data: {
@@ -93,6 +115,13 @@ describe('BlocksService', () => {
     expect(deletedRequest).toHaveProperty('sourceId', mockUsers[0].id);
     expect(recordCountBefore).toBe(1);
     expect(recordCountAfter).toBe(0);
+  });
+
+  // テスト名が微妙。のちほど修正
+  it('should not remove non-existent block', async () => {
+    const deleteFunc = async () =>
+      await blocksService.remove(mockUsers[0].id, mockUsers[1].id);
+    await expect(deleteFunc()).rejects.toThrow(NotFoundException);
   });
 
   it('should find a blocking user', async () => {
