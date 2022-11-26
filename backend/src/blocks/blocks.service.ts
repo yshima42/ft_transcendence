@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { Block, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-// import { UpdateBlockDto } from './dto/update-block.dto';
 
 @Injectable()
 export class BlocksService {
