@@ -51,7 +51,7 @@ export class FileService {
   }
 
   deleteOldFile(newFilename: string, user: User): void {
-    const oldExtname = extname(user.avatarUrl);
+    const oldExtname = extname(user.avatarImageUrl);
     if (oldExtname !== extname(newFilename)) {
       const oldFilePath = `./upload/${user.id}/${user.name}${oldExtname}`;
       if (existsSync(oldFilePath)) {
