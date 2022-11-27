@@ -202,7 +202,10 @@ export class UsersController {
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) friendId: string
   ): Promise<{ count: number }> {
-    return await this.friendRequestService.removeFriend(user.id, friendId);
+    return await this.friendRequestService.removeBetweenFriends(
+      user.id,
+      friendId
+    );
   }
 
   @Delete('me/friend-requests/:id')
@@ -211,7 +214,7 @@ export class UsersController {
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) friendId: string
   ): Promise<FriendRequest> {
-    return await this.friendRequestService.remove(user.id, friendId);
+    return await this.friendRequestService.removeOne(user.id, friendId);
   }
 
   @Get('me/friends')
