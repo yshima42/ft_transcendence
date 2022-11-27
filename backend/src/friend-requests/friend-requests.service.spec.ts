@@ -1,3 +1,4 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FriendRequest, User } from '@prisma/client';
 import { PrismaModule } from 'src/prisma/prisma.module';
@@ -124,6 +125,19 @@ describe('FriendRequestsService', () => {
         )
       ).resolves.toMatchObject(frinedRequestBase);
     });
+
+    it('should not create friend-request to myself', async () => {
+      await expect(
+        friendRequestsService.create(userArray[0].id, userArray[0].id)
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should not create duplicated friend-request', async () => {
+      await friendRequestsService.create(userArray[0].id, userArray[1].id);
+      await expect(
+        friendRequestsService.create(userArray[0].id, userArray[1].id)
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe('update', () => {
@@ -182,15 +196,21 @@ describe('FriendRequestsService', () => {
       });
 
       await expect(
-        friendRequestsService.remove(
+        friendRequestsService.removeOne(
           acceptedRequest.creatorId,
           acceptedRequest.receiverId
         )
       ).resolves.toHaveProperty('status', 'PENDING');
     });
+
+    it('should not remove non-existent request', async () => {
+      await expect(
+        friendRequestsService.removeOne(userArray[0].id, userArray[1].id)
+      ).rejects.toThrow(NotFoundException);
+    });
   });
 
-  describe('removeFriend', () => {
+  describe('removeBetweenFriends', () => {
     it('should remove an accepted request from myself', async () => {
       const acceptedRequest = await prisma.friendRequest.create({
         data: {
@@ -203,14 +223,14 @@ describe('FriendRequestsService', () => {
       });
 
       await expect(
-        friendRequestsService.removeFriend(
+        friendRequestsService.removeBetweenFriends(
           acceptedRequest.creatorId,
           acceptedRequest.receiverId
         )
       ).resolves.toHaveProperty('count', 1);
     });
 
-    it('should remove an accepted a request from others', async () => {
+    it('should remove an accepted request from others', async () => {
       const acceptedRequest = await prisma.friendRequest.create({
         data: {
           creatorId: userArray[1].id,
@@ -222,7 +242,7 @@ describe('FriendRequestsService', () => {
       });
 
       await expect(
-        friendRequestsService.removeFriend(
+        friendRequestsService.removeBetweenFriends(
           acceptedRequest.receiverId,
           acceptedRequest.creatorId
         )
@@ -247,8 +267,38 @@ describe('FriendRequestsService', () => {
       });
 
       await expect(
-        friendRequestsService.removeFriend(testUsers[0].id, testUsers[1].id)
+        friendRequestsService.removeBetweenFriends(
+          testUsers[0].id,
+          testUsers[1].id
+        )
       ).resolves.toHaveProperty('count', 2);
+    });
+
+    it('should not remove non-existent friend', async () => {
+      await expect(
+        friendRequestsService.removeBetweenFriends(
+          userArray[0].id,
+          userArray[1].id
+        )
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should not remove a request that is to/from not friend', async () => {
+      await prisma.friendRequest.createMany({
+        data: [
+          {
+            creatorId: userArray[0].id,
+            receiverId: userArray[1].id,
+            status: 'PENDING',
+          },
+        ],
+      });
+      await expect(
+        friendRequestsService.removeBetweenFriends(
+          userArray[0].id,
+          userArray[1].id
+        )
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
