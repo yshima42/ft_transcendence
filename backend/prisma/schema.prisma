@@ -11,8 +11,52 @@ datasource db {
 }
 
 model User {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name String @unique
+  id              String         @id @default(uuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  name            String         @unique
+  avatarUrl       String
+  nickname        String         @unique @default("")
+  onlineStatus    OnlineStatus   @default(ONLINE)
+  following       Relationship[] @relation("following")
+  followedBy      Relationship[] @relation("followedBy")
+  matchedUser     MatchResult[]  @relation("matchedUser")
+  matchedOpponent MatchResult[]  @relation("matchedOpponent")
+}
+
+enum OnlineStatus {
+  ONLINE
+  OFFLINE
+  INGAME
+}
+
+model Relationship {
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  user      User             @relation("following", fields: [userId], references: [id])
+  userId    String
+  peer      User             @relation("followedBy", fields: [peerId], references: [id])
+  peerId    String
+  type      RelationshipType
+
+  @@id([userId, peerId])
+}
+
+enum RelationshipType {
+  FRIEND
+  INCOMING
+  OUTGOING
+}
+
+model MatchResult {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation("matchedUser", fields: [userId], references: [id])
+  userId        String
+  opponent      User     @relation("matchedOpponent", fields: [opponentId], references: [id])
+  opponentId    String
+  userScore     Int
+  opponentScore Int
+  win           Boolean
 }
