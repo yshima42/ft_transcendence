@@ -9,10 +9,10 @@ export class GameService {
   constructor(private readonly prisma: PrismaService) {}
 
   async addMatchResult(
-    userId: string,
+    playerOneId: string,
     matchResultDto: MatchResultDto
   ): Promise<MatchResult> {
-    if (userId !== matchResultDto.userId) {
+    if (playerOneId !== matchResultDto.playerOneId) {
       throw new BadRequestException("Can't add match result of others");
     }
 
@@ -29,8 +29,8 @@ export class GameService {
 
     const matchResult = await this.prisma.matchResult.create({
       data: {
-        userId: matchResultDto.userId,
-        opponentId: matchResultDto.opponentId,
+        playerOneId: matchResultDto.playerOneId,
+        playerTwoId: matchResultDto.playerTwoId,
         userScore,
         opponentScore,
         win: userScore > opponentScore,
@@ -40,17 +40,17 @@ export class GameService {
     return matchResult;
   }
 
-  async findMatchHistory(userId: string): Promise<MatchResult[]> {
+  async findMatchHistory(playerOneId: string): Promise<MatchResult[]> {
     const matchResults = await this.prisma.matchResult.findMany({
-      where: { userId },
+      where: { playerOneId },
     });
 
     return matchResults;
   }
 
-  async findStats(userId: string): Promise<GameStats> {
+  async findStats(playerOneId: string): Promise<GameStats> {
     const matchResults = await this.prisma.matchResult.findMany({
-      where: { userId },
+      where: { playerOneId },
     });
     const matchNum = matchResults.length;
     const winNum = matchResults.filter((match) => match.win).length;
