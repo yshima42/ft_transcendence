@@ -6,7 +6,6 @@ import { FileModule } from './file/file.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 import { GameModule } from './game/game.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { ProfileModule } from './profile/profile.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -17,7 +16,6 @@ import { UsersModule } from './users/users.module';
     PrismaModule,
     FileModule,
     GameModule,
-    ProfileModule,
     FriendRequestsModule,
     BlocksModule,
   ],
