@@ -16,7 +16,7 @@ export const useMe = (): {
   const getMe = useCallback(() => {
     setMeLoading(true);
     axios
-      .get<User>('/profile')
+      .get<User>('/users/me/profile')
       .then((res) => setMe(res.data))
       .catch(() => navigate('/', { replace: true }))
       .finally(() => setMeLoading(false));
