@@ -29,9 +29,10 @@ export class AuthService {
 
   async generateJwt(
     id: string,
-    name: string
+    name: string,
+    isSecondFactorAuthenticated = false
   ): Promise<{ accessToken: string }> {
-    const payload = { id, name };
+    const payload = { id, name, isSecondFactorAuthenticated };
     const accessToken = await this.jwt.signAsync(payload, {
       expiresIn: '1d',
       secret: this.config.get('JWT_SECRET') as string,
