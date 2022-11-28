@@ -22,7 +22,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "preinstall": "npx typesync || :",
-    "prepare": "npx simple-git-hooks || :"
+    "prepare": "npx simple-git-hooks || :",
+    "setup:dev": "yarn install && yarn prisma migrate reset -f && yarn prisma generate"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.0",
@@ -102,7 +103,9 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "./lint-staged-each.sh"
+    "pre-commit": "./lint-staged-each.sh",
+    "post-checkout": "./setup-dev.sh",
+    "post-merge": "./setup-dev.sh"
   },
   "jest": {
     "moduleFileExtensions": [
