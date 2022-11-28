@@ -11,18 +11,18 @@ datasource db {
 }
 
 // 使用するときのみコメントアウトを外してください。
-// generator erd {
-//   provider = "prisma-erd-generator"
-//   output   = "./erd.md"
-// }
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./erd.md"
+}
 
-// generator dbml {
-//   provider = "prisma-dbml-generator"
-// }
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
 
-// generator docs {
-//   provider = "node node_modules/prisma-docs-generator"
-// }
+generator docs {
+  provider = "node node_modules/prisma-docs-generator"
+}
 
 // generator class_validator {
 //   provider = "prisma-class-validator-generator"
@@ -37,12 +37,20 @@ model User {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  creator   FriendRequest[] @relation("creator")
-  receiver  FriendRequest[] @relation("receiver")
-  blocking  Block[]         @relation("source")
-  blockedBy Block[]         @relation("target")
-  playerOne MatchResult[]   @relation("playerOne")
-  playerTwo MatchResult[]   @relation("playerTwo")
+  creator     FriendRequest[] @relation("creator")
+  receiver    FriendRequest[] @relation("receiver")
+  blocking    Block[]         @relation("source")
+  blockedBy   Block[]         @relation("target")
+  playerOne   MatchResult[]   @relation("playerOne")
+  playerTwo   MatchResult[]   @relation("playerTwo")
+  chat        Chat[]
+  chatOwner   Chat[]          @relation("chatOwner")
+  message     Message[]       @relation("messageSender")
+  messageTo   Message[]
+  dm          Dm[]
+  dmOwner     Dm[]            @relation("dmOwner")
+  dmMessage   DmMessage[]     @relation("dmMessageSender")
+  dmMessageTo DmMessage[]
 }
 
 enum OnlineStatus {
@@ -89,4 +97,48 @@ model MatchResult {
   win           Boolean
   startedAt     DateTime @default(now())
   finishededAt  DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  chat      Chat     @relation("chatMessage", fields: [chatId], references: [id])
+  chatId    String
+  sender    User     @relation("messageSender", fields: [senderId], references: [id])
+  senderId  String
+  messageTo User[]
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  owner     User      @relation("chatOwner", fields: [ownerId], references: [id])
+  ownerId   String
+  messages  Message[] @relation("chatMessage")
+  members   User[]
+}
+
+model DmMessage {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  dm        Dm       @relation("dmMessage", fields: [dmId], references: [id])
+  dmId      String
+  sender    User     @relation("dmMessageSender", fields: [senderId], references: [id])
+  senderId  String
+  messageTo User[]
+}
+
+model Dm {
+  id         String      @id @default(uuid())
+  content    String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  owner      User        @relation("dmOwner", fields: [ownerId], references: [id])
+  ownerId    String
+  dmMessages DmMessage[] @relation("dmMessage")
+  members    User[]
 }
