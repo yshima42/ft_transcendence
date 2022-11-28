@@ -36,3 +36,8 @@ lerna-debug.log*
 
 # upload
 /upload
+# prisma
+prisma/dbml
+prisma/docs
+prisma/generated
+prisma/erd.md
