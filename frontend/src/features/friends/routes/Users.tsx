@@ -35,7 +35,7 @@ export const Users: FC = memo(() => {
   }, [tabIndex]);
 
   async function getFriends(): Promise<void> {
-    const res: { data: User[] } = await axios.get('/friendships');
+    const res: { data: User[] } = await axios.get('/users/me/friends');
     setFriends(res.data);
   }
   useEffect(() => {
@@ -44,7 +44,9 @@ export const Users: FC = memo(() => {
 
   // pending
   async function getPending(): Promise<void> {
-    const res: { data: User[] } = await axios.get('/friendships/outgoing');
+    const res: { data: User[] } = await axios.get(
+      '/users/me/friend-requests/outgoing'
+    );
     setPending(res.data);
   }
   useEffect(() => {
@@ -53,7 +55,9 @@ export const Users: FC = memo(() => {
 
   // recognition
   async function getRecognition(): Promise<void> {
-    const res: { data: User[] } = await axios.get('/friendships/incoming');
+    const res: { data: User[] } = await axios.get(
+      '/users/me/friend-requests/incoming'
+    );
     setRecognition(res.data);
   }
   useEffect(() => {
@@ -63,7 +67,7 @@ export const Users: FC = memo(() => {
   // blocked
   async function getBlocked(): Promise<void> {
     // TODO: api実装待ち
-    const res: { data: User[] } = await axios.get('/users/all');
+    const res: { data: User[] } = await axios.get('/users/me/blocks');
     setBlocked(res.data);
   }
   useEffect(() => {
