@@ -18,14 +18,10 @@ export const PendingList: FC<Props> = (props) => {
   }, [users]);
 
   if (users === undefined) return <></>;
-  // friendships/cancel
+
   const onClickCancel = (id: string) => {
-    console.log('before');
-    console.log(userList);
     cancel(id);
     setUserList(userList.filter((user) => user.id !== id));
-    console.log('after');
-    console.log(userList);
   };
 
   return (

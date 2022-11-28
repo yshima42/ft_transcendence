@@ -19,13 +19,11 @@ export const RecognitionList: FC<Props> = (props) => {
     setUserList(users);
   }, [users]);
 
-  // friendships/accept
   const onClickAccept = (id: string) => {
     accept(id);
     setUserList(userList.filter((user) => user.id !== id));
   };
 
-  // friendships/reject
   const onClickReject = (id: string) => {
     reject(id);
     setUserList(userList.filter((user) => user.id !== id));
