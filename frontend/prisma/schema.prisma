@@ -8,42 +8,53 @@ datasource db {
 }
 
 model User {
-  id                                       String         @id
-  createdAt                                DateTime       @default(now())
-  updatedAt                                DateTime
-  name                                     String         @unique
-  avatarUrl                                String
-  nickname                                 String         @unique @default("")
-  onlineStatus                             OnlineStatus   @default(ONLINE)
-  MatchResult_MatchResult_opponentIdToUser MatchResult[]  @relation("MatchResult_opponentIdToUser")
-  MatchResult_MatchResult_userIdToUser     MatchResult[]  @relation("MatchResult_userIdToUser")
-  Relationship_Relationship_peerIdToUser   Relationship[] @relation("Relationship_peerIdToUser")
-  Relationship_Relationship_userIdToUser   Relationship[] @relation("Relationship_userIdToUser")
+  id                                           String          @id
+  createdAt                                    DateTime        @default(now())
+  updatedAt                                    DateTime
+  name                                         String          @unique
+  nickname                                     String          @unique @default("")
+  onlineStatus                                 OnlineStatus    @default(ONLINE)
+  avatarImageUrl                               String
+  Block_Block_sourceIdToUser                   Block[]         @relation("Block_sourceIdToUser")
+  Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
+  FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
+  FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
+  MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")
+  MatchResult_MatchResult_playerTwoIdToUser    MatchResult[]   @relation("MatchResult_playerTwoIdToUser")
 }
 
 model MatchResult {
-  id                                String   @id
-  createdAt                         DateTime @default(now())
-  updatedAt                         DateTime
-  userId                            String
-  opponentId                        String
-  userScore                         Int
-  opponentScore                     Int
-  win                               Boolean
-  User_MatchResult_opponentIdToUser User     @relation("MatchResult_opponentIdToUser", fields: [opponentId], references: [id])
-  User_MatchResult_userIdToUser     User     @relation("MatchResult_userIdToUser", fields: [userId], references: [id])
+  id                                 String   @id
+  userScore                          Int
+  opponentScore                      Int
+  win                                Boolean
+  finishededAt                       DateTime
+  playerOneId                        String
+  playerTwoId                        String
+  startedAt                          DateTime @default(now())
+  User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
+  User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
 }
 
-model Relationship {
-  createdAt                      DateTime         @default(now())
-  updatedAt                      DateTime
-  userId                         String
-  peerId                         String
-  type                           RelationshipType
-  User_Relationship_peerIdToUser User             @relation("Relationship_peerIdToUser", fields: [peerId], references: [id])
-  User_Relationship_userIdToUser User             @relation("Relationship_userIdToUser", fields: [userId], references: [id])
+model Block {
+  sourceId                  String
+  targetId                  String
+  User_Block_sourceIdToUser User   @relation("Block_sourceIdToUser", fields: [sourceId], references: [id])
+  User_Block_targetIdToUser User   @relation("Block_targetIdToUser", fields: [targetId], references: [id])
 
-  @@id([userId, peerId])
+  @@id([sourceId, targetId])
+}
+
+model FriendRequest {
+  createdAt                           DateTime            @default(now())
+  updatedAt                           DateTime
+  creatorId                           String
+  receiverId                          String
+  status                              FriendRequestStatus
+  User_FriendRequest_creatorIdToUser  User                @relation("FriendRequest_creatorIdToUser", fields: [creatorId], references: [id])
+  User_FriendRequest_receiverIdToUser User                @relation("FriendRequest_receiverIdToUser", fields: [receiverId], references: [id])
+
+  @@id([creatorId, receiverId])
 }
 
 enum OnlineStatus {
@@ -52,8 +63,8 @@ enum OnlineStatus {
   INGAME
 }
 
-enum RelationshipType {
-  FRIEND
-  INCOMING
-  OUTGOING
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }

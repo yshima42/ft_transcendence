@@ -13,7 +13,7 @@ export const UserNavigation: FC = memo(() => {
   return (
     <Flex p="5%" mt={4} align="center">
       <Link to="/app/profile">
-        <Avatar size="sm" src={me?.avatarUrl}>
+        <Avatar size="sm" src={me?.avatarImageUrl}>
           <AvatarBadge boxSize="1.1em" bg="green.500" />
         </Avatar>
       </Link>
