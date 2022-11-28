@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start:dev": "vite",
+    "api": "yarn --cwd ../backend start:dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint:es": "eslint'src/**/*.{js,jsx,ts,tsx}'",
@@ -20,7 +22,8 @@
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "setup:dev": "yarn install && yarn prisma db pull && yarn prisma generate"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -103,6 +106,8 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "./lint-staged-each.sh"
+    "pre-commit": "./lint-staged-each.sh",
+    "post-checkout": "./setup-dev.sh",
+    "post-merge": "./setup-dev.sh"
   }
 }
