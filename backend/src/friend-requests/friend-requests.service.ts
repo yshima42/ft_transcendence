@@ -13,7 +13,9 @@ export class FriendRequestsService {
 
   async create(creatorId: string, receiverId: string): Promise<FriendRequest> {
     if (creatorId === receiverId) {
-      throw new BadRequestException('can not send to myself.');
+      throw new BadRequestException(
+        'You cannot send a friend-request to yourself.'
+      );
     }
 
     try {
@@ -25,7 +27,9 @@ export class FriendRequestsService {
         },
       });
     } catch (error) {
-      throw new BadRequestException('already sends a friend-request.');
+      throw new BadRequestException(
+        'You have already sent a friend-request to this user.'
+      );
     }
   }
 
@@ -112,7 +116,7 @@ export class FriendRequestsService {
         },
       });
     } catch (error) {
-      throw new NotFoundException('you did not send a friend-request.');
+      throw new NotFoundException('This user is not your friend.');
     }
   }
 
@@ -160,7 +164,7 @@ export class FriendRequestsService {
     });
 
     if (acceptedRequests.length === 0) {
-      throw new NotFoundException('you are not friends.');
+      throw new NotFoundException('This user is not your friend.');
     }
 
     return await this.removeTwo(userId, friendId);

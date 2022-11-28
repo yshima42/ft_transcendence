@@ -12,7 +12,7 @@ export class BlocksService {
 
   async create(sourceId: string, targetId: string): Promise<Block> {
     if (sourceId === targetId) {
-      throw new BadRequestException('can not block myself.');
+      throw new BadRequestException('You cannot block yourself.');
     }
     try {
       return await this.prisma.block.create({
@@ -22,7 +22,7 @@ export class BlocksService {
         },
       });
     } catch (error) {
-      throw new BadRequestException('already blocks.');
+      throw new BadRequestException('You have already blocked this user.');
     }
   }
 
@@ -49,7 +49,7 @@ export class BlocksService {
         },
       });
     } catch (error) {
-      throw new NotFoundException('you did not block.');
+      throw new NotFoundException('You have not blocked this user.');
     }
   }
 }
