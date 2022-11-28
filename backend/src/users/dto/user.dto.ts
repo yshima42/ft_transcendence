@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { OnlineStatus } from '@prisma/client';
-import { IsDate, IsEnum, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsString, IsUUID } from 'class-validator';
 
 export class UserDto {
   @IsUUID()
@@ -29,6 +29,18 @@ export class UserDto {
     default: 'patrash',
   })
   nickname?: string;
+
+  @IsString()
+  @ApiProperty({
+    default: '',
+  })
+  twoFactorAuthenticationSecret?: string | null;
+
+  @IsBoolean()
+  @ApiProperty({
+    default: false,
+  })
+  isTwoFactorAuthenticationEnabled?: boolean;
 
   @IsEnum(OnlineStatus)
   @ApiProperty({
