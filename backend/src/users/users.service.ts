@@ -8,6 +8,16 @@ import { UserDto } from './dto/user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async setTwoFactorAuthenticationSecret(
+    secret: string,
+    id: string
+  ): Promise<User> {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { twoFactorAuthenticationSecret: secret },
+    });
+  }
+
   async findAll(user: User): Promise<User[]> {
     const users = await this.prisma.user.findMany({
       where: { id: { not: user.id } },
@@ -52,6 +62,14 @@ export class UsersService {
       }
       if (attrs.includes('nickname')) {
         userDto.nickname = user.nickname;
+      }
+      if (attrs.includes('twoFactorAuthenticationSecret')) {
+        userDto.twoFactorAuthenticationSecret =
+          user.twoFactorAuthenticationSecret;
+      }
+      if (attrs.includes('isTwoFactorAuthenticationEnabled?')) {
+        userDto.isTwoFactorAuthenticationEnabled =
+          user.isTwoFactorAuthenticationEnabled;
       }
       if (attrs.includes('onlineStatus')) {
         userDto.onlineStatus = user.onlineStatus;
