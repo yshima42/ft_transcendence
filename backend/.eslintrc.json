@@ -64,7 +64,13 @@
           "interface": "always",
           "strategy": "always",
           "guard": "always",
-          "decorator": "always"
+          "decorator": "always",
+          /*
+          * swagger用のentityファイルがuser.entity.tsで、 
+          * import { UserEntity } from 'src/users/entities/user.entity'
+          * となり、拡張子と勘違いされてしまうため追加
+          */
+          "entity" : "ignorePackages"
         }
       }
     ],

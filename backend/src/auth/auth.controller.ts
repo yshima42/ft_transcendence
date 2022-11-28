@@ -6,118 +6,84 @@ import {
   HttpStatus,
   Post,
   UseGuards,
-  Req,
   Res,
   Redirect,
 } from '@nestjs/common';
-import { Response, Request } from 'express';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CookieOptions } from 'csurf';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { GetIntraname } from './decorator/get-intraname.decorator';
+import { GetFtProfile } from './decorator/get-ft-profile.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
+import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  readonly cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    // secure: false,
+    sameSite: 'none',
+    path: '/',
+  };
 
   @Get('login/42')
   @UseGuards(FtOauthGuard)
   ftOauth(): void {}
 
-  // @Get('login/42/return')
-  // @UseGuards(FtOauthGuard)
-  // async ftOauthCallback(
-  //   @GetIntraname() intraname: string
-  // ): Promise<{ accessToken: string }> {
-  //   console.log(intraname, ' login !');
-
-  //   return await this.authService.login(intraname);
-  // }
-
-  @Get('login/42/return')
+  @Get('login/42/callback')
   @UseGuards(FtOauthGuard)
-  @Redirect('http://localhost:5173/user-list')
+  @Redirect('http://localhost:5173/app')
   async ftOauthCallback(
-    @GetIntraname() intraname: string,
+    @GetFtProfile() ftProfile: FtProfile,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    console.log(intraname, ' login !');
+    const name = ftProfile.intraName;
+    const signupUser = { name, avatarImageUrl: ftProfile.imageUrl };
+    const { accessToken } = await this.authService.login(name, signupUser);
+    res.cookie('access_token', accessToken, this.cookieOptions);
 
-    const jwt = await this.authService.login(intraname);
-    res.cookie('access_token', jwt.accessToken, {
-      httpOnly: true,
-      secure: true,
-      // secure: false,
-      sameSite: 'none',
-      path: '/',
-    });
+    console.log(ftProfile.intraName, ' login !');
+    console.log(accessToken);
 
-    return {
-      message: 'ok',
-    };
+    return { message: 'ok' };
   }
-
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login/dummy')
-  // async dummyLogin(
-  //   @Body() body: { name: string }
-  // ): Promise<{ accessToken: string }> {
-  //   const { name } = body;
-
-  //   return await this.authService.dummyLogin(name);
-  // }
 
   @HttpCode(HttpStatus.OK)
   @Post('login/dummy')
+  @ApiOperation({
+    summary: 'seedで作ったdummy1~5のaccess_tokenを取得(ログイン)',
+  })
+  @ApiBody({
+    description: 'seedで作ったdummyのnameを設定',
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          example: 'dummy1',
+        },
+      },
+    },
+  })
   async dummyLogin(
-    @Body() body: { name: string },
+    @Body('name') name: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    const jwt = await this.authService.login(body.name);
-    res.cookie('access_token', jwt.accessToken, {
-      httpOnly: true,
-      secure: true,
-      // secure: false,
-      sameSite: 'none',
-      path: '/',
-    });
+    const { accessToken } = await this.authService.login(name);
+    res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return {
-      message: 'ok',
-    };
+    return { message: 'ok' };
   }
-
-  // @HttpCode(HttpStatus.OK)
-  // @Post('login')
-  // async login(
-  //   @Body() dto: AuthDto,
-  //   @Res({ passthrough: true }) res: Response
-  // ): Promise<Msg> {
-  //   const jwt = await this.authService.login(dto);
-  //   res.cookie('access_token', jwt.accessToken, {
-  //     httpOnly: true,
-  //     secure: true,
-  //     sameSite: 'none',
-  //     path: '/',
-  //   });
-
-  //   return {
-  //     message: 'ok',
-  //   };
-  // }
 
   @HttpCode(HttpStatus.OK)
   @Post('/logout')
-  logout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
-  ): { message: string } {
-    res.cookie('access_token', '', {
-      httpOnly: true,
-      secure: true,
-      // secure: false,
-      sameSite: 'none',
-      path: '/',
-    });
+  @ApiOperation({ summary: 'access_tokenのcookieを削除(ログアウト)' })
+  logout(@Res({ passthrough: true }) res: Response): { message: string } {
+    res.cookie('access_token', '', this.cookieOptions);
 
     return { message: 'ok' };
   }
