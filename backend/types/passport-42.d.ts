@@ -3,6 +3,6 @@ declare module 'passport-42' {
   export let Strategy: any;
   export interface Profile {
     username: string;
-    photos: Array<{ value: string }>;
+    _json: { image: { link: string } };
   }
 }
