@@ -66,7 +66,6 @@ export const Users: FC = memo(() => {
 
   // blocked
   async function getBlocked(): Promise<void> {
-    // TODO: api実装待ち
     const res: { data: User[] } = await axios.get('/users/me/blocks');
     setBlocked(res.data);
   }

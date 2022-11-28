@@ -357,8 +357,6 @@ export class UsersController {
   @ApiOperation({ summary: 'フレンド一覧取得' })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findFriends(@GetUser() user: User): Promise<User[]> {
-    console.log('hello');
-
     return await this.friendRequestService.findFriends(user.id);
   }
 
@@ -379,8 +377,6 @@ export class UsersController {
   })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findIncomingRequest(@GetUser() user: User): Promise<User[]> {
-    console.log('hello');
-
     return await this.friendRequestService.findIncomingRequest(user.id);
   }
 }
