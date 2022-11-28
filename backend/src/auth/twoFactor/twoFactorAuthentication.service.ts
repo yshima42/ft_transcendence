@@ -37,6 +37,21 @@ export class TwoFactorAuthenticationService {
 
   // TODO eslint error
   /* eslint-disable */
+  public isTwoFactorAuthenticationCodeValid(
+    twoFactorAuthenticationCode: string,
+    user: User
+  ) {
+    console.log(twoFactorAuthenticationCode);
+    console.log(user);
+    return authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret: user.twoFactorAuthenticationSecret as string,
+    });
+  }
+  /* eslint-enable */
+
+  // TODO eslint error
+  /* eslint-disable */
   public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
     return await toFileStream(stream, otpauthUrl);
   }
