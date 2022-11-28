@@ -29,8 +29,64 @@ datasource db {
 // }
 
 model User {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name String @unique
+  id             String       @id @default(uuid())
+  name           String       @unique
+  avatarImageUrl String
+  nickname       String       @unique @default("")
+  onlineStatus   OnlineStatus @default(ONLINE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  creator   FriendRequest[] @relation("creator")
+  receiver  FriendRequest[] @relation("receiver")
+  blocking  Block[]         @relation("source")
+  blockedBy Block[]         @relation("target")
+  playerOne MatchResult[]   @relation("playerOne")
+  playerTwo MatchResult[]   @relation("playerTwo")
+}
+
+enum OnlineStatus {
+  ONLINE
+  OFFLINE
+  INGAME
+}
+
+model FriendRequest {
+  creator    User                @relation("creator", fields: [creatorId], references: [id])
+  creatorId  String
+  receiver   User                @relation("receiver", fields: [receiverId], references: [id])
+  receiverId String
+  status     FriendRequestStatus
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@id([creatorId, receiverId])
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Block {
+  source   User   @relation("source", fields: [sourceId], references: [id])
+  sourceId String
+  target   User   @relation("target", fields: [targetId], references: [id])
+  targetId String
+
+  @@id([sourceId, targetId])
+}
+
+model MatchResult {
+  id            String   @id @default(uuid())
+  playerOne     User     @relation("playerOne", fields: [playerOneId], references: [id])
+  playerOneId   String
+  playerTwo     User     @relation("playerTwo", fields: [playerTwoId], references: [id])
+  playerTwoId   String
+  userScore     Int
+  opponentScore Int
+  win           Boolean
+  startedAt     DateTime @default(now())
+  finishededAt  DateTime @updatedAt
 }

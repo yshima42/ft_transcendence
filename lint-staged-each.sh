@@ -35,5 +35,5 @@ rootDir=$(pwd | sed -r "s/\/\.git\/hooks//")
 for project in ${stagedProjects[@]}; do
   echo "Executing $project lint-staged entry..."
   cd "$rootDir/$project"
-  npx lint-staged 2>/dev/null
+  npx lint-staged 2> lint_error.log
 done
