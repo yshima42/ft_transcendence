@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -exu
+
 projects=("backend" "frontend")
 rootDir=$(pwd | sed -r "s/\/\.git\/hooks//")
 
