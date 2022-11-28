@@ -1,4 +1,4 @@
-import { PrismaClient, User } from '@prisma/client';
+import { Block, FriendRequest, PrismaClient, User } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const date = new Date('2022-11-01T04:34:22+09:00');
@@ -51,22 +51,67 @@ const userData: User[] = [
   },
 ];
 
-const createUsers = async () => {
-  const users = [];
-  for (const u of userData) {
-    const user = prisma.user.create({
-      data: u,
-    });
-    users.push(user);
-  }
+const friendRequestData: FriendRequest[] = [
+  {
+    creatorId: userData[1].id,
+    receiverId: userData[0].id,
+    status: 'PENDING',
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+  },
+  {
+    creatorId: userData[2].id,
+    receiverId: userData[0].id,
+    status: 'PENDING',
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+  },
+  {
+    creatorId: userData[3].id,
+    receiverId: userData[0].id,
+    status: 'ACCEPTED',
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+  },
+  {
+    creatorId: userData[0].id,
+    receiverId: userData[4].id,
+    status: 'PENDING',
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+  },
+  {
+    creatorId: userData[3].id,
+    receiverId: userData[4].id,
+    status: 'PENDING',
+    createdAt: new Date(date),
+    updatedAt: new Date(date),
+  },
+];
 
-  return await prisma.$transaction(users);
-};
+const blockData: Block[] = [
+  {
+    sourceId: userData[0].id,
+    targetId: userData[1].id,
+  },
+  {
+    sourceId: userData[0].id,
+    targetId: userData[2].id,
+  },
+];
 
 const main = async () => {
   console.log(`Start seeding ...`);
 
-  await createUsers();
+  await prisma.user.createMany({
+    data: userData,
+  });
+  await prisma.friendRequest.createMany({
+    data: friendRequestData,
+  });
+  await prisma.block.createMany({
+    data: blockData,
+  });
 
   console.log(`Seeding finished.`);
 };
