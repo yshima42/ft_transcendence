@@ -22,7 +22,8 @@
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "setup:dev": "yarn install && npx prisma db pull && npx prisma generate"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.11",
@@ -102,6 +103,8 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "./lint-staged-each.sh"
+    "pre-commit": "./lint-staged-each.sh",
+    "post-checkout": "./setup-dev.sh",
+    "post-merge": "./setup-dev.sh"
   }
 }
