@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useRequestFriend } from 'features/friends/hooks/useRequestFriend';
+import { useRequest } from 'features/friends/hooks/useRequest';
 import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
@@ -16,10 +16,10 @@ export const UsersList: FC<Props> = (props) => {
     setUserList(users);
   }, [users]);
 
-  const { requestFriend } = useRequestFriend();
+  const { request } = useRequest();
   if (users === undefined) return <></>;
-  const onClickRequestFriend = (id: string) => {
-    requestFriend(id);
+  const onClickRequest = (id: string) => {
+    request(id);
     setUserList(userList.filter((user) => user.id !== id));
   };
 
@@ -36,7 +36,7 @@ export const UsersList: FC<Props> = (props) => {
           key={user.id}
           username={user.name}
           nickname={user.nickname}
-          avatarImageUrl={user.avatarUrl}
+          avatarImageUrl={user.avatarImageUrl}
           winRate={50}
           totalNumOfGames={100}
           buttons={
@@ -45,7 +45,7 @@ export const UsersList: FC<Props> = (props) => {
                 text="Request"
                 id={user.id}
                 onClick={(id) => {
-                  onClickRequestFriend(id);
+                  onClickRequest(id);
                 }}
               />
             </>

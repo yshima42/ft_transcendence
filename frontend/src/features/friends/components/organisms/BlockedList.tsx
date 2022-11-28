@@ -37,7 +37,7 @@ export const BlockedList: FC<Props> = (props) => {
           key={user.id}
           username={user.name}
           nickname={user.nickname}
-          avatarImageUrl={user.avatarUrl}
+          avatarImageUrl={user.avatarImageUrl}
           winRate={50}
           totalNumOfGames={100}
           buttons={

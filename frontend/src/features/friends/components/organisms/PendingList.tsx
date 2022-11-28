@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useCancelFriend } from 'features/friends/hooks/useCancelFriend';
+import { useCancel } from 'features/friends/hooks/useCancel';
 import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
@@ -12,17 +12,17 @@ type Props = {
 export const PendingList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { cancelFriend } = useCancelFriend();
+  const { cancel } = useCancel();
   useEffect(() => {
     setUserList(users);
   }, [users]);
 
   if (users === undefined) return <></>;
   // friendships/cancel
-  const onClickCancelFriend = (id: string) => {
+  const onClickCancel = (id: string) => {
     console.log('before');
     console.log(userList);
-    cancelFriend(id);
+    cancel(id);
     setUserList(userList.filter((user) => user.id !== id));
     console.log('after');
     console.log(userList);
@@ -41,7 +41,7 @@ export const PendingList: FC<Props> = (props) => {
           key={user.id}
           username={user.name}
           nickname={user.nickname}
-          avatarImageUrl={user.avatarUrl}
+          avatarImageUrl={user.avatarImageUrl}
           winRate={50}
           totalNumOfGames={100}
           buttons={
@@ -50,7 +50,7 @@ export const PendingList: FC<Props> = (props) => {
                 text="Cancel"
                 id={user.id}
                 onClick={(id) => {
-                  onClickCancelFriend(id);
+                  onClickCancel(id);
                 }}
               />
             </>
