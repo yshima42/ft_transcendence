@@ -1,0 +1,25 @@
+name: Wiki
+
+on:
+  gollum
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.repository.full_name }}.wiki
+          ref: ${{ github.event.pages[0].sha }}
+          fetch-depth: 2
+      - name: Discord wiki
+        run: |
+          url=${HTML_URL}/_compare/$(git rev-parse HEAD^)...$(git rev-parse HEAD)
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"content\": \"Wiki ${ACTION}: ${TITLE}\n${url}\"}" \
+            ${WEBHOOK_URL}
+        env:
+          ACTION: ${{ github.event.pages[0].action }}
+          TITLE: ${{ github.event.pages[0].title }}
+          HTML_URL: ${{ github.event.pages[0].html_url }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}

@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start:dev": "vite",
+    "api": "yarn --cwd ../backend start:dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint:es": "eslint'src/**/*.{js,jsx,ts,tsx}'",
@@ -20,7 +22,8 @@
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "setup:dev": "yarn install && yarn prisma db pull && yarn prisma generate"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.11",
@@ -36,6 +39,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
+    "@prisma/client": "^4.6.1",
     "@storybook/addon-actions": "^6.5.13",
     "@storybook/addon-console": "^1.2.3",
     "@storybook/addon-essentials": "^6.5.13",
@@ -75,6 +79,7 @@
     "jest-environment-jsdom": "^29.3.0",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
+    "prisma": "^4.6.1",
     "simple-git-hooks": "^2.8.1",
     "stylelint": "^14.14.0",
     "stylelint-config-recess-order": "^3.0.0",
@@ -98,6 +103,8 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "./lint-staged-each.sh"
+    "pre-commit": "./lint-staged-each.sh",
+    "post-checkout": "./setup-dev.sh",
+    "post-merge": "./setup-dev.sh"
   }
 }
