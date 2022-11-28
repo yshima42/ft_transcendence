@@ -11,6 +11,8 @@ const userData: User[] = [
     name: 'dummy1',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
     nickname: 'nickname1',
+    twoFactorAuthenticationSecret: '',
+    isTwoFactorAuthenticationEnabled: false,
     onlineStatus: 'ONLINE',
   },
   {
@@ -20,6 +22,8 @@ const userData: User[] = [
     name: 'dummy2',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
     nickname: 'nickname2',
+    twoFactorAuthenticationSecret: '',
+    isTwoFactorAuthenticationEnabled: false,
     onlineStatus: 'OFFLINE',
   },
   {
@@ -29,6 +33,8 @@ const userData: User[] = [
     name: 'dummy3',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
     nickname: 'nickname3',
+    twoFactorAuthenticationSecret: '',
+    isTwoFactorAuthenticationEnabled: false,
     onlineStatus: 'INGAME',
   },
   {
@@ -38,6 +44,8 @@ const userData: User[] = [
     name: 'dummy4',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
     nickname: 'nickname4',
+    twoFactorAuthenticationSecret: '',
+    isTwoFactorAuthenticationEnabled: false,
     onlineStatus: 'OFFLINE',
   },
   {
@@ -47,6 +55,8 @@ const userData: User[] = [
     name: 'dummy5',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
     nickname: 'nickname5',
+    twoFactorAuthenticationSecret: '',
+    isTwoFactorAuthenticationEnabled: false,
     onlineStatus: 'OFFLINE',
   },
 ];

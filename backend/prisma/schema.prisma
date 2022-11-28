@@ -29,13 +29,15 @@ datasource db {
 // }
 
 model User {
-  id             String       @id @default(uuid())
-  name           String       @unique
-  avatarImageUrl String
-  nickname       String       @unique @default("")
-  onlineStatus   OnlineStatus @default(ONLINE)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id                               String       @id @default(uuid())
+  name                             String       @unique
+  avatarImageUrl                   String
+  nickname                         String       @unique @default("")
+  twoFactorAuthenticationSecret    String?
+  isTwoFactorAuthenticationEnabled Boolean      @default(false)
+  onlineStatus                     OnlineStatus @default(ONLINE)
+  createdAt                        DateTime     @default(now())
+  updatedAt                        DateTime     @updatedAt
 
   creator   FriendRequest[] @relation("creator")
   receiver  FriendRequest[] @relation("receiver")
