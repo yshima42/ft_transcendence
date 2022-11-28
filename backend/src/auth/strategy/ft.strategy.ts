@@ -20,7 +20,7 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     profile: Profile
   ): { ftProfile: FtProfile } {
     const intraName = profile.username;
-    const imageUrl = profile.photos[0].value;
+    const imageUrl = profile._json.image.link;
     const ftProfile = { intraName, imageUrl };
 
     return { ftProfile };
