@@ -10,6 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 使用するときのみコメントアウトを外してください。
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output   = "./erd.md"
+// }
+
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
+
+// generator docs {
+//   provider = "node node_modules/prisma-docs-generator"
+// }
+
+// generator class_validator {
+//   provider = "prisma-class-validator-generator"
+// }
+
 model User {
   id             String       @id @default(uuid())
   name           String       @unique
