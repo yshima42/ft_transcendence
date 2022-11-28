@@ -21,11 +21,7 @@ export const BlockedList: FC<Props> = (props) => {
 
   const onClickUnblock = (id: string) => {
     unblock(id);
-    console.log('before');
-    console.log(userList);
     setUserList(userList.filter((user) => user.id !== id));
-    console.log('after');
-    console.log(userList);
   };
 
   return (
@@ -36,7 +32,7 @@ export const BlockedList: FC<Props> = (props) => {
       }}
       gap={6}
     >
-      {users.map((user) => (
+      {userList.map((user) => (
         <UserCard
           key={user.id}
           username={user.name}
