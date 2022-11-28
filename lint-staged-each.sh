@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 # lint-staged-each.sh
 #   execute each lint-staged entry in sub-directories projects recursively
 #
