@@ -31,6 +31,7 @@ import {
   MatchResult,
   User,
 } from '@prisma/client';
+import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
@@ -59,7 +60,7 @@ export class UsersController {
   ) {}
 
   @Get('all')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorAuthGuard)
   @ApiOperation({
     summary: '自分以外のユーザー情報を取得',
   })
