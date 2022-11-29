@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FtStrategy } from './strategy/ft.strategy';
+import { JwtTwoFactorStrategy } from './strategy/jwt-two-factor.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { TwoFactorAuthenticationController } from './twoFactor/twoFactorAuthentication.controller';
 import { TwoFactorAuthenticationService } from './twoFactor/twoFactorAuthentication.service';
@@ -19,6 +20,7 @@ import { TwoFactorAuthenticationService } from './twoFactor/twoFactorAuthenticat
     JwtAuthGuard,
     FtStrategy,
     TwoFactorAuthenticationService,
+    JwtTwoFactorStrategy,
   ],
   exports: [JwtStrategy, JwtAuthGuard],
 })
