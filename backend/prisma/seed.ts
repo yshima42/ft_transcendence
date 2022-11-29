@@ -1,11 +1,4 @@
-import {
-  Block,
-  FriendRequest,
-  PrismaClient,
-  User,
-  Dm,
-  DmMessage,
-} from '@prisma/client';
+import { Block, FriendRequest, PrismaClient, User } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
