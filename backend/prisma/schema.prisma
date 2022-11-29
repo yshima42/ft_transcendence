@@ -24,9 +24,9 @@ generator docs {
   provider = "node node_modules/prisma-docs-generator"
 }
 
-// generator class_validator {
-//   provider = "prisma-class-validator-generator"
-// }
+generator class_validator {
+  provider = "prisma-class-validator-generator"
+}
 
 model User {
   id             String       @id @default(uuid())
@@ -37,20 +37,15 @@ model User {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  creator     FriendRequest[] @relation("creator")
-  receiver    FriendRequest[] @relation("receiver")
-  blocking    Block[]         @relation("source")
-  blockedBy   Block[]         @relation("target")
-  playerOne   MatchResult[]   @relation("playerOne")
-  playerTwo   MatchResult[]   @relation("playerTwo")
-  chat        Chat[]
-  chatOwner   Chat[]          @relation("chatOwner")
-  message     Message[]       @relation("messageSender")
-  messageTo   Message[]
-  dm          Dm[]
-  dmOwner     Dm[]            @relation("dmOwner")
-  dmMessage   DmMessage[]     @relation("dmMessageSender")
-  dmMessageTo DmMessage[]
+  creator   FriendRequest[] @relation("creator")
+  receiver  FriendRequest[] @relation("receiver")
+  blocking  Block[]         @relation("source")
+  blockedBy Block[]         @relation("target")
+  playerOne MatchResult[]   @relation("playerOne")
+  playerTwo MatchResult[]   @relation("playerTwo")
+
+  chatMessages ChatMessage[] @relation("messageSender") // ユーザーが送信したチャットメッセージ
+  ChatUser     ChatUser[] // ユーザーが参加しているチャットルーム
 }
 
 enum OnlineStatus {
@@ -99,46 +94,36 @@ model MatchResult {
   finishededAt  DateTime @updatedAt
 }
 
-model Message {
-  id        String   @id @default(uuid())
-  content   String
-  createdAt DateTime @default(now())
-  chat      Chat     @relation("chatMessage", fields: [chatId], references: [id])
-  chatId    String
-  sender    User     @relation("messageSender", fields: [senderId], references: [id])
-  senderId  String
-  messageTo User[]
-}
-
-model Chat {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  owner     User      @relation("chatOwner", fields: [ownerId], references: [id])
-  ownerId   String
-  messages  Message[] @relation("chatMessage")
-  members   User[]
-}
-
-model DmMessage {
-  id        String   @id @default(uuid())
-  content   String
-  createdAt DateTime @default(now())
-  dm        Dm       @relation("dmMessage", fields: [dmId], references: [id])
-  dmId      String
-  sender    User     @relation("dmMessageSender", fields: [senderId], references: [id])
-  senderId  String
-  messageTo User[]
-}
-
-model Dm {
-  id         String      @id @default(uuid())
+model ChatMessage {
+  id         String   @id @default(uuid())
   content    String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  owner      User        @relation("dmOwner", fields: [ownerId], references: [id])
-  ownerId    String
-  dmMessages DmMessage[] @relation("dmMessage")
-  members    User[]
+  createdAt  DateTime @default(now())
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id]) // 属するチャットルーム
+  chatRoomId String
+  sender     User     @relation("messageSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
+  senderId   String
+}
+
+model ChatRoom {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  chatMessages ChatMessage[] // チャットルームに属するメッセージ
+  chatUsers    ChatUser[] // チャットルームに属するユーザー
+}
+
+model ChatUser {
+  chatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id]) // 参加しているチャットルーム
+  chatRoomId String
+  user       User           @relation(fields: [userId], references: [id]) // チャットの参加者
+  userId     String
+  status     ChatUserStatus // チャットの参加者のステータス
+
+  @@id([chatRoomId, userId])
+}
+
+enum ChatUserStatus {
+  OWNER
+  MEMBER
 }
