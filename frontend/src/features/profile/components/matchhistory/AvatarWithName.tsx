@@ -13,7 +13,10 @@ export const AvatarWithName: FC<Props> = memo((props) => {
     <Box h="90" p={2}>
       <VStack>
         <Avatar size="md" src={avatarUrl} name={name} />
-        <Text fontSize="sm">{name}</Text>
+        {/* TODO:ニックネームが長くなるときどう表示するか考える。暫定で省略している */}
+        <Text maxWidth={20} noOfLines={1}>
+          {name}
+        </Text>
       </VStack>
     </Box>
   );
