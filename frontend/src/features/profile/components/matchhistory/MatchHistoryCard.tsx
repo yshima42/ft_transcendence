@@ -8,6 +8,9 @@ export const MatchHistoryCard: FC = memo(() => {
   const { getMatches, loading, matches } = useAllMatches();
   useEffect(() => getMatches(), [getMatches]);
 
+  // TODO:機能要件の時に変更する。フロントでロジックを書きたくない？
+  const latest5Matches = matches.slice(-5);
+
   return (
     <>
       {loading ? (
@@ -21,12 +24,12 @@ export const MatchHistoryCard: FC = memo(() => {
               <Text as="b">Match History</Text>
             </Box>
             <VStack justify="center">
-              {matches.map((match) => (
+              {latest5Matches.map((match) => (
                 <Box key={match.id}>
                   <GameResultCard
-                    opponentId={match.opponentId}
+                    opponentId={match.playerTwoId}
                     score={`${match.userScore} - ${match.opponentScore}`}
-                    createdAt={match.createdAt}
+                    createdAt={match.startedAt}
                     win={match.win}
                   />
                 </Box>

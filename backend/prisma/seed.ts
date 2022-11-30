@@ -1,4 +1,10 @@
-import { Block, FriendRequest, PrismaClient, User } from '@prisma/client';
+import {
+  Block,
+  FriendRequest,
+  MatchResult,
+  PrismaClient,
+  User,
+} from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
@@ -93,6 +99,38 @@ for (let i = 0; i < 30; i++) {
   }
 }
 
+const GAMEWINSCORE = 5;
+const getLoserScore = () => {
+  return Math.floor(Math.random() * (GAMEWINSCORE - 1));
+};
+
+const matchScoreData: Array<[number, number]> = [];
+for (let i = 0; i < 30; i++) {
+  const matchScore: [number, number] =
+    Math.random() > 0.5
+      ? [GAMEWINSCORE, getLoserScore()]
+      : [getLoserScore(), GAMEWINSCORE];
+  matchScoreData.push(matchScore);
+}
+
+const matchResultData: MatchResult[] = [];
+for (let i = 0; i < 30; i++) {
+  const playerOneId = idMap.get('dummy1');
+  const playerTwoId = idMap.get('dummy' + (i + 1).toString());
+  if (playerOneId !== undefined && playerTwoId !== undefined) {
+    matchResultData.push({
+      id: uuidv4(),
+      playerOneId,
+      playerTwoId,
+      userScore: matchScoreData[i][0],
+      opponentScore: matchScoreData[i][1],
+      win: matchScoreData[i][0] > matchScoreData[i][1],
+      startedAt: new Date(),
+      finishededAt: new Date(),
+    });
+  }
+}
+
 const main = async () => {
   console.log(`Start seeding ...`);
 
@@ -104,6 +142,9 @@ const main = async () => {
   });
   await prisma.block.createMany({
     data: blockData,
+  });
+  await prisma.matchResult.createMany({
+    data: matchResultData,
   });
 
   console.log(`Seeding finished.`);
