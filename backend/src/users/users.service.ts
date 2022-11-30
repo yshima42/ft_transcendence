@@ -25,6 +25,13 @@ export class UsersService {
     });
   }
 
+  async turnOffTwoFactorAuthentication(id: string): Promise<User> {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { isTwoFactorAuthenticationEnabled: false },
+    });
+  }
+
   async findAll(user: User): Promise<User[]> {
     const users = await this.prisma.user.findMany({
       where: { id: { not: user.id } },
