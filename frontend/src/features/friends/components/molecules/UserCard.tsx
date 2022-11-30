@@ -1,5 +1,6 @@
 import { FC, memo, ReactNode } from 'react';
-import { Box, Flex, Avatar, Text, Spacer, Heading } from '@chakra-ui/react';
+import { Box, Flex, Text, Spacer, Heading } from '@chakra-ui/react';
+import { LinkedAvatar } from 'components/LinkedAvatar';
 
 type Props = {
   username: string;
@@ -24,12 +25,10 @@ export const UserCard: FC<Props> = memo((props) => {
     <Box p={4} bg="white" borderRadius="md" shadow="md">
       <Flex align="center">
         <Flex align="center" mr={2}>
-          <Avatar
-            size="lg"
-            name={nickname}
-            src={avatarImageUrl}
-            mr={4}
-            bg="white"
+          <LinkedAvatar
+            size="sm"
+            imageUrl={avatarImageUrl}
+            linkUrl="/app/profile"
           />
           <Box>
             <Text fontSize="lg" fontWeight="bold">
