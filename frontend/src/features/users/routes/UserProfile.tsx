@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Image } from '@chakra-ui/react';
-import { ContentLayout } from 'components/layout/ContentLayout';
-import { PrimaryTable } from 'components/table/PrimaryTable';
+import { PrimaryTable } from 'components/atoms/table/PrimaryTable';
+import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 type UserStats = {
   id: string;
