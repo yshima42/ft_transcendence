@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
 export const fetchProfile = async (): Promise<User> => {
-  const result = await axios.get<User>('/profile');
+  const result = await axios.get<User>('/users/me/profile');
 
   return result.data;
 };
