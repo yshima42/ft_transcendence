@@ -111,7 +111,8 @@
   "simple-git-hooks": {
     "pre-commit": "./lint-staged-each.sh",
     "post-checkout": "./setup-dev.sh",
-    "post-merge": "./setup-dev.sh"
+    "post-merge": "./setup-dev.sh",
+    "pre-push": "./conflict-check.sh"
   },
   "jest": {
     "moduleFileExtensions": [
