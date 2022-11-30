@@ -15,8 +15,8 @@ import {
 } from '@chakra-ui/react';
 import { useAuth } from 'features/auth/hooks/useAuth';
 import { Link } from 'react-router-dom';
-import { LogoButton } from 'components/button/LogoButton';
-import { NavigationItem } from 'components/layout/MainLayout/MainLayout';
+import { LogoButton } from 'components/atoms/button/LogoButton';
+import { NavigationItem } from 'components/environments/MainLayout/MainLayout';
 
 type Props = {
   items: NavigationItem[];

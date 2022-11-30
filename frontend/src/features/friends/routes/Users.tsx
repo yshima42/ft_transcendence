@@ -2,7 +2,7 @@ import { memo, FC, useState, useMemo, useEffect } from 'react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { axios } from 'lib/axios';
-import { ContentLayout } from 'components/layout/ContentLayout';
+import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { BlockedList } from 'features/friends/components/organisms/BlockedList';
 import { FriendsList } from 'features/friends/components/organisms/FriendsList';
 import { PendingList } from 'features/friends/components/organisms/PendingList';
