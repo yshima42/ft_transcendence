@@ -9,7 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { useProfile } from '../hooks/useProfile';
+import { useProfile } from '../../../hooks/api/profile/useProfile';
 import { AvatarFormData, useSaveAvatar } from '../hooks/useSaveAvatar';
 import { ProfileFormData, useSaveProfile } from '../hooks/useSaveProfile';
 
@@ -56,7 +56,7 @@ export const ProfileEdit: FC = memo(() => {
   return (
     <Flex direction="column" bg="gray" w="100%" align="center">
       <form onSubmit={onSubmitSave}>
-        <Avatar size="2xl" name={user.nickname} src={user.avatarUrl} />
+        <Avatar size="2xl" name={user.nickname} src={user.avatarImageUrl} />
         <Button onClick={onClickFileSelect}>ファイル選択</Button>
         <input
           hidden
