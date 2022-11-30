@@ -17,18 +17,12 @@ model User {
   updatedAt                                    DateTime
   Block_Block_sourceIdToUser                   Block[]         @relation("Block_sourceIdToUser")
   Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
-  ChatChat_ownerIdToUser                       Chat[]          @relation("Chat_ownerIdToUser")
-  DMDM_ownerIdToUser                           DM[]            @relation("DM_ownerIdToUser")
-  DMMessageDMMessage_senderIdToUser            DMMessage[]     @relation("DMMessage_senderIdToUser")
+  ChatMessage                                  ChatMessage[]
+  ChatUser                                     ChatUser[]
   FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
   FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
   MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")
   MatchResult_MatchResult_playerTwoIdToUser    MatchResult[]   @relation("MatchResult_playerTwoIdToUser")
-  MessageMessage_senderIdToUser                Message[]       @relation("Message_senderIdToUser")
-  Chat                                         Chat[]
-  DMMessage                                    DMMessage[]
-  DM                                           DM[]
-  Message                                      Message[]
 }
 
 model MatchResult {
@@ -65,48 +59,33 @@ model FriendRequest {
   @@id([creatorId, receiverId])
 }
 
-model Chat {
-  id                     String    @id
-  name                   String    @unique
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime
-  ownerId                String
-  UserChat_ownerIdToUser User      @relation("Chat_ownerIdToUser", fields: [ownerId], references: [id])
-  Message                Message[]
-  User                   User[]
+model ChatMessage {
+  id         String   @id
+  content    String
+  createdAt  DateTime @default(now())
+  chatRoomId String
+  senderId   String
+  ChatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  User       User     @relation(fields: [senderId], references: [id])
 }
 
-model DM {
-  id                   String      @id
-  content              String
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime
-  ownerId              String
-  UserDM_ownerIdToUser User        @relation("DM_ownerIdToUser", fields: [ownerId], references: [id])
-  DMMessage            DMMessage[]
-  User                 User[]
+model ChatRoom {
+  id          String        @id
+  name        String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime
+  ChatMessage ChatMessage[]
+  ChatUser    ChatUser[]
 }
 
-model DMMessage {
-  id                           String   @id
-  content                      String
-  createdAt                    DateTime @default(now())
-  DMId                         String
-  senderId                     String
-  DM                           DM       @relation(fields: [DMId], references: [id])
-  UserDMMessage_senderIdToUser User     @relation("DMMessage_senderIdToUser", fields: [senderId], references: [id])
-  User                         User[]
-}
+model ChatUser {
+  chatRoomId String
+  userId     String
+  status     ChatUserStatus
+  ChatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id])
+  User       User           @relation(fields: [userId], references: [id])
 
-model Message {
-  id                         String   @id
-  content                    String
-  createdAt                  DateTime @default(now())
-  chatId                     String
-  senderId                   String
-  Chat                       Chat     @relation(fields: [chatId], references: [id])
-  UserMessage_senderIdToUser User     @relation("Message_senderIdToUser", fields: [senderId], references: [id])
-  User                       User[]
+  @@id([chatRoomId, userId])
 }
 
 enum OnlineStatus {
@@ -119,4 +98,9 @@ enum FriendRequestStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+enum ChatUserStatus {
+  OWNER
+  MEMBER
 }
