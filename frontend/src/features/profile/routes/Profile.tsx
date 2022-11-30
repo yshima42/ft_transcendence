@@ -1,6 +1,6 @@
 import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
-import { ContentLayout } from 'components/layout/ContentLayout';
+import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
