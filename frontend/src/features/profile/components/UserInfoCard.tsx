@@ -19,7 +19,7 @@ export const UserInfoCard: FC = memo(() => {
       direction="column"
       align="center"
     >
-      <Avatar size="2xl" name={user.nickname} src={user.avatarUrl} />
+      <Avatar size="2xl" name={user.nickname} src={user.avatarImageUrl} />
       <Text fontSize="md" fontWeight="bold" pt="2">
         {user.nickname}
       </Text>
