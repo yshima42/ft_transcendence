@@ -1,7 +1,9 @@
 import { memo, FC, useState } from 'react';
 import { Avatar, Button, Flex, Spacer, Text } from '@chakra-ui/react';
+import { useQRCode } from 'next-qrcode';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../hooks/useProfile';
+import { useTwoFactorGenerate } from '../hooks/useTwoFactorGenerate';
 import { useTwoFactorTurnOn } from '../hooks/useTwoFactorTrunOn';
 import { useTwoFactorTurnOff } from '../hooks/useTwoFactorTurnOff';
 
@@ -10,16 +12,20 @@ export const UserInfoCard: FC = memo(() => {
   const { user } = useProfile();
   const { turnOn } = useTwoFactorTurnOn();
   const { turnOff } = useTwoFactorTurnOff();
+  const { getQrcode, url } = useTwoFactorGenerate();
+  const { Canvas } = useQRCode();
 
   const navigate = useNavigate();
 
-  const [twoFactor, setTwoFactor] = useState(
+  const [twoFactor, setTwoFactor] = useState<boolean>(
     user.isTwoFactorAuthenticationEnabled 
   );
 
   const onClickSwitchButton = () => {
     twoFactor ? turnOff() : turnOn();
     setTwoFactor(!twoFactor);
+    if (twoFactor) getQrcode();
+    console.log(url);
   };
 
   return (
@@ -54,6 +60,23 @@ export const UserInfoCard: FC = memo(() => {
       <Button size="xs" onClick={() => navigate('/app/profile/edit')}>
         Edit
       </Button>
+      {twoFactor && url !== '' ? (
+        <Canvas
+          text={url}
+          options={{
+            level: 'M',
+            margin: 3,
+            scale: 4,
+            width: 200,
+            color: {
+              dark: '#010599FF',
+              light: '#FFBF60FF',
+            },
+          }}
+        />
+      ) : (
+        <></>
+      )}
     </Flex>
   );
 });

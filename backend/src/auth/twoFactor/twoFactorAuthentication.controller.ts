@@ -30,8 +30,8 @@ export class TwoFactorAuthenticationController {
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,
-    // secure: true,
-    secure: false,
+    secure: true,
+    // secure: false,
     sameSite: 'none',
     path: '/',
   };
@@ -40,16 +40,16 @@ export class TwoFactorAuthenticationController {
   /* eslint-disable */
   @Post('generate')
   @UseGuards(JwtAuthGuard)
-  async register(@Res() response: Response, @GetUser() user: User) {
+  async register(
+    // @Res() response: Response,
+    @GetUser() user: User
+  ): Promise<{ url: string }> {
     const { otpauthUrl } =
       await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
         user
       );
 
-    return await this.twoFactorAuthenticationService.pipeQrCodeStream(
-      response,
-      otpauthUrl
-    );
+    return { url: otpauthUrl };
   }
   /* eslint-enable */
 
@@ -59,18 +59,24 @@ export class TwoFactorAuthenticationController {
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   async turnOnTwoFactorAuthentication(
-    @GetUser() user: User,
-    @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto
-  ) {
-    const isCodeValid =
-      this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        twoFactorAuthenticationCode,
-        user
-      );
-    if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
-    }
+    @GetUser() user: User
+  ): Promise<{ message: string }> {
     await this.usersService.turnOnTwoFactorAuthentication(user.id);
+
+    return { message: 'ok' };
+  }
+  /* eslint-enable */
+
+  // TODO eslint error
+  /* eslint-disable */
+  @Post('turn-off')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  async turnOffTwoFactorAuthentication(
+    @GetUser() user: User
+  ): Promise<{ message: string }> {
+    await this.usersService.turnOffTwoFactorAuthentication(user.id);
+    return { message: 'ok' };
   }
   /* eslint-enable */
 
