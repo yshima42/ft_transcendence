@@ -13,6 +13,7 @@ export class TwoFactorAuthenticationService {
     private readonly configService: ConfigService
   ) {}
 
+  // TODO secret をハッシュ化させる必要があるかも。
   public async generateTwoFactorAuthenticationSecret(user: User): Promise<{
     secret: string;
     otpauthUrl: string;
