@@ -30,11 +30,14 @@ export const GameResultCard: FC<Props> = memo((props) => {
       ) : (
         <Box h="90px" bg="gray.200" borderRadius={20} px={4}>
           <HStack>
-            <AvatarWithName name={me.nickname} avatarUrl={me.avatarImageUrl} />
+            <AvatarWithName
+              name={me.nickname}
+              avatarImageUrl={me.avatarImageUrl}
+            />
             <ScoreAndDate score={score} createdAt={createdAt} />
             <AvatarWithName
               name={opponent.nickname}
-              avatarUrl={opponent.avatarImageUrl}
+              avatarImageUrl={opponent.avatarImageUrl}
             />
             <Box w="50px">
               <Center>
