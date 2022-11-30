@@ -7,12 +7,12 @@ import { BlockedList } from 'features/friends/components/organisms/BlockedList';
 import { FriendsList } from 'features/friends/components/organisms/FriendsList';
 import { PendingList } from 'features/friends/components/organisms/PendingList';
 import { RecognitionList } from 'features/friends/components/organisms/RecognitionList';
-import { UsersList } from 'features/friends/components/organisms/UsersList';
+import { RequestableUsersList } from 'features/friends/components/organisms/RequestableUsersList';
 
 const tabs = ['Friends', 'Pending', 'Recognition', 'Blocked', 'Users'];
 
 export const Users: FC = memo(() => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [requestableUsers, setRequestableUsers] = useState<User[]>([]);
   const [friends, setFriends] = useState<User[]>([]);
   const [pending, setPending] = useState<User[]>([]);
   const [recognition, setRecognition] = useState<User[]>([]);
@@ -26,12 +26,14 @@ export const Users: FC = memo(() => {
   }, []);
 
   // TODO ここはSearchに置き換わる
-  async function getAllUsers(): Promise<void> {
-    const res: { data: User[] } = await axios.get('/users/all');
-    setUsers(res.data);
+  async function getRequestableUsers(): Promise<void> {
+    const res: { data: User[] } = await axios.get(
+      '/users/me/requestable-users'
+    );
+    setRequestableUsers(res.data);
   }
   useEffect(() => {
-    getAllUsers().catch((err) => console.error(err));
+    getRequestableUsers().catch((err) => console.error(err));
   }, [tabIndex]);
 
   async function getFriends(): Promise<void> {
@@ -102,7 +104,7 @@ export const Users: FC = memo(() => {
             <BlockedList users={blocked} />
           </TabPanel>
           <TabPanel>
-            <UsersList users={users} />
+            <RequestableUsersList users={requestableUsers} />
           </TabPanel>
         </TabPanels>
       </Tabs>
