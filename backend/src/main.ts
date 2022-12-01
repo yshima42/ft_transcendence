@@ -1,11 +1,21 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe , Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    // TODO: 本番環境、開発環境でログレベルを切り替える
+    logger: ['error', 'warn', 'debug', 'log', 'verbose'],
+  });
+  // log
+  Logger.log('Starting server...');
+  Logger.error('internal server error');
+  Logger.warn('client error');
+  Logger.log('info');
+  Logger.debug('development environment');
+  Logger.verbose('local environment');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.enableCors({
     credentials: true,
