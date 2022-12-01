@@ -24,7 +24,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "preinstall": "npx typesync || :",
     "prepare": "npx simple-git-hooks || :",
-    "setup:dev": "yarn install && yarn prisma generate && yarn prisma migrate reset -f"
+    "migrate:dev": "dotenv -e .env.development -- yarn prisma migrate dev",
+    "migrate:reset": "dotenv -e .env.development -- yarn prisma migrate reset",
+    "setup:dev": "yarn install && yarn prisma generate && yarn migrate:reset -f"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.0",
@@ -70,6 +72,7 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
+    "dotenv-cli": "^6.0.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
