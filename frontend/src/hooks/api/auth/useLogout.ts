@@ -1,9 +1,7 @@
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { usePostApi } from '../generics/usePostApi';
 
-// TODO: eslintエラー
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export type LogoutReqBody = void;
+export type LogoutReqBody = Record<string, never>;
 
 export interface LogoutResBody {
   message: string;
@@ -12,7 +10,7 @@ export interface LogoutResBody {
 export type Logout = UseMutateAsyncFunction<
   LogoutResBody,
   unknown,
-  void,
+  LogoutReqBody,
   unknown
 >;
 
