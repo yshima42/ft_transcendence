@@ -138,6 +138,7 @@ model DmMessage {
 model DmRoom {
   id         String      @id @default(uuid())
   createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   dmMessages DmMessage[] // DMルームに属するメッセージ
   dmUsers    DmUser[] // チャットルームに属するユーザー
 }
