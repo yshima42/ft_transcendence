@@ -12,6 +12,9 @@ const PADDLE_WIDTH = 20;
 const PADDLE_HEIGHT = 75;
 const PADDLE_START_POS = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
 const PADDLE_SPEED = 7;
+const BALL_COLOR = '#4FD1C5';
+const PADDLE_COLOR = '#4FD1C5';
+const BG_COLOR = '#1A202C';
 
 export const PongGame: FC = memo(() => {
   let ballX = BALL_START_X;
@@ -24,27 +27,27 @@ export const PongGame: FC = memo(() => {
   let downPressed = false;
   let upPressed = false;
 
-  document.addEventListener('keydown', keyDownHandler, false);
-  document.addEventListener('keyup', keyUpHandler, false);
-
-  function keyDownHandler(e: KeyboardEvent) {
+  const keyDownHandler = (e: KeyboardEvent) => {
     if (e.key === 'Down' || e.key === 'ArrowDown') {
       downPressed = true;
     } else if (e.key === 'Up' || e.key === 'ArrowUp') {
       upPressed = true;
     }
-  }
+  };
 
-  function keyUpHandler(e: KeyboardEvent) {
+  const keyUpHandler = (e: KeyboardEvent) => {
     if (e.key === 'Down' || e.key === 'ArrowDown') {
       downPressed = false;
     } else if (e.key === 'Up' || e.key === 'ArrowUp') {
       upPressed = false;
     }
-  }
+  };
+
+  document.addEventListener('keydown', keyDownHandler, false);
+  document.addEventListener('keyup', keyUpHandler, false);
 
   const drawBall = (ctx: CanvasRenderingContext2D) => {
-    ctx.fillStyle = '#4FD1C5';
+    ctx.fillStyle = BALL_COLOR;
     ctx.beginPath();
     ctx.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
     ctx.fill();
@@ -67,14 +70,14 @@ export const PongGame: FC = memo(() => {
     }
 
     ctx.rect(0, paddleY, paddleWidth, paddleHeight);
-    ctx.fillStyle = '#4FD1C5';
+    ctx.fillStyle = PADDLE_COLOR;
     ctx.fill();
     ctx.closePath();
   };
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = '#1A202C';
+    ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     drawBall(ctx);
