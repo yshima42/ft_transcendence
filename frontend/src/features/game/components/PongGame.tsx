@@ -21,25 +21,25 @@ export const PongGame: FC = memo(() => {
   const ballRadius = BALL_SIZE;
   const paddleHeight = PADDLE_HEIGHT;
   const paddleWidth = PADDLE_WIDTH;
-  let rightPressed = false;
-  let leftPressed = false;
+  let downPressed = false;
+  let upPressed = false;
 
   document.addEventListener('keydown', keyDownHandler, false);
   document.addEventListener('keyup', keyUpHandler, false);
 
   function keyDownHandler(e: KeyboardEvent) {
     if (e.key === 'Down' || e.key === 'ArrowDown') {
-      rightPressed = true;
+      downPressed = true;
     } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      leftPressed = true;
+      upPressed = true;
     }
   }
 
   function keyUpHandler(e: KeyboardEvent) {
     if (e.key === 'Down' || e.key === 'ArrowDown') {
-      rightPressed = false;
+      downPressed = false;
     } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      leftPressed = false;
+      upPressed = false;
     }
   }
 
@@ -54,12 +54,12 @@ export const PongGame: FC = memo(() => {
   const drawPaddle = (ctx: CanvasRenderingContext2D) => {
     ctx.beginPath();
 
-    if (rightPressed) {
+    if (downPressed) {
       paddleY += PADDLE_SPEED;
       if (paddleY + paddleHeight > ctx.canvas.height) {
         paddleY = ctx.canvas.height - paddleHeight;
       }
-    } else if (leftPressed) {
+    } else if (upPressed) {
       paddleY -= PADDLE_SPEED;
       if (paddleY < 0) {
         paddleY = 0;
