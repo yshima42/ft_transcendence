@@ -19,6 +19,8 @@ model User {
   Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
   ChatMessage                                  ChatMessage[]
   ChatUser                                     ChatUser[]
+  DmMessage                                    DmMessage[]
+  DmUser                                       DmUser[]
   FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
   FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
   MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")
@@ -86,6 +88,33 @@ model ChatUser {
   User       User           @relation(fields: [userId], references: [id])
 
   @@id([chatRoomId, userId])
+}
+
+model DmMessage {
+  id        String   @id
+  content   String
+  createdAt DateTime @default(now())
+  dmRoomId  String
+  senderId  String
+  DmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id])
+  User      User     @relation(fields: [senderId], references: [id])
+}
+
+model DmRoom {
+  id        String      @id
+  createdAt DateTime    @default(now())
+  updatedAt DateTime
+  DmMessage DmMessage[]
+  DmUser    DmUser[]
+}
+
+model DmUser {
+  dmRoomId String
+  userId   String
+  DmRoom   DmRoom @relation(fields: [dmRoomId], references: [id])
+  User     User   @relation(fields: [userId], references: [id])
+
+  @@id([dmRoomId, userId])
 }
 
 enum OnlineStatus {
