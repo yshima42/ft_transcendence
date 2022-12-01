@@ -1,9 +1,9 @@
 import { memo, FC } from 'react';
 import { Flex, Divider } from '@chakra-ui/react';
-import { LogoButton } from 'components/button/LogoButton';
-import { NavigationItem } from 'components/layout/MainLayout/MainLayout';
-import { NavItem } from 'components/layout/MainLayout/NavItem';
-import { UserNavigation } from 'components/layout/MainLayout/UserNavigation';
+import { LogoButton } from 'components/atoms/button/LogoButton';
+import { NavigationItem } from 'components/environments/MainLayout/MainLayout';
+import { NavItem } from './NavItem';
+import { UserNavigation } from './UserNavigation';
 
 type Props = {
   items: NavigationItem[];

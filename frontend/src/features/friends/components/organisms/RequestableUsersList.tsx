@@ -9,7 +9,7 @@ type Props = {
   users: User[];
 };
 
-export const UsersList: FC<Props> = (props) => {
+export const RequestableUsersList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
   useEffect(() => {
@@ -31,7 +31,7 @@ export const UsersList: FC<Props> = (props) => {
       }}
       gap={6}
     >
-      {users.map((user) => (
+      {userList.map((user) => (
         <UserCard
           key={user.id}
           username={user.name}

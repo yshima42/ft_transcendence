@@ -2,6 +2,8 @@
 
 set -exu
 
+git pull || :
+
 projects=("backend" "frontend")
 rootDir=$(pwd | sed -r "s/\/\.git\/hooks//")
 

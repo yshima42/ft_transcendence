@@ -451,4 +451,32 @@ describe('FriendRequestsService', () => {
       ).resolves.toStrictEqual([]);
     });
   });
+
+  describe('findRequestableUsers', () => {
+    it('should find requestable users', async () => {
+      await prisma.friendRequest.createMany({
+        data: [
+          {
+            creatorId: userArray[0].id,
+            receiverId: userArray[1].id,
+            status: 'PENDING',
+          },
+          {
+            creatorId: userArray[0].id,
+            receiverId: userArray[2].id,
+            status: 'ACCEPTED',
+          },
+          {
+            creatorId: userArray[3].id,
+            receiverId: userArray[0].id,
+            status: 'PENDING',
+          },
+        ],
+      });
+
+      await expect(
+        friendRequestsService.findRequestableUsers(userArray[0].id)
+      ).resolves.toStrictEqual([userArray[4], userArray[5]]);
+    });
+  });
 });

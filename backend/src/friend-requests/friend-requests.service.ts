@@ -88,6 +88,36 @@ export class FriendRequestsService {
     });
   }
 
+  async findRequestableUsers(id: string): Promise<User[]> {
+    return await this.prisma.user.findMany({
+      where: {
+        NOT: {
+          id,
+        },
+        AND: [
+          {
+            receiver: {
+              every: {
+                NOT: {
+                  creatorId: id,
+                },
+              },
+            },
+          },
+          {
+            creator: {
+              every: {
+                NOT: {
+                  receiverId: id,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+  }
+
   async update(
     updateFriendRequestDto: UpdateFriendRequestDto
   ): Promise<FriendRequest> {
