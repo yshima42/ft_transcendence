@@ -10,7 +10,7 @@ export const Matching: FC = memo(() => {
 
   const onClickMatch = () => {
     setMatched(true);
-    setTimeout(() => navigate('/app/game'), 3 * 1000);
+    setTimeout(() => navigate('/app/game'), 0 * 1000);
   };
 
   const onClickCancel = () => {
@@ -34,7 +34,7 @@ export const Matching: FC = memo(() => {
             )}
             <Divider />
             <Stack spacing={4} py={4} px={10} align="center">
-              {matched ? <Box>Starting in 3 seconds</Box> : <Spinner />}
+              {matched ? <Box>Starting in 0 seconds</Box> : <Spinner />}
               {matched ? (
                 <></>
               ) : (
