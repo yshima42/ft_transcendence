@@ -45,7 +45,9 @@ model User {
   playerTwo MatchResult[]   @relation("playerTwo")
 
   chatMessages ChatMessage[] @relation("messageSender") // ユーザーが送信したチャットメッセージ
+  dmMessages   DmMessage[]   @relation("dmMessageSender") // ユーザーが送信したDMメッセージ
   ChatUser     ChatUser[] // ユーザーが参加しているチャットルーム
+  DmUser       DmUser[] // ユーザーが参加しているDMルーム
 }
 
 enum OnlineStatus {
@@ -121,6 +123,32 @@ model ChatUser {
   status     ChatUserStatus // チャットの参加者のステータス
 
   @@id([chatRoomId, userId])
+}
+
+model DmMessage {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id]) // 属するDMルーム
+  dmRoomId  String
+  sender    User     @relation("dmMessageSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
+  senderId  String
+}
+
+model DmRoom {
+  id         String      @id @default(uuid())
+  createdAt  DateTime    @default(now())
+  dmMessages DmMessage[] // DMルームに属するメッセージ
+  dmUsers    DmUser[] // チャットルームに属するユーザー
+}
+
+model DmUser {
+  dmRoom   DmRoom @relation(fields: [dmRoomId], references: [id]) // 参加しているチャットルーム
+  dmRoomId String
+  user     User   @relation(fields: [userId], references: [id]) // チャットの参加者
+  userId   String
+
+  @@id([dmRoomId, userId])
 }
 
 enum ChatUserStatus {
