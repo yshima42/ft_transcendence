@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
-import { ContentLayout } from 'components/layout/ContentLayout';
+import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 type State = {
   id: string;
