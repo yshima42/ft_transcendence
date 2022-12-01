@@ -1,4 +1,15 @@
-import { Block, FriendRequest, PrismaClient, User } from '@prisma/client';
+import {
+  Block,
+  FriendRequest,
+  PrismaClient,
+  User,
+  ChatRoom,
+  ChatUser,
+  ChatMessage,
+  DmRoom,
+  DmUser,
+  DmMessage,
+} from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
@@ -93,6 +104,104 @@ for (let i = 0; i < 30; i++) {
   }
 }
 
+const chatRooms: ChatRoom[] = [];
+for (let i = 0; i < 1; i++) {
+  const id = uuidv4();
+  const name = 'DmRoom' + id;
+  chatRooms.push({
+    id,
+    name,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+}
+
+const chatUsers: ChatUser[] = [];
+for (let i = 0; i < 1; i++) {
+  const chatRoomId = chatRooms[i].id;
+  const userId = idMap.get('dummy1');
+  const status = 'OWNER';
+  if (userId !== undefined) {
+    chatUsers.push({
+      chatRoomId,
+      userId,
+      status,
+    });
+  }
+  const userId2 = idMap.get('dummy2');
+  const status2 = 'OWNER';
+  if (userId2 !== undefined) {
+    chatUsers.push({
+      chatRoomId,
+      userId: userId2,
+      status: status2,
+    });
+  }
+}
+
+const chatMessages: ChatMessage[] = [];
+for (let i = 0; i < 1; i++) {
+  const id = uuidv4();
+  const content = 'Hello' + id;
+  const chatRoomId = chatRooms[i].id;
+  const senderId = idMap.get('dummy1');
+  if (senderId !== undefined) {
+    chatMessages.push({
+      id,
+      content,
+      chatRoomId,
+      senderId,
+      createdAt: new Date(),
+    });
+  }
+}
+
+const dmRooms: DmRoom[] = [];
+for (let i = 0; i < 1; i++) {
+  const id = uuidv4();
+  dmRooms.push({
+    id,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+}
+
+const dmUsers: DmUser[] = [];
+for (let i = 0; i < 1; i++) {
+  const dmRoomId = dmRooms[i].id;
+  const userId = idMap.get('dummy1');
+  if (userId !== undefined) {
+    dmUsers.push({
+      dmRoomId,
+      userId,
+    });
+  }
+  const userId2 = idMap.get('dummy2');
+  if (userId2 !== undefined) {
+    dmUsers.push({
+      dmRoomId,
+      userId: userId2,
+    });
+  }
+}
+
+const dmMessage: DmMessage[] = [];
+for (let i = 0; i < 1; i++) {
+  const id = uuidv4();
+  const content = 'Hello' + id;
+  const dmRoomId = dmRooms[i].id;
+  const senderId = idMap.get('dummy1');
+  if (senderId !== undefined) {
+    dmMessage.push({
+      id,
+      content,
+      dmRoomId,
+      senderId,
+      createdAt: new Date(),
+    });
+  }
+}
+
 const main = async () => {
   console.log(`Start seeding ...`);
 
@@ -104,6 +213,24 @@ const main = async () => {
   });
   await prisma.block.createMany({
     data: blockData,
+  });
+  await prisma.chatRoom.createMany({
+    data: chatRooms,
+  });
+  await prisma.chatUser.createMany({
+    data: chatUsers,
+  });
+  await prisma.chatMessage.createMany({
+    data: chatMessages,
+  });
+  await prisma.dmRoom.createMany({
+    data: dmRooms,
+  });
+  await prisma.dmUser.createMany({
+    data: dmUsers,
+  });
+  await prisma.dmMessage.createMany({
+    data: dmMessage,
   });
 
   console.log(`Seeding finished.`);
