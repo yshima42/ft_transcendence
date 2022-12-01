@@ -14,8 +14,10 @@ export const Game: FC = memo(() => {
   let dy = -5;
   const ballRadius = 10;
 
-  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  const paddleHeight = 75;
+  const paddleWidth = 20;
+
+  const drawBall = (ctx: CanvasRenderingContext2D) => {
     ctx.fillStyle = '#000000';
     ctx.beginPath();
     ctx.arc(x, y, ballRadius, 0, 2 * Math.PI);
@@ -32,6 +34,23 @@ export const Game: FC = memo(() => {
     // frameごとに進む
     x += dx;
     y += dy;
+  };
+
+  const drawPaddle = (ctx: CanvasRenderingContext2D) => {
+    const paddleY = (ctx.canvas.height - paddleHeight) / 2;
+
+    ctx.beginPath();
+    ctx.rect(0, paddleY, paddleWidth, paddleHeight);
+    ctx.fillStyle = '#0095DD';
+    ctx.fill();
+    ctx.closePath();
+  };
+
+  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    drawBall(ctx);
+    drawPaddle(ctx);
   }, []);
 
   return (
