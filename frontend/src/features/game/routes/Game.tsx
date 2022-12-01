@@ -1,4 +1,4 @@
-import { memo, FC } from 'react';
+import { memo, FC, useCallback } from 'react';
 import { Button, Center } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 // import io from 'socket.io-client';
@@ -8,53 +8,36 @@ import { Canvas } from './Canvas';
 // const socket = io.connect('http://localhost:3000');
 
 export const Game: FC = memo(() => {
-  //   const sendMessage = () => {
-  //     socket.emit('message', { message: 'hello' });
-  //   };
+  let x = 50;
+  let y = 100;
+  let dx = 5;
+  let dy = -5;
+  const ballRadius = 10;
 
-  //   useEffect(() => {
-  //     socket.on('message', (message) => {
-  //       alert(message);
+  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(x, y, ballRadius, 0, 2 * Math.PI);
+    ctx.fill();
 
-  //       return () => {
-  //         socket.off('receive_message');
-  //       };
-  //     });
-  //   }, []);
-  // // contextを状態として持つ
-  // const [context, setContext] = useState(null);
-  // // コンポーネントの初期化完了後コンポーネント状態にコンテキストを登録
-  // useEffect(() => {
-  //   const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-  //   const canvasContext = canvas.getContext('2d');
-  //   setContext(canvasContext);
-  // }, []);
+    // 壁で跳ね返る処理
+    if (x + dx > ctx.canvas.width - ballRadius || x + dx < ballRadius) {
+      dx = -dx;
+    }
+    if (y + dy > ctx.canvas.height - ballRadius || y + dy < ballRadius) {
+      dy = -dy;
+    }
 
-  // // 状態にコンテキストが登録されたらそれに対して操作できる
-  // const draw = () => {
-  //   let x = 10 / 2;
-  //   let y = 100 - 30;
-  //   const dx = 2;
-  //   const dy = -2;
-
-  //   context.beginPath();
-  //   context.arc(x, y, 10, 0, Math.PI * 2, false);
-  //   context.fillStyle = '#FF0000';
-  //   context.fill();
-  //   context.closePath();
-  //   x += dx;
-  //   y += dy;
-  // };
-
-  // useEffect(() => {
-  //   if (context !== null) {
-  //   }
-  // }, [context]);
+    // frameごとに進む
+    x += dx;
+    y += dy;
+  }, []);
 
   return (
     <ContentLayout>
       <Center>
-        <Canvas />
+        <Canvas draw={draw} />
       </Center>
       <Center>
         <input placeholder="Message..." />
