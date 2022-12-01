@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { MainLayout } from 'components/layout/MainLayout/MainLayout';
+import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { Chats } from 'features/chat/routes/Chats';
