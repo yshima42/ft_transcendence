@@ -2,9 +2,7 @@ import { FriendRequest } from '@prisma/client';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { usePatchApi } from '../generics/usePatchApi';
 
-// TODO: eslintエラー
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-export type FriendRequestApproveReqBody = void;
+export type FriendRequestApproveReqBody = Record<string, never>;
 
 export interface FriendRequestApproveResBody {
   friendRequest: FriendRequest;
