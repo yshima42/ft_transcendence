@@ -1,0 +1,23 @@
+name: main-update
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - 'main'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.merged }}
+
+    steps:
+      - name: Discord main update
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"content\": \"Pull Request Merged\n${HTML_URL}\"}" \
+            ${WEBHOOK_URL}
+        env:
+          HTML_URL: ${{ github.event.pull_request.html_url }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_MAIN_UPDATE_URL }}
