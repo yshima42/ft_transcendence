@@ -1,8 +1,8 @@
 import { memo, FC, useState } from 'react';
 import { Box, Divider, Flex, Heading, Spinner, Stack } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { PrimaryButton } from 'components/button/PrimaryButton';
-import { ContentLayout } from 'components/layout/ContentLayout';
+import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
+import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 export const Matching: FC = memo(() => {
   const navigate = useNavigate();

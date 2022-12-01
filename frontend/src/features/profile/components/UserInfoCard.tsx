@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Avatar, Button, Flex, Spacer, Tag, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { useProfile } from '../hooks/useProfile';
+import { useProfile } from '../../../hooks/api/profile/useProfile';
 
 export const UserInfoCard: FC = memo(() => {
   const { user } = useProfile();
