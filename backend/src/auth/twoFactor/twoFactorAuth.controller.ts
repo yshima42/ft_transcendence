@@ -6,8 +6,9 @@ import {
   Res,
   UseGuards,
   HttpCode,
-  UnauthorizedException,
-  Body,
+  Redirect,
+  Query,
+  Get,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { CookieOptions } from 'csurf';
@@ -16,15 +17,14 @@ import { UsersService } from 'src/users/users.service';
 import { AuthService } from '../auth.service';
 import { GetUser } from '../decorator/get-user.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { TwoFactorAuthenticationCodeDto } from './dto/twoFactorAuthenticationCode.dto';
-import { TwoFactorAuthenticationService } from './twoFactorAuthentication.service';
+import { TwoFactorAuthService } from './twoFactorAuth.service';
 
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
-export class TwoFactorAuthenticationController {
+export class TwoFactorAuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,
+    private readonly twoFactorAuthService: TwoFactorAuthService,
     private readonly usersService: UsersService
   ) {}
 
@@ -40,14 +40,9 @@ export class TwoFactorAuthenticationController {
   /* eslint-disable */
   @Post('generate')
   @UseGuards(JwtAuthGuard)
-  async register(
-    // @Res() response: Response,
-    @GetUser() user: User
-  ): Promise<{ url: string }> {
+  async register(@GetUser() user: User): Promise<{ url: string }> {
     const { otpauthUrl } =
-      await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
-        user
-      );
+      await this.twoFactorAuthService.generateTwoFactorAuthSecret(user);
 
     return { url: otpauthUrl };
   }
@@ -58,10 +53,10 @@ export class TwoFactorAuthenticationController {
   @Post('turn-on')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  async turnOnTwoFactorAuthentication(
+  async turnOnTwoFactorAuth(
     @GetUser() user: User
   ): Promise<{ message: string }> {
-    await this.usersService.turnOnTwoFactorAuthentication(user.id);
+    await this.usersService.turnOnTwoFactorAuth(user.id);
 
     return { message: 'ok' };
   }
@@ -72,29 +67,30 @@ export class TwoFactorAuthenticationController {
   @Post('turn-off')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  async turnOffTwoFactorAuthentication(
+  async turnOffTwoFactorAuth(
     @GetUser() user: User
   ): Promise<{ message: string }> {
-    await this.usersService.turnOffTwoFactorAuthentication(user.id);
+    await this.usersService.turnOffTwoFactorAuth(user.id);
+
     return { message: 'ok' };
   }
   /* eslint-enable */
 
-  @Post('authenticate')
+  @Get('authenticate')
   @HttpCode(200)
+  @Redirect('http://localhost:5173/app')
   @UseGuards(JwtAuthGuard)
   async authenticate(
     @GetUser() user: User,
-    @Body() { twoFactorAuthenticationCode }: TwoFactorAuthenticationCodeDto,
+    @Query('twoFactorAuthCode') twoFactorAuthCode: string,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ message: string }> {
-    const isCodeValid =
-      this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        twoFactorAuthenticationCode,
-        user
-      );
+  ): Promise<{ url: string }> {
+    const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthCodeValid(
+      twoFactorAuthCode,
+      user
+    );
     if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
+      return { url: 'http://localhost:5173/' };
     }
 
     const { accessToken } = await this.authService.generateJwt(
@@ -105,6 +101,6 @@ export class TwoFactorAuthenticationController {
 
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return { message: 'ok' };
+    return { url: 'http://localhost:5173/app' };
   }
 }

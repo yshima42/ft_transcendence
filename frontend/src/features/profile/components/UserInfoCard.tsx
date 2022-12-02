@@ -3,29 +3,22 @@ import { Avatar, Button, Flex, Spacer, Text } from '@chakra-ui/react';
 import { useQRCode } from 'next-qrcode';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../hooks/useProfile';
-import { useTwoFactorGenerate } from '../hooks/useTwoFactorGenerate';
-import { useTwoFactorTurnOn } from '../hooks/useTwoFactorTrunOn';
-import { useTwoFactorTurnOff } from '../hooks/useTwoFactorTurnOff';
+import { useTwoFactor } from '../hooks/useTwoFactor';
 
 export const UserInfoCard: FC = memo(() => {
-  console.log('UserInfoCard');
   const { user } = useProfile();
-  const { turnOn } = useTwoFactorTurnOn();
-  const { turnOff } = useTwoFactorTurnOff();
-  const { getQrcode, url } = useTwoFactorGenerate();
   const { Canvas } = useQRCode();
-
+  const { turnOn, turnOff, getQrcodeUrl, qrcodeUrl } = useTwoFactor();
   const navigate = useNavigate();
 
-  const [twoFactor, setTwoFactor] = useState<boolean>(
-    user.isTwoFactorAuthenticationEnabled 
+  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState<boolean>(
+    user.isTwoFactorAuthEnabled
   );
 
   const onClickSwitchButton = () => {
-    twoFactor ? turnOff() : turnOn();
-    setTwoFactor(!twoFactor);
-    if (twoFactor) getQrcode();
-    console.log(url);
+    isTwoFactorEnabled ? turnOff() : turnOn();
+    setIsTwoFactorEnabled(!isTwoFactorEnabled);
+    if (!isTwoFactorEnabled) getQrcodeUrl();
   };
 
   return (
@@ -48,21 +41,28 @@ export const UserInfoCard: FC = memo(() => {
         {user.name}
       </Text>
       <Flex mt="2">
-        <Text fontSize="sm">Two-Factor</Text>
-        {/* <Tag size="sm" variant="outline" colorScheme="green" ml="2">
-          ON
-        </Tag> */}
-        <Button bg="teal.200" onClick={onClickSwitchButton}>
-          {twoFactor ? 'off' : 'on'}
-        </Button>
+        <Text fontSize="sm" pr={2}>
+          Two-Factor
+        </Text>
+        {isTwoFactorEnabled ? (
+          <Button
+            size="xs"
+            bg="teal.200"
+            _hover={{ opacity: 0.8 }}
+            onClick={onClickSwitchButton}
+          >
+            active
+          </Button>
+        ) : (
+          <Button size="xs" bg="red.200" onClick={onClickSwitchButton}>
+            inactive
+          </Button>
+        )}
       </Flex>
       <Spacer />
-      <Button size="xs" onClick={() => navigate('/app/profile/edit')}>
-        Edit
-      </Button>
-      {twoFactor && url !== '' ? (
+      {isTwoFactorEnabled && qrcodeUrl !== '' ? (
         <Canvas
-          text={url}
+          text={qrcodeUrl}
           options={{
             level: 'M',
             margin: 3,
@@ -77,6 +77,9 @@ export const UserInfoCard: FC = memo(() => {
       ) : (
         <></>
       )}
+      <Button size="xs" onClick={() => navigate('/app/profile/edit')}>
+        Edit
+      </Button>
     </Flex>
   );
 });

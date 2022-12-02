@@ -30,12 +30,12 @@ export class UserEntity implements User {
   @ApiProperty({
     default: '',
   })
-  twoFactorAuthenticationSecret!: string;
+  twoFactorAuthSecret!: string;
 
   @ApiProperty({
     default: false,
   })
-  isTwoFactorAuthenticationEnabled!: boolean;
+  isTwoFactorAuthEnabled!: boolean;
 
   @ApiProperty({ default: 'ONLINE' })
   onlineStatus!: OnlineStatus;
