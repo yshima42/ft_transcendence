@@ -9,7 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { useProfile } from '../hooks/useProfile';
+import { useProfile } from '../../../hooks/api/profile/useProfile';
 import { AvatarFormData, useSaveAvatar } from '../hooks/useSaveAvatar';
 import { ProfileFormData, useSaveProfile } from '../hooks/useSaveProfile';
 

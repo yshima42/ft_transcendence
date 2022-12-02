@@ -1,8 +1,8 @@
 import { memo, FC, useState } from 'react';
 import { Box, Divider, Flex, Heading, Spinner, Stack } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { PrimaryButton } from 'components/button/PrimaryButton';
-import { ContentLayout } from 'components/layout/ContentLayout';
+import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
+import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 export const Matching: FC = memo(() => {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ export const Matching: FC = memo(() => {
 
   const onClickMatch = () => {
     setMatched(true);
-    setTimeout(() => navigate('/app/game'), 3 * 1000);
+    setTimeout(() => navigate('/app/game'), 0 * 1000);
   };
 
   const onClickCancel = () => {
@@ -34,7 +34,7 @@ export const Matching: FC = memo(() => {
             )}
             <Divider />
             <Stack spacing={4} py={4} px={10} align="center">
-              {matched ? <Box>Starting in 3 seconds</Box> : <Spinner />}
+              {matched ? <Box>Starting in 0 seconds</Box> : <Spinner />}
               {matched ? (
                 <></>
               ) : (
