@@ -25,11 +25,13 @@ export const GameResultCard: FC<Props> = memo((props) => {
           <AvatarWithName
             name={user.nickname}
             avatarImageUrl={user.avatarImageUrl}
+            id={userId}
           />
           <ScoreAndDate score={score} createdAt={createdAt} />
           <AvatarWithName
             name={opponent.nickname}
             avatarImageUrl={opponent.avatarImageUrl}
+            id={opponentId}
           />
           <Box w="50px">
             <Center>
