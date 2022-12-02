@@ -12,3 +12,5 @@ jobs:
         run: |
           yarn --cwd backend
           yarn --cwd backend build
+          yarn --cwd frontend
+          yarn --cwd frontend build
