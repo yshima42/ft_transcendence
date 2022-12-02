@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FriendRequest, User } from '@prisma/client';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FriendRequestsService } from './friend-requests.service';
+import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
 
 const date = new Date('2022-11-01T04:34:22+09:00');
 
