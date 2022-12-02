@@ -10,6 +10,9 @@ export const UserNavigation: FC = memo(() => {
 
   const { getMe, me } = useMe();
   useEffect(() => getMe(), [getMe]);
+  if (me === undefined) {
+    return <></>;
+  }
 
   return (
     <Flex p="5%" mt={4} align="center">
@@ -17,6 +20,7 @@ export const UserNavigation: FC = memo(() => {
         size="sm"
         imageUrl={me?.avatarImageUrl}
         linkUrl="/app/profile"
+        id={me?.id}
       >
         <AvatarBadge boxSize="1.1em" bg="green.500" />
       </LinkedAvatar>

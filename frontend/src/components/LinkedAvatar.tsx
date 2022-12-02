@@ -10,6 +10,7 @@ type Props = {
   name?: string;
   mr?: string;
   bg?: string;
+  id: string;
 };
 
 export const LinkedAvatar: FC<Props> = memo((props) => {
@@ -21,10 +22,11 @@ export const LinkedAvatar: FC<Props> = memo((props) => {
     name,
     mr,
     bg,
+    id,
   } = props;
 
   return (
-    <Link to={dstUrl}>
+    <Link to={dstUrl} state={id}>
       <Avatar size={size} src={srcUrl} name={name} mr={mr} bg={bg}>
         {children}
       </Avatar>

@@ -131,6 +131,23 @@ for (let i = 0; i < 30; i++) {
   }
 }
 
+for (let i = 0; i < 30; i++) {
+  const playerOneId = idMap.get('dummy' + (i + 1).toString());
+  const playerTwoId = idMap.get('dummy' + (i + 2).toString());
+  if (playerOneId !== undefined && playerTwoId !== undefined) {
+    matchResultData.push({
+      id: uuidv4(),
+      playerOneId,
+      playerTwoId,
+      userScore: matchScoreData[i][0],
+      opponentScore: matchScoreData[i][1],
+      win: matchScoreData[i][0] > matchScoreData[i][1],
+      startedAt: new Date(),
+      finishededAt: new Date(),
+    });
+  }
+}
+
 const main = async () => {
   console.log(`Start seeding ...`);
 
