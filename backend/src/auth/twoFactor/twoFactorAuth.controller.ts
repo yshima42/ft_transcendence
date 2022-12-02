@@ -36,8 +36,6 @@ export class TwoFactorAuthController {
     path: '/',
   };
 
-  // TODO eslint error
-  /* eslint-disable */
   @Post('generate')
   @UseGuards(JwtAuthGuard)
   async register(@GetUser() user: User): Promise<{ url: string }> {
@@ -46,10 +44,7 @@ export class TwoFactorAuthController {
 
     return { url: otpauthUrl };
   }
-  /* eslint-enable */
 
-  // TODO eslint error
-  /* eslint-disable */
   @Post('turn-on')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
@@ -60,10 +55,7 @@ export class TwoFactorAuthController {
 
     return { message: 'ok' };
   }
-  /* eslint-enable */
 
-  // TODO eslint error
-  /* eslint-disable */
   @Post('turn-off')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
@@ -74,7 +66,6 @@ export class TwoFactorAuthController {
 
     return { message: 'ok' };
   }
-  /* eslint-enable */
 
   @Get('authenticate')
   @HttpCode(200)

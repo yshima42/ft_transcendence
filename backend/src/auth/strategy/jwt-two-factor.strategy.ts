@@ -47,7 +47,6 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
       return { user };
     }
 
-    // TODO this is ok ?
     throw new UnauthorizedException();
   }
 }

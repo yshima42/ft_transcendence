@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
-import { Response } from 'express';
 import { authenticator } from 'otplib';
-import { toFileStream } from 'qrcode';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
@@ -13,7 +11,7 @@ export class TwoFactorAuthService {
     private readonly configService: ConfigService
   ) {}
 
-  // TODO secret をハッシュ化させる必要があるかも。
+  // TODO secret をハッシュ化させる。
   public async generateTwoFactorAuthSecret(user: User): Promise<{
     secret: string;
     otpauthUrl: string;
@@ -36,20 +34,13 @@ export class TwoFactorAuthService {
     };
   }
 
-  // TODO eslint error
-  /* eslint-disable */
-  public isTwoFactorAuthCodeValid(twoFactorAuthCode: string, user: User) {
+  public isTwoFactorAuthCodeValid(
+    twoFactorAuthCode: string,
+    user: User
+  ): boolean {
     return authenticator.verify({
       token: twoFactorAuthCode,
       secret: user.twoFactorAuthSecret as string,
     });
   }
-  /* eslint-enable */
-
-  // TODO eslint error
-  /* eslint-disable */
-  public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
-    return await toFileStream(stream, otpauthUrl);
-  }
-  /* eslint-enable */
 }
