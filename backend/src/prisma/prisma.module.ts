@@ -3,7 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma.service';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: [`.env.${process.env.NODE_ENV ?? 'invalid'}`],
+    }),
+  ],
   providers: [PrismaService],
   exports: [PrismaService],
 })
