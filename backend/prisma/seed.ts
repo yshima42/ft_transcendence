@@ -1,114 +1,97 @@
 import { Block, FriendRequest, PrismaClient, User } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
+
 const prisma = new PrismaClient();
 
-const date = new Date('2022-11-01T04:34:22+09:00');
+const idMap = new Map<string, string>();
+for (let i = 0; i < 100; i++) {
+  idMap.set('dummy' + i.toString(), uuidv4());
+}
 
-const userData: User[] = [
-  {
-    id: '21514d8b-e6af-490c-bc51-d0c7a359a267',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    name: 'dummy1',
-    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
-    nickname: 'nickname1',
-    twoFactorAuthSecret: '',
-    isTwoFactorAuthEnabled: false,
-    onlineStatus: 'ONLINE',
-  },
-  {
-    id: '40e8b4b4-9b39-4b7e-8e31-78e31975d320',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    name: 'dummy2',
-    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
-    nickname: 'nickname2',
-    twoFactorAuthSecret: '',
-    isTwoFactorAuthEnabled: false,
-    onlineStatus: 'OFFLINE',
-  },
-  {
-    id: '5001da8b-0316-411e-a34f-1db29d4d4c4b',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    name: 'dummy3',
-    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
-    nickname: 'nickname3',
-    twoFactorAuthSecret: '',
-    isTwoFactorAuthEnabled: false,
-    onlineStatus: 'INGAME',
-  },
-  {
-    id: '7fd8fa2a-398f-495a-bb55-7290136c7e3f',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    name: 'dummy4',
-    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=4',
-    nickname: 'nickname4',
-    twoFactorAuthSecret: '',
-    isTwoFactorAuthEnabled: false,
-    onlineStatus: 'OFFLINE',
-  },
-  {
-    id: '9f1b53bf-e25d-4630-a174-ac4c7adadcd6',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-    name: 'dummy5',
-    avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=5',
-    nickname: 'nickname5',
-    twoFactorAuthSecret: '',
-    isTwoFactorAuthEnabled: false,
-    onlineStatus: 'OFFLINE',
-  },
-];
+const onlineStatus = ['ONLINE', 'OFFLINE', 'INGAME'] as const;
+const FriendRequestStatus = ['PENDING', 'ACCEPTED', 'DECLINED'] as const;
 
-const friendRequestData: FriendRequest[] = [
-  {
-    creatorId: userData[1].id,
-    receiverId: userData[0].id,
-    status: 'PENDING',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-  },
-  {
-    creatorId: userData[2].id,
-    receiverId: userData[0].id,
-    status: 'PENDING',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-  },
-  {
-    creatorId: userData[3].id,
-    receiverId: userData[0].id,
-    status: 'ACCEPTED',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-  },
-  {
-    creatorId: userData[0].id,
-    receiverId: userData[4].id,
-    status: 'PENDING',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-  },
-  {
-    creatorId: userData[3].id,
-    receiverId: userData[4].id,
-    status: 'PENDING',
-    createdAt: new Date(date),
-    updatedAt: new Date(date),
-  },
-];
+const getOnlineStatus = () => {
+  const randomIndex = Math.floor(Math.random() * onlineStatus.length);
 
-const blockData: Block[] = [
-  {
-    sourceId: userData[0].id,
-    targetId: userData[1].id,
-  },
-  {
-    sourceId: userData[0].id,
-    targetId: userData[2].id,
-  },
-];
+  return onlineStatus[randomIndex];
+};
+
+const getFriendRequestStatus = () => {
+  const randomIndex = Math.floor(Math.random() * FriendRequestStatus.length);
+
+  return FriendRequestStatus[randomIndex];
+};
+
+const userData: User[] = [];
+
+idMap.forEach((value, key) => {
+  userData.push({
+    id: value,
+    name: key,
+    avatarImageUrl:
+      'https://placehold.jp/2b52ee/ffffff/150x150.png?text=' + key,
+    nickname: 'nickname' + key,
+    onlineStatus: getOnlineStatus(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+});
+
+const friendRequestData: FriendRequest[] = [];
+for (let i = 0; i < 30; i++) {
+  const creatorId = idMap.get('dummy1');
+  const receiverId = idMap.get('dummy' + (i + 1).toString());
+  if (creatorId !== undefined && receiverId !== undefined) {
+    friendRequestData.push({
+      creatorId,
+      receiverId,
+      status: getFriendRequestStatus(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+}
+
+for (let i = 40; i < 60; i++) {
+  const creatorId = idMap.get('dummy' + (i + 1).toString());
+  const receiverId = idMap.get('dummy1');
+  if (creatorId !== undefined && receiverId !== undefined) {
+    friendRequestData.push({
+      creatorId,
+      receiverId,
+      status: getFriendRequestStatus(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+}
+
+for (let i = 2; i < 30; i++) {
+  const creatorId = idMap.get('dummy' + i.toString());
+  const receiverId = idMap.get('dummy' + (i + 1).toString());
+  if (creatorId !== undefined && receiverId !== undefined) {
+    friendRequestData.push({
+      creatorId,
+      receiverId,
+      status: 'PENDING',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+}
+
+const blockData: Block[] = [];
+for (let i = 0; i < 30; i++) {
+  const targetId = idMap.get('dummy' + i.toString());
+  const sourceId = idMap.get('dummy1');
+  if (targetId !== undefined && sourceId !== undefined) {
+    blockData.push({
+      targetId,
+      sourceId,
+    });
+  }
+}
 
 const main = async () => {
   console.log(`Start seeding ...`);

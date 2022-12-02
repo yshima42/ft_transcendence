@@ -1,10 +1,10 @@
 #!/bin/bash
+set -eux
 
-# docker-compose down
-# docker-compose up -d
-# sleep 2
-# yarn prisma migrate dev
-# yarn prisma generate
-# yarn prisma db seed
-yarn prisma migrate reset --skip-generate --skip-seed
-yarn start:dev
+docker-compose down
+docker-compose up -d
+
+yarn prisma generate
+yarn prisma migrate dev --name init
+yarn prisma db seed
+yarn prisma studio

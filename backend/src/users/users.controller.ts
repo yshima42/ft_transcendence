@@ -383,4 +383,14 @@ export class UsersController {
   async findIncomingRequest(@GetUser() user: User): Promise<User[]> {
     return await this.friendRequestService.findIncomingRequest(user.id);
   }
+
+  @Get('me/requestable-users')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: '自分がフレンドリクエストを送ることができるユーザー一覧取得',
+  })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async findRequetableUsers(@GetUser() user: User): Promise<User[]> {
+    return await this.friendRequestService.findRequestableUsers(user.id);
+  }
 }
