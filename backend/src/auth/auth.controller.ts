@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   HttpCode,
@@ -8,6 +7,7 @@ import {
   UseGuards,
   Res,
   Redirect,
+  Query,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CookieOptions } from 'csurf';
@@ -24,8 +24,8 @@ export class AuthController {
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,
-    // secure: true,
-    secure: false,
+    secure: true,
+    // secure: false,
     sameSite: 'none',
     path: '/',
   };
@@ -40,20 +40,26 @@ export class AuthController {
   async ftOauthCallback(
     @GetFtProfile() ftProfile: FtProfile,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ message: string }> {
+  ): Promise<{ url: string }> {
     const name = ftProfile.intraName;
     const signupUser = { name, avatarImageUrl: ftProfile.imageUrl };
-    const { accessToken } = await this.authService.login(name, signupUser);
+    const { accessToken, isTwoFactorAuthEnabled } =
+      await this.authService.login(name, signupUser);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
 
-    return { message: 'ok' };
+    if (isTwoFactorAuthEnabled) {
+      return { url: 'http://localhost:5173/twofactor' };
+    } else {
+      return { url: 'http://localhost:5173/app' };
+    }
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('login/dummy')
+  @Get('login/dummy')
+  @Redirect('http://localhost:5173/app')
   @ApiOperation({
     summary: 'seedで作ったdummy1~5のaccess_tokenを取得(ログイン)',
   })
@@ -70,13 +76,18 @@ export class AuthController {
     },
   })
   async dummyLogin(
-    @Body('name') name: string,
+    @Query('name') name: string,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ message: string }> {
-    const { accessToken } = await this.authService.login(name);
+  ): Promise<{ url: string }> {
+    const { accessToken, isTwoFactorAuthEnabled } =
+      await this.authService.login(name);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return { message: 'ok' };
+    if (isTwoFactorAuthEnabled) {
+      return { url: 'http://localhost:5173/twofactor' };
+    } else {
+      return { url: 'http://localhost:5173/app' };
+    }
   }
 
   @HttpCode(HttpStatus.OK)
