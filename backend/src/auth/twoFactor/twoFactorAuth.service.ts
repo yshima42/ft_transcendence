@@ -7,13 +7,14 @@ import { toFileStream } from 'qrcode';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
-export class TwoFactorAuthenticationService {
+export class TwoFactorAuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly configService: ConfigService
   ) {}
 
-  public async generateTwoFactorAuthenticationSecret(user: User): Promise<{
+  // TODO secret をハッシュ化させる必要があるかも。
+  public async generateTwoFactorAuthSecret(user: User): Promise<{
     secret: string;
     otpauthUrl: string;
   }> {
@@ -27,7 +28,7 @@ export class TwoFactorAuthenticationService {
       secret
     );
 
-    await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
+    await this.usersService.setTwoFactorAuthSecret(secret, user.id);
 
     return {
       secret,
@@ -37,15 +38,10 @@ export class TwoFactorAuthenticationService {
 
   // TODO eslint error
   /* eslint-disable */
-  public isTwoFactorAuthenticationCodeValid(
-    twoFactorAuthenticationCode: string,
-    user: User
-  ) {
-    console.log(twoFactorAuthenticationCode);
-    console.log(user);
+  public isTwoFactorAuthCodeValid(twoFactorAuthCode: string, user: User) {
     return authenticator.verify({
-      token: twoFactorAuthenticationCode,
-      secret: user.twoFactorAuthenticationSecret as string,
+      token: twoFactorAuthCode,
+      secret: user.twoFactorAuthSecret as string,
     });
   }
   /* eslint-enable */
