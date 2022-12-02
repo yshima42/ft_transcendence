@@ -3,8 +3,8 @@ import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { Chats } from 'features/chat/routes/Chats';
-import { DirectMessage } from 'features/dm/routes/DirectMessage';
-import { DirectMessageList } from 'features/dm/routes/DirectMessageList';
+import { DirectMessageRooms } from 'features/dm/routes/DirectMessageRooms';
+import { DirectMessages } from 'features/dm/routes/DirectMessages';
 import { Users } from 'features/friends/routes/Users';
 import { Game } from 'features/game/routes/Game';
 import { GameTop } from 'features/game/routes/GameTop';
@@ -39,8 +39,8 @@ export const publicRoutes = [
       { path: 'games', element: <Games /> },
       { path: '', element: <GameTop /> },
       { path: 'matching', element: <Matching /> },
-      { path: 'dm', element: <DirectMessageList /> },
-      { path: 'dm/:id', element: <DirectMessage /> },
+      { path: 'dm', element: <DirectMessageRooms /> },
+      { path: 'dm/:id', element: <DirectMessages /> },
       { path: 'profile', element: <Profile /> },
       { path: 'profile/edit', element: <ProfileEdit /> },
       { path: 'users/:id', element: <UserProfile /> },

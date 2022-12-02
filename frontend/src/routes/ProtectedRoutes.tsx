@@ -1,5 +1,5 @@
 // import { ChatRoomList } from 'components/pages/ChatRoomList';
-// import { DirectMessage } from 'components/pages/DirectMessage';
+// import { DirectMessages } from 'components/pages/DirectMessages';
 // import { Game } from 'components/pages/Game';
 // import { GameSelect } from 'components/pages/GameSelect';
 // import { Page404 } from 'components/pages/Page404';
@@ -15,7 +15,7 @@ export const protectedRoutes = [
   //     { path: 'chatroom-list', element: <ChatRoomList /> },
   //     { path: 'game-select', element: <GameSelect /> },
   //     { path: 'game', element: <Game /> },
-  //     { path: 'direct-message', element: <DirectMessage /> },
+  //     { path: 'direct-message', element: <DirectMessages /> },
   //     { path: '*', element: <Page404 /> },
   //   ],
   // },
