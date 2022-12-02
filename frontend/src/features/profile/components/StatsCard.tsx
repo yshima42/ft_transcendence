@@ -7,7 +7,7 @@ import {
   Heading,
   Text,
 } from '@chakra-ui/react';
-import { useStats } from '../hooks/useStats';
+import { useGameStats } from 'hooks/api/game/useGameStats';
 
 // const colorScaleRYG = (rate: number) => {
 //   if (rate < 50) {
@@ -21,11 +21,16 @@ import { useStats } from '../hooks/useStats';
 //   }
 // };
 
-export const StatsCard: FC = memo(() => {
-  const { stats } = useStats();
-  const { winNum, loseNum } = stats;
+type StatsCardProps = {
+  id: string;
+};
 
-  const winRate = Math.floor((winNum / (winNum + loseNum)) * 100);
+export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
+  const { gameStats } = useGameStats(id);
+  const { winNum, loseNum } = gameStats;
+  const matchNum = winNum + loseNum;
+
+  const winRate = matchNum !== 0 ? Math.floor((winNum / matchNum) * 100) : 0;
 
   return (
     <Flex
@@ -52,7 +57,7 @@ export const StatsCard: FC = memo(() => {
         >
           <CircularProgressLabel>
             <Text fontSize="2xl" fontWeight="bold">{`${winRate}%`}</Text>
-            <Text fontSize="sm">{`${winNum}/${winNum + loseNum}`}</Text>
+            <Text fontSize="sm">{`${winNum}/${matchNum}`}</Text>
           </CircularProgressLabel>
         </CircularProgress>
       </Flex>
