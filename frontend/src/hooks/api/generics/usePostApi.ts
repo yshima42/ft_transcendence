@@ -1,6 +1,7 @@
 import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
+// 返り値のpostFunc を使う際は、await すること。
 export function usePostApi<ReqBody, ResBody>(
   endpoint: string
 ): {
