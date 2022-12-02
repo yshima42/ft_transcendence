@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Block, User } from '@prisma/client';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { BlocksService } from './blocks.service';
+import { BlocksService } from 'src/blocks/blocks.service';
 
 const date = new Date('2022-11-01T04:34:22+09:00');
 
