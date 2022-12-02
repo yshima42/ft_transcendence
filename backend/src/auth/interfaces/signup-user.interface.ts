@@ -6,7 +6,7 @@ export type SignupUser = Omit<
   | 'createdAt'
   | 'updatedAt'
   | 'nickname'
-  | 'twoFactorAuthenticationSecret'
-  | 'isTwoFactorAuthenticationEnabled'
+  | 'twoFactorAuthSecret'
+  | 'isTwoFactorAuthEnabled'
   | 'onlineStatus'
 >;

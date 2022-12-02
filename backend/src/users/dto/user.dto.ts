@@ -34,13 +34,13 @@ export class UserDto {
   @ApiProperty({
     default: '',
   })
-  twoFactorAuthenticationSecret?: string | null;
+  twoFactorAuthSecret?: string | null;
 
   @IsBoolean()
   @ApiProperty({
     default: false,
   })
-  isTwoFactorAuthenticationEnabled?: boolean;
+  isTwoFactorAuthEnabled?: boolean;
 
   @IsEnum(OnlineStatus)
   @ApiProperty({
