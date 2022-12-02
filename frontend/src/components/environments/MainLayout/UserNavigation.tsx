@@ -3,7 +3,7 @@ import { AvatarBadge, Button, Flex, Heading } from '@chakra-ui/react';
 import { useAuth } from 'features/auth/hooks/useAuth';
 import { useMe } from 'hooks/useMe';
 import { Link } from 'react-router-dom';
-import { LinkedAvatar } from 'components/LinkedAvatar';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 
 export const UserNavigation: FC = memo(() => {
   const { logout } = useAuth();
@@ -18,7 +18,7 @@ export const UserNavigation: FC = memo(() => {
     <Flex p="5%" mt={4} align="center">
       <LinkedAvatar
         size="sm"
-        imageUrl={me?.avatarImageUrl}
+        src={me?.avatarImageUrl}
         linkUrl="/app/profile"
         id={me?.id}
       >
