@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DmRoom, DmMessage } from '@prisma/client';
+import { DmMessage } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ResponseDmRoom, ResponseDmMessage } from './dm.interface';
 import { CreateDmMessageDto } from './dto/create-dm.dto';
 // import { UpdateDmDto } from './dto/update-dm.dto';
 
@@ -8,12 +9,14 @@ import { CreateDmMessageDto } from './dto/create-dm.dto';
 export class DmService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createDmMessageDto: CreateDmMessageDto): Promise<DmMessage> {
-    Logger.debug(`create: ${JSON.stringify(createDmMessageDto)}`);
+  async create(
+    createDmMessageDto: CreateDmMessageDto,
+    senderId: string
+  ): Promise<DmMessage> {
     const dmMessage = await this.prisma.dmMessage.create({
       data: {
         content: createDmMessageDto.content,
-        senderId: createDmMessageDto.senderId,
+        senderId,
         dmRoomId: createDmMessageDto.dmRoomId,
       },
     });
@@ -30,8 +33,7 @@ export class DmService {
   // findOne(id: number) {
   //   return `This action returns a #${id} dm`;
   // }
-  async findMyDmRooms(userId: string): Promise<DmRoom[]> {
-    Logger.debug(`findMyDms: ${JSON.stringify(userId)}`);
+  async findMyDmRooms(userId: string): Promise<ResponseDmRoom[]> {
     if (userId === undefined) {
       Logger.warn(`findMyDms: userId is undefined`);
 
@@ -46,18 +48,40 @@ export class DmService {
           },
         },
       },
-      include: {
-        dmUsers: true,
-        dmMessages: true,
+      select: {
+        id: true,
+        dmUsers: {
+          where: {
+            userId: {
+              not: userId,
+            },
+          },
+          select: {
+            user: {
+              select: {
+                name: true,
+                avatarImageUrl: true,
+              },
+            },
+          },
+        },
+        dmMessages: {
+          select: {
+            content: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+        },
       },
     });
-    Logger.debug(`findMyDms: ${JSON.stringify(dmRooms)}`);
 
     return dmRooms;
   }
 
-  async findDmMessages(id: string): Promise<DmMessage[]> {
-    Logger.debug(`findDmMessages: ${JSON.stringify(id)}`);
+  async findDmMessages(id: string): Promise<ResponseDmMessage[]> {
     if (id === undefined) {
       Logger.warn(`findDmMessages: dmRoomId is undefined`);
 
@@ -68,8 +92,17 @@ export class DmService {
       where: {
         dmRoomId: id,
       },
-      include: {
-        sender: true,
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        sender: {
+          select: {
+            name: true,
+            avatarImageUrl: true,
+            onlineStatus: true,
+          },
+        },
       },
     });
     Logger.debug(`findDmMessages: ${JSON.stringify(dmMessages)}`);
