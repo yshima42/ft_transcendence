@@ -70,7 +70,7 @@ export class UsersController {
   }
 
   @Get('me/profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorAuthGuard)
   @ApiOperation({
     summary: '自分のユーザー情報取得',
     description:
