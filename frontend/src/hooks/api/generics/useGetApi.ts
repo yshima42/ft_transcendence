@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
+// 使う際は、このhooks自体を<Suspense> で囲むこと。
 export function useGetApi<ResBody>(endpoint: string): {
   data: ResBody;
 } {
