@@ -8,20 +8,24 @@ import { UserDto } from './dto/user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async setTwoFactorAuthenticationSecret(
-    secret: string,
-    id: string
-  ): Promise<User> {
+  async setTwoFactorAuthSecret(secret: string, id: string): Promise<User> {
     return await this.prisma.user.update({
       where: { id },
-      data: { twoFactorAuthenticationSecret: secret },
+      data: { twoFactorAuthSecret: secret },
     });
   }
 
-  async turnOnTwoFactorAuthentication(id: string): Promise<User> {
+  async turnOnTwoFactorAuth(id: string): Promise<User> {
     return await this.prisma.user.update({
       where: { id },
-      data: { isTwoFactorAuthenticationEnabled: true },
+      data: { isTwoFactorAuthEnabled: true },
+    });
+  }
+
+  async turnOffTwoFactorAuth(id: string): Promise<User> {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { isTwoFactorAuthEnabled: false },
     });
   }
 
@@ -70,13 +74,11 @@ export class UsersService {
       if (attrs.includes('nickname')) {
         userDto.nickname = user.nickname;
       }
-      if (attrs.includes('twoFactorAuthenticationSecret')) {
-        userDto.twoFactorAuthenticationSecret =
-          user.twoFactorAuthenticationSecret;
+      if (attrs.includes('twoFactorAuthSecret')) {
+        userDto.twoFactorAuthSecret = user.twoFactorAuthSecret;
       }
-      if (attrs.includes('isTwoFactorAuthenticationEnabled?')) {
-        userDto.isTwoFactorAuthenticationEnabled =
-          user.isTwoFactorAuthenticationEnabled;
+      if (attrs.includes('isTwoFactorAuthEnabled?')) {
+        userDto.isTwoFactorAuthEnabled = user.isTwoFactorAuthEnabled;
       }
       if (attrs.includes('onlineStatus')) {
         userDto.onlineStatus = user.onlineStatus;
