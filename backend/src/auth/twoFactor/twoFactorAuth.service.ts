@@ -12,7 +12,7 @@ export class TwoFactorAuthService {
   ) {}
 
   // TODO secret をハッシュ化させる。
-  public async generateTwoFactorAuthSecret(user: User): Promise<{
+  async generateTwoFactorAuthSecret(user: User): Promise<{
     secret: string;
     otpauthUrl: string;
   }> {
@@ -34,10 +34,7 @@ export class TwoFactorAuthService {
     };
   }
 
-  public isTwoFactorAuthCodeValid(
-    twoFactorAuthCode: string,
-    user: User
-  ): boolean {
+  isTwoFactorAuthCodeValid(twoFactorAuthCode: string, user: User): boolean {
     return authenticator.verify({
       token: twoFactorAuthCode,
       secret: user.twoFactorAuthSecret as string,
