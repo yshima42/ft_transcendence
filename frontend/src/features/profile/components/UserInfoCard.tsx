@@ -1,16 +1,15 @@
 import { memo, FC } from 'react';
-import { Avatar, Button, Flex, Spacer, Tag, Text } from '@chakra-ui/react';
+import { Avatar, Flex, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useNavigate } from 'react-router-dom';
+import { ProfileSetting } from './ProfileSetting';
 
 type UserInfoCardProps = {
   user: User;
+  isLoginUser: boolean;
 };
 
 export const UserInfoCard: FC<UserInfoCardProps> = memo(
-  ({ user }: UserInfoCardProps) => {
-    const navigate = useNavigate();
-
+  ({ user, isLoginUser }: UserInfoCardProps) => {
     return (
       <Flex
         w="100%"
@@ -30,16 +29,7 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
         <Text fontSize="xs" color="gray">
           {user.name}
         </Text>
-        <Flex mt="2">
-          <Text fontSize="sm">Two-Factor</Text>
-          <Tag size="sm" variant="outline" colorScheme="green" ml="2">
-            ON
-          </Tag>
-        </Flex>
-        <Spacer />
-        <Button size="xs" onClick={() => navigate('/app/profile/edit')}>
-          Edit
-        </Button>
+        {isLoginUser && <ProfileSetting />}
       </Flex>
     );
   }

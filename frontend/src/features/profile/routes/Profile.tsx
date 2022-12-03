@@ -13,6 +13,8 @@ import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
 export const Profile: FC = memo(() => {
   const { id } = useParams();
   const { user } = useProfile(id);
+  const { user: loginUser } = useProfile();
+  const isLoginUser = user.id === loginUser.id;
 
   return (
     <ContentLayout title="Profile">
@@ -42,7 +44,7 @@ export const Profile: FC = memo(() => {
         >
           <GridItem bg="gray" area="profile">
             <ProfileCardWrapper>
-              <UserInfoCard user={user} />
+              <UserInfoCard user={user} isLoginUser={isLoginUser} />
             </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="stats">
