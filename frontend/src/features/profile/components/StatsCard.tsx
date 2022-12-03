@@ -27,10 +27,6 @@ type StatsCardProps = {
 
 export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
   const { gameStats } = useGameStats(id);
-  const { winNum, loseNum } = gameStats;
-  const matchNum = winNum + loseNum;
-
-  const winRate = matchNum !== 0 ? Math.floor((winNum / matchNum) * 100) : 0;
 
   return (
     <Flex
@@ -50,14 +46,17 @@ export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
       </Flex>
       <Flex justify="center" align="center" pt="4">
         <CircularProgress
-          value={winRate}
+          value={gameStats.winRate}
           // TODO 彩度調節したい
           // color={colorScaleRYG(winRate)}
           size="200px"
         >
           <CircularProgressLabel>
-            <Text fontSize="2xl" fontWeight="bold">{`${winRate}%`}</Text>
-            <Text fontSize="sm">{`${winNum}/${matchNum}`}</Text>
+            <Text
+              fontSize="2xl"
+              fontWeight="bold"
+            >{`${gameStats.winRate}%`}</Text>
+            <Text fontSize="sm">{`${gameStats.totalWins}/${gameStats.totalMatches}`}</Text>
           </CircularProgressLabel>
         </CircularProgress>
       </Flex>

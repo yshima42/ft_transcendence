@@ -1,8 +1,10 @@
 import { useGetApi } from '../generics/useGetApi';
 
 export interface GameStats {
-  winNum: number;
-  loseNum: number;
+  totalMatches: number;
+  totalWins: number;
+  totalLoses: number;
+  winRate: number;
 }
 
 export const useGameStats = (userId = 'me'): { gameStats: GameStats } => {

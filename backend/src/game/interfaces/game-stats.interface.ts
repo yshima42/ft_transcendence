@@ -1,4 +1,6 @@
 export interface GameStats {
-  winNum: number;
-  loseNum: number;
+  totalMatches: number;
+  totalWins: number;
+  totalLoses: number;
+  winRate: number;
 }
