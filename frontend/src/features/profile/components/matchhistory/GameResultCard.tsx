@@ -1,21 +1,19 @@
 import { memo, FC } from 'react';
 import { Box, Center, HStack, Text } from '@chakra-ui/react';
-import { useProfile } from 'hooks/api/profile/useProfile';
+import { User } from '@prisma/client';
 import { AvatarWithName } from './AvatarWithName';
 import { ScoreAndDate } from './ScoreAndDate';
 
 type Props = {
-  userId: string;
-  opponentId: string;
+  user: User;
+  opponent: User;
   score: string;
   createdAt: Date;
   win: boolean;
 };
 
 export const GameResultCard: FC<Props> = memo((props) => {
-  const { userId, opponentId, score, createdAt, win } = props;
-  const user = useProfile(userId).user;
-  const opponent = useProfile(opponentId).user;
+  const { user, opponent, score, createdAt, win } = props;
 
   // TODO:spinnerつける？使うフックを変更し、一時的にspinner表示を削除した
   return (
@@ -25,13 +23,13 @@ export const GameResultCard: FC<Props> = memo((props) => {
           <AvatarWithName
             name={user.nickname}
             avatarImageUrl={user.avatarImageUrl}
-            id={userId}
+            id={user.id}
           />
           <ScoreAndDate score={score} createdAt={createdAt} />
           <AvatarWithName
             name={opponent.nickname}
             avatarImageUrl={opponent.avatarImageUrl}
-            id={opponentId}
+            id={opponent.id}
           />
           <Box w="50px">
             <Center>

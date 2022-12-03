@@ -2,7 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { MatchResult } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MatchResultDto } from './dto/match-result.dto';
-import { GameStats } from './interfaces/game-stats.interface';
+import {
+  GameStats,
+  MatchResultWithPlayers,
+} from './interfaces/game-stats.interface';
 
 @Injectable()
 export class GameService {
@@ -40,9 +43,15 @@ export class GameService {
     return matchResult;
   }
 
-  async findMatchHistory(playerOneId: string): Promise<MatchResult[]> {
+  async findMatchHistory(
+    playerOneId: string
+  ): Promise<MatchResultWithPlayers[]> {
     const matchResults = await this.prisma.matchResult.findMany({
       where: { playerOneId },
+      include: {
+        playerOne: true,
+        playerTwo: true,
+      },
     });
 
     return matchResults;
