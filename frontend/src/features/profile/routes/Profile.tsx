@@ -13,7 +13,6 @@ export const Profile: FC = memo(() => {
   const location = useLocation();
   const id = location.state as string;
   const user: User = useProfile(id).user;
-  console.log(user);
 
   return (
     <ContentLayout title="Profile">

@@ -52,9 +52,15 @@ export class GameService {
     const matchResults = await this.prisma.matchResult.findMany({
       where: { playerOneId },
     });
-    const matchNum = matchResults.length;
-    const winNum = matchResults.filter((match) => match.win).length;
+    const totalMatches = matchResults.length;
+    const totalWins = matchResults.filter((match) => match.win).length;
+    const winRate = totalMatches === 0 ? 0 : (totalWins / totalMatches) * 100;
 
-    return { winNum, loseNum: matchNum - winNum };
+    return {
+      totalMatches,
+      totalWins,
+      totalLoses: totalMatches - totalWins,
+      winRate,
+    };
   }
 }
