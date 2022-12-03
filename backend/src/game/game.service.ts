@@ -63,7 +63,8 @@ export class GameService {
     });
     const totalMatches = matchResults.length;
     const totalWins = matchResults.filter((match) => match.win).length;
-    const winRate = totalMatches === 0 ? 0 : (totalWins / totalMatches) * 100;
+    const winRate =
+      totalMatches === 0 ? 0 : Math.round((totalWins / totalMatches) * 100);
 
     return {
       totalMatches,
