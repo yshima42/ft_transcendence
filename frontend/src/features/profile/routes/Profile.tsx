@@ -1,18 +1,18 @@
 import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
-import { User } from '@prisma/client';
 import { useProfile } from 'hooks/api/profile/useProfile';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
 import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
 
+// /app/profile経由で表示するときはid=undefinedとなり、useProfileでログインユーザーの情報が取れる
+// 少し可読性が低いので、余力あれば書き換えてもいいかもれない。
 export const Profile: FC = memo(() => {
-  const location = useLocation();
-  const id = location.state as string;
-  const user: User = useProfile(id).user;
+  const { id } = useParams();
+  const { user } = useProfile(id);
 
   return (
     <ContentLayout title="Profile">

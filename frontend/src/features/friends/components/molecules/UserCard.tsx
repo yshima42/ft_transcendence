@@ -2,8 +2,6 @@ import { FC, memo, ReactNode } from 'react';
 import { Box, Flex, Text, Spacer, Heading } from '@chakra-ui/react';
 import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 
-// TODO:Propsとしてuserを渡せると、LinkedAvaterで遷移する先のプロフィールページでAPIをたたかずに済む。
-// 余裕があれば対応したい
 type Props = {
   id: string;
   username: string;
@@ -33,7 +31,6 @@ export const UserCard: FC<Props> = memo((props) => {
             size="sm"
             src={avatarImageUrl}
             linkUrl={`/app/users/${id}`}
-            id={id}
           />
           <Box>
             <Text fontSize="lg" fontWeight="bold">

@@ -16,12 +16,7 @@ export const UserNavigation: FC = memo(() => {
 
   return (
     <Flex p="5%" mt={4} align="center">
-      <LinkedAvatar
-        size="sm"
-        src={me?.avatarImageUrl}
-        linkUrl="/app/profile"
-        id={me?.id}
-      >
+      <LinkedAvatar size="sm" src={me?.avatarImageUrl} linkUrl="/app/profile">
         <AvatarBadge boxSize="1.1em" bg="green.500" />
       </LinkedAvatar>
       <Flex flexDir="column" ml={4}>
