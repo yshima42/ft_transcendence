@@ -19,7 +19,6 @@ export const AvatarWithName: FC<Props> = memo((props) => {
           src={avatarImageUrl}
           name={name}
           linkUrl={`/app/users/${id}`}
-          id={id}
         />
 
         {/* TODO:ニックネームが長くなるときどう表示するか考える。暫定で省略している */}
