@@ -8,27 +8,6 @@ import { UserDto } from './dto/user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async setTwoFactorAuthSecret(secret: string, id: string): Promise<User> {
-    return await this.prisma.user.update({
-      where: { id },
-      data: { twoFactorAuthSecret: secret },
-    });
-  }
-
-  async turnOnTwoFactorAuth(id: string): Promise<User> {
-    return await this.prisma.user.update({
-      where: { id },
-      data: { isTwoFactorAuthEnabled: true },
-    });
-  }
-
-  async turnOffTwoFactorAuth(id: string): Promise<User> {
-    return await this.prisma.user.update({
-      where: { id },
-      data: { isTwoFactorAuthEnabled: false },
-    });
-  }
-
   async findAll(user: User): Promise<User[]> {
     const users = await this.prisma.user.findMany({
       where: { id: { not: user.id } },

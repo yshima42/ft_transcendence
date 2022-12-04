@@ -14,21 +14,21 @@ export const useTwoFactor = (): {
 
   const turnOn = useCallback(() => {
     axios
-      .post('/2fa/turn-on')
+      .post('/users/me/profile', { isTwoFactorAuthEnabled: true })
       .then(() => console.log('ok'))
       .catch(() => navigate('/', { replace: true }));
   }, []);
 
   const turnOff = useCallback(() => {
     axios
-      .post('/2fa/turn-off')
+      .post('/users/me/profile', { isTwoFactorAuthEnabled: false })
       .then(() => console.log('ok'))
       .catch(() => navigate('/', { replace: true }));
   }, []);
 
   const getQrcodeUrl = useCallback(() => {
     axios
-      .post<{ url: string }>('/2fa/generate')
+      .post<{ url: string }>('/auth/2fa/generate')
       .then((res) => setQrcodeUrl(res.data.url))
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
