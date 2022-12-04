@@ -21,7 +21,7 @@ export const useLogout = (): {
   const { postFunc: logout, isLoading } = usePostApi<
     LogoutReqBody,
     LogoutResBody
-  >('/auth/login/dummy');
+  >('/auth/logout');
 
   return { logout, isLoading };
 };
