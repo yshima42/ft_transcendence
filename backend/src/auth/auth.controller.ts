@@ -114,7 +114,7 @@ export class AuthController {
     return { message: 'ok' };
   }
 
-  @Get('2fa/generate')
+  @Post('2fa/generate')
   @UseGuards(JwtTwoFactorAuthGuard)
   async register(@GetUser() user: User): Promise<{ url: string }> {
     const { otpAuthUrl } = await this.authService.generateTwoFactorAuthSecret(
