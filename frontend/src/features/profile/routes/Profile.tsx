@@ -1,12 +1,21 @@
 import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
+import { useProfile } from 'hooks/api/profile/useProfile';
+import { useParams } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
 import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
 
+// /app/profile経由で表示するときはid=undefinedとなり、useProfileでログインユーザーの情報が取れる
+// 少し可読性が低いので、余力あれば書き換えてもいいかもれない。
 export const Profile: FC = memo(() => {
+  const { id } = useParams();
+  const { user } = useProfile(id);
+  const { user: loginUser } = useProfile();
+  const isLoginUser = user.id === loginUser.id;
+
   return (
     <ContentLayout title="Profile">
       <Flex justify="center">
@@ -35,17 +44,17 @@ export const Profile: FC = memo(() => {
         >
           <GridItem bg="gray" area="profile">
             <ProfileCardWrapper>
-              <UserInfoCard />
+              <UserInfoCard user={user} isLoginUser={isLoginUser} />
             </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="stats">
             <ProfileCardWrapper>
-              <StatsCard />
+              <StatsCard id={user.id} />
             </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="history">
             <ProfileCardWrapper>
-              <MatchHistoryCard />
+              <MatchHistoryCard id={user.id} />
             </ProfileCardWrapper>
           </GridItem>
         </Grid>
