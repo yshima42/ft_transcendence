@@ -10,17 +10,24 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 import { CookieOptions } from 'csurf';
 import { Response } from 'express';
+import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
+import { GetUser } from './decorator/get-user.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService
+  ) {}
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,
@@ -97,5 +104,43 @@ export class AuthController {
     res.cookie('access_token', '', this.cookieOptions);
 
     return { message: 'ok' };
+  }
+
+  @Post('2fa/generate')
+  @UseGuards(JwtAuthGuard)
+  async register(@GetUser() user: User): Promise<{ url: string }> {
+    const { otpAuthUrl } = await this.authService.generateTwoFactorAuthSecret(
+      user
+    );
+
+    return { url: otpAuthUrl };
+  }
+
+  @Get('2fa/authenticate')
+  @HttpCode(200)
+  @Redirect('http://localhost:5173/app')
+  @UseGuards(JwtAuthGuard)
+  async authenticate(
+    @GetUser() user: User,
+    @Query('twoFactorAuthCode') twoFactorAuthCode: string,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<{ url: string }> {
+    const isCodeValid = this.authService.isTwoFactorAuthCodeValid(
+      twoFactorAuthCode,
+      user
+    );
+    if (!isCodeValid) {
+      return { url: 'http://localhost:5173/' };
+    }
+
+    const { accessToken } = await this.authService.generateJwt(
+      user.id,
+      user.name,
+      true
+    );
+
+    res.cookie('access_token', accessToken, this.cookieOptions);
+
+    return { url: 'http://localhost:5173/app' };
   }
 }

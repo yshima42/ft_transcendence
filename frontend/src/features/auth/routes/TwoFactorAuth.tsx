@@ -34,7 +34,7 @@ export const TwoFactorAuth: FC = memo(() => {
             bg="teal.300"
             color="white"
             as="a"
-            href={`http://localhost:3000/2fa/authenticate?twoFactorAuthCode=${token}`}
+            href={`http://localhost:3000/auth/2fa/authenticate?twoFactorAuthCode=${token}`}
           >
             submit
           </Button>

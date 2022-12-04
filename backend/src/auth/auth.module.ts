@@ -8,18 +8,15 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FtStrategy } from './strategy/ft.strategy';
 import { JwtTwoFactorStrategy } from './strategy/jwt-two-factor.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
-import { TwoFactorAuthController } from './twoFactor/twoFactorAuth.controller';
-import { TwoFactorAuthService } from './twoFactor/twoFactorAuth.service';
 
 @Module({
   imports: [PrismaModule, JwtModule.register({}), UsersModule],
-  controllers: [AuthController, TwoFactorAuthController],
+  controllers: [AuthController],
   providers: [
     AuthService,
     JwtStrategy,
     JwtAuthGuard,
     FtStrategy,
-    TwoFactorAuthService,
     JwtTwoFactorStrategy,
   ],
   exports: [JwtStrategy, JwtAuthGuard],
