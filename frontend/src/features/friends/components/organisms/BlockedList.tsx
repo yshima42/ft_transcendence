@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useUnblock } from 'features/friends/hooks/useUnblock';
+import { useUserBlockCancel } from 'hooks/api';
 import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
@@ -12,15 +12,15 @@ type Props = {
 export const BlockedList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { unblock } = useUnblock();
+  const { cancelUserBlock } = useUserBlockCancel();
   useEffect(() => {
     setUserList(users);
   }, [users]);
 
   if (users === undefined) return <></>;
 
-  const onClickUnblock = (id: string) => {
-    unblock(id);
+  const onClickUnblock = async (id: string) => {
+    await cancelUserBlock(id);
     setUserList(userList.filter((user) => user.id !== id));
   };
 
@@ -46,8 +46,8 @@ export const BlockedList: FC<Props> = (props) => {
               <UserCardButton
                 text="UnBlock"
                 id={user.id}
-                onClick={(id) => {
-                  onClickUnblock(id);
+                onClick={async (id) => {
+                  await onClickUnblock(id);
                 }}
               />
             </>
