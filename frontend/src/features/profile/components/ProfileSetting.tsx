@@ -26,9 +26,7 @@ export const ProfileSetting: FC = memo(() => {
       const { url } = await generateQrCodeUrl({});
       setUrl(url);
     }
-    isTwoFactorEnabled
-      ? await switchTwoFactor({ isTwoFactorAuthEnabled: false })
-      : await switchTwoFactor({ isTwoFactorAuthEnabled: true });
+    await switchTwoFactor({ isTwoFactorAuthEnabled: !isTwoFactorEnabled });
     setIsTwoFactorEnabled(newIsTwoFactorEnabled);
   };
 
