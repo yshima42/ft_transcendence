@@ -13,8 +13,8 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import { useAuth } from 'features/auth/hooks/useAuth';
-import { Link } from 'react-router-dom';
+import { useLogout } from 'hooks/api';
+import { Link, useNavigate } from 'react-router-dom';
 import { LogoButton } from 'components/atoms/button/LogoButton';
 import { NavigationItem } from 'components/environments/MainLayout/MainLayout';
 
@@ -24,7 +24,14 @@ type Props = {
 
 export const SpMenu: FC<Props> = memo((props) => {
   const { items } = props;
-  const { logout } = useAuth();
+  const { logout } = useLogout();
+
+  const navigate = useNavigate();
+
+  const onClickLogout = async () => {
+    await logout({});
+    navigate('/');
+  };
 
   return (
     <>
@@ -47,7 +54,7 @@ export const SpMenu: FC<Props> = memo((props) => {
           <Link to="/app/profile">
             <MenuItem icon={<InfoOutlineIcon />}>Profile</MenuItem>
           </Link>
-          <MenuItem icon={<ArrowForwardIcon />} onClick={logout}>
+          <MenuItem icon={<ArrowForwardIcon />} onClick={onClickLogout}>
             Logout
           </MenuItem>
         </MenuList>
