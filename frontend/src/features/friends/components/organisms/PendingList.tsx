@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useCancel } from 'features/friends/hooks/useCancel';
+import { useFriendRequestCancel } from 'hooks/api';
 import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
@@ -12,15 +12,15 @@ type Props = {
 export const PendingList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { cancel } = useCancel();
+  const { cancelFriendRequest } = useFriendRequestCancel();
   useEffect(() => {
     setUserList(users);
   }, [users]);
 
   if (users === undefined) return <></>;
 
-  const onClickCancel = (id: string) => {
-    cancel(id);
+  const onClickCancel = async (id: string) => {
+    await cancelFriendRequest(id);
     setUserList(userList.filter((user) => user.id !== id));
   };
 
@@ -46,8 +46,8 @@ export const PendingList: FC<Props> = (props) => {
               <UserCardButton
                 text="Cancel"
                 id={user.id}
-                onClick={(id) => {
-                  onClickCancel(id);
+                onClick={async (id) => {
+                  await onClickCancel(id);
                 }}
               />
             </>
