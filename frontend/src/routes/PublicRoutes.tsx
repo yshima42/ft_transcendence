@@ -5,6 +5,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
+import { TwoFactorAuth } from 'features/auth/routes/TwoFactorAuth';
 import { Chats } from 'features/chat/routes/Chats';
 import { DirectMessage } from 'features/dm/routes/DirectMessage';
 import { Users } from 'features/friends/routes/Users';
@@ -37,6 +38,7 @@ export const publicRoutes = [
     path: '/',
     element: <Login />,
   },
+  { path: '/twofactor', element: <TwoFactorAuth /> },
   { path: '/app/game', element: <Game /> },
   { path: '*', element: <Page404 /> },
   {
