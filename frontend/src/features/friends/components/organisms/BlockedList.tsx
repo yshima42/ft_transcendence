@@ -35,6 +35,7 @@ export const BlockedList: FC<Props> = (props) => {
       {userList.map((user) => (
         <UserCard
           key={user.id}
+          id={user.id}
           username={user.name}
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}

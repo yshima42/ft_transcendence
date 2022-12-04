@@ -7,7 +7,7 @@ import {
   Heading,
   Text,
 } from '@chakra-ui/react';
-import { useStats } from '../hooks/useStats';
+import { useGameStats } from 'hooks/api/game/useGameStats';
 
 // const colorScaleRYG = (rate: number) => {
 //   if (rate < 50) {
@@ -21,11 +21,12 @@ import { useStats } from '../hooks/useStats';
 //   }
 // };
 
-export const StatsCard: FC = memo(() => {
-  const { stats } = useStats();
-  const { winNum, loseNum } = stats;
+type StatsCardProps = {
+  id: string;
+};
 
-  const winRate = Math.floor((winNum / (winNum + loseNum)) * 100);
+export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
+  const { gameStats } = useGameStats(id);
 
   return (
     <Flex
@@ -45,14 +46,17 @@ export const StatsCard: FC = memo(() => {
       </Flex>
       <Flex justify="center" align="center" pt="4">
         <CircularProgress
-          value={winRate}
+          value={gameStats.winRate}
           // TODO 彩度調節したい
           // color={colorScaleRYG(winRate)}
           size="200px"
         >
           <CircularProgressLabel>
-            <Text fontSize="2xl" fontWeight="bold">{`${winRate}%`}</Text>
-            <Text fontSize="sm">{`${winNum}/${winNum + loseNum}`}</Text>
+            <Text
+              fontSize="2xl"
+              fontWeight="bold"
+            >{`${gameStats.winRate}%`}</Text>
+            <Text fontSize="sm">{`${gameStats.totalWins}/${gameStats.totalMatches}`}</Text>
           </CircularProgressLabel>
         </CircularProgress>
       </Flex>

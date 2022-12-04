@@ -11,7 +11,7 @@ model User {
   id                                           String          @id
   name                                         String          @unique
   avatarImageUrl                               String
-  nickname                                     String          @unique @default("")
+  nickname                                     String          @unique
   onlineStatus                                 OnlineStatus    @default(ONLINE)
   createdAt                                    DateTime        @default(now())
   updatedAt                                    DateTime

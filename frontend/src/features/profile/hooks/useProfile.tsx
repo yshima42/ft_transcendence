@@ -9,7 +9,7 @@ export const fetchProfile = async (): Promise<User> => {
 };
 
 export const useProfile = (): { user: User } => {
-  const { data: user } = useQuery<User>(['profile'], fetchProfile);
+  const { data: user } = useQuery<User>(['users/me/profile'], fetchProfile);
 
   // TODO エラーの場合、useQuery内で例外が投げられるので、ここにはいつ入るかわかってない。
   if (user === undefined) {
