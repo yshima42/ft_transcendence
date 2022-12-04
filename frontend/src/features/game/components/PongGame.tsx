@@ -5,7 +5,7 @@ import { Canvas } from './Canvas';
 const BALL_START_X = 50;
 const BALL_START_Y = 100;
 // const BALL_SPEED = 5;
-const BALL_SPEED = 0;
+const BALL_SPEED = 5;
 const BALL_SIZE = 10;
 const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 500;
@@ -17,87 +17,107 @@ const BALL_COLOR = '#4FD1C5';
 const PADDLE_COLOR = '#4FD1C5';
 const BG_COLOR = '#1A202C';
 
+class Vector {
+  x: number;
+  y: number;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+class Ball {
+  up: boolean;
+  down: boolean;
+  pos: { x: number; y: number };
+
+  constructor(x: number, y: number) {
+    this.pos = new Vector(x, y);
+    this.up = false;
+    this.down = false;
+  }
+
+  draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.fillStyle = BALL_COLOR;
+    ctx.beginPath();
+    ctx.arc(this.pos.x, this.pos.y, BALL_SIZE, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.closePath();
+  };
+}
+
+class Paddle {
+  up: boolean;
+  down: boolean;
+  pos: { x: number; y: number };
+
+  constructor(x: number, y: number) {
+    this.pos = new Vector(x, y);
+    this.up = false;
+    this.down = false;
+  }
+
+  draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+    if (this.down) {
+      this.pos.y += PADDLE_SPEED;
+      if (this.pos.y + PADDLE_HEIGHT > ctx.canvas.height) {
+        this.pos.y = ctx.canvas.height - PADDLE_HEIGHT;
+      }
+    } else if (this.up) {
+      this.pos.y -= PADDLE_SPEED;
+      if (this.pos.y < 0) {
+        this.pos.y = 0;
+      }
+    }
+    ctx.rect(this.pos.x, this.pos.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+    ctx.fillStyle = PADDLE_COLOR;
+    ctx.fill();
+    ctx.closePath();
+  };
+}
+
 export const PongGame: FC = memo(() => {
-  let ballX = BALL_START_X;
-  let ballY = BALL_START_Y;
   let dX = BALL_SPEED;
   let dY = -BALL_SPEED;
-  const ballRadius = BALL_SIZE;
-  const paddleHeight = PADDLE_HEIGHT;
-  const paddleWidth = PADDLE_WIDTH;
-  let downPressed = false;
-  let upPressed = false;
+  const paddle1 = new Paddle(0, PADDLE_START_POS);
+  const paddle2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
+  const ball = new Ball(BALL_START_X, BALL_START_Y);
 
   // const { player, setPlayer } = useContext(gameContext);
 
-  const keyDownHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Down' || e.key === 'ArrowDown') {
-      downPressed = true;
-    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      upPressed = true;
-    }
-  };
+  // const canvas = document.getElementById('canvas') as HTMLElement;
 
-  const keyUpHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Down' || e.key === 'ArrowDown') {
-      downPressed = false;
-    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      upPressed = false;
-    }
-  };
+  const userInput = (obj: Paddle) => {
+    document.addEventListener(
+      'keydown',
+      (e: KeyboardEvent) => {
+        if (e.key === 'Down' || e.key === 'ArrowDown') {
+          obj.down = true;
+        } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+          obj.up = true;
+        }
+      },
+      false
+    );
 
-  document.addEventListener('keydown', keyDownHandler, false);
-  document.addEventListener('keyup', keyUpHandler, false);
-
-  const drawBall = (ctx: CanvasRenderingContext2D) => {
-    ctx.fillStyle = BALL_COLOR;
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
-    ctx.fill();
-  };
-
-  let paddle1Y = PADDLE_START_POS;
-  const drawPaddle1 = (ctx: CanvasRenderingContext2D) => {
-    ctx.beginPath();
-
-    if (downPressed) {
-      paddle1Y += PADDLE_SPEED;
-      if (paddle1Y + paddleHeight > ctx.canvas.height) {
-        paddle1Y = ctx.canvas.height - paddleHeight;
-      }
-    } else if (upPressed) {
-      paddle1Y -= PADDLE_SPEED;
-      if (paddle1Y < 0) {
-        paddle1Y = 0;
-      }
-    }
-
-    ctx.rect(0, paddle1Y, paddleWidth, paddleHeight);
-    ctx.fillStyle = PADDLE_COLOR;
-    ctx.fill();
-    ctx.closePath();
-  };
-
-  let paddle2Y = PADDLE_START_POS;
-  const drawPaddle2 = (ctx: CanvasRenderingContext2D) => {
-    ctx.beginPath();
-
-    if (downPressed) {
-      paddle2Y += PADDLE_SPEED;
-      if (paddle2Y + paddleHeight > ctx.canvas.height) {
-        paddle2Y = ctx.canvas.height - paddleHeight;
-      }
-    } else if (upPressed) {
-      paddle2Y -= PADDLE_SPEED;
-      if (paddle2Y < 0) {
-        paddle2Y = 0;
-      }
-    }
-
-    ctx.rect(CANVAS_WIDTH - PADDLE_WIDTH, paddle2Y, paddleWidth, paddleHeight);
-    ctx.fillStyle = PADDLE_COLOR;
-    ctx.fill();
-    ctx.closePath();
+    document.addEventListener(
+      'keyup',
+      (e: KeyboardEvent) => {
+        if (e.key === 'Down' || e.key === 'ArrowDown') {
+          obj.down = false;
+        } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+          obj.up = false;
+        }
+      },
+      false
+    );
   };
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
@@ -105,15 +125,20 @@ export const PongGame: FC = memo(() => {
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    drawBall(ctx);
-    drawPaddle1(ctx);
-    drawPaddle2(ctx);
+    paddle1.draw(ctx);
+    paddle2.draw(ctx);
+    ball.draw(ctx);
+
+    userInput(paddle1);
 
     // パドルで跳ね返る処理・ゲームオーバー処理
-    if (ballX + dX > ctx.canvas.width - ballRadius) {
+    if (ball.pos.x + dX > ctx.canvas.width - BALL_SIZE) {
       dX = -dX;
-    } else if (ballX + dX < ballRadius) {
-      if (ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
+    } else if (ball.pos.x + dX < BALL_SIZE) {
+      if (
+        ball.pos.y > paddle1.pos.y &&
+        ball.pos.y < paddle1.pos.y + PADDLE_HEIGHT
+      ) {
         dX = -dX;
       } else {
         console.log('Game Over');
@@ -122,17 +147,17 @@ export const PongGame: FC = memo(() => {
       }
     }
 
-    // 上下の壁で跳ね返る処理
+    // // 上下の壁で跳ね返る処理
     if (
-      ballY + dY > ctx.canvas.height - ballRadius ||
-      ballY + dY < ballRadius
+      ball.pos.y + dY > ctx.canvas.height - BALL_SIZE ||
+      ball.pos.y + dY < BALL_SIZE
     ) {
       dY = -dY;
     }
 
-    // frameごとに進む
-    ballX += dX;
-    ballY += dY;
+    // // frameごとに進む
+    ball.pos.x += dX;
+    ball.pos.y += dY;
   }, []);
 
   return <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />;
