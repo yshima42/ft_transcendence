@@ -14,14 +14,14 @@ export const useTwoFactor = (): {
 
   const turnOn = useCallback(async () => {
     await axios
-      .post('/users/me/profile', { isTwoFactorAuthEnabled: true })
+      .post('/auth/2fa/update', { isTwoFactorAuthEnabled: true })
       .catch(() => navigate('/', { replace: true }));
     console.log('ok');
   }, []);
 
   const turnOff = useCallback(async () => {
     await axios
-      .post('/users/me/profile', { isTwoFactorAuthEnabled: false })
+      .post('/auth/2fa/update', { isTwoFactorAuthEnabled: false })
       .catch(() => navigate('/', { replace: true }));
     console.log('ok');
   }, []);
