@@ -1,4 +1,6 @@
 import { memo, FC, useCallback } from 'react';
+import { SOCKET_URL } from 'config/default';
+import { io } from 'socket.io-client';
 import { Canvas } from './Canvas';
 
 // TODO: これらを設定などで変えられる機能を作る
@@ -83,6 +85,34 @@ class Paddle {
   };
 }
 
+const userInput = (obj: Paddle) => {
+  document.addEventListener(
+    'keydown',
+    (e: KeyboardEvent) => {
+      if (e.key === 'Down' || e.key === 'ArrowDown') {
+        obj.down = true;
+      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+        obj.up = true;
+      }
+    },
+    false
+  );
+
+  document.addEventListener(
+    'keyup',
+    (e: KeyboardEvent) => {
+      if (e.key === 'Down' || e.key === 'ArrowDown') {
+        obj.down = false;
+      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+        obj.up = false;
+      }
+    },
+    false
+  );
+};
+
+const socket = io(SOCKET_URL);
+
 export const PongGame: FC = memo(() => {
   let dX = BALL_SPEED;
   let dY = -BALL_SPEED;
@@ -90,35 +120,11 @@ export const PongGame: FC = memo(() => {
   const paddle2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
+  socket.emit('newPlayer', 'hi');
+
   // const { player, setPlayer } = useContext(gameContext);
 
   // const canvas = document.getElementById('canvas') as HTMLElement;
-
-  const userInput = (obj: Paddle) => {
-    document.addEventListener(
-      'keydown',
-      (e: KeyboardEvent) => {
-        if (e.key === 'Down' || e.key === 'ArrowDown') {
-          obj.down = true;
-        } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-          obj.up = true;
-        }
-      },
-      false
-    );
-
-    document.addEventListener(
-      'keyup',
-      (e: KeyboardEvent) => {
-        if (e.key === 'Down' || e.key === 'ArrowDown') {
-          obj.down = false;
-        } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-          obj.up = false;
-        }
-      },
-      false
-    );
-  };
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -158,6 +164,8 @@ export const PongGame: FC = memo(() => {
     // // frameごとに進む
     ball.pos.x += dX;
     ball.pos.y += dY;
+
+    // socket.emit('update', { x: paddle1.pos.x, y: paddle1.pos.y });
   }, []);
 
   return <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />;
