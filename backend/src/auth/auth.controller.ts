@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   HttpCode,
@@ -8,19 +7,31 @@ import {
   UseGuards,
   Res,
   Redirect,
+  Query,
+  Body,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 import { CookieOptions } from 'csurf';
 import { Response } from 'express';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { UserDto } from 'src/users/dto/user.dto';
+import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
+import { GetUser } from './decorator/get-user.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtTwoFactorAuthGuard } from './guards/jwt-two-factor-auth.guard';
 import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService
+  ) {}
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,
@@ -40,20 +51,30 @@ export class AuthController {
   async ftOauthCallback(
     @GetFtProfile() ftProfile: FtProfile,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ message: string }> {
+  ): Promise<{ url: string }> {
     const name = ftProfile.intraName;
-    const signupUser = { name, avatarImageUrl: ftProfile.imageUrl };
-    const { accessToken } = await this.authService.login(name, signupUser);
+    const signupUser = {
+      name,
+      nickname: name,
+      avatarImageUrl: ftProfile.imageUrl,
+    };
+    const { accessToken, isTwoFactorAuthEnabled } =
+      await this.authService.login(name, signupUser);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
 
-    return { message: 'ok' };
+    if (isTwoFactorAuthEnabled) {
+      return { url: 'http://localhost:5173/twofactor' };
+    } else {
+      return { url: 'http://localhost:5173/app' };
+    }
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('login/dummy')
+  @Get('login/dummy')
+  @Redirect('http://localhost:5173/app')
   @ApiOperation({
     summary: 'seedで作ったdummy1~5のaccess_tokenを取得(ログイン)',
   })
@@ -70,13 +91,18 @@ export class AuthController {
     },
   })
   async dummyLogin(
-    @Body('name') name: string,
+    @Query('name') name: string,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ message: string }> {
-    const { accessToken } = await this.authService.login(name);
+  ): Promise<{ url: string }> {
+    const { accessToken, isTwoFactorAuthEnabled } =
+      await this.authService.login(name);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return { message: 'ok' };
+    if (isTwoFactorAuthEnabled) {
+      return { url: 'http://localhost:5173/twofactor' };
+    } else {
+      return { url: 'http://localhost:5173/app' };
+    }
   }
 
   @HttpCode(HttpStatus.OK)
@@ -86,5 +112,61 @@ export class AuthController {
     res.cookie('access_token', '', this.cookieOptions);
 
     return { message: 'ok' };
+  }
+
+  @Get('2fa/generate')
+  @UseGuards(JwtTwoFactorAuthGuard)
+  async register(@GetUser() user: User): Promise<{ url: string }> {
+    const { otpAuthUrl } = await this.authService.generateTwoFactorAuthSecret(
+      user
+    );
+
+    return { url: otpAuthUrl };
+  }
+
+  @Post('2fa/update')
+  @UseGuards(JwtTwoFactorAuthGuard)
+  async isTwoFactorAuthEnabledUpdate(
+    @GetUser() user: User,
+    @Body() updateUserDto: UpdateUserDto,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<UserDto> {
+    const { accessToken } = await this.authService.generateJwt(
+      user.id,
+      user.name,
+      updateUserDto.isTwoFactorAuthEnabled
+    );
+
+    res.cookie('access_token', accessToken, this.cookieOptions);
+
+    return await this.usersService.update(user.id, updateUserDto);
+  }
+
+  @Get('2fa/authenticate')
+  @HttpCode(200)
+  @Redirect('http://localhost:5173/app')
+  @UseGuards(JwtAuthGuard)
+  async authenticate(
+    @GetUser() user: User,
+    @Query('twoFactorAuthCode') twoFactorAuthCode: string,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<{ url: string }> {
+    const isCodeValid = this.authService.isTwoFactorAuthCodeValid(
+      twoFactorAuthCode,
+      user
+    );
+    if (!isCodeValid) {
+      return { url: 'http://localhost:5173/' };
+    }
+
+    const { accessToken } = await this.authService.generateJwt(
+      user.id,
+      user.name,
+      true
+    );
+
+    res.cookie('access_token', accessToken, this.cookieOptions);
+
+    return { url: 'http://localhost:5173/app' };
   }
 }
