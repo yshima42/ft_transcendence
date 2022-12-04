@@ -1,4 +1,4 @@
-import { FC, FormEvent, memo, useContext, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, memo, useContext, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import gameContext from './gameContext';
 import gameService from './gameService';
@@ -12,10 +12,10 @@ export const JoinRoom: FC = memo(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setInRoom, isInRoom } = useContext(gameContext);
 
-  // const handleRoomNameChange = (e: ChangeEvent) => {
-  //   const value = e.target.value;
-  //   setRoomName(value);
-  // };
+  const handleRoomNameChange = (e: ChangeEvent) => {
+    const value = (e.target as HTMLInputElement).value;
+    setRoomName(value);
+  };
 
   const joinRoom = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,9 +25,10 @@ export const JoinRoom: FC = memo(() => {
     setJoining(true);
 
     const joined = await gameService
+      // TODO: catchの(e: { error: string })はこの書き方で良いのか確認
       .joinGameRoom(socket, roomName)
-      .catch((err) => {
-        alert(err);
+      .catch((e: { error: string }) => {
+        alert(e.error);
       });
 
     if (joined === true) setInRoom(true);
@@ -41,7 +42,7 @@ export const JoinRoom: FC = memo(() => {
       <input
         placeholder="Room ID"
         value={roomName}
-        // onChange={handleRoomNameChange}
+        onChange={handleRoomNameChange}
       />
       <Button type="submit" disabled={isJoining}>
         {isJoining ? 'Joining...' : 'Join'}
