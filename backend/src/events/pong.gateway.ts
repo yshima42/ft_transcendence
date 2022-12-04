@@ -11,7 +11,7 @@ import { Socket, Server } from 'socket.io';
 // const games: Socket[] = [];
 
 type Players = {
-  [key: string]: string;
+  [key: string]: { x: number; y: number };
 };
 
 const players: Players = {};
@@ -25,18 +25,23 @@ export class PongGateway {
 
   @SubscribeMessage('newPlayer')
   handleNewPlayer(
-    @MessageBody() data: string,
+    @MessageBody() pos: { x: number; y: number },
     @ConnectedSocket() socket: Socket
   ): void {
     console.log(`new client: ${socket.id}`);
-    players[socket.id] = data;
+    players[socket.id] = pos;
+    socket.emit('updatePlayers', players);
   }
 
   @SubscribeMessage('disconnect')
-  handleDisconnect(@ConnectedSocket() socket: Socket): void {
+  handleDisconnect(
+    @ConnectedSocket() socket: Socket
+    // @MessageBody() pos: { x: number; y: number }
+  ): void {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete players[socket.id];
-    console.log(`good-bye client: ${socket.id}`);
+    console.log(`good-bey: ${socket.id}`);
+    socket.emit('updatePlayers', players);
   }
 
   // @SubscribeMessage('events')
