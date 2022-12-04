@@ -1,6 +1,9 @@
 import { memo, FC, useState } from 'react';
 import { Box, Divider, Flex, Heading, Spinner, Stack } from '@chakra-ui/react';
+// import { useEffect } from '@storybook/addons';
+// import { SOCKET_URL } from 'config/default';
 import { useNavigate } from 'react-router-dom';
+// import { io, Socket } from 'socket.io-client';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 

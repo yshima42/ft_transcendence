@@ -1,10 +1,11 @@
 import { memo, FC, useCallback } from 'react';
 import { Canvas } from './Canvas';
 
-// ToDo: これらを設定などで変えられる機能を作る
+// TODO: これらを設定などで変えられる機能を作る
 const BALL_START_X = 50;
 const BALL_START_Y = 100;
-const BALL_SPEED = 5;
+// const BALL_SPEED = 5;
+const BALL_SPEED = 0;
 const BALL_SIZE = 10;
 const CANVAS_WIDTH = 1000;
 const CANVAS_HEIGHT = 500;
@@ -53,23 +54,45 @@ export const PongGame: FC = memo(() => {
     ctx.fill();
   };
 
-  let paddleY = PADDLE_START_POS;
-  const drawPaddle = (ctx: CanvasRenderingContext2D) => {
+  let paddle1Y = PADDLE_START_POS;
+  const drawPaddle1 = (ctx: CanvasRenderingContext2D) => {
     ctx.beginPath();
 
     if (downPressed) {
-      paddleY += PADDLE_SPEED;
-      if (paddleY + paddleHeight > ctx.canvas.height) {
-        paddleY = ctx.canvas.height - paddleHeight;
+      paddle1Y += PADDLE_SPEED;
+      if (paddle1Y + paddleHeight > ctx.canvas.height) {
+        paddle1Y = ctx.canvas.height - paddleHeight;
       }
     } else if (upPressed) {
-      paddleY -= PADDLE_SPEED;
-      if (paddleY < 0) {
-        paddleY = 0;
+      paddle1Y -= PADDLE_SPEED;
+      if (paddle1Y < 0) {
+        paddle1Y = 0;
       }
     }
 
-    ctx.rect(0, paddleY, paddleWidth, paddleHeight);
+    ctx.rect(0, paddle1Y, paddleWidth, paddleHeight);
+    ctx.fillStyle = PADDLE_COLOR;
+    ctx.fill();
+    ctx.closePath();
+  };
+
+  let paddle2Y = PADDLE_START_POS;
+  const drawPaddle2 = (ctx: CanvasRenderingContext2D) => {
+    ctx.beginPath();
+
+    if (downPressed) {
+      paddle2Y += PADDLE_SPEED;
+      if (paddle2Y + paddleHeight > ctx.canvas.height) {
+        paddle2Y = ctx.canvas.height - paddleHeight;
+      }
+    } else if (upPressed) {
+      paddle2Y -= PADDLE_SPEED;
+      if (paddle2Y < 0) {
+        paddle2Y = 0;
+      }
+    }
+
+    ctx.rect(CANVAS_WIDTH - PADDLE_WIDTH, paddle2Y, paddleWidth, paddleHeight);
     ctx.fillStyle = PADDLE_COLOR;
     ctx.fill();
     ctx.closePath();
@@ -81,13 +104,14 @@ export const PongGame: FC = memo(() => {
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     drawBall(ctx);
-    drawPaddle(ctx);
+    drawPaddle1(ctx);
+    drawPaddle2(ctx);
 
     // パドルで跳ね返る処理・ゲームオーバー処理
     if (ballX + dX > ctx.canvas.width - ballRadius) {
       dX = -dX;
     } else if (ballX + dX < ballRadius) {
-      if (ballY > paddleY && ballY < paddleY + paddleHeight) {
+      if (ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
         dX = -dX;
       } else {
         console.log('Game Over');
