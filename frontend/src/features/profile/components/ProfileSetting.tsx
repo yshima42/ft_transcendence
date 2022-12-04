@@ -2,24 +2,33 @@ import { memo, FC, useState } from 'react';
 import { Button, Flex, Spacer, Text } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
 
+import { useQrCodeUrl } from 'hooks/api/auth/useQrCodeUrl';
+import { useTwoFactorSwitch } from 'hooks/api/auth/useTwoFactorSwitch';
 import { useQRCode } from 'next-qrcode';
 import { useNavigate } from 'react-router-dom';
-import { useTwoFactor } from '../hooks/useTwoFactor';
 
 export const ProfileSetting: FC = memo(() => {
   const { user } = useProfile();
   const { Canvas } = useQRCode();
-  const { turnOn, turnOff, getQrcodeUrl, qrcodeUrl } = useTwoFactor();
+  const { switchTwoFactor } = useTwoFactorSwitch();
+  const { generateQrCodeUrl } = useQrCodeUrl();
   const navigate = useNavigate();
 
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState<boolean>(
     user.isTwoFactorAuthEnabled
   );
 
+  const [url, setUrl] = useState('');
+
   const onClickSwitchButton = async () => {
     const newIsTwoFactorEnabled = !isTwoFactorEnabled;
-    if (newIsTwoFactorEnabled) await getQrcodeUrl();
-    isTwoFactorEnabled ? await turnOff() : await turnOn();
+    if (newIsTwoFactorEnabled) {
+      const { url } = await generateQrCodeUrl({});
+      setUrl(url);
+    }
+    isTwoFactorEnabled
+      ? await switchTwoFactor({ isTwoFactorAuthEnabled: false })
+      : await switchTwoFactor({ isTwoFactorAuthEnabled: true });
     setIsTwoFactorEnabled(newIsTwoFactorEnabled);
   };
 
@@ -45,9 +54,9 @@ export const ProfileSetting: FC = memo(() => {
         )}
       </Flex>
       <Spacer />
-      {isTwoFactorEnabled && qrcodeUrl !== '' ? (
+      {isTwoFactorEnabled && url !== '' ? (
         <Canvas
-          text={qrcodeUrl}
+          text={url}
           options={{
             level: 'M',
             margin: 3,
