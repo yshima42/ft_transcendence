@@ -6,8 +6,8 @@ import io from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { JoinRoom } from '../components/JoinRoom';
 import { PongGame } from '../components/PongGame';
-import GameContext, { GameContextProps } from '../components/gameContext';
-import socketService from '../components/socketService';
+import GameContext, { GameContextProps } from '../utils/gameContext';
+import socketService from '../utils/socketService';
 // import { Game } from './Game';
 
 // const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
@@ -50,8 +50,8 @@ export const GameTop: FC = memo(() => {
   const [player, setPlayer] = useState<'one' | 'two'>('one');
 
   const connectSocket = async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const socket = await socketService.connect(SOCKET_URL).catch((err) => {
+    // youtubeではconst socketにしてたけど必要ない?
+    await socketService.connect(SOCKET_URL).catch((err) => {
       console.log('Error: ', err);
     });
   };

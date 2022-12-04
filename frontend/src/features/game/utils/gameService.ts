@@ -8,6 +8,14 @@ class GameService {
       socket.on('roomJoinError', (error) => reject(error));
     });
   }
+
+  // public async updateGame(socket: Socket) {
+  //   socket.emit('update');
+  // }
+
+  // public onGameUpdate(socket: Socket, listener: (matrix: string) => void) {
+  //   socket.on('onGameUpdate', ({ matrix }) => listener(matrix));
+  // }
 }
 
 export default new GameService();

@@ -1,8 +1,8 @@
 import { ChangeEvent, FC, FormEvent, memo, useContext, useState } from 'react';
 import { Button } from '@chakra-ui/react';
-import gameContext from './gameContext';
-import gameService from './gameService';
-import socketService from './socketService';
+import gameContext from '../utils/gameContext';
+import gameService from '../utils/gameService';
+import socketService from '../utils/socketService';
 
 export const JoinRoom: FC = memo(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,8 +25,8 @@ export const JoinRoom: FC = memo(() => {
     setJoining(true);
 
     const joined = await gameService
-      // TODO: catchの(e: { error: string })はこの書き方で良いのか確認
       .joinGameRoom(socket, roomName)
+      // TODO: catchの(e: { error: string })はこの書き方で良いのか確認
       .catch((e: { error: string }) => {
         alert(e.error);
       });

@@ -28,6 +28,8 @@ export const PongGame: FC = memo(() => {
   let downPressed = false;
   let upPressed = false;
 
+  // const { player, setPlayer } = useContext(gameContext);
+
   const keyDownHandler = (e: KeyboardEvent) => {
     if (e.key === 'Down' || e.key === 'ArrowDown') {
       downPressed = true;

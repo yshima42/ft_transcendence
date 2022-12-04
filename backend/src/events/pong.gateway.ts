@@ -65,6 +65,16 @@ export class PongGateway {
     return gameRoom;
   }
 
+  @SubscribeMessage('update')
+  handleUpdate(
+    @MessageBody() message: string,
+    @ConnectedSocket() socket: Socket
+  ): void {
+    const gameRoom = this.getSocketGameRoom(socket);
+    console.log(message);
+    socket.to(gameRoom).emit('onGameUpdate', message);
+  }
+
   // @SubscribeMessage('events')
   // handleEvent(@MessageBody() message: string): void {
   //   this.server.emit('events', message);
