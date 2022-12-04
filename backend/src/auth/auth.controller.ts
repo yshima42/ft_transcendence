@@ -8,6 +8,7 @@ import {
   Res,
   Redirect,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
@@ -19,6 +20,7 @@ import { GetFtProfile } from './decorator/get-ft-profile.decorator';
 import { GetUser } from './decorator/get-user.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtTwoFactorAuthGuard } from './guards/jwt-two-factor-auth.guard';
 import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
@@ -111,8 +113,12 @@ export class AuthController {
   }
 
   @Post('2fa/generate')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtTwoFactorAuthGuard)
   async register(@GetUser() user: User): Promise<{ url: string }> {
+    if (!user.isTwoFactorAuthEnabled) {
+      console.log('kamei');
+      throw new UnauthorizedException();
+    }
     const { otpAuthUrl } = await this.authService.generateTwoFactorAuthSecret(
       user
     );

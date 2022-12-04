@@ -18,8 +18,9 @@ export const ProfileSetting: FC = memo(() => {
 
   const onClickSwitchButton = () => {
     isTwoFactorEnabled ? turnOff() : turnOn();
-    setIsTwoFactorEnabled(!isTwoFactorEnabled);
-    if (!isTwoFactorEnabled) getQrcodeUrl();
+    const newIsTwoFactorEnabled = !isTwoFactorEnabled;
+    setIsTwoFactorEnabled(newIsTwoFactorEnabled);
+    if (newIsTwoFactorEnabled) getQrcodeUrl();
   };
 
   return (
