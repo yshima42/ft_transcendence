@@ -8,7 +8,6 @@ import {
   Res,
   Redirect,
   Query,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
@@ -112,13 +111,9 @@ export class AuthController {
     return { message: 'ok' };
   }
 
-  @Post('2fa/generate')
+  @Get('2fa/generate')
   @UseGuards(JwtTwoFactorAuthGuard)
   async register(@GetUser() user: User): Promise<{ url: string }> {
-    if (!user.isTwoFactorAuthEnabled) {
-      console.log('kamei');
-      throw new UnauthorizedException();
-    }
     const { otpAuthUrl } = await this.authService.generateTwoFactorAuthSecret(
       user
     );
