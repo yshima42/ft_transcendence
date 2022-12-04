@@ -30,23 +30,15 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
   async validate(payload: {
     id: string;
     name: string;
-    isTwoFactorAuthenticated: boolean;
+    isOtpValid: boolean;
   }): Promise<{ user: User }> {
-    const { id, isTwoFactorAuthenticated } = payload;
+    const { id, isOtpValid } = payload;
     const user = await this.prismaService.user.findUnique({ where: { id } });
 
-    if (user === null) {
+    if (user === null || (user.isTwoFactorAuthEnabled && !isOtpValid)) {
       throw new UnauthorizedException();
     }
 
-    if (!user.isTwoFactorAuthEnabled) {
-      return { user };
-    }
-
-    if (isTwoFactorAuthenticated) {
-      return { user };
-    }
-
-    throw new UnauthorizedException();
+    return { user };
   }
 }
