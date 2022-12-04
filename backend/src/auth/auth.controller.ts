@@ -8,11 +8,14 @@ import {
   Res,
   Redirect,
   Query,
+  Body,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { CookieOptions } from 'csurf';
 import { Response } from 'express';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
@@ -119,6 +122,24 @@ export class AuthController {
     );
 
     return { url: otpAuthUrl };
+  }
+
+  @Post('2fa/update')
+  @UseGuards(JwtTwoFactorAuthGuard)
+  async isTwoFactorAuthEnabledUpdate(
+    @GetUser() user: User,
+    @Body() updateUserDto: UpdateUserDto,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<UserDto> {
+    const { accessToken } = await this.authService.generateJwt(
+      user.id,
+      user.name,
+      updateUserDto.isTwoFactorAuthEnabled
+    );
+
+    res.cookie('access_token', accessToken, this.cookieOptions);
+
+    return await this.usersService.update(user.id, updateUserDto);
   }
 
   @Get('2fa/authenticate')
