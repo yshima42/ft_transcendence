@@ -1,17 +1,27 @@
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from '@tanstack/react-query';
-import { useGetApi } from '../generics/useGetApi';
+import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { usePostApi } from '../generics/usePostApi';
+
+export type QrCodeUrlReqBody = Record<string, never>;
+
+export interface QrCodeUrlResBody {
+  url: string;
+}
+
+export type GenerateQrCodeUrl = UseMutateAsyncFunction<
+  QrCodeUrlResBody,
+  unknown,
+  QrCodeUrlReqBody,
+  unknown
+>;
 
 export const useQrCodeUrl = (): {
-  url: string;
-  refetchQrCodeUrl: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<{ url: string }, unknown>>;
+  generateQrCodeUrl: GenerateQrCodeUrl;
+  isLoading: boolean;
 } => {
-  const { data, refetch } = useGetApi<{ url: string }>('/auth/2fa/generate');
+  const { postFunc: generateQrCodeUrl, isLoading } = usePostApi<
+    QrCodeUrlReqBody,
+    QrCodeUrlResBody
+  >('/auth/2fa/generate');
 
-  return { url: data.url, refetchQrCodeUrl: refetch };
+  return { generateQrCodeUrl, isLoading };
 };
