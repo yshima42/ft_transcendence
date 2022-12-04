@@ -32,9 +32,9 @@ model User {
   id                     String       @id @default(uuid())
   name                   String       @unique
   avatarImageUrl         String
-  nickname               String       @unique @default("")
-  twoFactorAuthSecret    String?
+  nickname               String       @unique
   isTwoFactorAuthEnabled Boolean      @default(false)
+  twoFactorAuthSecret    String?
   onlineStatus           OnlineStatus @default(ONLINE)
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt
