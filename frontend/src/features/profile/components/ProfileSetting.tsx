@@ -16,11 +16,11 @@ export const ProfileSetting: FC = memo(() => {
     user.isTwoFactorAuthEnabled
   );
 
-  const onClickSwitchButton = () => {
-    isTwoFactorEnabled ? turnOff() : turnOn();
+  const onClickSwitchButton = async () => {
     const newIsTwoFactorEnabled = !isTwoFactorEnabled;
+    if (newIsTwoFactorEnabled) await getQrcodeUrl();
+    isTwoFactorEnabled ? await turnOff() : await turnOn();
     setIsTwoFactorEnabled(newIsTwoFactorEnabled);
-    if (newIsTwoFactorEnabled) getQrcodeUrl();
   };
 
   return (
