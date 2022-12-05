@@ -26,6 +26,7 @@
     "prepare": "npx simple-git-hooks || :",
     "migrate:dev": "dotenv -e .env.development -- yarn prisma migrate dev",
     "migrate:reset": "dotenv -e .env.development -- yarn prisma migrate reset",
+    "migrate:clear": "dotenv -e .env.development -- yarn prisma migrate reset --skip-seed",
     "setup:dev": "yarn install && yarn prisma generate && yarn migrate:reset -f"
   },
   "dependencies": {
@@ -44,8 +45,10 @@
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",
+    "otplib": "^12.0.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
+    "qrcode": "^1.5.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.7",
@@ -68,6 +71,7 @@
     "@types/passport": "^1.0.11",
     "@types/passport-jwt": "^3.0.7",
     "@types/prettier": "^2.7.1",
+    "@types/qrcode": "^1.5.0",
     "@types/rimraf": "^3.0.2",
     "@types/socket.io": "^3.0.2",
     "@types/source-map-support": "^0.5.6",

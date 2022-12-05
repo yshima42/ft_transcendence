@@ -1,4 +1,15 @@
+import { Prisma } from '@prisma/client';
+
 export interface GameStats {
-  winNum: number;
-  loseNum: number;
+  totalMatches: number;
+  totalWins: number;
+  totalLoses: number;
+  winRate: number;
 }
+
+export type MatchResultWithPlayers = Prisma.MatchResultGetPayload<{
+  include: {
+    playerOne: true;
+    playerTwo: true;
+  };
+}>;
