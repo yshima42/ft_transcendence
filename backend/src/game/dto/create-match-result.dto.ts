@@ -2,8 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsUUID, Max, Min } from 'class-validator';
 
-// あとでcreateMatchResultDtoにしたい
-export class MatchResultDto {
+export class CreateMatchResultDto {
   @IsUUID()
   @ApiProperty({ default: '21514d8b-e6af-490c-bc51-d0c7a359a267' })
   playerOneId!: string;
