@@ -21,7 +21,7 @@ docker-compose -f backend/docker-compose.yml up -d
 echo "${GREEN}Executing backend setup...${RESET}"
 # .envファイルがない場合は警告して終了
 if [ ! -f backend/.env ]; then
-  echo -e "${RED}No .env file${RESET}"
+  echo -e "${RED}No .env file ｡ﾟ(ﾟ´Д｀ﾟ)ﾟ｡${RESET}"
   exit 1
 fi
 rm -rf "backend/prisma/migrations"
@@ -33,7 +33,7 @@ yarn --cwd backend prisma db seed
 # frontend
 echo "${GREEN}Executing frontend setup...${RESET}"
 if [ ! -f frontend/.env ]; then
-  echo -e "${RED}No .env file${RESET}"
+  echo -e "${RED}No .env file ｡ﾟ(ﾟ´Д｀ﾟ)ﾟ｡${RESET}"
   exit 1
 fi
 yarn --cwd frontend install
