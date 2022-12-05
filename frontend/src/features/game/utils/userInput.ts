@@ -3,17 +3,28 @@ import { io } from 'socket.io-client';
 import { Paddle } from './objs';
 
 const socket = io(SOCKET_URL);
+// emitの回数を減らすため
+let justPressed = false;
 
 export const userInput = (obj: Paddle): void => {
   document.addEventListener(
     'keydown',
     (e: KeyboardEvent) => {
       if (e.key === 'Down' || e.key === 'ArrowDown') {
+        if (!obj.down) {
+          justPressed = true;
+        }
         obj.down = true;
       } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+        if (!obj.up) {
+          justPressed = true;
+        }
         obj.up = true;
       }
-      emitUserCommands(obj);
+      if (justPressed) {
+        emitUserCommands(obj);
+        justPressed = false;
+      }
     },
     false
   );
@@ -26,7 +37,9 @@ export const userInput = (obj: Paddle): void => {
       } else if (e.key === 'Up' || e.key === 'ArrowUp') {
         obj.up = false;
       }
-      emitUserCommands(obj);
+      if (justPressed) {
+        emitUserCommands(obj);
+      }
     },
     false
   );
