@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useRequest } from 'features/friends/hooks/useRequest';
+import { useFriendRequest } from 'hooks/api';
 import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
@@ -16,10 +16,12 @@ export const RequestableUsersList: FC<Props> = (props) => {
     setUserList(users);
   }, [users]);
 
-  const { request } = useRequest();
+  const { requestFriend } = useFriendRequest();
   if (users === undefined) return <></>;
-  const onClickRequest = (id: string) => {
-    request(id);
+  const onClickRequest = async (id: string) => {
+    await requestFriend({
+      receiverId: id,
+    });
     setUserList(userList.filter((user) => user.id !== id));
   };
 
@@ -34,6 +36,7 @@ export const RequestableUsersList: FC<Props> = (props) => {
       {userList.map((user) => (
         <UserCard
           key={user.id}
+          id={user.id}
           username={user.name}
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}
@@ -44,8 +47,8 @@ export const RequestableUsersList: FC<Props> = (props) => {
               <UserCardButton
                 text="Request"
                 id={user.id}
-                onClick={(id) => {
-                  onClickRequest(id);
+                onClick={async (id) => {
+                  await onClickRequest(id);
                 }}
               />
             </>

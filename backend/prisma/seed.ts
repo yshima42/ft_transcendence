@@ -9,6 +9,7 @@ import {
   DmRoom,
   DmUser,
   DmMessage,
+  MatchResult,
 } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -43,6 +44,8 @@ idMap.forEach((value, key) => {
     avatarImageUrl:
       'https://placehold.jp/2b52ee/ffffff/150x150.png?text=' + key,
     nickname: 'nickname' + key,
+    twoFactorAuthSecret: '',
+    isTwoFactorAuthEnabled: false,
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -202,6 +205,55 @@ for (let i = 0; i < 1; i++) {
   }
 }
 
+const GAMEWINSCORE = 5;
+const getLoserScore = () => {
+  return Math.floor(Math.random() * (GAMEWINSCORE - 1));
+};
+
+const matchScoreData: Array<[number, number]> = [];
+for (let i = 0; i < 30; i++) {
+  const matchScore: [number, number] =
+    Math.random() > 0.5
+      ? [GAMEWINSCORE, getLoserScore()]
+      : [getLoserScore(), GAMEWINSCORE];
+  matchScoreData.push(matchScore);
+}
+
+const matchResultData: MatchResult[] = [];
+for (let i = 0; i < 30; i++) {
+  const playerOneId = idMap.get('dummy1');
+  const playerTwoId = idMap.get('dummy' + (i + 1).toString());
+  if (playerOneId !== undefined && playerTwoId !== undefined) {
+    matchResultData.push({
+      id: uuidv4(),
+      playerOneId,
+      playerTwoId,
+      userScore: matchScoreData[i][0],
+      opponentScore: matchScoreData[i][1],
+      win: matchScoreData[i][0] > matchScoreData[i][1],
+      startedAt: new Date(),
+      finishededAt: new Date(),
+    });
+  }
+}
+
+for (let i = 0; i < 30; i++) {
+  const playerOneId = idMap.get('dummy' + (i + 1).toString());
+  const playerTwoId = idMap.get('dummy' + (i + 2).toString());
+  if (playerOneId !== undefined && playerTwoId !== undefined) {
+    matchResultData.push({
+      id: uuidv4(),
+      playerOneId,
+      playerTwoId,
+      userScore: matchScoreData[i][0],
+      opponentScore: matchScoreData[i][1],
+      win: matchScoreData[i][0] > matchScoreData[i][1],
+      startedAt: new Date(),
+      finishededAt: new Date(),
+    });
+  }
+}
+
 const main = async () => {
   console.log(`Start seeding ...`);
 
@@ -231,6 +283,9 @@ const main = async () => {
   });
   await prisma.dmMessage.createMany({
     data: dmMessage,
+  });
+  await prisma.matchResult.createMany({
+    data: matchResultData,
   });
 
   console.log(`Seeding finished.`);
