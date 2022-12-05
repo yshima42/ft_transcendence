@@ -1,8 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Grid } from '@chakra-ui/react';
-import { User } from '@prisma/client';
-import { useAccept } from 'features/friends/hooks/useAccept';
-import { useReject } from 'features/friends/hooks/useReject';
+import { FriendRequestStatus, User } from '@prisma/client';
+import { useFriendRequestRespond } from 'hooks/api';
 import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
@@ -13,19 +12,16 @@ type Props = {
 export const RecognitionList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { accept } = useAccept();
-  const { reject } = useReject();
+  const { respondFriendRequest } = useFriendRequestRespond();
   useEffect(() => {
     setUserList(users);
   }, [users]);
 
-  const onClickAccept = (id: string) => {
-    accept(id);
-    setUserList(userList.filter((user) => user.id !== id));
-  };
-
-  const onClickReject = (id: string) => {
-    reject(id);
+  const onClickRespond = async (id: string, status: FriendRequestStatus) => {
+    await respondFriendRequest({
+      creatorId: id,
+      status,
+    });
     setUserList(userList.filter((user) => user.id !== id));
   };
 
@@ -51,15 +47,15 @@ export const RecognitionList: FC<Props> = (props) => {
               <UserCardButton
                 text="Accept"
                 id={user.id}
-                onClick={(id) => {
-                  onClickAccept(id);
+                onClick={async (id) => {
+                  await onClickRespond(id, 'ACCEPTED');
                 }}
               />
               <UserCardButton
                 text="Reject"
                 id={user.id}
-                onClick={(id) => {
-                  onClickReject(id);
+                onClick={async (id) => {
+                  await onClickRespond(id, 'DECLINED');
                 }}
               />
             </>

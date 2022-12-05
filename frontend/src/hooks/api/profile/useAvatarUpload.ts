@@ -1,6 +1,10 @@
 import { User } from '@prisma/client';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
-import { FileReqBody, usePostFileApi } from '../generics/usePostFileApi';
+import { usePostFileApi } from '../generics/usePostFileApi';
+
+export interface AvatarFormData {
+  file: File;
+}
 
 export interface AvatarUploadResBody {
   user: User;
@@ -9,7 +13,7 @@ export interface AvatarUploadResBody {
 export type UploadAvatar = UseMutateAsyncFunction<
   AvatarUploadResBody,
   unknown,
-  FileReqBody,
+  AvatarFormData,
   unknown
 >;
 
