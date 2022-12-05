@@ -51,20 +51,6 @@ export class GameService {
     return matchResults;
   }
 
-  // async findMatchHistory(
-  //   playerOneId: string
-  // ): Promise<MatchResultWithPlayers[]> {
-  //   const matchResults = await this.prisma.matchResult.findMany({
-  //     where: { playerOneId },
-  //     include: {
-  //       playerOne: true,
-  //       playerTwo: true,
-  //     },
-  //   });
-
-  //   return matchResults;
-  // }
-
   async findStats(playerOneId: string): Promise<GameStats> {
     const matchResults = await this.prisma.matchResult.findMany({
       where: { playerOneId },
