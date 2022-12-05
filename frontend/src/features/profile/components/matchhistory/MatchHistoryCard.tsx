@@ -29,7 +29,7 @@ export const MatchHistoryCard: FC<MatchHistoryCardProps> = memo(
                   <GameResultCard
                     user={match.playerOne}
                     opponent={match.playerTwo}
-                    score={`${match.userScore} - ${match.opponentScore}`}
+                    score={`${match.playerOneScore} - ${match.playerTwoScore}`}
                     createdAt={match.finishedAt}
                     win={match.win}
                   />
