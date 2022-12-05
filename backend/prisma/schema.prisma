@@ -11,18 +11,18 @@ datasource db {
 }
 
 // 使用するときのみコメントアウトを外してください。
-generator erd {
-  provider = "prisma-erd-generator"
-  output   = "./erd.md"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output   = "./erd.md"
+// }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
 
-generator docs {
-  provider = "node node_modules/prisma-docs-generator"
-}
+// generator docs {
+//   provider = "node node_modules/prisma-docs-generator"
+// }
 
 // generator class_validator {
 //   provider = "prisma-class-validator-generator"
