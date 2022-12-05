@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -u
+set -uxe
 
 git fetch origin main
 git merge origin/main --no-commit --no-ff

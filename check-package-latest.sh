@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -u
+set -uex
 
 projects=("backend" "frontend")
 rootDir=$(pwd | sed -r "s/\/\.git\/hooks//")
