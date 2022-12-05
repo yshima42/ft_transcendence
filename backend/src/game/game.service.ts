@@ -51,12 +51,23 @@ export class GameService {
     return matchResults;
   }
 
-  async findStats(playerOneId: string): Promise<GameStats> {
+  async findStats(playerId: string): Promise<GameStats> {
     const matchResults = await this.prisma.matchResult.findMany({
-      where: { playerOneId },
+      where: {
+        OR: [{ playerOneId: playerId }, { playerTwoId: playerId }],
+      },
     });
     const totalMatches = matchResults.length;
-    const totalWins = matchResults.filter((match) => match.win).length;
+
+    const winMatches = matchResults.filter((match) => {
+      return (
+        (match.playerOneId === playerId && match.win) ||
+        (match.playerTwoId === playerId && !match.win)
+      );
+    });
+
+    const totalWins = winMatches.length;
+
     const winRate =
       totalMatches === 0 ? 0 : Math.round((totalWins / totalMatches) * 100);
 
