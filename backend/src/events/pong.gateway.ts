@@ -32,6 +32,7 @@ export class PongGateway {
     players[socket.id] = pos;
     console.log(pos);
     socket.emit('updatePlayers', players);
+    socket.emit('updatePos', players);
   }
 
   @SubscribeMessage('disconnect')
@@ -52,7 +53,7 @@ export class PongGateway {
   ): void {
     players[socket.id] = data;
     console.log(data);
-    socket.broadcast.emit('commandUpdate', players);
+    socket.broadcast.emit('commandUpdate', data);
   }
 
   // @SubscribeMessage('events')

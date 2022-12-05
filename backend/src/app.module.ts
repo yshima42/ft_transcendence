@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { BlocksModule } from './blocks/blocks.module';
-import { EventsModule } from './events/events.module';
 import { PongModule } from './events/pong.module';
-import { RoomModule } from './events/room.module';
 import { FileModule } from './file/file.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 import { GameModule } from './game/game.module';
@@ -24,8 +22,6 @@ import { UsersModule } from './users/users.module';
     GameModule,
     FriendRequestsModule,
     BlocksModule,
-    EventsModule,
-    RoomModule,
     PongModule,
   ],
   controllers: [],

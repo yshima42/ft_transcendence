@@ -1,6 +1,6 @@
 import { memo, FC, useCallback } from 'react';
-// import { SOCKET_URL } from 'config/default';
-// import { io } from 'socket.io-client';
+import { SOCKET_URL } from 'config/default';
+import { io } from 'socket.io-client';
 import {
   BALL_SIZE,
   BALL_SPEED,
@@ -17,7 +17,7 @@ import { Ball, Paddle } from '../utils/objs';
 import { userInput } from '../utils/userInput';
 import { Canvas } from './Canvas';
 
-// const socket = io(SOCKET_URL);
+const socket = io(SOCKET_URL);
 
 const scoring = (player: Paddle) => {
   player.score++;
@@ -48,7 +48,8 @@ export const PongGame: FC = memo(() => {
   //   for (const id in players) {
   //     console.log(id);
   //     if (clientPaddles[id] === undefined && id !== socket.id) {
-  //       clientPaddles[id] = new Paddle(players[id].x, players[id].y);
+  //       console.log(id);
+  //       clientPaddles[id] = new Paddle(100, 100);
   //     }
   //   }
   // });
@@ -58,8 +59,20 @@ export const PongGame: FC = memo(() => {
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    socket.on('commandUpdate', (data: { up: boolean; down: boolean }) => {
+      player1.up = data.up;
+      player1.down = data.down;
+    });
+
+    // socket.on('updatePos', (players: Players) => {
+    //   for (const id in players) {
+    //     console.log(id);
+    //     clientPaddles[id].draw(ctx);
+    //   }
+    // });
     player1.draw(ctx);
     player2.draw(ctx);
+
     ball.draw(ctx);
 
     userInput(player1);
