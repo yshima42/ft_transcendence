@@ -10,7 +10,7 @@ import {
 import { User, Dm } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ResponseDmRoom, ResponseDm } from './dm.interface';
+import { ResponseDm } from './dm.interface';
 import { DmService } from './dm.service';
 import { CreateDmDto } from './dto/create-dm.dto';
 
@@ -34,13 +34,5 @@ export class DmController {
   @UseGuards(JwtAuthGuard)
   async findDms(@Param('id') id: string): Promise<ResponseDm[]> {
     return await this.dmService.findDms(id);
-  }
-
-  @Get('me')
-  @UseGuards(JwtAuthGuard)
-  async findMyDmRooms(@GetUser() user: User): Promise<ResponseDmRoom[]> {
-    Logger.debug(`findMyDmRooms: ${JSON.stringify(user)}`);
-
-    return await this.dmService.findMyDmRooms(user.id);
   }
 }

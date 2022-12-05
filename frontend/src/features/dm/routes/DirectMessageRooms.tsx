@@ -22,7 +22,7 @@ export const DirectMessageRooms: React.FC = React.memo(() => {
   const [dmRooms, setDmRooms] = React.useState<ResponseDmRoom[]>([]);
 
   async function getAllDmRoom(): Promise<void> {
-    const res: { data: ResponseDmRoom[] } = await axios.get('/dm/me');
+    const res: { data: ResponseDmRoom[] } = await axios.get('/dmroom/me');
     setDmRooms(res.data);
   }
 
