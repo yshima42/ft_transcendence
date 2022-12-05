@@ -9,7 +9,9 @@ CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "avatarImageUrl" TEXT NOT NULL,
-    "nickname" TEXT NOT NULL DEFAULT '',
+    "nickname" TEXT NOT NULL,
+    "isTwoFactorAuthEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "twoFactorAuthSecret" TEXT,
     "onlineStatus" "OnlineStatus" NOT NULL DEFAULT 'ONLINE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -45,7 +47,7 @@ CREATE TABLE "MatchResult" (
     "opponentScore" INTEGER NOT NULL,
     "win" BOOLEAN NOT NULL,
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "finishededAt" TIMESTAMP(3) NOT NULL,
+    "finishedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "MatchResult_pkey" PRIMARY KEY ("id")
 );

@@ -24,8 +24,7 @@
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "db:pull": "dotenv -e .env.development -- yarn prisma db pull",
-    "setup:dev": "yarn install && cp ../backend/prisma/schema.prisma ./prisma && yarn prisma generate"
+    "setup:dev": "yarn install && yarn prisma db pull && yarn prisma generate"
   },
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
@@ -69,7 +68,6 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@vitejs/plugin-react": "^2.2.0",
     "babel-loader": "^9.1.0",
-    "dotenv-cli": "^6.0.0",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
