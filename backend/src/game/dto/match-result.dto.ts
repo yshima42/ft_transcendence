@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumberString, IsUUID } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNumber, IsUUID, Max, Min } from 'class-validator';
 
 // あとでcreateMatchResultDtoにしたい
 export class MatchResultDto {
@@ -11,11 +12,17 @@ export class MatchResultDto {
   @ApiProperty({ default: '40e8b4b4-9b39-4b7e-8e31-78e31975d320' })
   playerTwoId!: string;
 
-  @IsNumberString()
+  @Transform((transformFnParams) => Number(transformFnParams.value))
+  @IsNumber()
+  @Max(5)
+  @Min(0)
   @ApiProperty({ default: 5 })
-  userScore!: string;
+  playerOneScore!: number;
 
-  @IsNumberString()
-  @ApiProperty({ default: 3 })
-  opponentScore!: string;
+  @Transform((transformFnParams) => Number(transformFnParams.value))
+  @IsNumber()
+  @Max(5)
+  @Min(0)
+  @ApiProperty({ default: 5 })
+  playerTwoScore!: number;
 }
