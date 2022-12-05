@@ -10,7 +10,7 @@ export * from './profile/useProfile';
 export * from './relations/useAllUsers';
 export * from './relations/useBlockUsers';
 export * from './relations/useFriendRequest';
-export * from './relations/useFriendRequestApprove';
+export * from './relations/useFriendRequestRespond';
 export * from './relations/useFriendRequestCancel';
 export * from './relations/useFriendUnregister';
 export * from './relations/useFriends';

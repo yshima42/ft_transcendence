@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { MatchResult, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
 import { MatchResultDto } from './dto/match-result.dto';
 import { GameStatsEntity } from './entities/game-stats.entity';
 import { MatchResultEntity } from './entities/match-result.entity';
@@ -16,11 +16,11 @@ import { GameStats } from './interfaces/game-stats.interface';
 
 @Controller('game')
 @ApiTags('game')
+@UseGuards(JwtTwoFactorAuthGuard)
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
   @Post('matches')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'ゲーム結果を送信' })
   @ApiCreatedResponse({ type: MatchResultEntity })
   async addMatchResult(
@@ -31,7 +31,6 @@ export class GameController {
   }
 
   @Get('matches')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'ゲーム結果を取得' })
   @ApiOkResponse({ type: MatchResultEntity, isArray: true })
   async findMatchHistory(@GetUser() user: User): Promise<MatchResult[]> {
@@ -39,7 +38,6 @@ export class GameController {
   }
 
   @Get('stats')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'ゲームStatsを取得' })
   @ApiOkResponse({ type: GameStatsEntity })
   async findGameStats(@GetUser() user: User): Promise<GameStats> {

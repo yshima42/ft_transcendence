@@ -1,4 +1,10 @@
-import { createReadStream, existsSync, mkdirSync, unlinkSync } from 'fs';
+import {
+  createReadStream,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  unlinkSync,
+} from 'fs';
 import { extname } from 'path';
 import {
   FileTypeValidator,
@@ -31,7 +37,10 @@ export class FileService {
         if (req.user?.user === undefined) {
           throw new InternalServerErrorException('Error in multerOptions');
         }
-        cb(null, `${req.user.user.name}${extname(file.originalname)}`);
+        cb(
+          null,
+          `${req.user.user.name}-${Date.now()}${extname(file.originalname)}`
+        );
       },
     }),
   });
@@ -51,12 +60,13 @@ export class FileService {
   }
 
   deleteOldFile(newFilename: string, user: User): void {
-    const oldExtname = extname(user.avatarImageUrl);
-    if (oldExtname !== extname(newFilename)) {
-      const oldFilePath = `./upload/${user.id}/${user.name}${oldExtname}`;
-      if (existsSync(oldFilePath)) {
-        unlinkSync(oldFilePath);
+    const uploadDir = `./upload/${user.id}/`;
+    const oldFiles = readdirSync(`./upload/${user.id}`);
+
+    oldFiles.forEach((oldFilename) => {
+      if (oldFilename !== newFilename) {
+        unlinkSync(uploadDir + oldFilename);
       }
-    }
+    });
   }
 }

@@ -1,6 +1,3 @@
 import { User } from '@prisma/client';
 
-export type SignupUser = Omit<
-  User,
-  'id' | 'createdAt' | 'updatedAt' | 'nickname' | 'onlineStatus'
->;
+export type SignupUser = Pick<User, 'name' | 'nickname' | 'avatarImageUrl'>;

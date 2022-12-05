@@ -1,29 +1,32 @@
-import { FC, memo, useEffect } from 'react';
-import { Avatar, AvatarBadge, Button, Flex, Heading } from '@chakra-ui/react';
-import { useAuth } from 'features/auth/hooks/useAuth';
-import { useMe } from 'hooks/useMe';
-import { Link } from 'react-router-dom';
+import { FC, memo } from 'react';
+import { AvatarBadge, Button, Flex, Heading } from '@chakra-ui/react';
+import { useLogout, useProfile } from 'hooks/api';
+import { Link, useNavigate } from 'react-router-dom';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 
 export const UserNavigation: FC = memo(() => {
-  const { logout } = useAuth();
+  const { logout } = useLogout();
+  const { user } = useProfile();
 
-  const { getMe, me } = useMe();
-  useEffect(() => getMe(), [getMe]);
+  const navigate = useNavigate();
+
+  const onClickLogout = async () => {
+    await logout({});
+    navigate('/');
+  };
 
   return (
     <Flex p="5%" mt={4} align="center">
-      <Link to="/app/profile">
-        <Avatar size="sm" src={me?.avatarImageUrl}>
-          <AvatarBadge boxSize="1.1em" bg="green.500" />
-        </Avatar>
-      </Link>
+      <LinkedAvatar size="sm" src={user.avatarImageUrl} linkUrl="/app/profile">
+        <AvatarBadge boxSize="1.1em" bg="green.500" />
+      </LinkedAvatar>
       <Flex flexDir="column" ml={4}>
         <Link to="/app/profile">
           <Heading as="h3" size="sm">
-            {me?.name}
+            {user.nickname}
           </Heading>
         </Link>
-        <Button size="xs" rounded="lg" onClick={logout} color="gray">
+        <Button size="xs" rounded="lg" onClick={onClickLogout} color="gray">
           Logout
         </Button>
       </Flex>
