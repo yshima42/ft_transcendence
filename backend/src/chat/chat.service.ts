@@ -1,9 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ChatRoom, ChatMessage } from '@prisma/client';
+import { ChatMessage } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatMessage } from './chat.interface';
 import { CreateChatMessageDto } from './dto/create-chat.dto';
-import { UpdateChatRoomDto } from './dto/update-chat.dto';
 
 @Injectable()
 export class ChatService {
@@ -23,30 +22,6 @@ export class ChatService {
     Logger.debug(`createChatMessage: ${JSON.stringify(chatMessage)}`);
 
     return chatMessage;
-  }
-
-  async update(
-    id: string,
-    updateChatRoomDto: UpdateChatRoomDto
-  ): Promise<ChatRoom> {
-    const { name } = updateChatRoomDto;
-
-    return await this.prisma.chatRoom.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-      },
-    });
-  }
-
-  async remove(id: string): Promise<ChatRoom> {
-    return await this.prisma.chatRoom.delete({
-      where: {
-        id,
-      },
-    });
   }
 
   async findAll(chatRoomId: string): Promise<ResponseChatMessage[]> {

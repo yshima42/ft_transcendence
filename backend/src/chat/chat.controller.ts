@@ -3,9 +3,7 @@ import {
   Get,
   Post,
   Body,
-  // Patch,
   Param,
-  // Delete,
   Logger,
   UseGuards,
 } from '@nestjs/common';
@@ -15,8 +13,6 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResponseChatMessage } from './chat.interface';
 import { ChatService } from './chat.service';
 import { CreateChatMessageDto } from './dto/create-chat.dto';
-
-// import { UpdateChatRoomDto } from './dto/update-chat.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -42,17 +38,4 @@ export class ChatController {
   ): Promise<ResponseChatMessage[]> {
     return await this.chatService.findAll(chatRoomId);
   }
-
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateChatRoomDto: UpdateChatRoomDto
-  // ) {
-  //   return this.chatService.update(+id, updateChatRoomDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.chatService.remove(+id);
-  // }
 }

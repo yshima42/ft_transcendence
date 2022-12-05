@@ -14,8 +14,6 @@ import { ResponseChatRoom } from './chatroom.interface';
 import { ChatroomService } from './chatroom.service';
 import { CreateChatroomDto } from './dto/create-chatroom.dto';
 
-// import { UpdateChatroomDto } from './dto/update-chatroom.dto';
-
 @Controller('chatroom')
 export class ChatroomController {
   constructor(private readonly chatroomService: ChatroomService) {}
@@ -39,17 +37,4 @@ export class ChatroomController {
   async findOne(@Param('id') id: string): Promise<ChatRoom> {
     return await this.chatroomService.findOne(id);
   }
-
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateChatroomDto: UpdateChatroomDto
-  // ) {
-  //   return this.chatroomService.update(+id, updateChatroomDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.chatroomService.remove(+id);
-  // }
 }
