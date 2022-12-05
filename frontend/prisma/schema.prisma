@@ -7,41 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                                           String          @id
-  name                                         String          @unique
-  avatarImageUrl                               String
-  nickname                                     String          @unique
-  isTwoFactorAuthEnabled                       Boolean         @default(false)
-  twoFactorAuthSecret                          String?
-  onlineStatus                                 OnlineStatus    @default(ONLINE)
-  createdAt                                    DateTime        @default(now())
-  updatedAt                                    DateTime
-  Block_Block_sourceIdToUser                   Block[]         @relation("Block_sourceIdToUser")
-  Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
-  ChatMessage                                  ChatMessage[]
-  ChatUser                                     ChatUser[]
-  DmMessage                                    DmMessage[]
-  DmUser                                       DmUser[]
-  FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
-  FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
-  MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")
-  MatchResult_MatchResult_playerTwoIdToUser    MatchResult[]   @relation("MatchResult_playerTwoIdToUser")
-}
-
-model MatchResult {
-  id                                 String   @id
-  playerOneId                        String
-  playerTwoId                        String
-  userScore                          Int
-  opponentScore                      Int
-  win                                Boolean
-  startedAt                          DateTime @default(now())
-  finishededAt                       DateTime
-  User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
-  User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
-}
-
 model Block {
   sourceId                  String
   targetId                  String
@@ -49,18 +14,6 @@ model Block {
   User_Block_targetIdToUser User   @relation("Block_targetIdToUser", fields: [targetId], references: [id])
 
   @@id([sourceId, targetId])
-}
-
-model FriendRequest {
-  creatorId                           String
-  receiverId                          String
-  status                              FriendRequestStatus
-  createdAt                           DateTime            @default(now())
-  updatedAt                           DateTime
-  User_FriendRequest_creatorIdToUser  User                @relation("FriendRequest_creatorIdToUser", fields: [creatorId], references: [id])
-  User_FriendRequest_receiverIdToUser User                @relation("FriendRequest_receiverIdToUser", fields: [receiverId], references: [id])
-
-  @@id([creatorId, receiverId])
 }
 
 model ChatMessage {
@@ -119,10 +72,56 @@ model DmUser {
   @@id([dmRoomId, userId])
 }
 
-enum OnlineStatus {
-  ONLINE
-  OFFLINE
-  INGAME
+model FriendRequest {
+  creatorId                           String
+  receiverId                          String
+  status                              FriendRequestStatus
+  createdAt                           DateTime            @default(now())
+  updatedAt                           DateTime
+  User_FriendRequest_creatorIdToUser  User                @relation("FriendRequest_creatorIdToUser", fields: [creatorId], references: [id])
+  User_FriendRequest_receiverIdToUser User                @relation("FriendRequest_receiverIdToUser", fields: [receiverId], references: [id])
+
+  @@id([creatorId, receiverId])
+}
+
+model MatchResult {
+  id                                 String   @id
+  playerOneId                        String
+  playerTwoId                        String
+  userScore                          Int
+  opponentScore                      Int
+  win                                Boolean
+  startedAt                          DateTime @default(now())
+  finishedAt                         DateTime
+  User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
+  User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
+}
+
+model User {
+  id                                           String          @id
+  name                                         String          @unique
+  avatarImageUrl                               String
+  nickname                                     String          @unique
+  isTwoFactorAuthEnabled                       Boolean         @default(false)
+  twoFactorAuthSecret                          String?
+  onlineStatus                                 OnlineStatus    @default(ONLINE)
+  createdAt                                    DateTime        @default(now())
+  updatedAt                                    DateTime
+  Block_Block_sourceIdToUser                   Block[]         @relation("Block_sourceIdToUser")
+  Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
+  ChatMessage                                  ChatMessage[]
+  ChatUser                                     ChatUser[]
+  DmMessage                                    DmMessage[]
+  DmUser                                       DmUser[]
+  FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
+  FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
+  MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")
+  MatchResult_MatchResult_playerTwoIdToUser    MatchResult[]   @relation("MatchResult_playerTwoIdToUser")
+}
+
+enum ChatUserStatus {
+  OWNER
+  MEMBER
 }
 
 enum FriendRequestStatus {
@@ -131,7 +130,8 @@ enum FriendRequestStatus {
   DECLINED
 }
 
-enum ChatUserStatus {
-  OWNER
-  MEMBER
+enum OnlineStatus {
+  ONLINE
+  OFFLINE
+  INGAME
 }

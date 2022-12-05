@@ -12,9 +12,9 @@
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:debug": "NODE_ENV=development nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "format": "prettier --write --loglevel=warn \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint 'src/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "format": "prettier --write --loglevel=warn 'src/**/*.ts' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
     "test": "jest",
     "test:all": "jest --runInBand",
@@ -28,7 +28,7 @@
     "migrate:reset": "dotenv -e .env.development -- yarn prisma migrate reset",
     "migrate:clear": "dotenv -e .env.development -- yarn prisma migrate reset --skip-seed",
     "setup:dev": "yarn install && yarn prisma generate && yarn migrate:reset -f",
-    "studio": "dotenv -e .env.development -- yarn prisma studio"
+    "prisma:studio": "dotenv -e .env.development -- yarn prisma studio"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.1",
@@ -117,6 +117,12 @@
     ],
     "src/**/*.{html,json,gql,graphql}": [
       "prettier --write --loglevel=error"
+    ],
+    "./*.json": [
+      "prettier --write --loglevel=error"
+    ],
+    "prisma/schema.prisma": [
+      "prisma format"
     ]
   },
   "simple-git-hooks": {
