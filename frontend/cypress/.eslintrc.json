@@ -3,5 +3,13 @@
   "env": {
     "cypress/globals": true
   },
-  "extends": ["plugin:cypress/recommended", "plugin:chai-friendly/recommended"]
+  "extends": ["plugin:cypress/recommended", "plugin:chai-friendly/recommended"],
+  "overrides": [
+    {
+      "files": ["**/*.ts"],
+      "rules": {
+        "jest/expect-expect": "off"
+      }
+    }
+  ]
 }
