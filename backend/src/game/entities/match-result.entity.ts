@@ -30,5 +30,5 @@ export class MatchResultEntity implements MatchResult {
   startedAt!: Date;
 
   @ApiProperty()
-  finishededAt!: Date;
+  finishedAt!: Date;
 }

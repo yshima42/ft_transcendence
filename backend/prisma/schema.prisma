@@ -95,7 +95,7 @@ model MatchResult {
   opponentScore Int
   win           Boolean
   startedAt     DateTime @default(now())
-  finishededAt  DateTime @updatedAt
+  finishedAt    DateTime @updatedAt
 }
 
 model ChatMessage {
