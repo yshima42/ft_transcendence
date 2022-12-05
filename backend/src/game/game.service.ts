@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { MatchResult } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { MatchResultDto } from './dto/match-result.dto';
+import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import {
   GameStats,
   MatchResultWithPlayers,
@@ -12,18 +12,11 @@ export class GameService {
   constructor(private readonly prisma: PrismaService) {}
 
   async addMatchResult(
-    playerOneId: string,
-    matchResultDto: MatchResultDto
+    createMatchResultDto: CreateMatchResultDto
   ): Promise<MatchResult> {
-    if (playerOneId !== matchResultDto.playerOneId) {
-      throw new BadRequestException("Can't add match result of others");
-    }
-
-    const playerOneScore = Number(matchResultDto.playerOneScore);
-    const playerTwoScore = Number(matchResultDto.playerTwoScore);
+    const playerOneScore = Number(createMatchResultDto.playerOneScore);
+    const playerTwoScore = Number(createMatchResultDto.playerTwoScore);
     if (
-      !(playerOneScore >= 0 && playerOneScore <= 5) ||
-      !(playerTwoScore >= 0 && playerTwoScore <= 5) ||
       (playerOneScore < 5 && playerTwoScore < 5) ||
       (playerOneScore === 5 && playerTwoScore === 5)
     ) {
@@ -32,8 +25,8 @@ export class GameService {
 
     const matchResult = await this.prisma.matchResult.create({
       data: {
-        playerOneId: matchResultDto.playerOneId,
-        playerTwoId: matchResultDto.playerTwoId,
+        playerOneId: createMatchResultDto.playerOneId,
+        playerTwoId: createMatchResultDto.playerTwoId,
         playerOneScore,
         playerTwoScore,
         win: playerOneScore > playerTwoScore,
