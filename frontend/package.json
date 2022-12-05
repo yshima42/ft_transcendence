@@ -24,7 +24,7 @@
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "db:pull": "dotenv -e .env.development -- yarn prisma db pull",
-    "setup:dev": "yarn install && yarn db:pull && yarn prisma generate"
+    "setup:dev": "yarn install && cp ../backend/prisma/schema.prisma ./prisma && yarn prisma generate"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
