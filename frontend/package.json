@@ -75,7 +75,7 @@
     "eslint-plugin-jest": "^27.1.6",
     "eslint-plugin-jest-dom": "^4.0.3",
     "eslint-plugin-jsx-a11y": "^6.6.1",
-    "eslint-plugin-n": "^15.5.2",
+    "eslint-plugin-n": "^15.6.0",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -94,7 +94,7 @@
     "stylelint-order": "^5.0.0",
     "ts-jest": "^29.0.3",
     "typescript": "*",
-    "vite": "^3.2.4",
+    "vite": "^3.2.5",
     "vite-tsconfig-paths": "^3.6.0"
   },
   "lint-staged": {
