@@ -109,10 +109,4 @@ export class DmService {
 
     return dmMessages;
   }
-  // update(id: number, updateDmDto: UpdateDmDto) {
-  //   return `This action updates a #${id} dm`;
-  // }
-  // remove(id: number) {
-  //   return `This action removes a #${id} dm`;
-  // }
 }

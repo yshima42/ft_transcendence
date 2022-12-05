@@ -3,8 +3,7 @@ import { ChatRoom } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chatroom.interface';
 import { CreateChatroomDto } from './dto/create-chatroom.dto';
-
-// import { UpdateChatroomDto } from './dto/update-chatroom.dto';
+import { UpdateChatroomDto } from './dto/update-chatroom.dto';
 
 @Injectable()
 export class ChatroomService {
@@ -62,11 +61,35 @@ export class ChatroomService {
     return chatRoom;
   }
 
-  // update(id: number, updateChatroomDto: UpdateChatroomDto) {
-  //   return `This action updates a #${id} chatroom`;
-  // }
+  // update
+  async update(
+    id: string,
+    updateChatroomDto: UpdateChatroomDto
+  ): Promise<ChatRoom> {
+    const { name } = updateChatroomDto;
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} chatroom`;
-  // }
+    const chatRoom = await this.prisma.chatRoom.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+      },
+    });
+    Logger.debug(`updateChatRoom: ${JSON.stringify(chatRoom)}`);
+
+    return chatRoom;
+  }
+
+  // remove
+  async remove(id: string): Promise<ChatRoom> {
+    const chatRoom = await this.prisma.chatRoom.delete({
+      where: {
+        id,
+      },
+    });
+    Logger.debug(`removeChatRoom: ${JSON.stringify(chatRoom)}`);
+
+    return chatRoom;
+  }
 }
