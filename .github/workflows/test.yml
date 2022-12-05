@@ -14,3 +14,12 @@ jobs:
           yarn --cwd backend build
           yarn --cwd frontend
           yarn --cwd frontend build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: test
+        run: |
+          yarn --cwd backend
+          yarn --cwd backend test
