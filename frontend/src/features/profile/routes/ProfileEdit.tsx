@@ -8,26 +8,29 @@ import {
   Switch,
   Text,
 } from '@chakra-ui/react';
+import { AvatarFormData, useAvatarUpload } from 'hooks/api';
+import { useProfile } from 'hooks/api/profile/useProfile';
+import {
+  ProfileFormData,
+  useProfileEdit,
+} from 'hooks/api/profile/useProfileEdit';
 import { useNavigate } from 'react-router-dom';
-import { useProfile } from '../../../hooks/api/profile/useProfile';
-import { AvatarFormData, useSaveAvatar } from '../hooks/useSaveAvatar';
-import { ProfileFormData, useSaveProfile } from '../hooks/useSaveProfile';
 
 export const ProfileEdit: FC = memo(() => {
   const { user } = useProfile();
   const navigate = useNavigate();
-  const { saveProfile, isLoading: isLoading1 } = useSaveProfile();
-  const { saveAvatar, isLoading: isLoading2 } = useSaveAvatar();
+  const { editProfile, isLoading: isLoading1 } = useProfileEdit();
+  const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
   const [profileFormData, setProfileFormData] = useState<ProfileFormData>();
   const [avatarFormData, setAvatarFormData] = useState<AvatarFormData>();
 
   const onSubmitSave = async (event: SyntheticEvent) => {
     event.preventDefault();
     if (profileFormData !== undefined) {
-      await saveProfile(profileFormData);
+      await editProfile(profileFormData);
     }
     if (avatarFormData !== undefined) {
-      await saveAvatar(avatarFormData);
+      await uploadAvatar(avatarFormData);
     }
     navigate('/app/profile');
   };

@@ -1,6 +1,6 @@
 import { FriendRequest } from '@prisma/client';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
-import { useDeleteApi } from '../generics/useDeleteApi';
+import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
+import { axios } from 'lib/axios';
 
 export interface FriendRequestCancelResBody {
   friendRequest: FriendRequest;
@@ -9,20 +9,24 @@ export interface FriendRequestCancelResBody {
 export type CancelFriendRequest = UseMutateAsyncFunction<
   FriendRequestCancelResBody,
   unknown,
-  void,
+  string,
   unknown
 >;
 
-export const useFriendRequestCancel = (
-  userId: string
-): {
+export const useFriendRequestCancel = (): {
   cancelFriendRequest: CancelFriendRequest;
   isLoading: boolean;
 } => {
-  const { deleteFunc: cancelFriendRequest, isLoading } =
-    useDeleteApi<FriendRequestCancelResBody>(
-      `/users/me/friend-requests/${userId}`
+  const axiosDelete = async (userId: string) => {
+    const result = await axios.delete<FriendRequestCancelResBody>(
+      '/users/me/friend-requests/' + userId
     );
+
+    return result.data;
+  };
+
+  const { mutateAsync: cancelFriendRequest, isLoading } =
+    useMutation(axiosDelete);
 
   return { cancelFriendRequest, isLoading };
 };
