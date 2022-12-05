@@ -23,6 +23,7 @@ export const FriendsList: FC<Props> = (props) => {
       {users.map((user) => (
         <UserCard
           key={user.id}
+          id={user.id}
           username={user.name}
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}
