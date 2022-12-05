@@ -123,6 +123,9 @@
     ],
     "./*.json": [
       "prettier --write --loglevel=error"
+    ],
+    "prisma/schema.prisma": [
+      "prisma format"
     ]
   },
   "simple-git-hooks": {
