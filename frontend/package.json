@@ -9,14 +9,14 @@
     "api": "yarn --cwd ../backend start:dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint:es": "eslint'src/**/*.{js,jsx,ts,tsx}'",
-    "lint:es:fix": "eslint--fix'src/**/*.{js,jsx,ts,tsx}'",
-    "lint:style": "stylelint'src/**/*.{css,less,sass,scss}'",
-    "lint:style:fix": "stylelint--fix'src/**/*.{css,less,sass,scss}'",
-    "lint": "npmrun--silentlint:style;npmrun--silentlint:es",
-    "lint:fix": "npmrun--silentlint:style:fix;npmrun--silentlint:es:fix",
+    "lint:es": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "lint:es:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx}'",
+    "lint:style": "stylelint 'src/**/*.{css,less,sass,scss}'",
+    "lint:style:fix": "stylelint --fix 'src/**/*.{css,less,sass,scss}'",
+    "lint": "npm run --silent lint:style; npm run --silent lint:es",
+    "lint:fix": "npm run --silent lint:style:fix; npm run --silent lint:es:fix",
     "preinstall": "npx typesync || :",
-    "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}'",
+    "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
     "prepare": "npx simple-git-hooks || :",
     "test": "jest --config ./jest.config.json",
@@ -24,7 +24,7 @@
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "db:pull": "dotenv -e .env.development -- yarn prisma db pull",
-    "setup:dev": "yarn install && yarn db:pull && yarn prisma generate"
+    "setup:dev": "yarn install && cp ../backend/prisma/schema.prisma ./prisma && yarn prisma generate"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -106,6 +106,9 @@
       "stylelint --fix --quiet"
     ],
     "src/**/*.{html,json,gql,graphql}": [
+      "prettier --write --loglevel=error"
+    ],
+    "./*.json": [
       "prettier --write --loglevel=error"
     ]
   },
