@@ -45,9 +45,9 @@ const mockChats: Chat[] = [
 
 export const useAllChats = (): {
   getChats: () => void;
-  chats: Chat[];
+  chat: Chat[];
 } => {
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [chat, setChats] = useState<Chat[]>([]);
   const navigate = useNavigate();
 
   const getChats = useCallback(() => {
@@ -58,5 +58,5 @@ export const useAllChats = (): {
       .catch(() => navigate('/', { replace: true }));
   }, [navigate]);
 
-  return { getChats, chats };
+  return { getChats, chat };
 };

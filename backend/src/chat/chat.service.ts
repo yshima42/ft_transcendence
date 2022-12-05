@@ -1,30 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChatRoom, ChatMessage } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChatRoomDto } from './dto/create-chat.dto';
+import { ResponseChatMessage } from './chat.interface';
+import { CreateChatMessageDto } from './dto/create-chat.dto';
 import { UpdateChatRoomDto } from './dto/update-chat.dto';
 
 @Injectable()
 export class ChatService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createChatRoomDto: CreateChatRoomDto): Promise<ChatRoom> {
-    const { name } = createChatRoomDto;
-
-    return await this.prisma.chatRoom.create({
+  async create(
+    createChatMessageDto: CreateChatMessageDto,
+    senderId: string
+  ): Promise<ChatMessage> {
+    const chatMessage = await this.prisma.chatMessage.create({
       data: {
-        name,
+        content: createChatMessageDto.content,
+        chatRoomId: createChatMessageDto.chatRoomId,
+        senderId,
       },
     });
+    Logger.debug(`createChatMessage: ${JSON.stringify(chatMessage)}`);
+
+    return chatMessage;
   }
-
-  // findAll() {
-  //   return `This action returns all chat`;
-  // }
-
-  // findOne(id: string) {
-  //   return `This action returns a #${id} chat`;
-  // }
 
   async update(
     id: string,
@@ -50,16 +49,28 @@ export class ChatService {
     });
   }
 
-  async findChatMessages(id: string): Promise<ChatMessage[]> {
-    Logger.debug(`findChatMessages: ${JSON.stringify(id)}`);
-    if (id === undefined) {
+  async findAll(chatRoomId: string): Promise<ResponseChatMessage[]> {
+    Logger.debug(`findChatMessages: ${JSON.stringify(chatRoomId)}`);
+    if (chatRoomId === undefined) {
       Logger.warn(`findChatMessages: chatRoomId is undefined`);
 
       return [];
     }
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
-        id,
+        chatRoomId,
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        sender: {
+          select: {
+            name: true,
+            avatarImageUrl: true,
+            onlineStatus: true,
+          },
+        },
       },
     });
     Logger.debug(`findChatMessages: ${JSON.stringify(chatMessage)}`);

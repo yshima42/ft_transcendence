@@ -23,13 +23,11 @@ export const DirectMessageRooms: React.FC = React.memo(() => {
 
   async function getAllDmRoom(): Promise<void> {
     const res: { data: ResponseDmRoom[] } = await axios.get('/dm/me');
-    console.log('res', res.data);
     setDmRooms(res.data);
   }
 
   React.useEffect(() => {
     getAllDmRoom().catch((err) => console.error(err));
-    console.log('dmRooms', dmRooms);
   }, []);
 
   return (
@@ -38,7 +36,7 @@ export const DirectMessageRooms: React.FC = React.memo(() => {
         <C.List spacing={3}>
           {dmRooms.map((dmRoom) => (
             <C.ListItem key={dmRoom.id}>
-              <C.Link as={Link} to={`${dmRoom.id}`} state={{ id: dmRoom.id }}>
+              <Link to={`${dmRoom.id}`} state={{ id: dmRoom.id }}>
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
                     <C.Box>
@@ -56,7 +54,7 @@ export const DirectMessageRooms: React.FC = React.memo(() => {
                     </C.Box>
                   </C.Flex>
                 </C.Box>
-              </C.Link>
+              </Link>
             </C.ListItem>
           ))}
         </C.List>
