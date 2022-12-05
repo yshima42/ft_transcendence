@@ -88,7 +88,6 @@ model MatchResult {
   playerTwoId    String
   playerOneScore Int
   playerTwoScore Int
-  win            Boolean
   startedAt      DateTime @default(now())
   finishedAt     DateTime @updatedAt
 }

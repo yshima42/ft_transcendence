@@ -126,7 +126,6 @@ for (let i = 0; i < 30; i++) {
       playerTwoId,
       playerOneScore: matchScoreData[i][0],
       playerTwoScore: matchScoreData[i][1],
-      win: matchScoreData[i][0] > matchScoreData[i][1],
       startedAt: new Date(),
       finishedAt: new Date(),
     });
@@ -143,7 +142,6 @@ for (let i = 0; i < 30; i++) {
       playerTwoId,
       playerOneScore: matchScoreData[i][0],
       playerTwoScore: matchScoreData[i][1],
-      win: matchScoreData[i][0] > matchScoreData[i][1],
       startedAt: new Date(),
       finishedAt: new Date(),
     });
