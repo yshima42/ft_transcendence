@@ -10,7 +10,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "paths": {"passport-42": ["types/passport-42"]},
+    "paths": { "passport-42": ["types/passport-42"] },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
