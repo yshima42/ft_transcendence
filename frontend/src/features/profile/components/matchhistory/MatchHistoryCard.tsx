@@ -27,11 +27,15 @@ export const MatchHistoryCard: FC<MatchHistoryCardProps> = memo(
               {latest5Matches.map((match) => (
                 <Box key={match.id}>
                   <GameResultCard
-                    user={match.playerOne}
-                    opponent={match.playerTwo}
+                    playerOne={match.playerOne}
+                    playerTwo={match.playerTwo}
                     score={`${match.playerOneScore} - ${match.playerTwoScore}`}
                     createdAt={match.finishedAt}
-                    win={match.win}
+                    win={
+                      (id === match.playerOne.id &&
+                        match.playerOneScore === 5) ||
+                      (id === match.playerTwo.id && match.playerTwoScore === 5)
+                    }
                   />
                 </Box>
               ))}
