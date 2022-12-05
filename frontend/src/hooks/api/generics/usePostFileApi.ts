@@ -1,4 +1,8 @@
-import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
+import {
+  UseMutateAsyncFunction,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
 export interface FileReqBody {
@@ -18,7 +22,13 @@ export function usePostFileApi<ResBody>(endpoint: string): {
     return result.data;
   };
 
-  const { mutateAsync: postFunc, isLoading } = useMutation(axiosPost);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: postFunc, isLoading } = useMutation(axiosPost, {
+    onSuccess: () => {
+      void queryClient.invalidateQueries(['/users/me/profile']);
+    },
+  });
 
   return { postFunc, isLoading };
 }
