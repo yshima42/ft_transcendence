@@ -8,7 +8,7 @@ import {
   ChatMessage,
   DmRoom,
   DmUser,
-  DmMessage,
+  Dm,
   MatchResult,
 } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
@@ -188,14 +188,14 @@ for (let i = 0; i < 1; i++) {
   }
 }
 
-const dmMessage: DmMessage[] = [];
+const dms: Dm[] = [];
 for (let i = 0; i < 1; i++) {
   const id = uuidv4();
   const content = 'Hello' + id;
   const dmRoomId = dmRooms[i].id;
   const senderId = idMap.get('dummy1');
   if (senderId !== undefined) {
-    dmMessage.push({
+    dms.push({
       id,
       content,
       dmRoomId,
@@ -281,8 +281,8 @@ const main = async () => {
   await prisma.dmUser.createMany({
     data: dmUsers,
   });
-  await prisma.dmMessage.createMany({
-    data: dmMessage,
+  await prisma.dm.createMany({
+    data: dms,
   });
   await prisma.matchResult.createMany({
     data: matchResultData,

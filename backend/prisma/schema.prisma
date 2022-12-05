@@ -47,7 +47,7 @@ model User {
   playerTwo MatchResult[]   @relation("playerTwo")
 
   chatMessages ChatMessage[] @relation("messageSender") // ユーザーが送信したチャットメッセージ
-  dmMessages   DmMessage[]   @relation("dmMessageSender") // ユーザーが送信したDMメッセージ
+  dms          Dm[]          @relation("dmSender") // ユーザーが送信したDMメッセージ
   ChatUser     ChatUser[] // ユーザーが参加しているチャットルーム
   DmUser       DmUser[] // ユーザーが参加しているDMルーム
 }
@@ -127,22 +127,22 @@ model ChatUser {
   @@id([chatRoomId, userId])
 }
 
-model DmMessage {
+model Dm {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
   dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id]) // 属するDMルーム
   dmRoomId  String
-  sender    User     @relation("dmMessageSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
+  sender    User     @relation("dmSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
   senderId  String
 }
 
 model DmRoom {
-  id         String      @id @default(uuid())
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  dmMessages DmMessage[] // DMルームに属するメッセージ
-  dmUsers    DmUser[] // チャットルームに属するユーザー
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  dms       Dm[] // DMルームに属するメッセージ
+  dmUsers   DmUser[] // チャットルームに属するユーザー
 }
 
 model DmUser {

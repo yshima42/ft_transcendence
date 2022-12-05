@@ -86,14 +86,14 @@ CREATE TABLE "ChatUser" (
 );
 
 -- CreateTable
-CREATE TABLE "DmMessage" (
+CREATE TABLE "Dm" (
     "id" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "dmRoomId" TEXT NOT NULL,
     "senderId" TEXT NOT NULL,
 
-    CONSTRAINT "DmMessage_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Dm_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -153,10 +153,10 @@ ALTER TABLE "ChatUser" ADD CONSTRAINT "ChatUser_chatRoomId_fkey" FOREIGN KEY ("c
 ALTER TABLE "ChatUser" ADD CONSTRAINT "ChatUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DmMessage" ADD CONSTRAINT "DmMessage_dmRoomId_fkey" FOREIGN KEY ("dmRoomId") REFERENCES "DmRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Dm" ADD CONSTRAINT "Dm_dmRoomId_fkey" FOREIGN KEY ("dmRoomId") REFERENCES "DmRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DmMessage" ADD CONSTRAINT "DmMessage_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Dm" ADD CONSTRAINT "Dm_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DmUser" ADD CONSTRAINT "DmUser_dmRoomId_fkey" FOREIGN KEY ("dmRoomId") REFERENCES "DmRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

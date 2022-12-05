@@ -7,7 +7,7 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
 
-export type ResponseDmMessage = {
+export type ResponseDm = {
   id: string;
   content: string;
   createdAt: Date;
@@ -25,10 +25,10 @@ type State = {
 export const DirectMessages: React.FC = React.memo(() => {
   const location = useLocation();
   const { id: dmRoomId } = location.state as State;
-  const [messages, setMessages] = React.useState<ResponseDmMessage[]>([]);
+  const [messages, setMessages] = React.useState<ResponseDm[]>([]);
 
-  async function getAllDmMessage(): Promise<void> {
-    const res: { data: ResponseDmMessage[] } = await axios.get(
+  async function getAllDm(): Promise<void> {
+    const res: { data: ResponseDm[] } = await axios.get(
       `/dm/messages/${dmRoomId}`
     );
     setMessages(res.data);
@@ -36,11 +36,11 @@ export const DirectMessages: React.FC = React.memo(() => {
   // 送信ボタンを押したときの処理
   async function sendMessage(content: string): Promise<void> {
     await axios.post(`/dm/${dmRoomId}`, { content, dmRoomId });
-    getAllDmMessage().catch((err) => console.error(err));
+    getAllDm().catch((err) => console.error(err));
   }
 
   React.useEffect(() => {
-    getAllDmMessage().catch((err) => console.error(err));
+    getAllDm().catch((err) => console.error(err));
   }, []);
 
   return (
