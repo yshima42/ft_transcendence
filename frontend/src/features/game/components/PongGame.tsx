@@ -1,132 +1,37 @@
 import { memo, FC, useCallback } from 'react';
 // import { SOCKET_URL } from 'config/default';
 // import { io } from 'socket.io-client';
+import {
+  BALL_SIZE,
+  BALL_SPEED,
+  BALL_START_X,
+  BALL_START_Y,
+  BG_COLOR,
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  PADDLE_HEIGHT,
+  PADDLE_START_POS,
+  PADDLE_WIDTH,
+} from '../utils/gameConfig';
+import { Ball, Paddle } from '../utils/objs';
+import { userInput } from '../utils/userInput';
 import { Canvas } from './Canvas';
-
-// TODO: これらを設定などで変えられる機能を作る
-const CANVAS_WIDTH = 1000;
-const CANVAS_HEIGHT = 500;
-const BALL_START_X = CANVAS_WIDTH / 2;
-const BALL_START_Y = CANVAS_HEIGHT / 2;
-const BALL_SPEED = 5;
-const BALL_SIZE = 10;
-const PADDLE_WIDTH = 20;
-const PADDLE_HEIGHT = 75;
-const PADDLE_START_POS = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
-const PADDLE_SPEED = 7;
-const BALL_COLOR = '#4FD1C5';
-const PADDLE_COLOR = '#4FD1C5';
-const BG_COLOR = '#1A202C';
-
-class Vector {
-  x: number;
-  y: number;
-
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-
-  set(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-}
-
-class Ball {
-  up: boolean;
-  down: boolean;
-  pos: { x: number; y: number };
-
-  constructor(x: number, y: number) {
-    this.pos = new Vector(x, y);
-    this.up = false;
-    this.down = false;
-  }
-
-  draw = (ctx: CanvasRenderingContext2D) => {
-    ctx.fillStyle = BALL_COLOR;
-    ctx.beginPath();
-    ctx.arc(this.pos.x, this.pos.y, BALL_SIZE, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.closePath();
-  };
-
-  setPosition = (x: number, y: number) => {
-    this.pos.x = x;
-    this.pos.y = y;
-  };
-}
-
-class Paddle {
-  up: boolean;
-  down: boolean;
-  pos: { x: number; y: number };
-  score: number;
-
-  constructor(x: number, y: number) {
-    this.pos = new Vector(x, y);
-    this.up = false;
-    this.down = false;
-    this.score = 0;
-  }
-
-  draw = (ctx: CanvasRenderingContext2D) => {
-    ctx.beginPath();
-    if (this.down) {
-      this.pos.y += PADDLE_SPEED;
-      if (this.pos.y + PADDLE_HEIGHT > ctx.canvas.height) {
-        this.pos.y = ctx.canvas.height - PADDLE_HEIGHT;
-      }
-    } else if (this.up) {
-      this.pos.y -= PADDLE_SPEED;
-      if (this.pos.y < 0) {
-        this.pos.y = 0;
-      }
-    }
-    ctx.rect(this.pos.x, this.pos.y, PADDLE_WIDTH, PADDLE_HEIGHT);
-    ctx.fillStyle = PADDLE_COLOR;
-    ctx.fill();
-    ctx.closePath();
-  };
-
-  setPosition = (x: number, y: number) => {
-    this.pos.x = x;
-    this.pos.y = y;
-  };
-}
-
-const userInput = (obj: Paddle) => {
-  document.addEventListener(
-    'keydown',
-    (e: KeyboardEvent) => {
-      if (e.key === 'Down' || e.key === 'ArrowDown') {
-        obj.down = true;
-      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-        obj.up = true;
-      }
-    },
-    false
-  );
-
-  document.addEventListener(
-    'keyup',
-    (e: KeyboardEvent) => {
-      if (e.key === 'Down' || e.key === 'ArrowDown') {
-        obj.down = false;
-      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-        obj.up = false;
-      }
-    },
-    false
-  );
-};
 
 // const socket = io(SOCKET_URL);
 
 const scoring = (player: Paddle) => {
   player.score++;
 };
+
+// type Players = {
+//   [key: string]: { x?: number; y?: number; up?: boolean; down?: boolean };
+// };
+
+// type ClientPaddles = {
+//   [key: string]: Paddle;
+// };
+
+// const clientPaddles: ClientPaddles = {};
 
 export const PongGame: FC = memo(() => {
   // const startX = 40 + Math.random() * 400;
@@ -138,9 +43,15 @@ export const PongGame: FC = memo(() => {
   // const paddle2 = new Paddle(startX, startY);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  // const { player, setPlayer } = useContext(gameContext);
-
-  // const canvas = document.getElementById('canvas') as HTMLElement;
+  // socket.emit('newPlayer', { x: startX, y: startY });
+  // socket.on('updatePlayers', (players: Players) => {
+  //   for (const id in players) {
+  //     console.log(id);
+  //     if (clientPaddles[id] === undefined && id !== socket.id) {
+  //       clientPaddles[id] = new Paddle(players[id].x, players[id].y);
+  //     }
+  //   }
+  // });
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -177,10 +88,16 @@ export const PongGame: FC = memo(() => {
       }
     }
 
+    // ゲーム終了
+    if (player1.score === 3 || player2.score === 3) {
+      ctx.fillText('Game Over', 250, 50);
+      // TODO: 他の所へ飛ばす等処理をする
+    }
+
     // スコアの表示
     ctx.font = '48px serif';
     ctx.fillText(player1.score.toString(), 20, 50);
-    ctx.fillText(player2.score.toString(), 800, 50);
+    ctx.fillText(player2.score.toString(), 960, 50);
 
     // 上下の壁で跳ね返る処理
     if (

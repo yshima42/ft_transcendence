@@ -11,7 +11,7 @@ import { Socket, Server } from 'socket.io';
 // const games: Socket[] = [];
 
 type Players = {
-  [key: string]: { x: number; y: number };
+  [key: string]: { x?: number; y?: number; up?: boolean; down?: boolean };
 };
 
 const players: Players = {};
@@ -30,6 +30,7 @@ export class PongGateway {
   ): void {
     console.log(`new client: ${socket.id}`);
     players[socket.id] = pos;
+    console.log(pos);
     socket.emit('updatePlayers', players);
   }
 
@@ -42,6 +43,16 @@ export class PongGateway {
     delete players[socket.id];
     console.log(`good-bey: ${socket.id}`);
     socket.emit('updatePlayers', players);
+  }
+
+  @SubscribeMessage('userCommands')
+  handleUserCommands(
+    @MessageBody() data: { up: boolean; down: boolean },
+    @ConnectedSocket() socket: Socket
+  ): void {
+    players[socket.id] = data;
+    console.log(data);
+    socket.broadcast.emit('commandUpdate', players);
   }
 
   // @SubscribeMessage('events')
