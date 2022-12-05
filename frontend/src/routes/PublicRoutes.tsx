@@ -2,7 +2,9 @@ import { Outlet } from 'react-router-dom';
 import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
-import { Chats } from 'features/chat/routes/Chats';
+import { ChatRoom } from 'features/chat/routes/ChatRoom';
+import { ChatRooms } from 'features/chat/routes/ChatRooms';
+import { CreateChatRooms } from 'features/chat/routes/CreateChatRooms';
 import { DirectMessageRooms } from 'features/dm/routes/DirectMessageRooms';
 import { DirectMessages } from 'features/dm/routes/DirectMessages';
 import { Users } from 'features/friends/routes/Users';
@@ -35,7 +37,9 @@ export const publicRoutes = [
     element: <App />,
     children: [
       { path: 'users', element: <Users /> },
-      { path: 'chats', element: <Chats /> },
+      { path: 'chat', element: <ChatRooms /> },
+      { path: 'chat/create', element: <CreateChatRooms /> },
+      { path: 'chat/:id', element: <ChatRoom /> },
       { path: 'games', element: <Games /> },
       { path: '', element: <GameTop /> },
       { path: 'matching', element: <Matching /> },

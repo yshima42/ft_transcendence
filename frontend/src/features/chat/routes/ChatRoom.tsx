@@ -7,10 +7,10 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
 
-export type ResponseDmMessage = {
+type ResponseChatMessage = {
   id: string;
-  content: string;
   createdAt: Date;
+  content: string;
   sender: {
     name: string;
     avatarImageUrl: string;
@@ -22,30 +22,30 @@ type State = {
   id: string;
 };
 
-export const DirectMessages: React.FC = React.memo(() => {
+export const ChatRoom: React.FC = React.memo(() => {
   const location = useLocation();
-  const { id: dmRoomId } = location.state as State;
-  const [messages, setMessages] = React.useState<ResponseDmMessage[]>([]);
+  const { id: chatRoomId } = location.state as State;
+  const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
 
-  async function getAllDmMessage(): Promise<void> {
-    const res: { data: ResponseDmMessage[] } = await axios.get(
-      `/dm/messages/${dmRoomId}`
+  async function getAllChatMessage(): Promise<void> {
+    const res: { data: ResponseChatMessage[] } = await axios.get(
+      `/chat/${chatRoomId}`
     );
     setMessages(res.data);
   }
   // 送信ボタンを押したときの処理
   async function sendMessage(content: string): Promise<void> {
-    await axios.post(`/dm/${dmRoomId}`, { content, dmRoomId });
-    getAllDmMessage().catch((err) => console.error(err));
+    await axios.post(`/chat`, { content, chatRoomId });
+    getAllChatMessage().catch((err) => console.error(err));
   }
 
   React.useEffect(() => {
-    getAllDmMessage().catch((err) => console.error(err));
+    getAllChatMessage().catch((err) => console.error(err));
   }, []);
 
   return (
     <>
-      <ContentLayout title="Direct Message">
+      <ContentLayout title="Chat Room">
         <C.Divider />
         <C.Flex
           flexDir="column"

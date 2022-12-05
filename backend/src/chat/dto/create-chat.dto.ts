@@ -7,7 +7,7 @@ export class CreateChatRoomDto {
   name!: string;
 }
 
-export class CreateMessageDto {
+export class CreateChatMessageDto {
   @IsNotEmpty()
   @IsString()
   content!: string;
@@ -15,10 +15,6 @@ export class CreateMessageDto {
   @IsNotEmpty()
   @IsUUID()
   chatRoomId!: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  senderId!: string;
 }
 
 export class CreateChatUserDto {

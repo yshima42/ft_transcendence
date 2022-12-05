@@ -6,13 +6,15 @@ import {
   // Patch,
   Param,
   // Delete,
-  // Logger,
+  Logger,
   UseGuards,
 } from '@nestjs/common';
-import { ChatRoom, ChatMessage } from '@prisma/client';
+import { ChatMessage, User } from '@prisma/client';
+import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ResponseChatMessage } from './chat.interface';
 import { ChatService } from './chat.service';
-import { CreateChatRoomDto } from './dto/create-chat.dto';
+import { CreateChatMessageDto } from './dto/create-chat.dto';
 
 // import { UpdateChatRoomDto } from './dto/update-chat.dto';
 
@@ -23,26 +25,23 @@ export class ChatController {
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(
-    @Body() createChatRoomDto: CreateChatRoomDto
-  ): Promise<ChatRoom> {
-    return await this.chatService.create(createChatRoomDto);
+    @Body() createChatMessageDto: CreateChatMessageDto,
+    @GetUser() user: User
+  ): Promise<ChatMessage> {
+    Logger.debug(
+      `createChatMessageDto: ${JSON.stringify(createChatMessageDto)}`
+    );
+
+    return await this.chatService.create(createChatMessageDto, user.id);
   }
 
-  @Get('messages/:id')
+  @Get(':chatRoomId')
   @UseGuards(JwtAuthGuard)
-  async findChatMessages(@Param('id') id: string): Promise<ChatMessage[]> {
-    return await this.chatService.findChatMessages(id);
+  async findAll(
+    @Param('chatRoomId') chatRoomId: string
+  ): Promise<ResponseChatMessage[]> {
+    return await this.chatService.findAll(chatRoomId);
   }
-
-  // @Get()
-  // findAll() {
-  //   return this.chatService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.chatService.findOne(+id);
-  // }
 
   // @Patch(':id')
   // update(
