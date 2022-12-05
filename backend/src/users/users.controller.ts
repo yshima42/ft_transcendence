@@ -31,6 +31,7 @@ import {
   MatchResult,
   User,
 } from '@prisma/client';
+import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
@@ -40,7 +41,6 @@ import { GameService } from 'src/game/game.service';
 import { GameStats } from 'src/game/interfaces/game-stats.interface';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserDto } from './dto/user.dto';
 import { BlockEntity } from './entities/block.entity';
 import { FriendRequestEntity } from './entities/friendRequest.entity';
@@ -49,6 +49,7 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 @ApiTags('users')
+@UseGuards(JwtTwoFactorAuthGuard)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -59,7 +60,6 @@ export class UsersController {
   ) {}
 
   @Get('all')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '自分以外のユーザー情報を取得',
   })
@@ -69,7 +69,6 @@ export class UsersController {
   }
 
   @Get('me/profile')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '自分のユーザー情報取得',
     description:
@@ -88,7 +87,6 @@ export class UsersController {
   }
 
   @Post('me/profile')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '自分のユーザー情報更新',
     description:
@@ -103,7 +101,6 @@ export class UsersController {
   }
 
   @Get(':id/profile')
-  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: UserEntity })
   @ApiOperation({
     summary: '各ユーザー情報取得',
@@ -122,7 +119,6 @@ export class UsersController {
   }
 
   @Get(':id/avatar/:filename')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '各ユーザーのアバター取得',
     description: 'このエンドポイントを各ユーザー情報のavatarImageUrlに設定',
@@ -140,7 +136,6 @@ export class UsersController {
   }
 
   @Get('avatar/:filename')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'アバターの取得',
   })
@@ -157,7 +152,6 @@ export class UsersController {
   }
 
   @Post('me/avatar')
-  @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'アバターの更新' })
   @UseInterceptors(FileInterceptor('file', FileService.multerOptions()))
@@ -189,7 +183,6 @@ export class UsersController {
   }
 
   @Get(':id/game/matches')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '各ユーザーのMatchHistory取得' })
   @ApiOkResponse({ type: MatchResultEntity, isArray: true })
   async findMatchHistory(
@@ -199,7 +192,6 @@ export class UsersController {
   }
 
   @Get(':id/game/stats')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '各ユーザーのStats取得' })
   @ApiOkResponse({ type: GameStatsEntity })
   async findGameStats(
@@ -216,7 +208,6 @@ export class UsersController {
    * ブロック関係
    ******************************/
   @Post('me/blocks')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'ユーザーをブロック' })
   @ApiBody({
     description: 'ブロックするユーザーのUUIDをtargetIdとして設定',
@@ -239,7 +230,6 @@ export class UsersController {
   }
 
   @Delete('me/blocks/:id')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'ユーザーのブロックを解除',
     description:
@@ -254,7 +244,6 @@ export class UsersController {
   }
 
   @Get('me/blocks')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'ブロックしているユーザーの一覧取得' })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findBlockedUsers(@GetUser() user: User): Promise<User[]> {
@@ -265,7 +254,6 @@ export class UsersController {
    * フレンド関係
    ******************************/
   @Post('me/friend-requests')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'フレンドリクエストの送信' })
   @ApiBody({
     description: 'フレンドリクエストを送る相手のUUIDをreceiverIdに設定',
@@ -288,7 +276,6 @@ export class UsersController {
   }
 
   @Patch('me/friend-requests/incoming')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'フレンドリクエストの承認・拒否',
     description:
@@ -324,7 +311,6 @@ export class UsersController {
   // numberがレスポンスとして返ってくるのは修正するべきでは
   // 上記検討次第swagger対応予定
   @Delete('me/friends/:id')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'フレンド解除',
     description: 'フレンドを解除するユーザーのUUIDをpathで渡す',
@@ -343,7 +329,6 @@ export class UsersController {
   // Postmanで試すと'PENDING'が返ってくるが正しい挙動か
   // 上記検討次第swagger対応予定
   @Delete('me/friend-requests/:id')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'フレンドリクエストキャンセル',
     description: 'フレンドリクエストをキャンセルするユーザーのUUIDをpathで渡す',
@@ -356,7 +341,6 @@ export class UsersController {
   }
 
   @Get('me/friends')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'フレンド一覧取得' })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findFriends(@GetUser() user: User): Promise<User[]> {
@@ -364,7 +348,6 @@ export class UsersController {
   }
 
   @Get('me/friend-requests/outgoing')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '自分から(自分→他ユーザー)のフレンドリクエスト一覧取得',
   })
@@ -374,7 +357,6 @@ export class UsersController {
   }
 
   @Get('me/friend-requests/incoming')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '他ユーザーから(他ユーザー→自分)のフレンドリクエスト一覧取得',
   })
@@ -384,7 +366,6 @@ export class UsersController {
   }
 
   @Get('me/requestable-users')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: '自分がフレンドリクエストを送ることができるユーザー一覧取得',
   })
