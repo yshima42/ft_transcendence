@@ -18,10 +18,10 @@ export class MatchResultEntity implements MatchResult {
   playerTwoId!: string;
 
   @ApiProperty({ default: 5 })
-  userScore!: number;
+  playerOneScore!: number;
 
   @ApiProperty({ default: 3 })
-  opponentScore!: number;
+  playerTwoScore!: number;
 
   @ApiProperty({ default: true })
   win!: boolean;

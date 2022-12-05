@@ -19,13 +19,13 @@ export class GameService {
       throw new BadRequestException("Can't add match result of others");
     }
 
-    const userScore = Number(matchResultDto.userScore);
-    const opponentScore = Number(matchResultDto.opponentScore);
+    const playerOneScore = Number(matchResultDto.playerOneScore);
+    const playerTwoScore = Number(matchResultDto.playerTwoScore);
     if (
-      !(userScore >= 0 && userScore <= 5) ||
-      !(opponentScore >= 0 && opponentScore <= 5) ||
-      (userScore < 5 && opponentScore < 5) ||
-      (userScore === 5 && opponentScore === 5)
+      !(playerOneScore >= 0 && playerOneScore <= 5) ||
+      !(playerTwoScore >= 0 && playerTwoScore <= 5) ||
+      (playerOneScore < 5 && playerTwoScore < 5) ||
+      (playerOneScore === 5 && playerTwoScore === 5)
     ) {
       throw new BadRequestException('Invalid score');
     }
@@ -34,9 +34,9 @@ export class GameService {
       data: {
         playerOneId: matchResultDto.playerOneId,
         playerTwoId: matchResultDto.playerTwoId,
-        userScore,
-        opponentScore,
-        win: userScore > opponentScore,
+        playerOneScore,
+        playerTwoScore,
+        win: playerOneScore > playerTwoScore,
       },
     });
 
