@@ -7,12 +7,12 @@ import {
   UseGuards,
   Logger,
 } from '@nestjs/common';
-import { User, DmMessage } from '@prisma/client';
+import { User, Dm } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ResponseDmRoom, ResponseDmMessage } from './dm.interface';
+import { ResponseDmRoom, ResponseDm } from './dm.interface';
 import { DmService } from './dm.service';
-import { CreateDmMessageDto } from './dto/create-dm.dto';
+import { CreateDmDto } from './dto/create-dm.dto';
 
 @Controller('dm')
 export class DmController {
@@ -22,18 +22,18 @@ export class DmController {
   @Post(':id')
   @UseGuards(JwtAuthGuard)
   async create(
-    @Body() createDmMessageDto: CreateDmMessageDto,
+    @Body() createDmDto: CreateDmDto,
     @GetUser() user: User
-  ): Promise<DmMessage> {
-    Logger.debug(`createDmMessageDto: ${JSON.stringify(createDmMessageDto)}`);
+  ): Promise<Dm> {
+    Logger.debug(`createDmDto: ${JSON.stringify(createDmDto)}`);
 
-    return await this.dmService.create(createDmMessageDto, user.id);
+    return await this.dmService.create(createDmDto, user.id);
   }
 
   @Get('messages/:id')
   @UseGuards(JwtAuthGuard)
-  async findDmMessages(@Param('id') id: string): Promise<ResponseDmMessage[]> {
-    return await this.dmService.findDmMessages(id);
+  async findDms(@Param('id') id: string): Promise<ResponseDm[]> {
+    return await this.dmService.findDms(id);
   }
 
   @Get('me')

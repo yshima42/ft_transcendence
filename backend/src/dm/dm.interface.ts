@@ -8,13 +8,13 @@ export type ResponseDmRoom = {
       avatarImageUrl: string;
     };
   }>;
-  dmMessages: Array<{
+  dms: Array<{
     content: string;
     createdAt: Date;
   }>;
 };
 
-export type ResponseDmMessage = {
+export type ResponseDm = {
   id: string;
   content: string;
   createdAt: Date;

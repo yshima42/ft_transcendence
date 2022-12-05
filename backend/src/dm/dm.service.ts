@@ -1,27 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DmMessage } from '@prisma/client';
+import { Dm } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseDmRoom, ResponseDmMessage } from './dm.interface';
-import { CreateDmMessageDto } from './dto/create-dm.dto';
+import { ResponseDmRoom, ResponseDm } from './dm.interface';
+import { CreateDmDto } from './dto/create-dm.dto';
 // import { UpdateDmDto } from './dto/update-dm.dto';
 
 @Injectable()
 export class DmService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    createDmMessageDto: CreateDmMessageDto,
-    senderId: string
-  ): Promise<DmMessage> {
-    const dmMessage = await this.prisma.dmMessage.create({
+  async create(createDmDto: CreateDmDto, senderId: string): Promise<Dm> {
+    const dm = await this.prisma.dm.create({
       data: {
-        content: createDmMessageDto.content,
+        content: createDmDto.content,
         senderId,
-        dmRoomId: createDmMessageDto.dmRoomId,
+        dmRoomId: createDmDto.dmRoomId,
       },
     });
 
-    return dmMessage;
+    return dm;
   }
 
   // create(createDmDto: CreateDmDto) {
@@ -65,7 +62,7 @@ export class DmService {
             },
           },
         },
-        dmMessages: {
+        dms: {
           select: {
             content: true,
             createdAt: true,
@@ -81,14 +78,14 @@ export class DmService {
     return dmRooms;
   }
 
-  async findDmMessages(id: string): Promise<ResponseDmMessage[]> {
+  async findDms(id: string): Promise<ResponseDm[]> {
     if (id === undefined) {
-      Logger.warn(`findDmMessages: dmRoomId is undefined`);
+      Logger.warn(`findDms: dmRoomId is undefined`);
 
       return [];
     }
 
-    const dmMessages = await this.prisma.dmMessage.findMany({
+    const dms = await this.prisma.dm.findMany({
       where: {
         dmRoomId: id,
       },
@@ -105,8 +102,8 @@ export class DmService {
         },
       },
     });
-    Logger.debug(`findDmMessages: ${JSON.stringify(dmMessages)}`);
+    Logger.debug(`findDms: ${JSON.stringify(dms)}`);
 
-    return dmMessages;
+    return dms;
   }
 }

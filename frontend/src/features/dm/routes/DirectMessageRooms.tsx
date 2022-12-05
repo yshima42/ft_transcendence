@@ -12,7 +12,7 @@ type ResponseDmRoom = {
       avatarImageUrl: string;
     };
   }>;
-  dmMessages: Array<{
+  dms: Array<{
     content: string;
     createdAt: Date;
   }>;
@@ -41,9 +41,7 @@ export const DirectMessageRooms: React.FC = React.memo(() => {
                   <C.Flex>
                     <C.Box>
                       <C.Text fontSize="sm">
-                        {new Date(
-                          dmRoom.dmMessages[0].createdAt
-                        ).toLocaleString()}
+                        {new Date(dmRoom.dms[0].createdAt).toLocaleString()}
                       </C.Text>
                       <C.Heading fontSize="xl">{`${dmRoom.dmUsers[0].user.name}`}</C.Heading>
                       <C.Avatar

@@ -6,7 +6,7 @@ export class CreateDmRoomDto {
   name!: string;
 }
 
-export class CreateDmMessageDto {
+export class CreateDmDto {
   @IsNotEmpty()
   @IsString()
   content!: string;
