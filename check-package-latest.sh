@@ -8,7 +8,7 @@ rootDir=$(pwd | sed -r "s/\/\.git\/hooks//")
 for project in ${projects[@]}; do
   echo "Executing $project setup:dev"
   cd "$rootDir/$project"
-  yarn ncu -e2 > /dev/null
+  yarn ncu -e2
   if [ ${?} -eq 1 ]; then
     printf '\033[31m%s\033[m\n' "No Package Latest!!!"
     exit 1
