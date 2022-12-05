@@ -15,8 +15,8 @@ export class GameService {
   async addMatchResult(
     createMatchResultDto: CreateMatchResultDto
   ): Promise<MatchResult> {
-    const playerOneScore = Number(createMatchResultDto.playerOneScore);
-    const playerTwoScore = Number(createMatchResultDto.playerTwoScore);
+    const playerOneScore = createMatchResultDto.playerOneScore;
+    const playerTwoScore = createMatchResultDto.playerTwoScore;
     if (
       (playerOneScore < 5 && playerTwoScore < 5) ||
       (playerOneScore === 5 && playerTwoScore === 5)
@@ -30,7 +30,6 @@ export class GameService {
         playerTwoId: createMatchResultDto.playerTwoId,
         playerOneScore,
         playerTwoScore,
-        win: playerOneScore > playerTwoScore,
       },
     });
 
@@ -61,8 +60,8 @@ export class GameService {
 
     const winMatches = matchResults.filter((match) => {
       return (
-        (match.playerOneId === playerId && match.win) ||
-        (match.playerTwoId === playerId && !match.win)
+        (match.playerOneId === playerId && match.playerOneScore === 5) ||
+        (match.playerTwoId === playerId && match.playerTwoScore === 5)
       );
     });
 
