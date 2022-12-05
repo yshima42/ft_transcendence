@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "start:dev": "vite",
+    "start:app": "cd ../ && ./start.sh",
     "api": "yarn --cwd ../backend start:dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
