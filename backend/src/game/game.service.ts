@@ -11,6 +11,7 @@ import {
 export class GameService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // TODO 自分で自分と戦う場合の処理
   async addMatchResult(
     createMatchResultDto: CreateMatchResultDto
   ): Promise<MatchResult> {
@@ -39,10 +40,7 @@ export class GameService {
   async findMatchHistory(playerId: string): Promise<MatchResultWithPlayers[]> {
     const matchResults = await this.prisma.matchResult.findMany({
       where: {
-        AND: {
-          playerOneId: playerId,
-          playerTwoId: playerId,
-        },
+        OR: [{ playerOneId: playerId }, { playerTwoId: playerId }],
       },
       include: {
         playerOne: true,
