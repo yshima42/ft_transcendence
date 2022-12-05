@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,56 +10,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 使用するときのみコメントアウトを外してください。
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output   = "./erd.md"
+// }
+
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
+
+// generator docs {
+//   provider = "node node_modules/prisma-docs-generator"
+// }
+
+// generator class_validator {
+//   provider = "prisma-class-validator-generator"
+// }
+
 model User {
-  id                                           String          @id
-  name                                         String          @unique
-  avatarImageUrl                               String
-  nickname                                     String          @unique
-  onlineStatus                                 OnlineStatus    @default(ONLINE)
-  createdAt                                    DateTime        @default(now())
-  updatedAt                                    DateTime
-  isTwoFactorAuthEnabled                       Boolean         @default(false)
-  twoFactorAuthSecret                          String?
-  Block_Block_sourceIdToUser                   Block[]         @relation("Block_sourceIdToUser")
-  Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
-  FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
-  FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
-  MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")
-  MatchResult_MatchResult_playerTwoIdToUser    MatchResult[]   @relation("MatchResult_playerTwoIdToUser")
-}
+  id                     String       @id @default(uuid())
+  name                   String       @unique
+  avatarImageUrl         String
+  nickname               String       @unique
+  isTwoFactorAuthEnabled Boolean      @default(false)
+  twoFactorAuthSecret    String?
+  onlineStatus           OnlineStatus @default(ONLINE)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
 
-model MatchResult {
-  id                                 String   @id
-  playerOneId                        String
-  playerTwoId                        String
-  userScore                          Int
-  opponentScore                      Int
-  win                                Boolean
-  startedAt                          DateTime @default(now())
-  finishededAt                       DateTime
-  User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
-  User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
-}
-
-model Block {
-  sourceId                  String
-  targetId                  String
-  User_Block_sourceIdToUser User   @relation("Block_sourceIdToUser", fields: [sourceId], references: [id])
-  User_Block_targetIdToUser User   @relation("Block_targetIdToUser", fields: [targetId], references: [id])
-
-  @@id([sourceId, targetId])
-}
-
-model FriendRequest {
-  creatorId                           String
-  receiverId                          String
-  status                              FriendRequestStatus
-  createdAt                           DateTime            @default(now())
-  updatedAt                           DateTime
-  User_FriendRequest_creatorIdToUser  User                @relation("FriendRequest_creatorIdToUser", fields: [creatorId], references: [id])
-  User_FriendRequest_receiverIdToUser User                @relation("FriendRequest_receiverIdToUser", fields: [receiverId], references: [id])
-
-  @@id([creatorId, receiverId])
+  creator   FriendRequest[] @relation("creator")
+  receiver  FriendRequest[] @relation("receiver")
+  blocking  Block[]         @relation("source")
+  blockedBy Block[]         @relation("target")
+  playerOne MatchResult[]   @relation("playerOne")
+  playerTwo MatchResult[]   @relation("playerTwo")
 }
 
 enum OnlineStatus {
@@ -65,8 +53,42 @@ enum OnlineStatus {
   INGAME
 }
 
+model FriendRequest {
+  creator    User                @relation("creator", fields: [creatorId], references: [id])
+  creatorId  String
+  receiver   User                @relation("receiver", fields: [receiverId], references: [id])
+  receiverId String
+  status     FriendRequestStatus
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@id([creatorId, receiverId])
+}
+
 enum FriendRequestStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+model Block {
+  source   User   @relation("source", fields: [sourceId], references: [id])
+  sourceId String
+  target   User   @relation("target", fields: [targetId], references: [id])
+  targetId String
+
+  @@id([sourceId, targetId])
+}
+
+model MatchResult {
+  id            String   @id @default(uuid())
+  playerOne     User     @relation("playerOne", fields: [playerOneId], references: [id])
+  playerOneId   String
+  playerTwo     User     @relation("playerTwo", fields: [playerTwoId], references: [id])
+  playerTwoId   String
+  userScore     Int
+  opponentScore Int
+  win           Boolean
+  startedAt     DateTime @default(now())
+  finishededAt  DateTime @updatedAt
 }
