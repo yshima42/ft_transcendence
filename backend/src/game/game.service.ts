@@ -36,11 +36,14 @@ export class GameService {
     return matchResult;
   }
 
-  async findMatchHistory(
-    playerOneId: string
-  ): Promise<MatchResultWithPlayers[]> {
+  async findMatchHistory(playerId: string): Promise<MatchResultWithPlayers[]> {
     const matchResults = await this.prisma.matchResult.findMany({
-      where: { playerOneId },
+      where: {
+        AND: {
+          playerOneId: playerId,
+          playerTwoId: playerId,
+        },
+      },
       include: {
         playerOne: true,
         playerTwo: true,
@@ -49,6 +52,20 @@ export class GameService {
 
     return matchResults;
   }
+
+  // async findMatchHistory(
+  //   playerOneId: string
+  // ): Promise<MatchResultWithPlayers[]> {
+  //   const matchResults = await this.prisma.matchResult.findMany({
+  //     where: { playerOneId },
+  //     include: {
+  //       playerOne: true,
+  //       playerTwo: true,
+  //     },
+  //   });
+
+  //   return matchResults;
+  // }
 
   async findStats(playerOneId: string): Promise<GameStats> {
     const matchResults = await this.prisma.matchResult.findMany({
