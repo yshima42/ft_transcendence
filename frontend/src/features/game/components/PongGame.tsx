@@ -1,4 +1,4 @@
-import { memo, FC, useCallback } from 'react';
+import { memo, FC, useCallback, useEffect } from 'react';
 import { SOCKET_URL } from 'config/default';
 import { io } from 'socket.io-client';
 import {
@@ -20,6 +20,18 @@ export const PongGame: FC = memo(() => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
+
+  useEffect(() => {
+    // TODO: RoomIdを指定する
+    socket.emit('connectPong');
+
+    // TODO: Roomがなかった時のエラー処理
+
+    // TODO: Player1か2の決定
+    socket.on('connectedPlayer', (data) => {
+      console.log(data);
+    });
+  }, []);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -50,6 +62,9 @@ export const PongGame: FC = memo(() => {
     }
 
     // スコアの表示
+    // socket.on('scoreUpdate', (data: { score: number }) => {
+    //   player1.score = data.score;
+    // });
     ctx.font = '48px serif';
     ctx.fillText(player1.score.toString(), 20, 50);
     ctx.fillText(player2.score.toString(), 960, 50);

@@ -53,12 +53,16 @@ export class Ball {
 }
 
 export class Paddle {
+  id: string;
+  role: 'Player1' | 'Player2';
   up: boolean;
   down: boolean;
   pos: { x: number; y: number };
   score: number;
 
   constructor(x: number, y: number) {
+    this.id = '';
+    this.role = 'Player1';
     this.pos = new Vector(x, y);
     this.up = false;
     this.down = false;
