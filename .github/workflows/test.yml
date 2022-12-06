@@ -8,19 +8,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: build_test
-        run: |
-          yarn --cwd backend
-          yarn --cwd backend build
-          yarn --cwd frontend
-          yarn --cwd frontend build
+      - name: backend install
+        run: yarn --cwd backend install
+      - name: backend build
+        run: yarn --cwd backend build
+      - name: frontend install
+        run: yarn --cwd frontend install
+      - name: frontend build
+        run: yarn --cwd frontend build
 
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: test
+      - name: env and docker
         run: |
-          bash setup-dev.sh
-          yarn --cwd backend
-          yarn --cwd backend test
+          echo 'DATABASE_URL="postgresql://udemy:udemy@localhost:5434/udemy?schema=public"' > backend/.env
+          docker-compose -f backend/docker-compose.yml up -d
+      - name: backend install
+        run: yarn --cwd backend install
+      - name: backend prisma generate
+        run: yarn --cwd backend prisma generate
+      - name: backend prisma migrate
+        run: yarn --cwd backend prisma migrate dev --name init
+      - name: test
+        run: yarn --cwd backend test
