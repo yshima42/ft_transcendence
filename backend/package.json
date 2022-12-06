@@ -10,8 +10,8 @@
     "build": "nest build",
     "start": "nest start",
     "start:app": "cd ../ && ./start-app.sh",
-    "start:dev": "NODE_ENV=development nest start --watch",
-    "start:debug": "NODE_ENV=development nest start --debug --watch",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint 'src/**/*.ts'",
     "lint:fix": "eslint 'src/**/*.ts' --fix",
@@ -25,7 +25,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "preinstall": "npx typesync || :",
     "prepare": "npx simple-git-hooks || :",
-    "setup:dev": "yarn install && yarn prisma generate && yarn prisma migrate reset -f"
+    "setup:dev": "bash ./setup-dev.sh"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.1",
@@ -126,10 +126,9 @@
     ]
   },
   "simple-git-hooks": {
-    "pre-commit": "./lint-staged-each.sh",
     "post-checkout": "./setup-dev.sh",
     "post-merge": "./setup-dev.sh",
-    "pre-push": "./check-conflict.sh && ./check-package-latest.sh"
+    "pre-push": "./lint-staged-each.sh && ./check-conflict.sh"
   },
   "jest": {
     "moduleFileExtensions": [
