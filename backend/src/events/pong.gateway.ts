@@ -46,6 +46,9 @@ export class PongGateway {
   handleConnection(@ConnectedSocket() socket: Socket): void {
     const scoring = (player: Paddle) => {
       player.score++;
+      // console.log('hi');
+      // TODO: player nameをつけて誰のスコアかわかるように
+      // socket.emit('scoreUpdate', { score: player.score });
     };
 
     setInterval(() => {
@@ -96,16 +99,10 @@ export class PongGateway {
     }, 33);
   }
 
-  @SubscribeMessage('newPlayer')
-  handleNewPlayer(
-    @MessageBody() pos: { x: number; y: number },
-    @ConnectedSocket() socket: Socket
-  ): void {
+  @SubscribeMessage('connectPong')
+  handleNewPlayer(@ConnectedSocket() socket: Socket): void {
     console.log(`new client: ${socket.id}`);
-    players[socket.id] = pos;
-    console.log(pos);
-    socket.emit('updatePlayers', players);
-    socket.emit('updatePos', players);
+    socket.emit('connectedPlayer', socket.id);
   }
 
   @SubscribeMessage('userCommands')
