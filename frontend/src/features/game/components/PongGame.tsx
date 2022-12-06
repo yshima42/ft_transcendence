@@ -47,6 +47,11 @@ export const PongGame: FC = memo(() => {
       player1.pos.y = data.y;
     });
 
+    socket.on('player2Update', (data: { x: number; y: number }) => {
+      player2.pos.x = data.x;
+      player2.pos.y = data.y;
+    });
+
     socket.on('ballUpdate', (data: { x: number; y: number }) => {
       ball.pos.x = data.x;
       ball.pos.y = data.y;
