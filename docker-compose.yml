@@ -2,6 +2,7 @@ version: '3'
 services:
   backend:
     build: ./backend
+    image: backend
     container_name: backend
     ports:
       - "3000:3000"
@@ -9,9 +10,12 @@ services:
       - ./backend:/app
     # restart: always
     depends_on:
-      - dev-postgres
+      - postgres
+    networks:
+      - ponggame
   frontend:
     build: ./frontend
+    image: frontend
     container_name: frontend
     ports:
       - "5173:5173"
@@ -20,8 +24,11 @@ services:
     # restart: always
     depends_on:
       - backend
-  dev-postgres:
+    networks:
+      - ponggame
+  postgres:
     image: postgres:14.4-alpine
+    container_name: postgres
     ports:
       - 5434:5432
     # restart: always
@@ -30,6 +37,6 @@ services:
       POSTGRES_PASSWORD: udemy
       POSTGRES_DB: udemy
     networks:
-      - lesson
+      - ponggame
 networks:
-  lesson:
+  ponggame:
