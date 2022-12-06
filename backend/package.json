@@ -25,7 +25,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "preinstall": "npx typesync || :",
     "prepare": "npx simple-git-hooks || :",
-    "setup:dev": "yarn install && yarn prisma generate && yarn prisma migrate reset -f"
+    "setup:dev": "bash ./setup-dev.sh"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.1",

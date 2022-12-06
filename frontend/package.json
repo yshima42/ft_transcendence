@@ -19,12 +19,11 @@
     "preinstall": "npx typesync || :",
     "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
-    "prepare": "npx simple-git-hooks || :",
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "setup:dev": "yarn install && yarn prisma db pull && yarn prisma generate"
+    "setup:dev": "bash ./setup-dev.sh"
   },
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
