@@ -5,7 +5,7 @@ import { PrismaService } from './prisma.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.env.${process.env.NODE_ENV ?? 'invalid'}`],
+      envFilePath: ['.env'],
     }),
   ],
   providers: [PrismaService],
