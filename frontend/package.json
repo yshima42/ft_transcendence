@@ -19,13 +19,11 @@
     "preinstall": "npx typesync || :",
     "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
-    "prepare": "npx simple-git-hooks || :",
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "db:pull": "dotenv -e .env.development -- yarn prisma db pull",
-    "setup:dev": "yarn install && cp ../backend/prisma/schema.prisma ./prisma && yarn prisma generate"
+    "setup:dev": "bash ./setup-dev.sh"
   },
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
@@ -61,7 +59,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/babel__core": "^7.1.20",
     "@types/eslint": "^8.4.10",
-    "@types/jest": "^29.2.3",
+    "@types/jest": "^29.2.4",
     "@types/prettier": "^2.7.1",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
@@ -69,7 +67,6 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@vitejs/plugin-react": "^2.2.0",
     "babel-loader": "^9.1.0",
-    "dotenv-cli": "^6.0.0",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
@@ -77,7 +74,7 @@
     "eslint-plugin-jest": "^27.1.6",
     "eslint-plugin-jest-dom": "^4.0.3",
     "eslint-plugin-jsx-a11y": "^6.6.1",
-    "eslint-plugin-n": "^15.5.2",
+    "eslint-plugin-n": "^15.6.0",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -89,14 +86,13 @@
     "npm-check-updates": "^16.4.3",
     "prettier": "^2.8.0",
     "prisma": "^4.7.1",
-    "simple-git-hooks": "^2.8.1",
     "stylelint": "^14.16.0",
     "stylelint-config-recess-order": "^3.0.0",
     "stylelint-config-standard": "^29.0.0",
     "stylelint-order": "^5.0.0",
     "ts-jest": "^29.0.3",
     "typescript": "*",
-    "vite": "^3.2.4",
+    "vite": "^3.2.5",
     "vite-tsconfig-paths": "^3.6.0"
   },
   "lint-staged": {
@@ -113,11 +109,5 @@
     "./*.json": [
       "prettier --write --loglevel=error"
     ]
-  },
-  "simple-git-hooks": {
-    "pre-commit": "./lint-staged-each.sh",
-    "post-checkout": "./setup-dev.sh",
-    "post-merge": "./setup-dev.sh",
-    "pre-push": "./check-conflict.sh && ./check-package-latest.sh"
   }
 }
