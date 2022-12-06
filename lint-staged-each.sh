@@ -8,7 +8,7 @@ set -eu
 #   Riakuto! Project by Klemiwary Books
 
 fileTypes="js|jsx|ts|tsx|html|json|css|sass|scss|less|gql|graphql"
-target="src|public"
+target="src|public|cypress"
 
 # detect git against tag
 if git rev-parse --verify HEAD >/dev/null 2>&1
