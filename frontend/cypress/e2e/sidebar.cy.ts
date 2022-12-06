@@ -8,5 +8,6 @@ describe('sidebar spec', () => {
   it('Users', () => {
     cy.contains('Users').click();
     cy.url().should('include', '/users');
+    cy.get('h2').should('have.text', 'Users');
   });
 });
