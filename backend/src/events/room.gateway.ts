@@ -35,17 +35,22 @@ export class RoomGateway {
       await socket.join(roomId);
       socket.emit('roomJoined');
       this.logger.log(`joinRoom: ${socket.id} joined ${roomId}`);
+
+      if (this.server.sockets.adapter.rooms.get(roomId)?.size === 2) {
+        socket.emit('startGame', { start: true, player: 'two' });
+        socket.to(roomId).emit('startGame', { start: false, player: 'one' });
+      }
     }
   }
 
-  // private getSocketGameRoom(socket: Socket): string {
-  //   const socketRooms = Array.from(socket.rooms.values()).filter(
-  //     (r) => r !== socket.id
-  //   );
-  //   const gameRoom = socketRooms?.[0];
+  private getSocketGameRoom(socket: Socket): string {
+    const socketRooms = Array.from(socket.rooms.values()).filter(
+      (r) => r !== socket.id
+    );
+    const gameRoom = socketRooms?.[0];
 
-  //   return gameRoom;
-  // }
+    return gameRoom;
+  }
 
   // @SubscribeMessage('update')
   // handleUpdate(
