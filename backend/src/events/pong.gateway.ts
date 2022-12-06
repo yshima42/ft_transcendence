@@ -35,17 +35,6 @@ export class PongGateway {
     socket.emit('updatePos', players);
   }
 
-  @SubscribeMessage('disconnect')
-  handleDisconnect(
-    @ConnectedSocket() socket: Socket
-    // @MessageBody() pos: { x: number; y: number }
-  ): void {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete players[socket.id];
-    console.log(`good-bey: ${socket.id}`);
-    socket.emit('updatePlayers', players);
-  }
-
   @SubscribeMessage('userCommands')
   handleUserCommands(
     @MessageBody() data: { up: boolean; down: boolean },

@@ -1,6 +1,7 @@
 import {
   BALL_COLOR,
   BALL_SIZE,
+  BALL_SPEED,
   PADDLE_COLOR,
   PADDLE_HEIGHT,
   PADDLE_SPEED,
@@ -26,11 +27,15 @@ export class Ball {
   up: boolean;
   down: boolean;
   pos: { x: number; y: number };
+  dx: number;
+  dy: number;
 
   constructor(x: number, y: number) {
     this.pos = new Vector(x, y);
     this.up = false;
     this.down = false;
+    this.dx = BALL_SPEED;
+    this.dy = -BALL_SPEED;
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {
