@@ -32,4 +32,4 @@ jobs:
       - name: backend prisma migrate
         run: yarn --cwd backend prisma migrate dev --name init
       - name: test
-        run: yarn --cwd backend test:all
+        run: yarn --cwd backend test:runInBand
