@@ -97,6 +97,10 @@ export class PongGateway {
         x: this.player1.pos.x,
         y: this.player1.pos.y,
       });
+      socket.emit('player2Update', {
+        x: this.player2.pos.x,
+        y: this.player2.pos.y,
+      });
       socket.emit('ballUpdate', {
         x: this.ball.pos.x,
         y: this.ball.pos.y,
@@ -111,6 +115,7 @@ export class PongGateway {
     @MessageBody() data: { up: boolean; down: boolean },
     @ConnectedSocket() socket: Socket
   ): void {
+    // player1操作
     if (data.down) {
       this.player1.pos.y += PADDLE_SPEED;
       if (this.player1.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
@@ -120,6 +125,19 @@ export class PongGateway {
       this.player1.pos.y -= PADDLE_SPEED;
       if (this.player1.pos.y < 0) {
         this.player1.pos.y = 0;
+      }
+    }
+
+    // player2操作
+    if (data.down) {
+      this.player2.pos.y += PADDLE_SPEED;
+      if (this.player2.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
+        this.player2.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
+      }
+    } else if (data.up) {
+      this.player2.pos.y -= PADDLE_SPEED;
+      if (this.player2.pos.y < 0) {
+        this.player2.pos.y = 0;
       }
     }
     players[socket.id] = data;
