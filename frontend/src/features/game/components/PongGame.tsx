@@ -10,6 +10,7 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from '../utils/gameConfig';
+// import gameContext from '../utils/gameContext';
 import { Ball, Paddle } from '../utils/objs';
 import { userInput } from '../utils/userInput';
 import { Canvas } from './Canvas';
@@ -20,6 +21,8 @@ export const PongGame: FC = memo(() => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
+
+  // const { player, setPlayer } = useContext(gameContext);
 
   useEffect(() => {
     // TODO: RoomIdを指定する

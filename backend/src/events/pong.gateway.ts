@@ -43,7 +43,12 @@ export class PongGateway {
   // 上下の壁で跳ね返る処理
 
   // handleConnection内はconnectionが確立されたら実行される
-  handleConnection(@ConnectedSocket() socket: Socket): void {
+  // handleConnection(@ConnectedSocket() socket: Socket): void {
+
+  // }
+
+  @SubscribeMessage('connectPong')
+  handleNewPlayer(@ConnectedSocket() socket: Socket): void {
     const scoring = (player: Paddle) => {
       player.score++;
       // console.log('hi');
@@ -85,8 +90,8 @@ export class PongGateway {
       }
 
       // frameごとに進む
-      this.ball.pos.x += this.ball.dx * 0.07;
-      this.ball.pos.y += this.ball.dy * 0.07;
+      this.ball.pos.x += this.ball.dx;
+      this.ball.pos.y += this.ball.dy;
 
       socket.emit('player1Update', {
         x: this.player1.pos.x,
@@ -97,10 +102,6 @@ export class PongGateway {
         y: this.ball.pos.y,
       });
     }, 33);
-  }
-
-  @SubscribeMessage('connectPong')
-  handleNewPlayer(@ConnectedSocket() socket: Socket): void {
     console.log(`new client: ${socket.id}`);
     socket.emit('connectedPlayer', socket.id);
   }
