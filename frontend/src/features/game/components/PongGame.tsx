@@ -1,4 +1,5 @@
-import { memo, FC, useCallback, useEffect } from 'react';
+import { memo, FC, useCallback, useEffect, useContext } from 'react';
+import { Spinner } from '@chakra-ui/react';
 import { SOCKET_URL } from 'config/default';
 import { io } from 'socket.io-client';
 import {
@@ -10,19 +11,92 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from '../utils/gameConfig';
-// import gameContext from '../utils/gameContext';
+import gameContext from '../utils/gameContext';
+import gameService from '../utils/gameService';
 import { Ball, Paddle } from '../utils/objs';
-import { userInput } from '../utils/userInput';
+import socketService from '../utils/socketService';
 import { Canvas } from './Canvas';
 
 const socket = io(SOCKET_URL);
+
+export type StartGame = {
+  start: boolean;
+  player: 'one' | 'two';
+};
+
+// emitの回数を減らすため
+let justPressed = false;
+export const userInput = (obj: Paddle, player: 'one' | 'two'): void => {
+  document.addEventListener(
+    'keydown',
+    (e: KeyboardEvent) => {
+      if (e.key === 'Down' || e.key === 'ArrowDown') {
+        if (!obj.down) {
+          justPressed = true;
+        }
+        obj.down = true;
+      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+        if (!obj.up) {
+          justPressed = true;
+        }
+        obj.up = true;
+      }
+      if (justPressed) {
+        emitUserCommands(obj, player);
+        justPressed = false;
+      }
+    },
+    false
+  );
+
+  document.addEventListener(
+    'keyup',
+    (e: KeyboardEvent) => {
+      if (e.key === 'Down' || e.key === 'ArrowDown') {
+        obj.down = false;
+      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+        obj.up = false;
+      }
+      if (justPressed) {
+        emitUserCommands(obj, player);
+      }
+    },
+    false
+  );
+};
+
+export const emitUserCommands = (obj: Paddle, player: 'one' | 'two'): void => {
+  const userCommands = {
+    up: obj.up,
+    down: obj.down,
+    player,
+  };
+  socket.emit('userCommands', userCommands);
+};
 
 export const PongGame: FC = memo(() => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  // const { player, setPlayer } = useContext(gameContext);
+  const { isGameStarted, setGameStarted } = useContext(gameContext);
+
+  let player: 'one' | 'two';
+
+  const handleGameStart = () => {
+    if (socketService.socket != null) {
+      gameService.onStartGame(socketService.socket, (options: StartGame) => {
+        // TODO: この下にスタートオプション書く
+        setGameStarted(true);
+        // setPlayer(options.player);
+        player = options.player;
+      });
+    }
+  };
+
+  useEffect(() => {
+    handleGameStart();
+  }, []);
 
   useEffect(() => {
     // TODO: RoomIdを指定する
@@ -61,7 +135,7 @@ export const PongGame: FC = memo(() => {
     player2.draw(ctx);
     ball.draw(ctx);
 
-    userInput(player1);
+    userInput(player1, player);
 
     // ゲーム終了
     if (player1.score === 3 || player2.score === 3) {
@@ -80,5 +154,12 @@ export const PongGame: FC = memo(() => {
     // socket.emit('update', { x: paddle1.pos.x, y: paddle1.pos.y });
   }, []);
 
-  return <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />;
+  return (
+    <>
+      {!isGameStarted && <Spinner />}
+      {isGameStarted && (
+        <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+      )}
+    </>
+  );
 });

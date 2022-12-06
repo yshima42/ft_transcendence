@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io-client';
+import { StartGame } from '../components/PongGame';
 
 class GameService {
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
@@ -16,6 +17,10 @@ class GameService {
   // public onGameUpdate(socket: Socket, listener: (matrix: string) => void) {
   //   socket.on('onGameUpdate', ({ matrix }) => listener(matrix));
   // }
+
+  public onStartGame(socket: Socket, listener: (options: StartGame) => void) {
+    socket.on('startGame', listener);
+  }
 }
 
 export default new GameService();

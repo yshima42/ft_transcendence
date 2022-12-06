@@ -11,6 +11,7 @@ import socketService from '../utils/socketService';
 export const GameTop: FC = memo(() => {
   const [isInRoom, setInRoom] = useState(false);
   const [player, setPlayer] = useState<'one' | 'two'>('one');
+  const [isGameStarted, setGameStarted] = useState(false);
 
   const connectSocket = async () => {
     await socketService.connect(SOCKET_URL).catch((err) => {
@@ -28,6 +29,8 @@ export const GameTop: FC = memo(() => {
     setInRoom,
     player,
     setPlayer,
+    isGameStarted,
+    setGameStarted,
   };
 
   return (

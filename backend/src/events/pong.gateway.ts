@@ -39,13 +39,17 @@ export class PongGateway {
   player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  // ボールの動き
-  // 上下の壁で跳ね返る処理
-
   // handleConnection内はconnectionが確立されたら実行される
-  // handleConnection(@ConnectedSocket() socket: Socket): void {
+  // handleConnection(@ConnectedSocket() socket: Socket): void {}
 
-  // }
+  private getSocketGameRoom(socket: Socket): string {
+    const socketRooms = Array.from(socket.rooms.values()).filter(
+      (r) => r !== socket.id
+    );
+    const gameRoom = socketRooms?.[0];
+
+    return gameRoom;
+  }
 
   @SubscribeMessage('connectPong')
   handleNewPlayer(@ConnectedSocket() socket: Socket): void {
@@ -55,6 +59,9 @@ export class PongGateway {
       // TODO: player nameをつけて誰のスコアかわかるように
       // socket.emit('scoreUpdate', { score: player.score });
     };
+
+    // TODO: roomつける時に有効化
+    // const gameRoom = this.getSocketGameRoom(socket);
 
     setInterval(() => {
       // パドルで跳ね返る処理・ゲームオーバー処理
@@ -90,38 +97,44 @@ export class PongGateway {
       }
 
       // frameごとに進む
-      this.ball.pos.x += this.ball.dx;
-      this.ball.pos.y += this.ball.dy;
+      this.ball.pos.x += this.ball.dx * 0.2;
+      this.ball.pos.y += this.ball.dy * 0.2;
 
+      // TODO: 後ほどルームIDつける
+      // socket.to(gameRoom).emit('player1Update', {
       socket.emit('player1Update', {
         x: this.player1.pos.x,
         y: this.player1.pos.y,
       });
+      // socket.to(gameRoom).emit('player2Update', {
       socket.emit('player2Update', {
         x: this.player2.pos.x,
         y: this.player2.pos.y,
       });
+      // socket.to(gameRoom).emit('ballUpdate', {
       socket.emit('ballUpdate', {
         x: this.ball.pos.x,
         y: this.ball.pos.y,
       });
     }, 33);
     console.log(`new client: ${socket.id}`);
+
+    // socket.to(gameRoom).emit('connectedPlayer', socket.id);
     socket.emit('connectedPlayer', socket.id);
   }
 
   @SubscribeMessage('userCommands')
   handleUserCommands(
-    @MessageBody() data: { up: boolean; down: boolean },
+    @MessageBody() data: { up: boolean; down: boolean; player: 'one' | 'two' },
     @ConnectedSocket() socket: Socket
   ): void {
     // player1操作
-    if (data.down) {
+    if (data.player === 'one' && data.down) {
       this.player1.pos.y += PADDLE_SPEED;
       if (this.player1.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
         this.player1.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (data.up) {
+    } else if (data.player === 'one' && data.up) {
       this.player1.pos.y -= PADDLE_SPEED;
       if (this.player1.pos.y < 0) {
         this.player1.pos.y = 0;
@@ -129,12 +142,12 @@ export class PongGateway {
     }
 
     // player2操作
-    if (data.down) {
+    if (data.player === 'two' && data.down) {
       this.player2.pos.y += PADDLE_SPEED;
       if (this.player2.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
         this.player2.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (data.up) {
+    } else if (data.player === 'two' && data.up) {
       this.player2.pos.y -= PADDLE_SPEED;
       if (this.player2.pos.y < 0) {
         this.player2.pos.y = 0;
