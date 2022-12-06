@@ -7,6 +7,9 @@ class SocketService {
     return await new Promise((resolve, reject) => {
       this.socket = io(url);
 
+      const e = 'socket is null';
+      if (this.socket === null) return reject(e);
+
       this.socket.on('connect', () => {
         resolve(this.socket);
       });

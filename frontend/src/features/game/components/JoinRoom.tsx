@@ -18,7 +18,9 @@ export const JoinRoom: FC = memo(() => {
   };
 
   const joinRoom = async (e: FormEvent) => {
+    // 何も入力してない時の処理
     e.preventDefault();
+
     const socket = socketService.socket;
     if (roomName === '' || roomName.trim() === '' || socket == null) return;
 
@@ -26,7 +28,6 @@ export const JoinRoom: FC = memo(() => {
 
     const joined = await gameService
       .joinGameRoom(socket, roomName)
-      // TODO: catchの(e: { error: string })はこの書き方で良いのか確認
       .catch((e: { error: string }) => {
         alert(e.error);
       });
