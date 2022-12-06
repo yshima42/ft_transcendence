@@ -17,6 +17,6 @@
     "jsx": "react-jsx",
     "baseUrl": "src"
   },
-  "include": ["src", "jest.setup.ts", "cypress"],
+  "include": ["src", "jest.setup.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
