@@ -8,17 +8,17 @@ RED="${BOLD}\033[31m"
 RESET='\033[0m'
 
 # リモートに今のブランチがあるかチェック。あるならpullしてくる
-echo "Checking remote branch..."
+echo -e "${GREEN}Checking remote branch...${RESET}"
 git fetch origin $(git rev-parse --abbrev-ref HEAD) && git pull || echo -e "${GREEN}No remote branch${RESET}"
 
 # docker 再起動
-echo "${GREEN}Restarting docker...${RESET}"
+echo -e "${GREEN}Restarting docker...${RESET}"
 # backend/docker-compose.yml
 docker-compose -f backend/docker-compose.yml down
 docker-compose -f backend/docker-compose.yml up -d
 
 # backend
-echo "${GREEN}Executing backend setup...${RESET}"
+echo -e "${GREEN}Executing backend setup...${RESET}"
 # .envファイルがない場合は警告して終了
 if [ ! -f backend/.env ]; then
   echo -e "${RED}No .env file ｡ﾟ(ﾟ´Д｀ﾟ)ﾟ｡${RESET}"
@@ -31,7 +31,7 @@ yarn --cwd backend prisma migrate dev --name init
 yarn --cwd backend prisma db seed
 
 # frontend
-echo "${GREEN}Executing frontend setup...${RESET}"
+echo -e "${GREEN}Executing frontend setup...${RESET}"
 if [ ! -f frontend/.env ]; then
   echo -e "${RED}No .env file ｡ﾟ(ﾟ´Д｀ﾟ)ﾟ｡${RESET}"
   exit 1
