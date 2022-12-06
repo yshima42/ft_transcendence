@@ -18,6 +18,8 @@ export class GameService {
     const playerOneScore = createMatchResultDto.playerOneScore;
     const playerTwoScore = createMatchResultDto.playerTwoScore;
     if (
+      !(playerOneScore >= 0 && playerOneScore <= 5) ||
+      !(playerTwoScore >= 0 && playerTwoScore <= 5) ||
       (playerOneScore < 5 && playerTwoScore < 5) ||
       (playerOneScore === 5 && playerTwoScore === 5)
     ) {

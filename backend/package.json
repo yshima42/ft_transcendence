@@ -28,7 +28,8 @@
     "migrate:reset": "dotenv -e .env.development -- yarn prisma migrate reset",
     "migrate:clear": "dotenv -e .env.development -- yarn prisma migrate reset --skip-seed",
     "setup:dev": "yarn install && yarn prisma generate && yarn migrate:reset -f",
-    "prisma:studio": "dotenv -e .env.development -- yarn prisma studio"
+    "prisma:studio": "dotenv -e .env.development -- yarn prisma studio",
+    "run:test": "dotenv -e .env.development -- yarn run test"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.0",
