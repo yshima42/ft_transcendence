@@ -3,8 +3,8 @@ import { createContext } from 'react';
 export type GameContextProps = {
   isInRoom: boolean;
   setInRoom: (inRoom: boolean) => void;
-  player: 'one' | 'two';
-  setPlayer: (player: 'one' | 'two') => void;
+  side: 'left' | 'right';
+  setSide: (role: 'left' | 'right') => void;
   isGameStarted: boolean;
   setGameStarted: (started: boolean) => void;
 };
@@ -13,9 +13,9 @@ const defaultState: GameContextProps = {
   isInRoom: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setInRoom: () => {},
-  player: 'one',
+  side: 'left',
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  setPlayer: () => {},
+  setSide: () => {},
   isGameStarted: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setGameStarted: () => {},
