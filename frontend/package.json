@@ -19,13 +19,11 @@
     "preinstall": "npx typesync || :",
     "format": "prettier --write --loglevel=warn '{src,cypress}/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
-    "prepare": "npx simple-git-hooks || :",
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "db:pull": "dotenv -e .env.development -- yarn prisma db pull",
-    "setup:dev": "yarn install && cp ../backend/prisma/schema.prisma ./prisma && yarn prisma generate"
+    "setup:dev": "bash ./setup-dev.sh"
   },
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
@@ -72,7 +70,6 @@
     "babel-loader": "^9.1.0",
     "chai": "^4.3.7",
     "cypress": "^11.2.0",
-    "dotenv-cli": "^6.0.0",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
@@ -94,7 +91,6 @@
     "npm-check-updates": "^16.4.3",
     "prettier": "^2.8.0",
     "prisma": "^4.7.1",
-    "simple-git-hooks": "^2.8.1",
     "stylelint": "^14.16.0",
     "stylelint-config-recess-order": "^3.0.0",
     "stylelint-config-standard": "^29.0.0",
@@ -118,11 +114,5 @@
     "./*.json": [
       "prettier --write --loglevel=error"
     ]
-  },
-  "simple-git-hooks": {
-    "pre-commit": "./lint-staged-each.sh",
-    "post-checkout": "./setup-dev.sh",
-    "post-merge": "./setup-dev.sh",
-    "pre-push": "./check-conflict.sh && ./check-package-latest.sh"
   }
 }
