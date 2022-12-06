@@ -10,8 +10,17 @@ import socketService from '../utils/socketService';
 
 export const GameTop: FC = memo(() => {
   const [isInRoom, setInRoom] = useState(false);
-  const [player, setPlayer] = useState<'one' | 'two'>('one');
+  const [side, setSide] = useState<'left' | 'right'>('left');
   const [isGameStarted, setGameStarted] = useState(false);
+
+  const gameContextValue: GameContextProps = {
+    isInRoom,
+    setInRoom,
+    side,
+    setSide,
+    isGameStarted,
+    setGameStarted,
+  };
 
   const connectSocket = async () => {
     await socketService.connect(SOCKET_URL).catch((err) => {
@@ -20,18 +29,8 @@ export const GameTop: FC = memo(() => {
   };
 
   useEffect(() => {
-    // voidで良いか確認
     void connectSocket();
   }, []);
-
-  const gameContextValue: GameContextProps = {
-    isInRoom,
-    setInRoom,
-    player,
-    setPlayer,
-    isGameStarted,
-    setGameStarted,
-  };
 
   return (
     <GameContext.Provider value={gameContextValue}>

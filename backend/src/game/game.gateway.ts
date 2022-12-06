@@ -6,7 +6,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import {
   BALL_SIZE,
   BALL_START_X,
@@ -17,10 +17,8 @@ import {
   PADDLE_SPEED,
   PADDLE_START_POS,
   PADDLE_WIDTH,
-} from './gameConfig';
-import { Ball, Paddle } from './objs';
-
-// const games: Socket[] = [];
+} from '../events/gameConfig';
+import { Ball, Paddle } from '../events/objs';
 
 type Players = {
   [key: string]: { x?: number; y?: number; up?: boolean; down?: boolean };
@@ -29,11 +27,39 @@ type Players = {
 const players: Players = {};
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class PongGateway {
+export class GameGateway {
   @WebSocketServer()
   server!: Server;
 
   private readonly logger: Logger = new Logger('Gateway Log');
+
+  @SubscribeMessage('joinRoom')
+  async joinRoom(
+    @MessageBody() roomId: string,
+    @ConnectedSocket() socket: Socket
+  ): Promise<void> {
+    const connectedSockets = this.server.sockets.adapter.rooms.get(roomId);
+    const socketRooms = Array.from(socket.rooms.values()).filter(
+      (r) => r !== socket.id
+    );
+    if (
+      socketRooms.length > 0 ||
+      (connectedSockets != null && connectedSockets.size === 2)
+    ) {
+      socket.emit('roomJoinError', {
+        error: 'Room is full',
+      });
+    } else {
+      await socket.join(roomId);
+      socket.emit('roomJoined');
+      this.logger.log(`joinRoom: ${socket.id} joined ${roomId}`);
+
+      if (this.server.sockets.adapter.rooms.get(roomId)?.size === 2) {
+        socket.emit('startGame', { start: true, side: 'right' });
+        socket.to(roomId).emit('startGame', { start: false, side: 'left' });
+      }
+    }
+  }
 
   player1 = new Paddle(0, PADDLE_START_POS);
   player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
@@ -125,16 +151,16 @@ export class PongGateway {
 
   @SubscribeMessage('userCommands')
   handleUserCommands(
-    @MessageBody() data: { up: boolean; down: boolean; player: 'one' | 'two' },
+    @MessageBody() data: { up: boolean; down: boolean; side: 'left' | 'right' },
     @ConnectedSocket() socket: Socket
   ): void {
     // player1操作
-    if (data.player === 'one' && data.down) {
+    if (data.side === 'left' && data.down) {
       this.player1.pos.y += PADDLE_SPEED;
       if (this.player1.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
         this.player1.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (data.player === 'one' && data.up) {
+    } else if (data.side === 'left' && data.up) {
       this.player1.pos.y -= PADDLE_SPEED;
       if (this.player1.pos.y < 0) {
         this.player1.pos.y = 0;
@@ -142,12 +168,12 @@ export class PongGateway {
     }
 
     // player2操作
-    if (data.player === 'two' && data.down) {
+    if (data.side === 'right' && data.down) {
       this.player2.pos.y += PADDLE_SPEED;
       if (this.player2.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
         this.player2.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (data.player === 'two' && data.up) {
+    } else if (data.side === 'right' && data.up) {
       this.player2.pos.y -= PADDLE_SPEED;
       if (this.player2.pos.y < 0) {
         this.player2.pos.y = 0;
