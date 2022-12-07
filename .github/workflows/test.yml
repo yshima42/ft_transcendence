@@ -41,4 +41,4 @@ jobs:
       - name: frontend prisma generate
         run: yarn --cwd frontend prisma generate
       - name: frontend test
-        run: yarn start-server-and-test api 3000/api dev 5173 'cypress run'
+        run: yarn --cwd frontend start-server-and-test api 3000/api dev 5173 'cypress run'
