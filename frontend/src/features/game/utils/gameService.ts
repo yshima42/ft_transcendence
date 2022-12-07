@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io-client';
 import { StartGame } from '../components/PongGame';
+import { Paddle } from './objs';
 
 class GameService {
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
@@ -10,9 +11,21 @@ class GameService {
     });
   }
 
-  // public async updateGame(socket: Socket) {
-  //   socket.emit('update');
-  // }
+  public async emitUserCommands(
+    socket: Socket,
+    obj: Paddle,
+    isLeftSide: boolean
+  ) {
+    const userCommands = {
+      up: obj.up,
+      down: obj.down,
+      isLeftSide,
+    };
+
+    return await new Promise(() => {
+      socket.emit('userCommands', userCommands);
+    });
+  }
 
   // public onGameUpdate(socket: Socket, listener: (matrix: string) => void) {
   //   socket.on('onGameUpdate', ({ matrix }) => listener(matrix));
