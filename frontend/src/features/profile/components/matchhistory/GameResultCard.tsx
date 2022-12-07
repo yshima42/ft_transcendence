@@ -5,15 +5,15 @@ import { AvatarWithName } from './AvatarWithName';
 import { ScoreAndDate } from './ScoreAndDate';
 
 type Props = {
-  user: User;
-  opponent: User;
+  playerOne: User;
+  playerTwo: User;
   score: string;
   createdAt: Date;
   win: boolean;
 };
 
 export const GameResultCard: FC<Props> = memo((props) => {
-  const { user, opponent, score, createdAt, win } = props;
+  const { playerOne, playerTwo, score, createdAt, win } = props;
 
   // TODO:spinnerつける？使うフックを変更し、一時的にspinner表示を削除した
   return (
@@ -21,15 +21,15 @@ export const GameResultCard: FC<Props> = memo((props) => {
       <Box h="90px" bg="gray.200" borderRadius={20} px={4}>
         <HStack>
           <AvatarWithName
-            name={user.nickname}
-            avatarImageUrl={user.avatarImageUrl}
-            id={user.id}
+            name={playerOne.nickname}
+            avatarImageUrl={playerOne.avatarImageUrl}
+            id={playerOne.id}
           />
           <ScoreAndDate score={score} createdAt={createdAt} />
           <AvatarWithName
-            name={opponent.nickname}
-            avatarImageUrl={opponent.avatarImageUrl}
-            id={opponent.id}
+            name={playerTwo.nickname}
+            avatarImageUrl={playerTwo.avatarImageUrl}
+            id={playerTwo.id}
           />
           <Box w="50px">
             <Center>
