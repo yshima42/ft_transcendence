@@ -1,6 +1,9 @@
 describe('sidebar spec', () => {
+  before(() => {
+    cy.exec('yarn --cwd ../backend prisma migrate reset -f');
+  });
+
   beforeEach(() => {
-    // cy.exec('yarn --cwd ../backend migrate:reset -f');
     cy.visit('/');
     cy.contains('Admin Test dummy1').click();
   });
