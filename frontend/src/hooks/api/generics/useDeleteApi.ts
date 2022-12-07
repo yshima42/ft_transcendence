@@ -1,7 +1,14 @@
-import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
+import {
+  UseMutateAsyncFunction,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
-export function useDeleteApi<ResBody>(endpoint: string): {
+export function useDeleteApi<ResBody>(
+  endpoint: string,
+  queryKeys?: string[]
+): {
   deleteFunc: UseMutateAsyncFunction<ResBody, unknown, void, unknown>;
   isLoading: boolean;
 } {
@@ -11,7 +18,15 @@ export function useDeleteApi<ResBody>(endpoint: string): {
     return result.data;
   };
 
-  const { mutateAsync: deleteFunc, isLoading } = useMutation(axiosDelete);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: deleteFunc, isLoading } = useMutation(axiosDelete, {
+    onSuccess: () => {
+      if (queryKeys !== undefined) {
+        void queryClient.invalidateQueries([...queryKeys]);
+      }
+    },
+  });
 
   return { deleteFunc, isLoading };
 }
