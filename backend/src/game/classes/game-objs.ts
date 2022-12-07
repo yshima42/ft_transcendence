@@ -4,7 +4,6 @@ import {
   BALL_SPEED,
   PADDLE_COLOR,
   PADDLE_HEIGHT,
-  PADDLE_SPEED,
   PADDLE_WIDTH,
 } from '../config/game-config';
 
@@ -59,6 +58,8 @@ export class Paddle {
   down: boolean;
   pos: { x: number; y: number };
   score: number;
+  dx: number;
+  dy: number;
 
   constructor(x: number, y: number) {
     this.id = '';
@@ -67,21 +68,12 @@ export class Paddle {
     this.up = false;
     this.down = false;
     this.score = 0;
+    this.dx = 0;
+    this.dy = 0;
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {
     ctx.beginPath();
-    if (this.down) {
-      this.pos.y += PADDLE_SPEED;
-      if (this.pos.y + PADDLE_HEIGHT > ctx.canvas.height) {
-        this.pos.y = ctx.canvas.height - PADDLE_HEIGHT;
-      }
-    } else if (this.up) {
-      this.pos.y -= PADDLE_SPEED;
-      if (this.pos.y < 0) {
-        this.pos.y = 0;
-      }
-    }
     ctx.rect(this.pos.x, this.pos.y, PADDLE_WIDTH, PADDLE_HEIGHT);
     ctx.fillStyle = PADDLE_COLOR;
     ctx.fill();
