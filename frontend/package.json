@@ -91,6 +91,7 @@
     "npm-check-updates": "^16.4.3",
     "prettier": "^2.8.0",
     "prisma": "^4.7.1",
+    "start-server-and-test": "^1.15.0",
     "stylelint": "^14.16.0",
     "stylelint-config-recess-order": "^3.0.0",
     "stylelint-config-standard": "^29.0.0",
