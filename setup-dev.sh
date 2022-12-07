@@ -1,14 +1,18 @@
 #!/bin/bash
 
-set -exu
+set -eux
 
-git pull || :
+BOLD='\033[1m'
+GREEN="${BOLD}\033[32m"
+RED="${BOLD}\033[31m"
+RESET='\033[0m'
 
-projects=("backend" "frontend")
-rootDir=$(pwd | sed -r "s/\/\.git\/hooks//")
+# リモートに今のブランチがあるかチェック。あるならpullしてくる
+echo -e "${GREEN}Checking remote branch...${RESET}"
+git fetch origin $(git rev-parse --abbrev-ref HEAD) && git pull || echo -e "${GREEN}No remote branch${RESET}"
 
-for project in ${projects[@]}; do
-  echo "Executing $project setup:dev"
-  cd "$rootDir/$project"
-  yarn setup:dev 2>/dev/null
-done
+cd backend
+bash setup-dev.sh
+
+cd ../frontend
+bash setup-dev.sh
