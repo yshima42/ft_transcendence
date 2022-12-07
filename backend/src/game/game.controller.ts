@@ -8,11 +8,14 @@ import {
 import { MatchResult, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
-import { MatchResultDto } from './dto/match-result.dto';
+import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import { GameStatsEntity } from './entities/game-stats.entity';
 import { MatchResultEntity } from './entities/match-result.entity';
 import { GameService } from './game.service';
-import { GameStats } from './interfaces/game-stats.interface';
+import {
+  GameStats,
+  MatchResultWithPlayers,
+} from './interfaces/game-stats.interface';
 
 @Controller('game')
 @ApiTags('game')
@@ -24,16 +27,17 @@ export class GameController {
   @ApiOperation({ summary: 'ゲーム結果を送信' })
   @ApiCreatedResponse({ type: MatchResultEntity })
   async addMatchResult(
-    @GetUser() user: User,
-    @Body() matchResultDto: MatchResultDto
+    @Body() createMatchResultDto: CreateMatchResultDto
   ): Promise<MatchResult> {
-    return await this.gameService.addMatchResult(user.id, matchResultDto);
+    return await this.gameService.addMatchResult(createMatchResultDto);
   }
 
   @Get('matches')
   @ApiOperation({ summary: 'ゲーム結果を取得' })
   @ApiOkResponse({ type: MatchResultEntity, isArray: true })
-  async findMatchHistory(@GetUser() user: User): Promise<MatchResult[]> {
+  async findMatchHistory(
+    @GetUser() user: User
+  ): Promise<MatchResultWithPlayers[]> {
     return await this.gameService.findMatchHistory(user.id);
   }
 
