@@ -1,5 +1,6 @@
 import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
+import { useBlockUsers } from 'hooks/api';
 import { useProfile } from 'hooks/api/profile/useProfile';
 import { useParams } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -14,7 +15,11 @@ export const Profile: FC = memo(() => {
   const { id } = useParams();
   const { user } = useProfile(id);
   const { user: loginUser } = useProfile();
+  const { users: blockedUsers } = useBlockUsers();
   const isLoginUser = user.id === loginUser.id;
+  const isBlockedUser =
+    blockedUsers.find((blockedUser) => blockedUser.id === user.id) !==
+    undefined;
 
   return (
     <ContentLayout title="Profile">
@@ -44,7 +49,11 @@ export const Profile: FC = memo(() => {
         >
           <GridItem bg="gray" area="profile">
             <ProfileCardWrapper>
-              <UserInfoCard user={user} isLoginUser={isLoginUser} />
+              <UserInfoCard
+                user={user}
+                isLoginUser={isLoginUser}
+                isBlockedUser={isBlockedUser}
+              />
             </ProfileCardWrapper>
           </GridItem>
           <GridItem bg="gray" area="stats">
