@@ -1,5 +1,9 @@
 import { Block } from '@prisma/client';
-import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
+import {
+  UseMutateAsyncFunction,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
 export interface UserBlockCancelResBody {
@@ -25,7 +29,13 @@ export const useUserBlockCancel = (): {
     return result.data;
   };
 
-  const { mutateAsync: cancelUserBlock, isLoading } = useMutation(axiosDelete);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: cancelUserBlock, isLoading } = useMutation(axiosDelete, {
+    onSuccess: () => {
+      void queryClient.invalidateQueries(['/users/me/blocks']);
+    },
+  });
 
   return { cancelUserBlock, isLoading };
 };
