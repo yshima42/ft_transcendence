@@ -23,9 +23,6 @@ export class MatchResultEntity implements MatchResult {
   @ApiProperty({ default: 3 })
   playerTwoScore!: number;
 
-  @ApiProperty({ default: true })
-  win!: boolean;
-
   @ApiProperty()
   startedAt!: Date;
 
