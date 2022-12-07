@@ -7,6 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Ball, Paddle } from './classes/game-objs';
 import {
   BALL_SIZE,
   BALL_START_X,
@@ -17,8 +18,7 @@ import {
   PADDLE_SPEED,
   PADDLE_START_POS,
   PADDLE_WIDTH,
-} from '../events/gameConfig';
-import { Ball, Paddle } from '../events/objs';
+} from './config/gameConfig';
 
 type Players = {
   [key: string]: { x?: number; y?: number; up?: boolean; down?: boolean };
@@ -33,12 +33,15 @@ export class GameGateway {
 
   private readonly logger: Logger = new Logger('Gateway Log');
 
+  // room関連
   @SubscribeMessage('joinRoom')
   async joinRoom(
-    @MessageBody() roomId: string,
+    @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
-    const connectedSockets = this.server.sockets.adapter.rooms.get(roomId);
+    const connectedSockets = this.server.sockets.adapter.rooms.get(
+      message.roomId
+    );
     const socketRooms = Array.from(socket.rooms.values()).filter(
       (r) => r !== socket.id
     );
@@ -50,13 +53,15 @@ export class GameGateway {
         error: 'Room is full',
       });
     } else {
-      await socket.join(roomId);
+      await socket.join(message.roomId);
       socket.emit('roomJoined');
-      this.logger.log(`joinRoom: ${socket.id} joined ${roomId}`);
+      this.logger.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
-      if (this.server.sockets.adapter.rooms.get(roomId)?.size === 2) {
-        socket.emit('startGame', { start: true, side: 'right' });
-        socket.to(roomId).emit('startGame', { start: false, side: 'left' });
+      if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
+        socket.emit('startGame', { start: true, isLeftSide: false });
+        socket
+          .to(message.roomId)
+          .emit('startGame', { start: false, isLeftSide: true });
       }
     }
   }
@@ -65,29 +70,27 @@ export class GameGateway {
   player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  // handleConnection内はconnectionが確立されたら実行される
-  // handleConnection(@ConnectedSocket() socket: Socket): void {}
-
-  private getSocketGameRoom(socket: Socket): string {
-    const socketRooms = Array.from(socket.rooms.values()).filter(
-      (r) => r !== socket.id
-    );
-    const gameRoom = socketRooms?.[0];
-
-    return gameRoom;
-  }
-
   @SubscribeMessage('connectPong')
   handleNewPlayer(@ConnectedSocket() socket: Socket): void {
     const scoring = (player: Paddle) => {
       player.score++;
-      // console.log('hi');
       // TODO: player nameをつけて誰のスコアかわかるように
       // socket.emit('scoreUpdate', { score: player.score });
     };
 
+    // ここでgameRoomIdが取れてない
+    // const getSocketGameRoom = (socket: Socket): string => {
+    //   const socketRooms = Array.from(socket.rooms.values()).filter(
+    //     (r) => r !== socket.id
+    //   );
+    //   console.log(socketRooms);
+    //   const gameRoom = socketRooms?.[0];
+
+    //   return gameRoom;
+    // };
+
     // TODO: roomつける時に有効化
-    // const gameRoom = this.getSocketGameRoom(socket);
+    // const gameRoom = getSocketGameRoom(socket);
 
     setInterval(() => {
       // パドルで跳ね返る処理・ゲームオーバー処理
@@ -123,22 +126,22 @@ export class GameGateway {
       }
 
       // frameごとに進む
-      this.ball.pos.x += this.ball.dx * 0.2;
-      this.ball.pos.y += this.ball.dy * 0.2;
+      this.ball.pos.x += this.ball.dx * 0.5;
+      this.ball.pos.y += this.ball.dy * 0.5;
 
       // TODO: 後ほどルームIDつける
-      // socket.to(gameRoom).emit('player1Update', {
       socket.emit('player1Update', {
+        // socket.to(gameRoom).emit('player1Update', {
         x: this.player1.pos.x,
         y: this.player1.pos.y,
       });
-      // socket.to(gameRoom).emit('player2Update', {
       socket.emit('player2Update', {
+        // socket.to(gameRoom).emit('player2Update', {
         x: this.player2.pos.x,
         y: this.player2.pos.y,
       });
-      // socket.to(gameRoom).emit('ballUpdate', {
       socket.emit('ballUpdate', {
+        // socket.to(gameRoom).emit('ballUpdate', {
         x: this.ball.pos.x,
         y: this.ball.pos.y,
       });
@@ -151,16 +154,16 @@ export class GameGateway {
 
   @SubscribeMessage('userCommands')
   handleUserCommands(
-    @MessageBody() data: { up: boolean; down: boolean; side: 'left' | 'right' },
+    @MessageBody() data: { up: boolean; down: boolean; isLeftSide: boolean },
     @ConnectedSocket() socket: Socket
   ): void {
     // player1操作
-    if (data.side === 'left' && data.down) {
+    if (data.isLeftSide && data.down) {
       this.player1.pos.y += PADDLE_SPEED;
       if (this.player1.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
         this.player1.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (data.side === 'left' && data.up) {
+    } else if (data.isLeftSide && data.up) {
       this.player1.pos.y -= PADDLE_SPEED;
       if (this.player1.pos.y < 0) {
         this.player1.pos.y = 0;
@@ -168,12 +171,12 @@ export class GameGateway {
     }
 
     // player2操作
-    if (data.side === 'right' && data.down) {
+    if (!data.isLeftSide && data.down) {
       this.player2.pos.y += PADDLE_SPEED;
       if (this.player2.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
         this.player2.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (data.side === 'right' && data.up) {
+    } else if (!data.isLeftSide && data.up) {
       this.player2.pos.y -= PADDLE_SPEED;
       if (this.player2.pos.y < 0) {
         this.player2.pos.y = 0;

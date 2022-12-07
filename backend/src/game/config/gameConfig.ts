@@ -12,3 +12,5 @@ export const PADDLE_SPEED = 7;
 export const BALL_COLOR = '#4FD1C5';
 export const PADDLE_COLOR = '#4FD1C5';
 export const BG_COLOR = '#1A202C';
+export const LEFT = true;
+export const RIGHT = false;

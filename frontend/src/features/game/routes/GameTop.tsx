@@ -10,14 +10,14 @@ import socketService from '../utils/socketService';
 
 export const GameTop: FC = memo(() => {
   const [isInRoom, setInRoom] = useState(false);
-  const [side, setSide] = useState<'left' | 'right'>('left');
+  const [isLeftSide, setLeftSide] = useState(true);
   const [isGameStarted, setGameStarted] = useState(false);
 
   const gameContextValue: GameContextProps = {
     isInRoom,
     setInRoom,
-    side,
-    setSide,
+    isLeftSide,
+    setLeftSide,
     isGameStarted,
     setGameStarted,
   };
