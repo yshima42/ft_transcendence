@@ -10,8 +10,8 @@ import {
   PADDLE_WIDTH,
 } from '../utils/gameConfig';
 import gameContext from '../utils/gameContext';
+import { Ball, Paddle } from '../utils/gameObjs';
 import gameService from '../utils/gameService';
-import { Ball, Paddle } from '../utils/objs';
 import socketService from '../utils/socketService';
 import { Canvas } from './Canvas';
 
@@ -88,7 +88,7 @@ export const PongGame: FC = memo(() => {
 
   const socket = socketService.socket;
 
-  // TODO: これをuseStateにしたら動かなくなるのを修正
+  // TODO: これをuseStateにしたら動かなくなる理由検証・修正
   let isLeftSide: boolean;
 
   const handleGameStart = () => {
@@ -158,9 +158,10 @@ export const PongGame: FC = memo(() => {
     }
 
     // スコアの表示
-    // socket.on('scoreUpdate', (data: { score: number }) => {
-    //   player1.score = data.score;
-    // });
+    if (socket != null)
+      socket.on('scoreUpdate', (data: { score: number }) => {
+        player1.score = data.score;
+      });
     ctx.font = '48px serif';
     ctx.fillText(player1.score.toString(), 20, 50);
     ctx.fillText(player2.score.toString(), 960, 50);

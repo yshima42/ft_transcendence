@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client';
 import { StartGame } from '../components/PongGame';
-import { Paddle } from './objs';
+import { Paddle } from './gameObjs';
 
 class GameService {
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
