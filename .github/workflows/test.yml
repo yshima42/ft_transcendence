@@ -31,5 +31,15 @@ jobs:
         run: yarn --cwd backend prisma generate
       - name: backend prisma migrate
         run: yarn --cwd backend prisma migrate dev --name init
-      - name: test
+      - name: backend test
         run: yarn --cwd backend test:runInBand
+      - name: frontend install
+        run: yarn --cwd frontend install
+      - name: frontend prisma db pull
+        run: yarn --cwd frontend prisma db pull
+      - name: frontend prisma generate
+        run: yarn --cwd frontend prisma generate
+      - name: start app
+        run: ./start-app.sh
+      - name: frontend test
+        run: yarn --cwd frontend cypress run
