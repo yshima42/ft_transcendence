@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -20,28 +19,33 @@ import {
   PADDLE_WIDTH,
 } from './config/game-config';
 
-type Players = {
-  [key: string]: { x?: number; y?: number; up?: boolean; down?: boolean };
-};
-
-const players: Players = {};
-
-const getSocketGameRoom = (socket: Socket): string => {
-  const socketRooms = Array.from(socket.rooms.values()).filter(
-    (r) => r !== socket.id
-  );
-  console.log(socketRooms);
-  const gameRoom = socketRooms?.[0];
-
-  return gameRoom;
+type GameScore = {
+  player1: number;
+  player2: number;
 };
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
-  @WebSocketServer()
-  server!: Server;
+  // サーバー側でのオブジェクト作成
+  player1 = new Paddle(0, PADDLE_START_POS);
+  player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
+  ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  private readonly logger: Logger = new Logger('Gateway Log');
+  private readonly gameScore: GameScore = { player1: 0, player2: 0 };
+
+  @WebSocketServer()
+  private readonly server!: Server;
+
+  // 現在接続してるsocketのroomIdを取得
+  getSocketGameRoom = (socket: Socket): string => {
+    const socketRooms = Array.from(socket.rooms.values()).filter(
+      (r) => r !== socket.id
+    );
+    console.log(socketRooms);
+    const gameRoom = socketRooms?.[0];
+
+    return gameRoom;
+  };
 
   // room関連
   @SubscribeMessage('joinRoom')
@@ -65,7 +69,7 @@ export class GameGateway {
     } else {
       await socket.join(message.roomId);
       socket.emit('roomJoined');
-      this.logger.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
       if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
         socket.emit('startGame', { start: true, isLeftSide: false });
@@ -76,19 +80,13 @@ export class GameGateway {
     }
   }
 
-  player1 = new Paddle(0, PADDLE_START_POS);
-  player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
-  ball = new Ball(BALL_START_X, BALL_START_Y);
-
   @SubscribeMessage('connectPong')
   handleNewPlayer(@ConnectedSocket() socket: Socket): void {
-    const gameRoom = getSocketGameRoom(socket);
+    const gameRoom = this.getSocketGameRoom(socket);
 
-    const scoring = (player: Paddle) => {
-      player.score++;
-      // TODO: player nameをつけて誰のスコアかわかるように
-      socket.to(gameRoom).emit('scoreUpdate', { score: player.score });
-    };
+    // console.log(`new client: ${socket.id}`);
+
+    socket.to(gameRoom).emit('connectedPlayer', socket.id);
 
     setInterval(() => {
       // パドルで跳ね返る処理・ゲームオーバー処理
@@ -100,7 +98,7 @@ export class GameGateway {
         ) {
           this.ball.dx = -this.ball.dx;
         } else {
-          scoring(this.player1);
+          this.player1.score++;
           this.ball.setPosition(BALL_START_X, BALL_START_Y);
         }
       } else if (this.ball.pos.x + this.ball.dx < BALL_SIZE) {
@@ -110,9 +108,18 @@ export class GameGateway {
         ) {
           this.ball.dx = -this.ball.dx;
         } else {
-          scoring(this.player2);
+          this.player2.score++;
           this.ball.setPosition(BALL_START_X, BALL_START_Y);
         }
+      }
+
+      // ゲーム終了処理
+      if (this.player1.score === 5 || this.player2.score === 5) {
+        socket.to(gameRoom).emit('finishGame');
+
+        // ここでAPI叩く
+
+        return;
       }
 
       // ボールの動き
@@ -131,26 +138,24 @@ export class GameGateway {
       socket.to(gameRoom).emit('player1Update', {
         x: this.player1.pos.x,
         y: this.player1.pos.y,
+        score: this.player1.score,
       });
       socket.to(gameRoom).emit('player2Update', {
         x: this.player2.pos.x,
         y: this.player2.pos.y,
+        score: this.player2.score,
       });
       socket.to(gameRoom).emit('ballUpdate', {
         x: this.ball.pos.x,
         y: this.ball.pos.y,
       });
     }, 33);
-    console.log(`new client: ${socket.id}`);
-
-    socket.to(gameRoom).emit('connectedPlayer', socket.id);
   }
 
   // TODO: 操作性をよくするためにワンクリックで動き続ける仕様にする(遅延が少なくなる)
   @SubscribeMessage('userCommands')
   handleUserCommands(
-    @MessageBody() data: { up: boolean; down: boolean; isLeftSide: boolean },
-    @ConnectedSocket() socket: Socket
+    @MessageBody() data: { up: boolean; down: boolean; isLeftSide: boolean }
   ): void {
     // player1操作
     if (data.isLeftSide && data.down) {
@@ -177,9 +182,12 @@ export class GameGateway {
         this.player2.pos.y = 0;
       }
     }
-    players[socket.id] = data;
 
     // TODO: 最後に消す
     console.log(data);
+  }
+
+  handleDisconnect(@ConnectedSocket() socket: Socket): void {
+    console.log(socket.id);
   }
 }

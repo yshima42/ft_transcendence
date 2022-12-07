@@ -15,9 +15,6 @@ import gameService from '../utils/gameService';
 import socketService from '../utils/socketService';
 import { Canvas } from './Canvas';
 
-// TODO: ここのとり方修正
-// const socket = io(SOCKET_URL);
-
 export type StartGame = {
   start: boolean;
   isLeftSide: boolean;
@@ -70,27 +67,17 @@ export const userInput = (obj: Paddle, isLeftSide: boolean): void => {
   );
 };
 
-// export const emitUserCommands = (obj: Paddle, isLeftSide: boolean): void => {
-//   const userCommands = {
-//     up: obj.up,
-//     down: obj.down,
-//     isLeftSide,
-//   };
-//   socket.emit('userCommands', userCommands);
-// };
-
 export const PongGame: FC = memo(() => {
+  // TODO: classでnewするよりtypeで型定義するほうが良さそう?(プレーヤーを増やす、ボールを増やす等ゲーム拡張するならnewの方が良い)
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
   const { isGameStarted, setGameStarted } = useContext(gameContext);
-
   const socket = socketService.socket;
 
   // TODO: これをuseStateにしたら動かなくなる理由検証・修正
   let isLeftSide: boolean;
-
   const handleGameStart = () => {
     if (socket != null) {
       gameService.onStartGame(socket, (options: StartGame) => {
@@ -118,8 +105,14 @@ export const PongGame: FC = memo(() => {
       socket.on('connectedPlayer', (data) => {
         console.log(data);
       });
+
+    if (socket != null)
+      socket.on('finishGame', () => {
+        console.log('done');
+      });
   }, []);
 
+  // このdrawの中にcanvasで表示したいものを書く
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = BG_COLOR;
@@ -127,16 +120,24 @@ export const PongGame: FC = memo(() => {
 
     // ここをpositionUpdateにする
     if (socket != null)
-      socket.on('player1Update', (data: { x: number; y: number }) => {
-        player1.pos.x = data.x;
-        player1.pos.y = data.y;
-      });
+      socket.on(
+        'player1Update',
+        (data: { x: number; y: number; score: number }) => {
+          player1.pos.x = data.x;
+          player1.pos.y = data.y;
+          player1.score = data.score;
+        }
+      );
 
     if (socket != null)
-      socket.on('player2Update', (data: { x: number; y: number }) => {
-        player2.pos.x = data.x;
-        player2.pos.y = data.y;
-      });
+      socket.on(
+        'player2Update',
+        (data: { x: number; y: number; score: number }) => {
+          player2.pos.x = data.x;
+          player2.pos.y = data.y;
+          player2.score = data.score;
+        }
+      );
 
     if (socket != null)
       socket.on('ballUpdate', (data: { x: number; y: number }) => {
@@ -151,17 +152,7 @@ export const PongGame: FC = memo(() => {
     // TODO: player1だけになってるの修正
     userInput(player1, isLeftSide);
 
-    // ゲーム終了
-    if (player1.score === 3 || player2.score === 3) {
-      ctx.fillText('Game Over', 250, 50);
-      // TODO: 他の所へ飛ばす等処理をする
-    }
-
     // スコアの表示
-    if (socket != null)
-      socket.on('scoreUpdate', (data: { score: number }) => {
-        player1.score = data.score;
-      });
     ctx.font = '48px serif';
     ctx.fillText(player1.score.toString(), 20, 50);
     ctx.fillText(player2.score.toString(), 960, 50);
