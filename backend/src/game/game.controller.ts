@@ -12,7 +12,10 @@ import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import { GameStatsEntity } from './entities/game-stats.entity';
 import { MatchResultEntity } from './entities/match-result.entity';
 import { GameService } from './game.service';
-import { GameStats } from './interfaces/game-stats.interface';
+import {
+  GameStats,
+  MatchResultWithPlayers,
+} from './interfaces/game-stats.interface';
 
 @Controller('game')
 @ApiTags('game')
@@ -32,7 +35,9 @@ export class GameController {
   @Get('matches')
   @ApiOperation({ summary: 'ゲーム結果を取得' })
   @ApiOkResponse({ type: MatchResultEntity, isArray: true })
-  async findMatchHistory(@GetUser() user: User): Promise<MatchResult[]> {
+  async findMatchHistory(
+    @GetUser() user: User
+  ): Promise<MatchResultWithPlayers[]> {
     return await this.gameService.findMatchHistory(user.id);
   }
 
