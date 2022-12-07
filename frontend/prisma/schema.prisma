@@ -47,16 +47,15 @@ model Block {
 }
 
 model MatchResult {
-  id            String   @id @default(uuid())
-  playerOneId   String
-  playerTwoId   String
+  id             String   @id @default(uuid())
+  playerOneId    String
+  playerTwoId    String
+  startedAt      DateTime @default(now())
+  finishedAt     DateTime @updatedAt
   playerOneScore Int
   playerTwoScore Int
-  win           Boolean
-  startedAt     DateTime @default(now())
-  finishedAt    DateTime @updatedAt
-  playerOne     User     @relation("playerOne", fields: [playerOneId], references: [id])
-  playerTwo     User     @relation("playerTwo", fields: [playerTwoId], references: [id])
+  playerOne      User     @relation("playerOne", fields: [playerOneId], references: [id])
+  playerTwo      User     @relation("playerTwo", fields: [playerTwoId], references: [id])
 }
 
 enum OnlineStatus {
