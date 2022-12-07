@@ -18,13 +18,23 @@ import {
   PADDLE_SPEED,
   PADDLE_START_POS,
   PADDLE_WIDTH,
-} from './config/gameConfig';
+} from './config/game-config';
 
 type Players = {
   [key: string]: { x?: number; y?: number; up?: boolean; down?: boolean };
 };
 
 const players: Players = {};
+
+const getSocketGameRoom = (socket: Socket): string => {
+  const socketRooms = Array.from(socket.rooms.values()).filter(
+    (r) => r !== socket.id
+  );
+  console.log(socketRooms);
+  const gameRoom = socketRooms?.[0];
+
+  return gameRoom;
+};
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
@@ -72,25 +82,13 @@ export class GameGateway {
 
   @SubscribeMessage('connectPong')
   handleNewPlayer(@ConnectedSocket() socket: Socket): void {
+    const gameRoom = getSocketGameRoom(socket);
+
     const scoring = (player: Paddle) => {
       player.score++;
       // TODO: player nameをつけて誰のスコアかわかるように
-      // socket.emit('scoreUpdate', { score: player.score });
+      socket.to(gameRoom).emit('scoreUpdate', { score: player.score });
     };
-
-    // ここでgameRoomIdが取れてない
-    // const getSocketGameRoom = (socket: Socket): string => {
-    //   const socketRooms = Array.from(socket.rooms.values()).filter(
-    //     (r) => r !== socket.id
-    //   );
-    //   console.log(socketRooms);
-    //   const gameRoom = socketRooms?.[0];
-
-    //   return gameRoom;
-    // };
-
-    // TODO: roomつける時に有効化
-    // const gameRoom = getSocketGameRoom(socket);
 
     setInterval(() => {
       // パドルで跳ね返る処理・ゲームオーバー処理
@@ -129,29 +127,26 @@ export class GameGateway {
       this.ball.pos.x += this.ball.dx * 0.5;
       this.ball.pos.y += this.ball.dy * 0.5;
 
-      // TODO: 後ほどルームIDつける
-      socket.emit('player1Update', {
-        // socket.to(gameRoom).emit('player1Update', {
+      // frameごとにplayer1,2,ballの位置を送信
+      socket.to(gameRoom).emit('player1Update', {
         x: this.player1.pos.x,
         y: this.player1.pos.y,
       });
-      socket.emit('player2Update', {
-        // socket.to(gameRoom).emit('player2Update', {
+      socket.to(gameRoom).emit('player2Update', {
         x: this.player2.pos.x,
         y: this.player2.pos.y,
       });
-      socket.emit('ballUpdate', {
-        // socket.to(gameRoom).emit('ballUpdate', {
+      socket.to(gameRoom).emit('ballUpdate', {
         x: this.ball.pos.x,
         y: this.ball.pos.y,
       });
     }, 33);
     console.log(`new client: ${socket.id}`);
 
-    // socket.to(gameRoom).emit('connectedPlayer', socket.id);
-    socket.emit('connectedPlayer', socket.id);
+    socket.to(gameRoom).emit('connectedPlayer', socket.id);
   }
 
+  // TODO: 操作性をよくするためにワンクリックで動き続ける仕様にする(遅延が少なくなる)
   @SubscribeMessage('userCommands')
   handleUserCommands(
     @MessageBody() data: { up: boolean; down: boolean; isLeftSide: boolean },
@@ -183,6 +178,8 @@ export class GameGateway {
       }
     }
     players[socket.id] = data;
+
+    // TODO: 最後に消す
     console.log(data);
   }
 }
