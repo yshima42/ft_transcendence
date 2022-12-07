@@ -1,6 +1,5 @@
 import { memo, FC } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useUserBlock, useUserBlockCancel } from 'hooks/api';
 
 type BlockButtonProps = {
@@ -12,16 +11,13 @@ export const BlockButton: FC<BlockButtonProps> = memo(
   ({ userId, isBlockedUser }: BlockButtonProps) => {
     const { blockUser } = useUserBlock();
     const { cancelUserBlock } = useUserBlockCancel();
-    const queryClient = useQueryClient();
 
     const onClickBlock = async () => {
       await blockUser({ targetId: userId });
-      void queryClient.invalidateQueries(['/users/me/blocks']);
     };
 
     const onClickCancelBlock = async () => {
       await cancelUserBlock(userId);
-      void queryClient.invalidateQueries(['/users/me/blocks']);
     };
 
     return (
