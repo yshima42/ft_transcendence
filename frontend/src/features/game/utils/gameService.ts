@@ -4,7 +4,7 @@ import { StartGame } from '../components/PongGame';
 class GameService {
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
     return await new Promise((resolve, reject) => {
-      socket.emit('joinRoom', roomId);
+      socket.emit('joinRoom', { roomId });
       socket.on('roomJoined', () => resolve(true));
       socket.on('roomJoinError', (error) => reject(error));
     });

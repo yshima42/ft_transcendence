@@ -17,16 +17,17 @@ import { Ball, Paddle } from '../utils/objs';
 import socketService from '../utils/socketService';
 import { Canvas } from './Canvas';
 
+// TODO: ここのとり方修正
 const socket = io(SOCKET_URL);
 
 export type StartGame = {
   start: boolean;
-  side: 'left' | 'right';
+  isLeftSide: boolean;
 };
 
 // emitの回数を減らすため
 let justPressed = false;
-export const userInput = (obj: Paddle, side: 'left' | 'right'): void => {
+export const userInput = (obj: Paddle, isLeftSide: boolean): void => {
   document.addEventListener(
     'keydown',
     (e: KeyboardEvent) => {
@@ -42,7 +43,7 @@ export const userInput = (obj: Paddle, side: 'left' | 'right'): void => {
         obj.up = true;
       }
       if (justPressed) {
-        emitUserCommands(obj, side);
+        emitUserCommands(obj, isLeftSide);
         justPressed = false;
       }
     },
@@ -58,18 +59,18 @@ export const userInput = (obj: Paddle, side: 'left' | 'right'): void => {
         obj.up = false;
       }
       if (justPressed) {
-        emitUserCommands(obj, side);
+        emitUserCommands(obj, isLeftSide);
       }
     },
     false
   );
 };
 
-export const emitUserCommands = (obj: Paddle, side: 'left' | 'right'): void => {
+export const emitUserCommands = (obj: Paddle, isLeftSide: boolean): void => {
   const userCommands = {
     up: obj.up,
     down: obj.down,
-    side,
+    isLeftSide,
   };
   socket.emit('userCommands', userCommands);
 };
@@ -82,7 +83,7 @@ export const PongGame: FC = memo(() => {
   const { isGameStarted, setGameStarted } = useContext(gameContext);
 
   // TODO: これをuseStateにしたら動かなくなるのを修正
-  let side: 'left' | 'right';
+  let isLeftSide: boolean;
 
   const handleGameStart = () => {
     if (socketService.socket != null) {
@@ -91,7 +92,7 @@ export const PongGame: FC = memo(() => {
         setGameStarted(true);
 
         // プレーヤーのサイド決定
-        side = options.side;
+        isLeftSide = options.isLeftSide;
       });
     }
   };
@@ -138,7 +139,7 @@ export const PongGame: FC = memo(() => {
     ball.draw(ctx);
 
     // TODO: player1だけになってるの修正
-    userInput(player1, side);
+    userInput(player1, isLeftSide);
 
     // ゲーム終了
     if (player1.score === 3 || player2.score === 3) {

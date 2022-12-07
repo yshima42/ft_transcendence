@@ -6,7 +6,7 @@ import {
   PADDLE_HEIGHT,
   PADDLE_SPEED,
   PADDLE_WIDTH,
-} from './gameConfig';
+} from '../config/gameConfig';
 
 export class Vector {
   x: number;
