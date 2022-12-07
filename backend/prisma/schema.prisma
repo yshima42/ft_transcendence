@@ -28,6 +28,7 @@ datasource db {
 //   provider = "prisma-class-validator-generator"
 // }
 
+// TODO 2fa部分を別テーブルに切り出す
 model User {
   id                     String       @id @default(uuid())
   name                   String       @unique
