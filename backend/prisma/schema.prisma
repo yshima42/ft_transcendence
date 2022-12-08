@@ -110,6 +110,8 @@ model ChatMessage {
 model ChatRoom {
   id            String         @id @default(uuid())
   name          String         @unique
+  status ChatRoomStatus @default(OPEN)
+  password     String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   chatMessages  ChatMessage[]
@@ -121,7 +123,7 @@ model ChatRoomUser {
   chatRoomId String
   user       User           @relation(fields: [userId], references: [id]) // チャットの参加者
   userId     String
-  status     ChatUserStatus // チャットの参加者のステータス
+  status     ChatUserStatus  @default(MEMBER)
 
   @@id([chatRoomId, userId])
 }
@@ -154,6 +156,15 @@ model DmRoomUser {
 }
 
 enum ChatUserStatus {
-  OWNER
-  MEMBER
+  OWNER // チャットルームのオーナー
+  SUBOWNER // チャットルームのサブオーナー
+  MEMBER // チャットルームのメンバー
+  KICKED // チャットルームからキックされた
+  BANNED // チャットルームからBANされた
+  MUTE // チャットルームからミュートされた
+}
+
+enum ChatRoomStatus {
+  OPEN
+  CLOSE
 }
