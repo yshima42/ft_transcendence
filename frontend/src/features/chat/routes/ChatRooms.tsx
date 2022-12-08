@@ -19,7 +19,7 @@ export const ChatRooms: React.FC = React.memo(() => {
   const [chatRooms, setChatRooms] = React.useState<ResponseChatRoom[]>([]);
 
   async function getAllChatRoom(): Promise<void> {
-    const res: { data: ResponseChatRoom[] } = await axios.get('/chatroom');
+    const res: { data: ResponseChatRoom[] } = await axios.get('/chat/room');
     setChatRooms(res.data);
   }
 
