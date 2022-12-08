@@ -22,7 +22,7 @@ model ChatMessage {
   createdAt  DateTime @default(now())
   chatRoomId String
   senderId   String
-  ChatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  ChatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   User       User     @relation(fields: [senderId], references: [id])
 }
 
@@ -51,7 +51,7 @@ model Dm {
   createdAt DateTime @default(now())
   dmRoomId  String
   senderId  String
-  DmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id])
+  DmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id], onDelete: Cascade)
   User      User     @relation(fields: [senderId], references: [id])
 }
 
