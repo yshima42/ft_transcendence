@@ -29,13 +29,13 @@ export const ChatRoom: React.FC = React.memo(() => {
 
   async function getAllChatMessage(): Promise<void> {
     const res: { data: ResponseChatMessage[] } = await axios.get(
-      `/chat/${chatRoomId}`
+      `/chat/message/${chatRoomId}`
     );
     setMessages(res.data);
   }
   // 送信ボタンを押したときの処理
   async function sendMessage(content: string): Promise<void> {
-    await axios.post(`/chat`, { content, chatRoomId });
+    await axios.post(`/chat/message`, { content, chatRoomId });
     getAllChatMessage().catch((err) => console.error(err));
   }
 

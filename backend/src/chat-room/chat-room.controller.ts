@@ -14,7 +14,7 @@ import { ResponseChatRoom } from './chat-room.interface';
 import { ChatRoomService } from './chat-room.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
 
-@Controller('chatroom')
+@Controller('chat/room')
 export class ChatRoomController {
   constructor(private readonly chatRoomService: ChatRoomService) {}
 
