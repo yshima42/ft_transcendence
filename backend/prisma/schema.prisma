@@ -45,6 +45,11 @@ model User {
   blockedBy Block[]         @relation("target")
   playerOne MatchResult[]   @relation("playerOne")
   playerTwo MatchResult[]   @relation("playerTwo")
+
+  chatMessages ChatMessage[]  @relation("messageSender") // ユーザーが送信したチャットメッセージ
+  dms          Dm[]           @relation("dmSender") // ユーザーが送信したDMメッセージ
+  ChatRoomUser ChatRoomUser[] // ユーザーが参加しているチャットルーム
+  DmRoomUser   DmRoomUser[] // ユーザーが参加しているDMルーム
 }
 
 enum OnlineStatus {
@@ -90,4 +95,65 @@ model MatchResult {
   playerTwoScore Int
   startedAt      DateTime @default(now())
   finishedAt     DateTime @updatedAt
+}
+
+model ChatMessage {
+  id         String   @id @default(uuid())
+  content    String
+  createdAt  DateTime @default(now())
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id]) // 属するチャットルーム
+  chatRoomId String
+  sender     User     @relation("messageSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
+  senderId   String
+}
+
+model ChatRoom {
+  id            String         @id @default(uuid())
+  name          String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  chatMessages  ChatMessage[] // チャットルームに属するメッセージ
+  chatRoomUsers ChatRoomUser[] // チャットルームに属するユーザー
+}
+
+model ChatRoomUser {
+  chatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id]) // 参加しているチャットルーム
+  chatRoomId String
+  user       User           @relation(fields: [userId], references: [id]) // チャットの参加者
+  userId     String
+  status     ChatUserStatus // チャットの参加者のステータス
+
+  @@id([chatRoomId, userId])
+}
+
+model Dm {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id]) // 属するDMルーム
+  dmRoomId  String
+  sender    User     @relation("dmSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
+  senderId  String
+}
+
+model DmRoom {
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  dms         Dm[] // DMルームに属するメッセージ
+  dmRoomUsers DmRoomUser[] // チャットルームに属するユーザー
+}
+
+model DmRoomUser {
+  dmRoom   DmRoom @relation(fields: [dmRoomId], references: [id]) // 参加しているチャットルーム
+  dmRoomId String
+  user     User   @relation(fields: [userId], references: [id]) // チャットの参加者
+  userId   String
+
+  @@id([dmRoomId, userId])
+}
+
+enum ChatUserStatus {
+  OWNER
+  MEMBER
 }

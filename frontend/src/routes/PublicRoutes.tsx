@@ -6,8 +6,11 @@ import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { TwoFactorAuth } from 'features/auth/routes/TwoFactorAuth';
-import { Chats } from 'features/chat/routes/Chats';
-import { DirectMessage } from 'features/dm/routes/DirectMessage';
+import { ChatRoom } from 'features/chat/routes/ChatRoom';
+import { ChatRooms } from 'features/chat/routes/ChatRooms';
+import { CreateChatRooms } from 'features/chat/routes/CreateChatRooms';
+import { DmRoom } from 'features/dm/routes/DmRoom';
+import { DmRooms } from 'features/dm/routes/DmRooms';
 import { Users } from 'features/friends/routes/Users';
 import { Game } from 'features/game/routes/Game';
 import { GameTop } from 'features/game/routes/GameTop';
@@ -46,11 +49,14 @@ export const publicRoutes = [
     element: <App />,
     children: [
       { path: 'users', element: <Users /> },
-      { path: 'chats', element: <Chats /> },
+      { path: 'chat', element: <ChatRooms /> },
+      { path: 'chat/create', element: <CreateChatRooms /> },
+      { path: 'chat/:id', element: <ChatRoom /> },
       { path: 'games', element: <Games /> },
       { path: '', element: <GameTop /> },
       { path: 'matching', element: <Matching /> },
-      { path: 'dm/*', element: <DirectMessage /> },
+      { path: 'dm', element: <DmRooms /> },
+      { path: 'dm/:id', element: <DmRoom /> },
       { path: 'profile', element: <Profile /> },
       { path: 'profile/edit', element: <ProfileEdit /> },
       // { path: 'users/:id', element: <UserProfile /> },
