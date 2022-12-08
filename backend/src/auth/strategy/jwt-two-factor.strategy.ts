@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class JwtTwoFactorStrategy extends PassportStrategy(
@@ -12,7 +13,8 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly prismaService: PrismaService
+    private readonly prismaService: PrismaService,
+    private readonly authService: AuthService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -34,8 +36,12 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
   }): Promise<{ user: User }> {
     const { id, isOtpValid } = payload;
     const user = await this.prismaService.user.findUnique({ where: { id } });
+    if (user === null) throw new UnauthorizedException();
+    const twoFactorAuthState = await this.authService.getTwoFactorAuthState(
+      user.id
+    );
 
-    if (user === null || (user.isTwoFactorAuthEnabled && !isOtpValid)) {
+    if (twoFactorAuthState && !isOtpValid) {
       throw new UnauthorizedException();
     }
 
