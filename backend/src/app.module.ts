@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { BlocksModule } from './blocks/blocks.module';
-import { ChatModule } from './chat/chat.module';
-import { ChatroomModule } from './chatroom/chatroom.module';
+import { ChatMessageModule } from './chat-message/chat-message.module';
+import { ChatroomModule } from './chat-room/chat-room.module';
 import { DmModule } from './dm/dm.module';
 import { DmroomModule } from './dmroom/dmroom.module';
 import { FileModule } from './file/file.module';
@@ -25,7 +25,7 @@ import { UsersModule } from './users/users.module';
     GameModule,
     FriendRequestsModule,
     BlocksModule,
-    ChatModule,
+    ChatMessageModule,
     DmModule,
     ChatroomModule,
     DmroomModule,

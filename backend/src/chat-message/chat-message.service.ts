@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChatMessage } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseChatMessage } from './chat.interface';
-import { CreateChatMessageDto } from './dto/create-chat.dto';
+import { ResponseChatMessage } from './chat-message.interface';
+import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 
 @Injectable()
-export class ChatService {
+export class ChatMessageService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
