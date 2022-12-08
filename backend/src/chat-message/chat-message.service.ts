@@ -27,11 +27,6 @@ export class ChatMessageService {
 
   async findAll(chatRoomId: string): Promise<ResponseChatMessage[]> {
     Logger.debug(`findChatMessages: ${JSON.stringify(chatRoomId)}`);
-    if (chatRoomId === undefined) {
-      Logger.warn(`findChatMessages: chatRoomId is undefined`);
-
-      return [];
-    }
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
         chatRoomId,
