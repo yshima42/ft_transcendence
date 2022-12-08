@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDmRoom } from './dm-room.interface';
 
@@ -7,12 +7,6 @@ export class DmRoomService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(userId: string): Promise<ResponseDmRoom[]> {
-    if (userId === undefined) {
-      Logger.warn(`findMyDms: userId is undefined`);
-
-      return [];
-    }
-
     const dmRooms = await this.prisma.dmRoom.findMany({
       where: {
         dmUsers: {
