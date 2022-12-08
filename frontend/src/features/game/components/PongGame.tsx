@@ -1,113 +1,188 @@
-import { memo, FC, useCallback } from 'react';
+import { memo, FC, useCallback, useEffect, useContext, useState } from 'react';
+import { Spinner } from '@chakra-ui/react';
+import { useProfile } from 'hooks/api';
+import {
+  BALL_START_X,
+  BALL_START_Y,
+  BG_COLOR,
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  PADDLE_START_POS,
+  PADDLE_WIDTH,
+} from '../utils/gameConfig';
+import gameContext from '../utils/gameContext';
+import { Ball, Paddle } from '../utils/gameObjs';
+import gameService from '../utils/gameService';
+import socketService from '../utils/socketService';
 import { Canvas } from './Canvas';
+import { Result } from './Result';
 
-// ToDo: これらを設定などで変えられる機能を作る
-const BALL_START_X = 50;
-const BALL_START_Y = 100;
-const BALL_SPEED = 5;
-const BALL_SIZE = 10;
-const CANVAS_WIDTH = 1000;
-const CANVAS_HEIGHT = 500;
-const PADDLE_WIDTH = 20;
-const PADDLE_HEIGHT = 75;
-const PADDLE_START_POS = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
-const PADDLE_SPEED = 7;
-const BALL_COLOR = '#4FD1C5';
-const PADDLE_COLOR = '#4FD1C5';
-const BG_COLOR = '#1A202C';
+export type StartGame = {
+  start: boolean;
+  isLeftSide: boolean;
+};
+
+// emitの回数を減らすため
+let justPressed = false;
+export const userInput = (obj: Paddle, isLeftSide: boolean): void => {
+  const socket = socketService.socket;
+  if (socket == null) return;
+  document.addEventListener(
+    'keydown',
+    (e: KeyboardEvent) => {
+      if (e.key === 'Down' || e.key === 'ArrowDown') {
+        if (!obj.down) {
+          justPressed = true;
+        }
+        obj.down = true;
+      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+        if (!obj.up) {
+          justPressed = true;
+        }
+        obj.up = true;
+      }
+      if (justPressed) {
+        if (socket != null) {
+          void gameService.emitUserCommands(socket, obj, isLeftSide);
+          justPressed = false;
+        }
+      }
+    },
+    false
+  );
+
+  document.addEventListener(
+    'keyup',
+    (e: KeyboardEvent) => {
+      if (e.key === 'Down' || e.key === 'ArrowDown') {
+        obj.down = false;
+      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+        obj.up = false;
+      }
+      if (justPressed) {
+        if (socket != null) {
+          void gameService.emitUserCommands(socket, obj, isLeftSide);
+        }
+      }
+    },
+    false
+  );
+};
 
 export const PongGame: FC = memo(() => {
-  let ballX = BALL_START_X;
-  let ballY = BALL_START_Y;
-  let dX = BALL_SPEED;
-  let dY = -BALL_SPEED;
-  const ballRadius = BALL_SIZE;
-  const paddleHeight = PADDLE_HEIGHT;
-  const paddleWidth = PADDLE_WIDTH;
-  let downPressed = false;
-  let upPressed = false;
+  // TODO: classでnewするよりtypeで型定義するほうが良さそう?(プレーヤーを増やす、ボールを増やす等ゲーム拡張するならnewの方が良い)
+  const player1 = new Paddle(0, PADDLE_START_POS);
+  const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
+  const ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  const keyDownHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Down' || e.key === 'ArrowDown') {
-      downPressed = true;
-    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      upPressed = true;
+  const { user } = useProfile();
+
+  const { isGameStarted, setGameStarted } = useContext(gameContext);
+  const [doneGame, setDoneGame] = useState(false);
+  const socket = socketService.socket;
+
+  // TODO: これをuseStateにしたら動かなくなる理由検証・修正
+  let isLeftSide: boolean;
+  const handleGameStart = () => {
+    if (socket != null) {
+      gameService.onStartGame(socket, (options: StartGame) => {
+        // 2プレーヤーが揃うとゲームスタート
+        setGameStarted(true);
+
+        console.log(user);
+
+        // プレーヤーのサイド決定
+        isLeftSide = options.isLeftSide;
+      });
     }
   };
 
-  const keyUpHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Down' || e.key === 'ArrowDown') {
-      downPressed = false;
-    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      upPressed = false;
-    }
-  };
+  useEffect(() => {
+    handleGameStart();
+  }, []);
 
-  document.addEventListener('keydown', keyDownHandler, false);
-  document.addEventListener('keyup', keyUpHandler, false);
+  // useEffect(() => {
+  //   socket?.on('initReturn', () => {
+  //     setInterval(() => {
+  //       // TODO: ここからユーザーインプットを送って反応を良くする
+  //       socket.emit('tick', 'hello');
+  //     }, 33);
+  //   });
+  // }, []);
 
-  const drawBall = (ctx: CanvasRenderingContext2D) => {
-    ctx.fillStyle = BALL_COLOR;
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
-    ctx.fill();
-  };
+  useEffect(() => {
+    // TODO: RoomIdを指定する
+    if (socket != null) socket.emit('connectPong');
 
-  let paddleY = PADDLE_START_POS;
-  const drawPaddle = (ctx: CanvasRenderingContext2D) => {
-    ctx.beginPath();
+    // TODO: Roomがなかった時のエラー処理
 
-    if (downPressed) {
-      paddleY += PADDLE_SPEED;
-      if (paddleY + paddleHeight > ctx.canvas.height) {
-        paddleY = ctx.canvas.height - paddleHeight;
-      }
-    } else if (upPressed) {
-      paddleY -= PADDLE_SPEED;
-      if (paddleY < 0) {
-        paddleY = 0;
-      }
-    }
+    // TODO: Player1か2の決定
+    if (socket != null)
+      socket.on('connectedPlayer', (data) => {
+        console.log(data);
+      });
 
-    ctx.rect(0, paddleY, paddleWidth, paddleHeight);
-    ctx.fillStyle = PADDLE_COLOR;
-    ctx.fill();
-    ctx.closePath();
-  };
+    if (socket != null)
+      socket.on('doneGame', () => {
+        setDoneGame(true);
+      });
+  }, []);
 
+  // このdrawの中にcanvasで表示したいものを書く
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    drawBall(ctx);
-    drawPaddle(ctx);
+    // ここをpositionUpdateにする
+    if (socket != null)
+      socket.on(
+        'player1Update',
+        (data: { x: number; y: number; score: number }) => {
+          player1.pos.x = data.x;
+          player1.pos.y = data.y;
+          player1.score = data.score;
+        }
+      );
 
-    // パドルで跳ね返る処理・ゲームオーバー処理
-    if (ballX + dX > ctx.canvas.width - ballRadius) {
-      dX = -dX;
-    } else if (ballX + dX < ballRadius) {
-      if (ballY > paddleY && ballY < paddleY + paddleHeight) {
-        dX = -dX;
-      } else {
-        console.log('Game Over');
-        document.location.reload();
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      }
-    }
+    if (socket != null)
+      socket.on(
+        'player2Update',
+        (data: { x: number; y: number; score: number }) => {
+          player2.pos.x = data.x;
+          player2.pos.y = data.y;
+          player2.score = data.score;
+        }
+      );
 
-    // 上下の壁で跳ね返る処理
-    if (
-      ballY + dY > ctx.canvas.height - ballRadius ||
-      ballY + dY < ballRadius
-    ) {
-      dY = -dY;
-    }
+    if (socket != null)
+      socket.on('ballUpdate', (data: { x: number; y: number }) => {
+        ball.pos.x = data.x;
+        ball.pos.y = data.y;
+      });
 
-    // frameごとに進む
-    ballX += dX;
-    ballY += dY;
+    player1.draw(ctx);
+    player2.draw(ctx);
+    ball.draw(ctx);
+
+    // TODO: player1だけになってるの修正
+    userInput(player1, isLeftSide);
+
+    // スコアの表示
+    ctx.font = '48px serif';
+    ctx.fillText(player1.score.toString(), 20, 50);
+    ctx.fillText(player2.score.toString(), 960, 50);
+
+    // socket.emit('update', { x: paddle1.pos.x, y: paddle1.pos.y });
   }, []);
 
-  return <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />;
+  return (
+    <>
+      {!isGameStarted && <Spinner />}
+      {!doneGame && isGameStarted && (
+        <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+      )}
+      {doneGame && <Result />}
+    </>
+  );
 });
