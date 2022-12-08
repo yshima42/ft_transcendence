@@ -29,6 +29,8 @@ model ChatMessage {
 model ChatRoom {
   id           String         @id
   name         String         @unique
+  status       ChatRoomStatus @default(OPEN)
+  password     String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime
   ChatMessage  ChatMessage[]
@@ -38,7 +40,7 @@ model ChatRoom {
 model ChatRoomUser {
   chatRoomId String
   userId     String
-  status     ChatUserStatus
+  status     ChatUserStatus @default(MEMBER)
   ChatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id])
   User       User           @relation(fields: [userId], references: [id])
 
@@ -120,7 +122,11 @@ model User {
 
 enum ChatUserStatus {
   OWNER
+  SUBOWNER
   MEMBER
+  KICKED
+  BANNED
+  MUTE
 }
 
 enum FriendRequestStatus {
@@ -133,4 +139,9 @@ enum OnlineStatus {
   ONLINE
   OFFLINE
   INGAME
+}
+
+enum ChatRoomStatus {
+  OPEN
+  CLOSE
 }

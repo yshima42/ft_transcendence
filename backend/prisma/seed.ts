@@ -10,6 +10,7 @@ import {
   DmRoomUser,
   Dm,
   MatchResult,
+  ChatRoomStatus,
 } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -111,9 +112,12 @@ const chatRooms: ChatRoom[] = [];
 for (let i = 0; i < 1; i++) {
   const id = uuidv4();
   const name = 'DmRoom' + id;
+  const status = 'OPEN' as ChatRoomStatus;
   chatRooms.push({
     id,
     name,
+    status,
+    password: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
