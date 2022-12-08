@@ -101,13 +101,14 @@ export const PongGame: FC = memo(() => {
     handleGameStart();
   }, []);
 
-  useEffect(() => {
-    socket?.on('initReturn', () => {
-      setInterval(() => {
-        socket.emit('tick', 'hello');
-      }, 33);
-    });
-  }, []);
+  // useEffect(() => {
+  //   socket?.on('initReturn', () => {
+  //     setInterval(() => {
+  //       // TODO: ここからユーザーインプットを送って反応を良くする
+  //       socket.emit('tick', 'hello');
+  //     }, 33);
+  //   });
+  // }, []);
 
   useEffect(() => {
     // TODO: RoomIdを指定する
