@@ -9,28 +9,26 @@ import { CreateDmDto } from './dto/create-dm.dto';
 export class DmService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createDmDto: CreateDmDto, senderId: string): Promise<Dm> {
+  async create(
+    createDmDto: CreateDmDto,
+    senderId: string,
+    dmRoomId: string
+  ): Promise<Dm> {
     const dm = await this.prisma.dm.create({
       data: {
         content: createDmDto.content,
         senderId,
-        dmRoomId: createDmDto.dmRoomId,
+        dmRoomId,
       },
     });
 
     return dm;
   }
 
-  async findDms(id: string): Promise<ResponseDm[]> {
-    if (id === undefined) {
-      Logger.warn(`findDms: dmRoomId is undefined`);
-
-      return [];
-    }
-
+  async findDms(dmRoomId: string): Promise<ResponseDm[]> {
     const dms = await this.prisma.dm.findMany({
       where: {
-        dmRoomId: id,
+        dmRoomId,
       },
       select: {
         id: true,
