@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseDmRoom } from './dmroom.interface';
+import { ResponseDmRoom } from './dm-room.interface';
 
 @Injectable()
-export class DmroomService {
+export class DmRoomService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(userId: string): Promise<ResponseDmRoom[]> {
