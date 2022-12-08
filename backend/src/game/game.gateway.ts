@@ -24,6 +24,20 @@ type GameScore = {
   player2: number;
 };
 
+const finishGame = async (player1: Paddle, player2: Paddle) => {
+  return await new Promise((resolve) => {
+    if (player1.score === 5) {
+      player1.score = 0;
+      player2.score = 0;
+      resolve('player1');
+    } else if (player2.score === 5) {
+      player1.score = 0;
+      player2.score = 0;
+      resolve('player2');
+    }
+  });
+};
+
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
   // サーバー側でのオブジェクト作成
@@ -81,12 +95,10 @@ export class GameGateway {
   }
 
   @SubscribeMessage('connectPong')
-  handleNewPlayer(@ConnectedSocket() socket: Socket): void {
+  handleConnectPong(@ConnectedSocket() socket: Socket): void {
     const gameRoom = this.getSocketGameRoom(socket);
 
     // console.log(`new client: ${socket.id}`);
-
-    socket.to(gameRoom).emit('connectedPlayer', socket.id);
 
     setInterval(() => {
       // パドルで跳ね返る処理・ゲームオーバー処理
@@ -111,15 +123,6 @@ export class GameGateway {
           this.player2.score++;
           this.ball.setPosition(BALL_START_X, BALL_START_Y);
         }
-      }
-
-      // ゲーム終了処理
-      if (this.player1.score === 5 || this.player2.score === 5) {
-        socket.to(gameRoom).emit('finishGame');
-
-        // ここでAPI叩く
-
-        return;
       }
 
       // ボールの動き
@@ -150,9 +153,22 @@ export class GameGateway {
         y: this.ball.pos.y,
       });
     }, 33);
+
+    socket.emit('initReturn');
   }
 
-  // TODO: 操作性をよくするためにワンクリックで動き続ける仕様にする(遅延が少なくなる)
+  @SubscribeMessage('tick')
+  handleNewPlayer(@ConnectedSocket() socket: Socket): void {
+    // ゲーム終了処理
+    const doneGame = finishGame(this.player1, this.player2);
+    doneGame
+      .then((data) => {
+        socket.emit('doneGame', data);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .catch(() => {});
+  }
+
   @SubscribeMessage('userCommands')
   handleUserCommands(
     @MessageBody() data: { up: boolean; down: boolean; isLeftSide: boolean }
