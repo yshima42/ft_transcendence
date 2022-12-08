@@ -8,7 +8,8 @@ import {
   // Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ChatRoom } from '@prisma/client';
+import { ChatRoom, User } from '@prisma/client';
+import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResponseChatRoom } from './chat-room.interface';
 import { ChatRoomService } from './chat-room.service';
@@ -21,9 +22,10 @@ export class ChatRoomController {
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(
-    @Body() createChatroomDto: CreateChatRoomDto
+    @Body() createChatroomDto: CreateChatRoomDto,
+    @GetUser() user: User
   ): Promise<ChatRoom> {
-    return await this.chatRoomService.create(createChatroomDto);
+    return await this.chatRoomService.create(createChatroomDto, user.id);
   }
 
   @Get()
