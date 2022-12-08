@@ -41,7 +41,12 @@ export const DmRooms: React.FC = React.memo(() => {
                   <C.Flex>
                     <C.Box>
                       <C.Text fontSize="sm">
-                        {new Date(dmRoom.dms[0].createdAt).toLocaleString()}
+                        {/* 投稿がない場合は何も表示しない */}
+                        {dmRoom.dms.length !== 0 ? (
+                          new Date(dmRoom.dms[0].createdAt).toLocaleString()
+                        ) : (
+                          <></>
+                        )}
                       </C.Text>
                       <C.Heading fontSize="xl">{`${dmRoom.dmRoomUsers[0].user.name}`}</C.Heading>
                       <C.Avatar

@@ -121,6 +121,38 @@ export class FriendRequestsService {
   async update(
     updateFriendRequestDto: UpdateFriendRequestDto
   ): Promise<FriendRequest> {
+    // もし、acceptされたら、DmRoomを作成する
+    // トランザクションに考慮する
+    if (updateFriendRequestDto.status === 'ACCEPTED') {
+      const result = await this.prisma.$transaction([
+        this.prisma.friendRequest.update({
+          where: {
+            creatorId_receiverId: {
+              creatorId: updateFriendRequestDto.creatorId,
+              receiverId: updateFriendRequestDto.receiverId,
+            },
+          },
+          data: updateFriendRequestDto,
+        }),
+        this.prisma.dmRoom.create({
+          data: {
+            dmRoomUsers: {
+              create: [
+                {
+                  userId: updateFriendRequestDto.creatorId,
+                },
+                {
+                  userId: updateFriendRequestDto.receiverId,
+                },
+              ],
+            },
+          },
+        }),
+      ]);
+
+      return result[0];
+    }
+
     return await this.prisma.friendRequest.update({
       where: {
         creatorId_receiverId: {

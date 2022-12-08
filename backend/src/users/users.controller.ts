@@ -297,6 +297,7 @@ export class UsersController {
   @ApiOkResponse({ type: FriendRequestEntity })
   async respondFriendRequest(
     @GetUser() user: User,
+    // TODO: ここDTO使ってないのなんで？
     @Body('creatorId', ParseUUIDPipe) creatorId: string,
     @Body('status', new ParseEnumPipe(FriendRequestStatus))
     status: FriendRequestStatus
