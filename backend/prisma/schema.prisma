@@ -101,7 +101,7 @@ model ChatMessage {
   id         String   @id @default(uuid())
   content    String
   createdAt  DateTime @default(now())
-  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id]) // 属するチャットルーム
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade) // 属するチャットルーム
   chatRoomId String
   sender     User     @relation("messageSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
   senderId   String
@@ -112,7 +112,7 @@ model ChatRoom {
   name          String         @unique
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  chatMessages  ChatMessage[] // チャットルームに属するメッセージ
+  chatMessages  ChatMessage[]
   chatRoomUsers ChatRoomUser[] // チャットルームに属するユーザー
 }
 
@@ -130,7 +130,7 @@ model Dm {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
-  dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id]) // 属するDMルーム
+  dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id], onDelete: Cascade) // 属するDMルーム dmRoomIdが削除されたら、このDmも削除される
   dmRoomId  String
   sender    User     @relation("dmSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
   senderId  String
