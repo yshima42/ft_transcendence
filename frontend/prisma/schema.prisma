@@ -27,15 +27,15 @@ model ChatMessage {
 }
 
 model ChatRoom {
-  id          String        @id
-  name        String        @unique
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime
-  ChatMessage ChatMessage[]
-  ChatUser    ChatUser[]
+  id           String         @id
+  name         String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  ChatMessage  ChatMessage[]
+  ChatRoomUser ChatRoomUser[]
 }
 
-model ChatUser {
+model ChatRoomUser {
   chatRoomId String
   userId     String
   status     ChatUserStatus
@@ -56,14 +56,14 @@ model Dm {
 }
 
 model DmRoom {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  Dm        Dm[]
-  DmUser    DmUser[]
+  id         String       @id
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  Dm         Dm[]
+  DmRoomUser DmRoomUser[]
 }
 
-model DmUser {
+model DmRoomUser {
   dmRoomId String
   userId   String
   DmRoom   DmRoom @relation(fields: [dmRoomId], references: [id])
@@ -109,9 +109,9 @@ model User {
   Block_Block_sourceIdToUser                   Block[]         @relation("Block_sourceIdToUser")
   Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
   ChatMessage                                  ChatMessage[]
-  ChatUser                                     ChatUser[]
+  ChatRoomUser                                 ChatRoomUser[]
   Dm                                           Dm[]
-  DmUser                                       DmUser[]
+  DmRoomUser                                   DmRoomUser[]
   FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
   FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
   MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")

@@ -22,7 +22,7 @@ type State = {
   id: string;
 };
 
-export const DirectMessages: React.FC = React.memo(() => {
+export const DmRoom: React.FC = React.memo(() => {
   const location = useLocation();
   const { id: dmRoomId } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseDm[]>([]);
