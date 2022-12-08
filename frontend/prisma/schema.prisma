@@ -8,21 +8,20 @@ datasource db {
 }
 
 model User {
-  id                     String          @id @default(uuid())
-  name                   String          @unique
-  avatarImageUrl         String
-  nickname               String          @unique
-  isTwoFactorAuthEnabled Boolean         @default(false)
-  twoFactorAuthSecret    String?
-  onlineStatus           OnlineStatus    @default(ONLINE)
-  createdAt              DateTime        @default(now())
-  updatedAt              DateTime        @updatedAt
-  blocking               Block[]         @relation("source")
-  blockedBy              Block[]         @relation("target")
-  creator                FriendRequest[] @relation("creator")
-  receiver               FriendRequest[] @relation("receiver")
-  playerOne              MatchResult[]   @relation("playerOne")
-  playerTwo              MatchResult[]   @relation("playerTwo")
+  id             String          @id @default(uuid())
+  name           String          @unique
+  avatarImageUrl String
+  nickname       String          @unique
+  onlineStatus   OnlineStatus    @default(ONLINE)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  blocking       Block[]         @relation("source")
+  blockedBy      Block[]         @relation("target")
+  creator        FriendRequest[] @relation("creator")
+  receiver       FriendRequest[] @relation("receiver")
+  playerOne      MatchResult[]   @relation("playerOne")
+  playerTwo      MatchResult[]   @relation("playerTwo")
+  TwoFactorAuth  TwoFactorAuth?
 }
 
 model FriendRequest {
@@ -56,6 +55,13 @@ model MatchResult {
   finishedAt     DateTime @updatedAt
   playerOne      User     @relation("playerOne", fields: [playerOneId], references: [id])
   playerTwo      User     @relation("playerTwo", fields: [playerTwoId], references: [id])
+}
+
+model TwoFactorAuth {
+  authUserId String   @unique
+  secret     String
+  createdAt  DateTime @default(now())
+  User       User     @relation(fields: [authUserId], references: [id])
 }
 
 enum OnlineStatus {
