@@ -1,33 +1,33 @@
 import { memo, FC, useState } from 'react';
 import { Button, Flex, Spacer, Text } from '@chakra-ui/react';
-import { useProfile } from 'hooks/api';
-
-import { useQrCodeUrl } from 'hooks/api/auth/useQrCodeUrl';
-import { useTwoFactorSwitch } from 'hooks/api/auth/useTwoFactorSwitch';
+import { useCreateTwoFactorAuth } from 'hooks/api/auth/useCreateTwoFactorAuth';
+import { useDeleteTwoFactorAuth } from 'hooks/api/auth/useDeleteTwoFactorAuth';
+import { useGetTwoFactorAuthState } from 'hooks/api/auth/useGetTwoFactorAuthState';
 import { useQRCode } from 'next-qrcode';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfileSetting: FC = memo(() => {
-  const { user } = useProfile();
+  const { createTwoFactorAuth } = useCreateTwoFactorAuth();
+  const { deleteTwoFactorAuth } = useDeleteTwoFactorAuth();
   const { Canvas } = useQRCode();
-  const { switchTwoFactor } = useTwoFactorSwitch();
-  const { generateQrCodeUrl } = useQrCodeUrl();
   const navigate = useNavigate();
 
-  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState<boolean>(
-    user.isTwoFactorAuthEnabled
+  const [twoFactorAuthState, setTwoFactorAuthState] = useState(
+    useGetTwoFactorAuthState().twoFactorAuthState
   );
 
   const [url, setUrl] = useState('');
 
   const onClickSwitchButton = async () => {
-    const newIsTwoFactorEnabled = !isTwoFactorEnabled;
-    if (newIsTwoFactorEnabled) {
-      const { url } = await generateQrCodeUrl({});
+    const newTwoFactorAuthState = !twoFactorAuthState;
+    if (newTwoFactorAuthState) {
+      const { url } = await createTwoFactorAuth({});
       setUrl(url);
+    } else {
+      await deleteTwoFactorAuth({});
+      setUrl('');
     }
-    await switchTwoFactor({ isTwoFactorAuthEnabled: !isTwoFactorEnabled });
-    setIsTwoFactorEnabled(newIsTwoFactorEnabled);
+    setTwoFactorAuthState(newTwoFactorAuthState);
   };
 
   return (
@@ -36,7 +36,7 @@ export const ProfileSetting: FC = memo(() => {
         <Text fontSize="sm" pr={2}>
           Two-Factor
         </Text>
-        {isTwoFactorEnabled ? (
+        {twoFactorAuthState ? (
           <Button
             size="xs"
             bg="teal.200"
@@ -52,7 +52,7 @@ export const ProfileSetting: FC = memo(() => {
         )}
       </Flex>
       <Spacer />
-      {isTwoFactorEnabled && url !== '' ? (
+      {twoFactorAuthState && url !== '' ? (
         <Canvas
           text={url}
           options={{
