@@ -27,16 +27,6 @@ export class UserEntity implements User {
   })
   nickname!: string;
 
-  @ApiProperty({
-    default: '',
-  })
-  twoFactorAuthSecret!: string;
-
-  @ApiProperty({
-    default: false,
-  })
-  isTwoFactorAuthEnabled!: boolean;
-
   @ApiProperty({ default: 'ONLINE' })
   onlineStatus!: OnlineStatus;
 }
