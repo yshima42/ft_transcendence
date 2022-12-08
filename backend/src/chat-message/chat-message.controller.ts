@@ -10,13 +10,13 @@ import {
 import { ChatMessage, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ResponseChatMessage } from './chat.interface';
-import { ChatService } from './chat.service';
-import { CreateChatMessageDto } from './dto/create-chat.dto';
+import { ResponseChatMessage } from './chat-message.interface';
+import { ChatMessageService } from './chat-message.service';
+import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 
 @Controller('chat')
-export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+export class ChatMessageController {
+  constructor(private readonly chatMessageService: ChatMessageService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -28,7 +28,7 @@ export class ChatController {
       `createChatMessageDto: ${JSON.stringify(createChatMessageDto)}`
     );
 
-    return await this.chatService.create(createChatMessageDto, user.id);
+    return await this.chatMessageService.create(createChatMessageDto, user.id);
   }
 
   @Get(':chatRoomId')
@@ -36,6 +36,6 @@ export class ChatController {
   async findAll(
     @Param('chatRoomId') chatRoomId: string
   ): Promise<ResponseChatMessage[]> {
-    return await this.chatService.findAll(chatRoomId);
+    return await this.chatMessageService.findAll(chatRoomId);
   }
 }

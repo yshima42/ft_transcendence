@@ -1,15 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ChatRoom } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ResponseChatRoom } from './chatroom.interface';
-import { CreateChatroomDto } from './dto/create-chatroom.dto';
-import { UpdateChatroomDto } from './dto/update-chatroom.dto';
+import { ResponseChatRoom } from './chat-room.interface';
+import { CreateChatRoomDto } from './dto/create-chat-room.dto';
+import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @Injectable()
-export class ChatroomService {
+export class ChatRoomService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createChatroomDto: CreateChatroomDto): Promise<ChatRoom> {
+  async create(createChatroomDto: CreateChatRoomDto): Promise<ChatRoom> {
     const { name } = createChatroomDto;
 
     const chatRoom = await this.prisma.chatRoom.create({
@@ -64,7 +64,7 @@ export class ChatroomService {
   // update
   async update(
     id: string,
-    updateChatroomDto: UpdateChatroomDto
+    updateChatroomDto: UpdateChatRoomDto
   ): Promise<ChatRoom> {
     const { name } = updateChatroomDto;
 
