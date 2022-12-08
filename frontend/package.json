@@ -10,14 +10,14 @@
     "api": "yarn --cwd ../backend start:dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint:es": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
-    "lint:es:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx}'",
+    "lint:es": "eslint '{src,cypress}/**/*.{js,jsx,ts,tsx}'",
+    "lint:es:fix": "eslint --fix '{src,cypress}/**/*.{js,jsx,ts,tsx}'",
     "lint:style": "stylelint 'src/**/*.{css,less,sass,scss}'",
     "lint:style:fix": "stylelint --fix 'src/**/*.{css,less,sass,scss}'",
     "lint": "npm run --silent lint:style; npm run --silent lint:es",
     "lint:fix": "npm run --silent lint:style:fix; npm run --silent lint:es:fix",
     "preinstall": "npx typesync || :",
-    "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
+    "format": "prettier --write --loglevel=warn '{src,cypress}/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
     "test": "jest --config ./jest.config.json",
     "test:watch": "npm run test -- --watch",
@@ -32,8 +32,8 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@tanstack/react-query": "^4.19.1",
-    "axios": "^1.2.0",
-    "framer-motion": "^7.6.18",
+    "axios": "^1.2.1",
+    "framer-motion": "^7.6.19",
     "next-qrcode": "^2.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -58,18 +58,23 @@
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.4.3",
     "@types/babel__core": "^7.1.20",
+    "@types/chai": "^4.3.4",
     "@types/eslint": "^8.4.10",
     "@types/jest": "^29.2.4",
     "@types/prettier": "^2.7.1",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
     "@types/testing-library__jest-dom": "^5.14.5",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.1",
     "@vitejs/plugin-react": "^2.2.0",
     "babel-loader": "^9.1.0",
+    "chai": "^4.3.7",
+    "cypress": "^11.2.0",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-chai-friendly": "^0.7.2",
+    "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^27.1.6",
     "eslint-plugin-jest-dom": "^4.0.3",
@@ -78,7 +83,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-storybook": "^0.6.7",
+    "eslint-plugin-storybook": "^0.6.8",
     "eslint-plugin-testing-library": "^5.9.1",
     "jest": "^29.3.1",
     "jest-environment-jsdom": "^29.3.1",
@@ -86,6 +91,7 @@
     "npm-check-updates": "^16.4.3",
     "prettier": "^2.8.0",
     "prisma": "^4.7.1",
+    "start-server-and-test": "^1.15.0",
     "stylelint": "^14.16.0",
     "stylelint-config-recess-order": "^3.0.0",
     "stylelint-config-standard": "^29.0.0",
@@ -96,14 +102,14 @@
     "vite-tsconfig-paths": "^3.6.0"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx}": [
+    "{src,cypress}/**/*.{js,jsx,ts,tsx}": [
       "prettier --write --loglevel=warn",
       "eslint --fix --quiet"
     ],
     "src/**/*.{css,less,sass,scss}": [
       "stylelint --fix --quiet"
     ],
-    "src/**/*.{html,json,gql,graphql}": [
+    "{src,cypress}/**/*.{html,json,gql,graphql}": [
       "prettier --write --loglevel=error"
     ],
     "./*.json": [
