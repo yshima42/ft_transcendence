@@ -6,6 +6,7 @@ import {
   Param,
   Logger,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ChatMessage, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -18,9 +19,11 @@ import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 export class ChatMessageController {
   constructor(private readonly chatMessageService: ChatMessageService) {}
 
-  @Post()
+  // create
+  @Post(':chatRoomId')
   @UseGuards(JwtAuthGuard)
   async create(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Body() createChatMessageDto: CreateChatMessageDto,
     @GetUser() user: User
   ): Promise<ChatMessage> {
@@ -28,7 +31,11 @@ export class ChatMessageController {
       `createChatMessageDto: ${JSON.stringify(createChatMessageDto)}`
     );
 
-    return await this.chatMessageService.create(createChatMessageDto, user.id);
+    return await this.chatMessageService.create(
+      createChatMessageDto,
+      chatRoomId,
+      user.id
+    );
   }
 
   @Get(':chatRoomId')

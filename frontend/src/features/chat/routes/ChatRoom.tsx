@@ -35,7 +35,7 @@ export const ChatRoom: React.FC = React.memo(() => {
   }
   // 送信ボタンを押したときの処理
   async function sendMessage(content: string): Promise<void> {
-    await axios.post(`/chat/message`, { content, chatRoomId });
+    await axios.post(`/chat/message/${chatRoomId}`, { content });
     getAllChatMessage().catch((err) => console.error(err));
   }
 

@@ -10,12 +10,13 @@ export class ChatMessageService {
 
   async create(
     createChatMessageDto: CreateChatMessageDto,
+    chatRoomId: string,
     senderId: string
   ): Promise<ChatMessage> {
     const chatMessage = await this.prisma.chatMessage.create({
       data: {
         content: createChatMessageDto.content,
-        chatRoomId: createChatMessageDto.chatRoomId,
+        chatRoomId,
         senderId,
       },
     });
