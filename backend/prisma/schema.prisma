@@ -86,16 +86,15 @@ model Block {
 }
 
 model MatchResult {
-  id            String   @id @default(uuid())
-  playerOne     User     @relation("playerOne", fields: [playerOneId], references: [id])
-  playerOneId   String
-  playerTwo     User     @relation("playerTwo", fields: [playerTwoId], references: [id])
-  playerTwoId   String
-  userScore     Int
-  opponentScore Int
-  win           Boolean
-  startedAt     DateTime @default(now())
-  finishedAt    DateTime @updatedAt
+  id             String   @id @default(uuid())
+  playerOne      User     @relation("playerOne", fields: [playerOneId], references: [id])
+  playerOneId    String
+  playerTwo      User     @relation("playerTwo", fields: [playerTwoId], references: [id])
+  playerTwoId    String
+  playerOneScore Int
+  playerTwoScore Int
+  startedAt      DateTime @default(now())
+  finishedAt     DateTime @updatedAt
 }
 
 model ChatMessage {

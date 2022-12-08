@@ -1,15 +1,17 @@
 import { memo, FC } from 'react';
 import { Avatar, Flex, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
+import { BlockButton } from './BlockButton';
 import { ProfileSetting } from './ProfileSetting';
 
 type UserInfoCardProps = {
   user: User;
   isLoginUser: boolean;
+  isBlockedUser: boolean;
 };
 
 export const UserInfoCard: FC<UserInfoCardProps> = memo(
-  ({ user, isLoginUser }: UserInfoCardProps) => {
+  ({ user, isLoginUser, isBlockedUser }: UserInfoCardProps) => {
     return (
       <Flex
         w="100%"
@@ -30,6 +32,9 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
           {user.name}
         </Text>
         {isLoginUser && <ProfileSetting />}
+        {isLoginUser || (
+          <BlockButton userId={user.id} isBlockedUser={isBlockedUser} />
+        )}
       </Flex>
     );
   }
