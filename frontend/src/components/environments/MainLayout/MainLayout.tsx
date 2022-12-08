@@ -33,7 +33,7 @@ export const MainLayout: FC<MainProps> = memo((props) => {
     },
     {
       title: 'Chat',
-      to: 'chats',
+      to: 'chat',
       icon: ChatIcon,
       iconComponent: <ChatIcon />,
     },
