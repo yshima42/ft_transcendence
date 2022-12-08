@@ -4,8 +4,8 @@ import { AuthModule } from './auth/auth.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { ChatMessageModule } from './chat-message/chat-message.module';
 import { ChatroomModule } from './chat-room/chat-room.module';
+import { DmRoomModule } from './dm-room/dm-room.module';
 import { DmModule } from './dm/dm.module';
-import { DmroomModule } from './dmroom/dmroom.module';
 import { FileModule } from './file/file.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 import { GameModule } from './game/game.module';
@@ -28,7 +28,7 @@ import { UsersModule } from './users/users.module';
     ChatMessageModule,
     DmModule,
     ChatroomModule,
-    DmroomModule,
+    DmRoomModule,
   ],
   controllers: [],
   providers: [],
