@@ -15,7 +15,7 @@ describe('sidebar spec', () => {
 
   it('chat', () => {
     cy.contains('Chat').click();
-    cy.url().should('include', '/chats');
+    cy.url().should('include', '/chat');
   });
 
   it('watch', () => {

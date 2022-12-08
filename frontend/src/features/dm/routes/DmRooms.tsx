@@ -6,7 +6,7 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 type ResponseDmRoom = {
   id: string;
-  dmUsers: Array<{
+  dmRoomUsers: Array<{
     user: {
       name: string;
       avatarImageUrl: string;
@@ -18,7 +18,7 @@ type ResponseDmRoom = {
   }>;
 };
 
-export const DirectMessageRooms: React.FC = React.memo(() => {
+export const DmRooms: React.FC = React.memo(() => {
   const [dmRooms, setDmRooms] = React.useState<ResponseDmRoom[]>([]);
 
   async function getAllDmRoom(): Promise<void> {
@@ -43,11 +43,11 @@ export const DirectMessageRooms: React.FC = React.memo(() => {
                       <C.Text fontSize="sm">
                         {new Date(dmRoom.dms[0].createdAt).toLocaleString()}
                       </C.Text>
-                      <C.Heading fontSize="xl">{`${dmRoom.dmUsers[0].user.name}`}</C.Heading>
+                      <C.Heading fontSize="xl">{`${dmRoom.dmRoomUsers[0].user.name}`}</C.Heading>
                       <C.Avatar
                         size="md"
-                        name={`${dmRoom.dmUsers[0].user.name}`}
-                        src={`${dmRoom.dmUsers[0].user.avatarImageUrl}`}
+                        name={`${dmRoom.dmRoomUsers[0].user.name}`}
+                        src={`${dmRoom.dmRoomUsers[0].user.avatarImageUrl}`}
                       />
                     </C.Box>
                   </C.Flex>
