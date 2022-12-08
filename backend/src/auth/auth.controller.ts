@@ -8,14 +8,11 @@ import {
   Res,
   Redirect,
   Query,
-  Body,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { CookieOptions } from 'csurf';
 import { Response } from 'express';
-import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
@@ -58,14 +55,16 @@ export class AuthController {
       nickname: name,
       avatarImageUrl: ftProfile.imageUrl,
     };
-    const { accessToken, isTwoFactorAuthEnabled } =
-      await this.authService.login(name, signupUser);
+    const { accessToken, twoFactorAuthState } = await this.authService.login(
+      name,
+      signupUser
+    );
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
 
-    if (isTwoFactorAuthEnabled) {
+    if (twoFactorAuthState) {
       return { url: 'http://localhost:5173/twofactor' };
     } else {
       return { url: 'http://localhost:5173/app' };
@@ -94,11 +93,12 @@ export class AuthController {
     @Query('name') name: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ url: string }> {
-    const { accessToken, isTwoFactorAuthEnabled } =
-      await this.authService.login(name);
+    const { accessToken, twoFactorAuthState } = await this.authService.login(
+      name
+    );
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    if (isTwoFactorAuthEnabled) {
+    if (twoFactorAuthState) {
       return { url: 'http://localhost:5173/twofactor' };
     } else {
       return { url: 'http://localhost:5173/app' };
@@ -114,45 +114,87 @@ export class AuthController {
     return { message: 'ok' };
   }
 
-  @Post('2fa/generate')
+  /**
+   * TwoFactorAuthテーブル上に、特定のユーザーのレコードが存在するか確認。
+   * @param user
+   * @returns trueなら2FA有効。falseなら無効。
+   */
+  @Get('2fa')
   @UseGuards(JwtTwoFactorAuthGuard)
-  async register(@GetUser() user: User): Promise<{ url: string }> {
-    const { otpAuthUrl } = await this.authService.generateTwoFactorAuthSecret(
-      user
-    );
-
-    return { url: otpAuthUrl };
+  async getTwoFactorAuthState(@GetUser() user: User): Promise<boolean> {
+    return await this.authService.getTwoFactorAuthState(user.id);
   }
 
-  @Post('2fa/update')
+  /**
+   * TwoFactorAuthテーブルに新規レコードを追加。
+   * @param user - 対象ユーザー
+   * @param res - cookie用
+   * @returns ワンタイムパスワード生成用QRコードURL
+   */
+  @Post('2fa')
   @UseGuards(JwtTwoFactorAuthGuard)
-  async isTwoFactorAuthEnabledUpdate(
+  async createTwoFactorAuth(
     @GetUser() user: User,
-    @Body() updateUserDto: UpdateUserDto,
     @Res({ passthrough: true }) res: Response
-  ): Promise<UserDto> {
+  ): Promise<{ url: string }> {
+    const { otpAuthUrl } = await this.authService.createTwoFactorAuth(user);
+
     const { accessToken } = await this.authService.generateJwt(
       user.id,
       user.name,
-      updateUserDto.isTwoFactorAuthEnabled
+      true
     );
 
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return await this.usersService.update(user.id, updateUserDto);
+    return { url: otpAuthUrl };
   }
 
-  @Get('2fa/authenticate')
+  // TODO PostからDeleteメソッドに変更
+  /**
+   * TwoFactorAuthテーブルからレコード削除。
+   * @param user - 対象ユーザー
+   * @param res - cookie用
+   * @returns 対象ユーザー
+   */
+  @Post('2fa/delete')
+  @UseGuards(JwtTwoFactorAuthGuard)
+  async deleteTwoFactorAuth(
+    @GetUser() user: User,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<User> {
+    const { accessToken } = await this.authService.generateJwt(
+      user.id,
+      user.name,
+      false
+    );
+
+    res.cookie('access_token', accessToken, this.cookieOptions);
+
+    return await this.authService.deleteTwoFactorAuth(user);
+  }
+
+  /**
+   * 入力されたワンタイムパスワードの検証。
+   * 正しければ、valid=trueを付与したaccessTokenを
+   * cookieに割り当てて、アプリトップへリダイレクト。
+   * 間違っていれば、ログインページにリダイレクト。
+   * @param user
+   * @param oneTimePassword - クエリから取得。
+   * @param res - cookie用
+   * @returns リダイレクト先
+   */
+  @Get('2fa/validation')
   @HttpCode(200)
   @Redirect('http://localhost:5173/app')
   @UseGuards(JwtAuthGuard)
-  async authenticate(
+  async validateOneTimePassword(
     @GetUser() user: User,
-    @Query('twoFactorAuthCode') twoFactorAuthCode: string,
+    @Query('oneTimePassword') oneTimePassword: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ url: string }> {
-    const isCodeValid = this.authService.isTwoFactorAuthCodeValid(
-      twoFactorAuthCode,
+    const isCodeValid = await this.authService.oneTimePasswordValidate(
+      oneTimePassword,
       user
     );
     if (!isCodeValid) {
