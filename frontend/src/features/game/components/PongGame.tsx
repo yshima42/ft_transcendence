@@ -1,5 +1,6 @@
-import { memo, FC, useCallback, useEffect, useContext } from 'react';
+import { memo, FC, useCallback, useEffect, useContext, useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
+import { useProfile } from 'hooks/api';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -14,6 +15,7 @@ import { Ball, Paddle } from '../utils/gameObjs';
 import gameService from '../utils/gameService';
 import socketService from '../utils/socketService';
 import { Canvas } from './Canvas';
+import { Result } from './Result';
 
 export type StartGame = {
   start: boolean;
@@ -73,7 +75,10 @@ export const PongGame: FC = memo(() => {
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
+  const { user } = useProfile();
+
   const { isGameStarted, setGameStarted } = useContext(gameContext);
+  const [doneGame, setDoneGame] = useState(false);
   const socket = socketService.socket;
 
   // TODO: これをuseStateにしたら動かなくなる理由検証・修正
@@ -84,6 +89,8 @@ export const PongGame: FC = memo(() => {
         // 2プレーヤーが揃うとゲームスタート
         setGameStarted(true);
 
+        console.log(user);
+
         // プレーヤーのサイド決定
         isLeftSide = options.isLeftSide;
       });
@@ -92,6 +99,14 @@ export const PongGame: FC = memo(() => {
 
   useEffect(() => {
     handleGameStart();
+  }, []);
+
+  useEffect(() => {
+    socket?.on('initReturn', () => {
+      setInterval(() => {
+        socket.emit('tick', 'hello');
+      }, 33);
+    });
   }, []);
 
   useEffect(() => {
@@ -107,8 +122,8 @@ export const PongGame: FC = memo(() => {
       });
 
     if (socket != null)
-      socket.on('finishGame', () => {
-        console.log('done');
+      socket.on('doneGame', () => {
+        setDoneGame(true);
       });
   }, []);
 
@@ -163,9 +178,10 @@ export const PongGame: FC = memo(() => {
   return (
     <>
       {!isGameStarted && <Spinner />}
-      {isGameStarted && (
+      {!doneGame && isGameStarted && (
         <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
       )}
+      {doneGame && <Result />}
     </>
   );
 });
