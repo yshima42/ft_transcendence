@@ -6,7 +6,6 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { Ball, GameRooms, Paddle } from './classes/game-objs';
 import {
   BALL_SIZE,
@@ -19,7 +18,6 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from './config/game-config';
-import { GameService } from './game.service';
 
 type GameScore = {
   player1: number;
