@@ -29,12 +29,16 @@ describe('sidebar spec', () => {
   it('profile', () => {
     cy.contains('nicknamedummy1').click();
     cy.url().should('include', '/profile');
+    // TODO: Spinnerにより、Pass しない。
+    cy.wait(1000);
     cy.get('h2').first().should('have.text', 'Profile');
   });
 
   it('avatar', () => {
     cy.get('.chakra-avatar__img').click();
     cy.url().should('include', '/profile');
+    // TODO: Spinnerにより、Pass しない。
+    cy.wait(1000);
     cy.get('h2').first().should('have.text', 'Profile');
   });
 
