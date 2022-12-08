@@ -5,7 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ResponseDmRoom } from './dmroom.interface';
 import { DmroomService } from './dmroom.service';
 
-@Controller('dmroom')
+@Controller('dm/room')
 export class DmroomController {
   constructor(private readonly dmroomService: DmroomService) {}
 
