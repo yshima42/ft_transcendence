@@ -128,7 +128,7 @@ for (let i = 0; i < 30; i++) {
       opponentScore: matchScoreData[i][1],
       win: matchScoreData[i][0] > matchScoreData[i][1],
       startedAt: new Date(),
-      finishededAt: new Date(),
+      finishedAt: new Date(),
     });
   }
 }
@@ -145,7 +145,7 @@ for (let i = 0; i < 30; i++) {
       opponentScore: matchScoreData[i][1],
       win: matchScoreData[i][0] > matchScoreData[i][1],
       startedAt: new Date(),
-      finishededAt: new Date(),
+      finishedAt: new Date(),
     });
   }
 }
