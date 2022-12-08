@@ -15,12 +15,12 @@ import { ResponseDm } from './dm.interface';
 import { DmService } from './dm.service';
 import { CreateDmDto } from './dto/create-dm.dto';
 
-@Controller('dm/message')
+@Controller('dm/:dmRoomId/message')
 export class DmController {
   constructor(private readonly dmService: DmService) {}
 
   // create dm message
-  @Post(':dmRoomId')
+  @Post()
   @UseGuards(JwtAuthGuard)
   async create(
     @Param('dmRoomId', new ParseUUIDPipe()) dmRoomId: string,
@@ -32,7 +32,7 @@ export class DmController {
     return await this.dmService.create(createDmDto, user.id, dmRoomId);
   }
 
-  @Get(':dmRoomId')
+  @Get()
   @UseGuards(JwtAuthGuard)
   async findDms(@Param('dmRoomId') dmRoomId: string): Promise<ResponseDm[]> {
     return await this.dmService.findDms(dmRoomId);

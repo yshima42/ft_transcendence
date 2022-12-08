@@ -15,12 +15,12 @@ import { ResponseChatMessage } from './chat-message.interface';
 import { ChatMessageService } from './chat-message.service';
 import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 
-@Controller('chat/message')
+@Controller('chat/:chatRoomId/message')
 export class ChatMessageController {
   constructor(private readonly chatMessageService: ChatMessageService) {}
 
   // create
-  @Post(':chatRoomId')
+  @Post()
   @UseGuards(JwtAuthGuard)
   async create(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
@@ -38,7 +38,7 @@ export class ChatMessageController {
     );
   }
 
-  @Get(':chatRoomId')
+  @Get('all')
   @UseGuards(JwtAuthGuard)
   async findAll(
     @Param('chatRoomId') chatRoomId: string
