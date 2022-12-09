@@ -36,6 +36,7 @@ const App = () => {
 };
 
 export const publicRoutes = [
+  // authを入れる場合は
   {
     path: '/',
     element: <Login />,
@@ -58,6 +59,7 @@ export const publicRoutes = [
       { path: 'dm/:id', element: <DmRoom /> },
       { path: 'profile', element: <Profile /> },
       { path: 'profile/edit', element: <ProfileEdit /> },
+      // { path: 'users/:id', element: <UserProfile /> },
       { path: 'users/:id', element: <Profile /> },
       { path: '*', element: <Page404 /> },
     ],
