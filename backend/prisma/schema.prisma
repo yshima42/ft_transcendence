@@ -60,7 +60,7 @@ enum OnlineStatus {
 model TwoFactorAuth {
   authUser   User     @relation(fields: [authUserId], references: [id])
   authUserId String   @unique
-  url        String
+  otpAuthUrl String
   secret     String
   createdAt  DateTime @default(now())
 }
