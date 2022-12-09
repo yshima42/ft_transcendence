@@ -14,7 +14,7 @@ export type CreateTwoFactorAuth = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useCreateTwoFactorAuth = (): {
+export const useTwoFactorAuthCreate = (): {
   createTwoFactorAuth: CreateTwoFactorAuth;
   isLoading: boolean;
 } => {
