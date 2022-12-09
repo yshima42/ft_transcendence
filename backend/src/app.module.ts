@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { ChatMessageModule } from './chat-message/chat-message.module';
+import { ChatRoomUserModule } from './chat-room-user/chat-room-user.module';
 import { ChatroomModule } from './chat-room/chat-room.module';
 import { DmRoomModule } from './dm-room/dm-room.module';
 import { DmModule } from './dm/dm.module';
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module';
     DmModule,
     ChatroomModule,
     DmRoomModule,
+    ChatRoomUserModule,
   ],
   controllers: [],
   providers: [],
