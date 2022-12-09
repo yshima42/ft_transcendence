@@ -1,6 +1,5 @@
 import { memo, FC, useCallback, useEffect, useContext, useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
-import { useProfile } from 'hooks/api';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -75,8 +74,6 @@ export const PongGame: FC = memo(() => {
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  const { user } = useProfile();
-
   const { isGameStarted, setGameStarted } = useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
   const socket = socketService.socket;
@@ -89,8 +86,6 @@ export const PongGame: FC = memo(() => {
         // 2プレーヤーが揃うとゲームスタート
         setGameStarted(true);
 
-        console.log(user);
-
         // プレーヤーのサイド決定
         isLeftSide = options.isLeftSide;
       });
@@ -101,14 +96,14 @@ export const PongGame: FC = memo(() => {
     handleGameStart();
   }, []);
 
-  // useEffect(() => {
-  //   socket?.on('initReturn', () => {
-  //     setInterval(() => {
-  //       // TODO: ここからユーザーインプットを送って反応を良くする
-  //       socket.emit('tick', 'hello');
-  //     }, 33);
-  //   });
-  // }, []);
+  useEffect(() => {
+    socket?.on('initReturn', () => {
+      setInterval(() => {
+        // TODO: ここからユーザーインプットを送って反応を良くする
+        socket.emit('tick', 'hello');
+      }, 33);
+    });
+  }, []);
 
   useEffect(() => {
     // TODO: RoomIdを指定する
