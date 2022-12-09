@@ -29,21 +29,21 @@ datasource db {
 // }
 
 model User {
-  id                     String       @id @default(uuid())
-  name                   String       @unique
-  avatarImageUrl         String
-  nickname               String       @unique
-  onlineStatus           OnlineStatus @default(ONLINE)
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @updatedAt
+  id             String       @id @default(uuid())
+  name           String       @unique
+  avatarImageUrl String
+  nickname       String       @unique
+  onlineStatus   OnlineStatus @default(ONLINE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   twoFactorAuth TwoFactorAuth?
-  creator   FriendRequest[] @relation("creator")
-  receiver  FriendRequest[] @relation("receiver")
-  blocking  Block[]         @relation("source")
-  blockedBy Block[]         @relation("target")
-  playerOne MatchResult[]   @relation("playerOne")
-  playerTwo MatchResult[]   @relation("playerTwo")
+  creator       FriendRequest[] @relation("creator")
+  receiver      FriendRequest[] @relation("receiver")
+  blocking      Block[]         @relation("source")
+  blockedBy     Block[]         @relation("target")
+  playerOne     MatchResult[]   @relation("playerOne")
+  playerTwo     MatchResult[]   @relation("playerTwo")
 
   chatMessages ChatMessage[]  @relation("messageSender") // ユーザーが送信したチャットメッセージ
   dms          Dm[]           @relation("dmSender") // ユーザーが送信したDMメッセージ
