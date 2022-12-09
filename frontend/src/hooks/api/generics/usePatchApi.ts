@@ -1,8 +1,13 @@
-import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
+import {
+  UseMutateAsyncFunction,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
 export function usePatchApi<ReqBody, ResBody>(
-  endpoint: string
+  endpoint: string,
+  queryKeys?: string[]
 ): {
   patchFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
   isLoading: boolean;
@@ -13,7 +18,15 @@ export function usePatchApi<ReqBody, ResBody>(
     return result.data;
   };
 
-  const { mutateAsync: patchFunc, isLoading } = useMutation(axiosPatch);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: patchFunc, isLoading } = useMutation(axiosPatch, {
+    onSuccess: () => {
+      if (queryKeys !== undefined) {
+        void queryClient.invalidateQueries([...queryKeys]);
+      }
+    },
+  });
 
   return { patchFunc, isLoading };
 }

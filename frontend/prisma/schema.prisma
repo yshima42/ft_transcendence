@@ -7,31 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id             String          @id @default(uuid())
-  name           String          @unique
-  avatarImageUrl String
-  nickname       String          @unique
-  onlineStatus   OnlineStatus    @default(ONLINE)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  blocking       Block[]         @relation("source")
-  blockedBy      Block[]         @relation("target")
-  creator        FriendRequest[] @relation("creator")
-  receiver       FriendRequest[] @relation("receiver")
-  playerOne      MatchResult[]   @relation("playerOne")
-  playerTwo      MatchResult[]   @relation("playerTwo")
-  TwoFactorAuth  TwoFactorAuth?
+model Block {
+  sourceId                  String
+  targetId                  String
+  User_Block_sourceIdToUser User   @relation("Block_sourceIdToUser", fields: [sourceId], references: [id])
+  User_Block_targetIdToUser User   @relation("Block_targetIdToUser", fields: [targetId], references: [id])
+
+  @@id([sourceId, targetId])
+}
+
+model ChatMessage {
+  id         String   @id
+  content    String
+  createdAt  DateTime @default(now())
+  chatRoomId String
+  senderId   String
+  ChatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  User       User     @relation(fields: [senderId], references: [id])
+}
+
+model ChatRoom {
+  id           String         @id
+  name         String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  ChatMessage  ChatMessage[]
+  ChatRoomUser ChatRoomUser[]
+}
+
+model ChatRoomUser {
+  chatRoomId String
+  userId     String
+  status     ChatUserStatus
+  ChatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id])
+  User       User           @relation(fields: [userId], references: [id])
+
+  @@id([chatRoomId, userId])
+}
+
+model Dm {
+  id        String   @id
+  content   String
+  createdAt DateTime @default(now())
+  dmRoomId  String
+  senderId  String
+  DmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id])
+  User      User     @relation(fields: [senderId], references: [id])
+}
+
+model DmRoom {
+  id         String       @id
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  Dm         Dm[]
+  DmRoomUser DmRoomUser[]
+}
+
+model DmRoomUser {
+  dmRoomId String
+  userId   String
+  DmRoom   DmRoom @relation(fields: [dmRoomId], references: [id])
+  User     User   @relation(fields: [userId], references: [id])
+
+  @@id([dmRoomId, userId])
 }
 
 model FriendRequest {
-  creatorId  String
-  receiverId String
-  status     FriendRequestStatus
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
-  creator    User                @relation("creator", fields: [creatorId], references: [id])
-  receiver   User                @relation("receiver", fields: [receiverId], references: [id])
+  creatorId                           String
+  receiverId                          String
+  status                              FriendRequestStatus
+  createdAt                           DateTime            @default(now())
+  updatedAt                           DateTime
+  User_FriendRequest_creatorIdToUser  User                @relation("FriendRequest_creatorIdToUser", fields: [creatorId], references: [id])
+  User_FriendRequest_receiverIdToUser User                @relation("FriendRequest_receiverIdToUser", fields: [receiverId], references: [id])
 
   @@id([creatorId, receiverId])
 }
@@ -57,21 +105,19 @@ model MatchResult {
   playerTwo      User     @relation("playerTwo", fields: [playerTwoId], references: [id])
 }
 
-model TwoFactorAuth {
-  authUserId String   @unique
-  secret     String
-  createdAt  DateTime @default(now())
-  User       User     @relation(fields: [authUserId], references: [id])
-}
-
-enum OnlineStatus {
-  ONLINE
-  OFFLINE
-  INGAME
+enum ChatUserStatus {
+  OWNER
+  MEMBER
 }
 
 enum FriendRequestStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+enum OnlineStatus {
+  ONLINE
+  OFFLINE
+  INGAME
 }
