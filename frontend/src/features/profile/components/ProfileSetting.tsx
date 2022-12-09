@@ -1,14 +1,14 @@
 import { memo, FC, useState } from 'react';
 import { Button, Flex, Spacer, Text } from '@chakra-ui/react';
-import { useCreateTwoFactorAuth } from 'hooks/api/auth/useCreateTwoFactorAuth';
-import { useDeleteTwoFactorAuth } from 'hooks/api/auth/useDeleteTwoFactorAuth';
 import { useGetTwoFactorAuthState } from 'hooks/api/auth/useGetTwoFactorAuthState';
+import { useTwoFactorAuthCreate } from 'hooks/api/auth/useTwoFactorAuthCreate';
+import { useTwoFactorAuthDelete } from 'hooks/api/auth/useTwoFactorAuthDelete';
 import { useQRCode } from 'next-qrcode';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfileSetting: FC = memo(() => {
-  const { createTwoFactorAuth } = useCreateTwoFactorAuth();
-  const { deleteTwoFactorAuth } = useDeleteTwoFactorAuth();
+  const { createTwoFactorAuth } = useTwoFactorAuthCreate();
+  const { deleteTwoFactorAuth } = useTwoFactorAuthDelete();
   const { Canvas } = useQRCode();
   const navigate = useNavigate();
 

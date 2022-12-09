@@ -14,7 +14,7 @@ export type DeleteTwoFactorAuth = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useDeleteTwoFactorAuth = (): {
+export const useTwoFactorAuthDelete = (): {
   deleteTwoFactorAuth: DeleteTwoFactorAuth;
   isLoading: boolean;
 } => {
