@@ -6,7 +6,6 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Ball, GameRooms, Paddle } from './classes/game-objs';
 import {
   BALL_SIZE,
   BALL_START_X,
@@ -18,11 +17,12 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from './config/game-config';
-
-type GameScore = {
-  player1: number;
-  player2: number;
-};
+import { CreateMatchResultDto } from './dto/create-match-result.dto';
+// TODO: 名前変更
+// eslint-disable-next-line import/extensions
+import { Ball, GameRoomDict, Paddle } from './game.class';
+import { UserDict } from './game.interface';
+import { GameService } from './game.service';
 
 // const finishGame = async (player1: Paddle, player2: Paddle) => {
 //   return await new Promise((resolve) => {
@@ -36,17 +36,23 @@ type GameScore = {
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
+  // gameServiceを使うのに必要
+  constructor(private readonly gameService: GameService) {}
+
   @WebSocketServer()
   private readonly server!: Server;
 
-  private readonly gameRooms: GameRooms = {};
+  private readonly gameRooms: GameRoomDict = {};
+  private readonly socketData: UserDict = {};
+
+  handleConnection(@ConnectedSocket() socket: Socket): void {
+    console.log(socket.id);
+  }
 
   // サーバー側でのオブジェクト作成
   player1 = new Paddle(0, PADDLE_START_POS);
   player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   ball = new Ball(BALL_START_X, BALL_START_Y);
-
-  private readonly gameScore: GameScore = { player1: 0, player2: 0 };
 
   // 現在接続してるsocketのroomIdを取得
   getSocketGameRoom = (socket: Socket): string => {
@@ -98,7 +104,7 @@ export class GameGateway {
 
     // console.log(`new client: ${socket.id}`);
 
-    setInterval(() => {
+    setInterval(async () => {
       // パドルで跳ね返る処理・ゲームオーバー処理
       // TODO: 壁で跳ね返る処理はcanvasのwallを使えるかも
       if (this.ball.pos.x + this.ball.dx > CANVAS_WIDTH - BALL_SIZE) {
@@ -125,7 +131,14 @@ export class GameGateway {
 
       // ゲーム終了
       if (this.player1.score === 5 || this.player2.score === 5) {
-        // const service =new GameService().addMatchResult()
+        const muchResult: CreateMatchResultDto = {
+          playerOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
+          playerTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
+          playerOneScore: this.player1.score,
+          playerTwoScore: this.player2.score,
+        };
+        await this.gameService.addMatchResult(muchResult);
+
         socket.to(gameRoom).emit('doneGame', {
           player1score: this.player1.score,
           player2score: this.player2.score,

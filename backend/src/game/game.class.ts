@@ -1,11 +1,4 @@
-import {
-  BALL_COLOR,
-  BALL_SIZE,
-  BALL_SPEED,
-  PADDLE_COLOR,
-  PADDLE_HEIGHT,
-  PADDLE_WIDTH,
-} from '../config/game-config';
+import { BALL_COLOR, BALL_SIZE, BALL_SPEED } from './config/game-config';
 
 export class Vector {
   x: number;
@@ -71,19 +64,6 @@ export class Paddle {
     this.dx = 0;
     this.dy = 0;
   }
-
-  draw = (ctx: CanvasRenderingContext2D): void => {
-    ctx.beginPath();
-    ctx.rect(this.pos.x, this.pos.y, PADDLE_WIDTH, PADDLE_HEIGHT);
-    ctx.fillStyle = PADDLE_COLOR;
-    ctx.fill();
-    ctx.closePath();
-  };
-
-  setPosition = (x: number, y: number): void => {
-    this.pos.x = x;
-    this.pos.y = y;
-  };
 }
 
 export class GameRoom {
@@ -98,6 +78,6 @@ export class GameRoom {
   }
 }
 
-export type GameRooms = {
+export type GameRoomDict = {
   [id: string]: GameRoom;
 };
