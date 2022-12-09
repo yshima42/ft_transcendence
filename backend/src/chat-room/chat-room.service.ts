@@ -21,7 +21,7 @@ export class ChatRoomService {
         chatRoomUsers: {
           create: {
             userId,
-            status: ChatUserStatus.OWNER,
+            status: ChatUserStatus.ADMIN,
           },
         },
       },

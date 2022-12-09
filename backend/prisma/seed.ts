@@ -112,7 +112,7 @@ const chatRooms: ChatRoom[] = [];
 for (let i = 0; i < 1; i++) {
   const id = uuidv4();
   const name = 'DmRoom' + id;
-  const status = 'OPEN' as ChatRoomStatus;
+  const status = 'PUBLIC' as ChatRoomStatus;
   chatRooms.push({
     id,
     name,
@@ -127,7 +127,7 @@ const chatRoomUsers: ChatRoomUser[] = [];
 for (let i = 0; i < 1; i++) {
   const chatRoomId = chatRooms[i].id;
   const userId = idMap.get('dummy1');
-  const status = 'OWNER';
+  const status = 'ADMIN';
   if (userId !== undefined) {
     chatRoomUsers.push({
       chatRoomId,
@@ -136,7 +136,7 @@ for (let i = 0; i < 1; i++) {
     });
   }
   const userId2 = idMap.get('dummy2');
-  const status2 = 'OWNER';
+  const status2 = 'ADMIN';
   if (userId2 !== undefined) {
     chatRoomUsers.push({
       chatRoomId,
