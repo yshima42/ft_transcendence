@@ -1,16 +1,15 @@
+import { TwoFactorAuth } from '@prisma/client';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
-import { usePostApi } from '../generics/usePostApi';
-
-export type DeleteTwoFactorAuthReqBody = Record<string, never>;
+import { useDeleteApi } from '../generics/useDeleteApi';
 
 export interface DeleteTwoFactorAuthResBody {
-  url: string;
+  twoFactorAuth: TwoFactorAuth;
 }
 
 export type DeleteTwoFactorAuth = UseMutateAsyncFunction<
   DeleteTwoFactorAuthResBody,
   unknown,
-  DeleteTwoFactorAuthReqBody,
+  void,
   unknown
 >;
 
@@ -18,12 +17,8 @@ export const useTwoFactorAuthDelete = (): {
   deleteTwoFactorAuth: DeleteTwoFactorAuth;
   isLoading: boolean;
 } => {
-  const { postFunc: deleteTwoFactorAuth, isLoading } = usePostApi<
-    DeleteTwoFactorAuthReqBody,
-    DeleteTwoFactorAuthResBody
-  >('/auth/2fa/delete');
+  const { deleteFunc: deleteTwoFactorAuth, isLoading } =
+    useDeleteApi<DeleteTwoFactorAuthResBody>(`/auth/2fa`);
 
   return { deleteTwoFactorAuth, isLoading };
 };
-
-// TODO PostからDeleteメソッドに変更
