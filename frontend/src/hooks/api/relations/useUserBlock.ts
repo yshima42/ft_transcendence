@@ -24,7 +24,7 @@ export const useUserBlock = (): {
   const { postFunc: blockUser, isLoading } = usePostApi<
     UserBlockReqBody,
     UserBlockResBody
-  >(`/users/me/blocks`, ['/users/me/blocks']);
+  >(`/users/me/blocks`, [['/users/me/blocks']]);
 
   return { blockUser, isLoading };
 };
