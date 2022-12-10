@@ -8,6 +8,7 @@ import {
   Res,
   Redirect,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
@@ -115,29 +116,18 @@ export class AuthController {
   }
 
   /**
-   * TwoFactorAuthテーブル上に、特定のユーザーのレコードが存在するか確認。
-   * @param user
-   * @returns trueなら2FA有効。falseなら無効。
-   */
-  @Get('2fa')
-  @UseGuards(JwtTwoFactorAuthGuard)
-  async getTwoFactorAuthState(@GetUser() user: User): Promise<boolean> {
-    return await this.authService.getTwoFactorAuthState(user.id);
-  }
-
-  /**
    * TwoFactorAuthテーブルに新規レコードを追加。
    * @param user - 対象ユーザー
    * @param res - cookie用
-   * @returns ワンタイムパスワード生成用QRコードURL
+   * @returns message
    */
   @Post('2fa')
   @UseGuards(JwtTwoFactorAuthGuard)
   async createTwoFactorAuth(
     @GetUser() user: User,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ url: string }> {
-    const { otpAuthUrl } = await this.authService.createTwoFactorAuth(user);
+  ): Promise<{ message: string }> {
+    await this.authService.createTwoFactorAuth(user);
 
     const { accessToken } = await this.authService.generateJwt(
       user.id,
@@ -147,22 +137,23 @@ export class AuthController {
 
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return { url: otpAuthUrl };
+    return { message: 'ok' };
   }
 
-  // TODO PostからDeleteメソッドに変更
   /**
    * TwoFactorAuthテーブルからレコード削除。
    * @param user - 対象ユーザー
    * @param res - cookie用
-   * @returns 対象ユーザー
+   * @returns message
    */
-  @Post('2fa/delete')
+  @Delete('2fa')
   @UseGuards(JwtTwoFactorAuthGuard)
   async deleteTwoFactorAuth(
     @GetUser() user: User,
     @Res({ passthrough: true }) res: Response
-  ): Promise<User> {
+  ): Promise<{ message: string }> {
+    await this.authService.deleteTwoFactorAuth(user);
+
     const { accessToken } = await this.authService.generateJwt(
       user.id,
       user.name,
@@ -171,7 +162,29 @@ export class AuthController {
 
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    return await this.authService.deleteTwoFactorAuth(user);
+    return { message: 'ok' };
+  }
+
+  /**
+   * 対象ユーザーのワンタイムパスワード生成用QRコードのURLを返す。
+   * @param user
+   * @returns
+   */
+  @Get('2fa')
+  @UseGuards(JwtTwoFactorAuthGuard)
+  async getQrcodeUrl(@GetUser() user: User): Promise<{ qrcodeUrl: string }> {
+    return await this.authService.getQrcodeUrl(user);
+  }
+
+  /**
+   * TwoFactorAuthテーブル上に、特定のユーザーのレコードが存在するか確認。
+   * @param user
+   * @returns trueなら2FA有効。falseなら無効。
+   */
+  @Get('2fa/state')
+  @UseGuards(JwtTwoFactorAuthGuard)
+  async getTwoFactorAuthState(@GetUser() user: User): Promise<boolean> {
+    return await this.authService.getTwoFactorAuthState(user.id);
   }
 
   /**
