@@ -1,23 +1,13 @@
 import { ChangeEvent, FC, memo, SyntheticEvent, useRef, useState } from 'react';
-import {
-  Avatar,
-  Button,
-  Flex,
-  FormLabel,
-  Input,
-  Switch,
-  Text,
-} from '@chakra-ui/react';
+import { Avatar, Button, Flex, FormLabel, Input, Text } from '@chakra-ui/react';
 import { AvatarFormData, useAvatarUpload } from 'hooks/api';
-import { useTwoFactorAuthCreate } from 'hooks/api/auth/useTwoFactorAuthCreate';
-import { useTwoFactorAuthDelete } from 'hooks/api/auth/useTwoFactorAuthDelete';
-import { useTwoFactorAuthState } from 'hooks/api/auth/useTwoFactorAuthState';
 import { useProfile } from 'hooks/api/profile/useProfile';
 import {
   ProfileFormData,
   useProfileEdit,
 } from 'hooks/api/profile/useProfileEdit';
 import { useNavigate } from 'react-router-dom';
+import { TwoFactorAuthSetting } from 'features/profile/components/TwoFactorAuthSetting';
 
 export const ProfileEdit: FC = memo(() => {
   const { user } = useProfile();
@@ -59,22 +49,6 @@ export const ProfileEdit: FC = memo(() => {
     }
   };
 
-  const { createTwoFactorAuth } = useTwoFactorAuthCreate();
-  const { deleteTwoFactorAuth } = useTwoFactorAuthDelete();
-  const [twoFactorAuthState, setTwoFactorAuthState] = useState(
-    useTwoFactorAuthState().twoFactorAuthState
-  );
-
-  const onClickSwitchButton = async () => {
-    const newTwoFactorAuthState = !twoFactorAuthState;
-    if (newTwoFactorAuthState) {
-      await createTwoFactorAuth({});
-    } else {
-      await deleteTwoFactorAuth();
-    }
-    setTwoFactorAuthState(newTwoFactorAuthState);
-  };
-
   return (
     <Flex direction="column" bg="gray" w="100%" align="center">
       <form onSubmit={onSubmitSave}>
@@ -110,27 +84,7 @@ export const ProfileEdit: FC = memo(() => {
         </Button>
         <br />
         <br />
-        <FormLabel>Two Factor</FormLabel>
-        <Switch
-          name="twoFactor"
-          // isChecked={profileFormData?.twoFactor}
-          onChange={onProfileChange}
-        />
-
-        {twoFactorAuthState ? (
-          <Button
-            size="xs"
-            bg="teal.200"
-            _hover={{ opacity: 0.8 }}
-            onClick={onClickSwitchButton}
-          >
-            active
-          </Button>
-        ) : (
-          <Button size="xs" bg="red.200" onClick={onClickSwitchButton}>
-            inactive
-          </Button>
-        )}
+        <TwoFactorAuthSetting />
       </form>
     </Flex>
   );
