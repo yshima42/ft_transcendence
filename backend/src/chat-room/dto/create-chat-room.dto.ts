@@ -1,7 +1,11 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import * as CV from 'class-validator';
 
 export class CreateChatRoomDto {
-  @IsNotEmpty()
-  @IsString()
+  @CV.IsNotEmpty()
+  @CV.IsString()
   name!: string;
+
+  @CV.IsString()
+  @CV.IsOptional()
+  password?: string;
 }
