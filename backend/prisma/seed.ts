@@ -109,7 +109,7 @@ for (let i = 0; i < 30; i++) {
 }
 
 const chatRooms: ChatRoom[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 100; i++) {
   const id = uuidv4();
   const name = 'DmRoom' + id;
   const status = 'PUBLIC' as ChatRoomStatus;
@@ -124,9 +124,9 @@ for (let i = 0; i < 1; i++) {
 }
 
 const chatRoomUsers: ChatRoomUser[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 100; i++) {
   const chatRoomId = chatRooms[i].id;
-  const userId = idMap.get('dummy1');
+  const userId = idMap.get('dummy' + i.toString());
   const status = 'ADMIN';
   if (userId !== undefined) {
     chatRoomUsers.push({
@@ -135,13 +135,16 @@ for (let i = 0; i < 1; i++) {
       status,
     });
   }
-  const userId2 = idMap.get('dummy2');
-  const status2 = 'ADMIN';
-  if (userId2 !== undefined) {
+}
+for (let i = 2; i < 100; i++) {
+  const chatRoomId = chatRooms[1].id;
+  const userId = idMap.get('dummy' + i.toString());
+  const status = 'NORMAL';
+  if (userId !== undefined) {
     chatRoomUsers.push({
       chatRoomId,
-      userId: userId2,
-      status: status2,
+      userId,
+      status,
     });
   }
 }
