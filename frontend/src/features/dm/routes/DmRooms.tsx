@@ -1,34 +1,11 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { axios } from 'lib/axios';
+import { useDmRooms } from 'hooks/api/dm/useDmRooms';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
-type ResponseDmRoom = {
-  id: string;
-  dmRoomUsers: Array<{
-    user: {
-      name: string;
-      avatarImageUrl: string;
-    };
-  }>;
-  dms: Array<{
-    content: string;
-    createdAt: Date;
-  }>;
-};
-
 export const DmRooms: React.FC = React.memo(() => {
-  const [dmRooms, setDmRooms] = React.useState<ResponseDmRoom[]>([]);
-
-  async function getAllDmRoom(): Promise<void> {
-    const res: { data: ResponseDmRoom[] } = await axios.get('/dm/room/me');
-    setDmRooms(res.data);
-  }
-
-  React.useEffect(() => {
-    getAllDmRoom().catch((err) => console.error(err));
-  }, []);
+  const { dmRooms } = useDmRooms();
 
   return (
     <>

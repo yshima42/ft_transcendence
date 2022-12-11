@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
-import { axios } from 'lib/axios';
+import { useSavedDms } from 'hooks/api/dm/useSavedDms';
 import { useLocation } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -17,7 +17,8 @@ export const DmRoom: React.FC = React.memo(() => {
   const { user } = useProfile();
   const location = useLocation();
   const { id: dmRoomId } = location.state as State;
-  const [messages, setMessages] = React.useState<ResponseDm[]>([]);
+  const { savedDms } = useSavedDms(dmRoomId);
+  const [messages, setMessages] = React.useState<ResponseDm[]>(savedDms);
   // TODO: ゲームとソケットを共有する
   const [socket] = React.useState<Socket>(io('http://localhost:3000'));
 
@@ -44,17 +45,6 @@ export const DmRoom: React.FC = React.memo(() => {
       dmRoomId,
     });
   }
-
-  async function getAllDm(): Promise<void> {
-    const res: { data: ResponseDm[] } = await axios.get(
-      `/dm/message/${dmRoomId}`
-    );
-    setMessages(res.data);
-  }
-
-  React.useEffect(() => {
-    getAllDm().catch((err) => console.error(err));
-  }, []);
 
   return (
     <>
