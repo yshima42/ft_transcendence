@@ -60,6 +60,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
       await axios.patch(`/chat/${chatRoomId}/user/${userId}`, {
         status,
       });
+      getAllUsers().catch((err) => console.log(err));
     }
 
     return (
@@ -86,9 +87,21 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
           status={ChatUserStatus.BANNED}
           text="Ban"
         />
-        <C.Button colorScheme="red">Mute</C.Button>
-        <C.Button colorScheme="red">Promote</C.Button>
-        <C.Button colorScheme="red">Appoint</C.Button>
+        <UserActionButton
+          userId={userId}
+          status={ChatUserStatus.MUTE}
+          text="Mute"
+        />
+        <UserActionButton
+          userId={userId}
+          status={ChatUserStatus.MODERATOR}
+          text="Promote"
+        />
+        <UserActionButton
+          userId={userId}
+          status={ChatUserStatus.ADMIN}
+          text="Appoint"
+        />
       </>
     ),
     MODERATOR: (userId: string) => (
@@ -98,14 +111,31 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
           status={ChatUserStatus.KICKED}
           text="Kick"
         />
-        <C.Button colorScheme="red">Ban</C.Button>
-        <C.Button colorScheme="red">Mute</C.Button>
+        <UserActionButton
+          userId={userId}
+          status={ChatUserStatus.BANNED}
+          text="Ban"
+        />
+        <UserActionButton
+          userId={userId}
+          status={ChatUserStatus.MUTE}
+          text="Mute"
+        />
       </>
     ),
     NORMAL: () => <></>,
     KICKED: () => <></>,
     BANNED: () => <></>,
     MUTE: () => <></>,
+  };
+
+  const actionButtonTexts: { [key in ChatUserStatus]: string } = {
+    ADMIN: '',
+    MODERATOR: 'Demote',
+    NORMAL: '',
+    KICKED: 'Rejoin',
+    BANNED: 'Unban',
+    MUTE: 'Unmute',
   };
 
   return (
@@ -140,6 +170,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
                         )}
                         {/* userがLoginUserでない、かつ、(LoginUserがADMIN または MODERATOR) かつ、userがNORMALのとき */}
                         {loginUser?.user.id !== user.user.id &&
+                          user.status === ChatUserStatus.NORMAL &&
                           (loginUser?.status === ChatUserStatus.MODERATOR ||
                             loginUser?.status === ChatUserStatus.ADMIN) && (
                             <C.Flex>
@@ -148,7 +179,18 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
                               )}
                             </C.Flex>
                           )}
-                        {/* userがLoginUserでない、かつ、LoginUserがMODERATOR かつ、userがNORMALのとき */}
+                        {/* userがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
+                        {loginUser?.user.id !== user.user.id &&
+                          loginUser?.status === ChatUserStatus.ADMIN &&
+                          user.status !== ChatUserStatus.NORMAL && (
+                            <C.Flex>
+                              <UserActionButton
+                                userId={user.user.id}
+                                status={ChatUserStatus.NORMAL}
+                                text={actionButtonTexts[user.status]}
+                              />
+                            </C.Flex>
+                          )}
                       </C.Flex>
                     </C.Flex>
                   </C.ListItem>
