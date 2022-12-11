@@ -1,5 +1,7 @@
 import { memo, FC, useCallback, useEffect, useContext, useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
+import { Socket } from 'socket.io-client';
+import SocketContext from 'contexts/SocketContext';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -12,7 +14,6 @@ import {
 import gameContext from '../utils/gameContext';
 import { Ball, Paddle } from '../utils/gameObjs';
 import gameService from '../utils/gameService';
-import socketService from '../utils/socketService';
 import { Canvas } from './Canvas';
 import { Result } from './Result';
 
@@ -23,8 +24,11 @@ export type StartGame = {
 
 // emitの回数を減らすため
 let justPressed = false;
-export const userInput = (obj: Paddle, isLeftSide: boolean): void => {
-  const socket = socketService.socket;
+export const userInput = (
+  socket: Socket | undefined,
+  obj: Paddle,
+  isLeftSide: boolean
+): void => {
   if (socket == null) return;
   document.addEventListener(
     'keydown',
@@ -73,10 +77,10 @@ export const PongGame: FC = memo(() => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
+  const { socket } = useContext(SocketContext).SocketState;
 
   const { isGameStarted, setGameStarted } = useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
-  const socket = socketService.socket;
 
   // TODO: これをuseStateにしたら動かなくなる理由検証・修正
   let isLeftSide: boolean;
@@ -161,7 +165,7 @@ export const PongGame: FC = memo(() => {
     ball.draw(ctx);
 
     // TODO: player1だけになってるの修正
-    userInput(player1, isLeftSide);
+    userInput(socket, player1, isLeftSide);
 
     // スコアの表示
     ctx.font = '48px serif';

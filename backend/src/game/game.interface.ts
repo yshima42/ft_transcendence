@@ -5,11 +5,16 @@ export type Position = {
   y: number;
 };
 
+export type Velocity = {
+  dx: number;
+  dy: number;
+};
+
 export type Ball = {
   up: boolean;
   down: boolean;
   pos: Position;
-  speed: { dx: number; dy: number };
+  velocity: Velocity;
 };
 
 export type Paddle = {
@@ -18,17 +23,17 @@ export type Paddle = {
   down: boolean;
   pos: Position;
   score: number;
-  speed: { dx: number; dy: number };
+  velocity: Velocity;
 };
 
-export type SocketData = {
-  isLeftSide: boolean;
-  client: Socket;
-  userId: string;
-  userName: string;
-  gameId: string;
+export type UserData = {
+  isLeftSide?: boolean;
+  socket: Socket;
+  id: string;
+  nickname: string;
+  inGame: boolean;
 };
 
 export type UserDict = {
-  [id: string]: SocketData;
+  [id: string]: UserData;
 };
