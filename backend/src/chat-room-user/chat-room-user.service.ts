@@ -1,14 +1,47 @@
 import { Injectable } from '@nestjs/common';
+import * as NestJS from '@nestjs/common';
 import { ChatUserStatus } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoomUser } from './chat-room-user.interface';
+import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
 import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
 @Injectable()
 export class ChatRoomUserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(chatRoomId: string, userId: string): Promise<void> {
+  async create(
+    chatRoomId: string,
+    createChatRoomUserDto: CreateChatRoomUserDto,
+    userId: string
+  ): Promise<void> {
+    const password = createChatRoomUserDto.password;
+    if (password !== undefined) {
+      // ChatRoomのパスワードを取得
+      const chatRoom = await this.prisma.chatRoom.findUnique({
+        where: {
+          id: chatRoomId,
+        },
+        select: {
+          password: true,
+        },
+      });
+      if (chatRoom === null || chatRoom.password === null) {
+        throw new NestJS.HttpException(
+          'ChatRoom not found',
+          NestJS.HttpStatus.NOT_FOUND
+        );
+      }
+      // パスワードが一致しない場合はエラー
+      const isPasswordMatch = await bcrypt.compare(password, chatRoom.password);
+      if (!isPasswordMatch) {
+        throw new NestJS.HttpException(
+          'Password not match',
+          NestJS.HttpStatus.BAD_REQUEST
+        );
+      }
+    }
     await this.prisma.chatRoomUser.create({
       data: {
         chatRoomId,

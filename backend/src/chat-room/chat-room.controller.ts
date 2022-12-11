@@ -25,7 +25,7 @@ export class ChatRoomController {
   async create(
     @Body() createChatroomDto: CreateChatRoomDto,
     @GetUser() user: User
-  ): Promise<void> {
+  ): Promise<Omit<ChatRoom, 'password'>> {
     return await this.chatRoomService.create(createChatroomDto, user.id);
   }
 
