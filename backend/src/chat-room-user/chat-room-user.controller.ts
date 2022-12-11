@@ -14,6 +14,7 @@ import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResponseChatRoomUser } from './chat-room-user.interface';
 import { ChatRoomUserService } from './chat-room-user.service';
+import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
 import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
 @Controller('chat/:chatRoomId/user')
@@ -24,9 +25,14 @@ export class ChatRoomUserController {
   @UseGuards(JwtAuthGuard)
   async create(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @Body() createChatRoomUserDto: CreateChatRoomUserDto,
     @GetUser() user: User
   ): Promise<void> {
-    return await this.chatRoomUserService.create(chatRoomId, user.id);
+    return await this.chatRoomUserService.create(
+      chatRoomId,
+      createChatRoomUserDto,
+      user.id
+    );
   }
 
   @Get()

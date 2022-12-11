@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
+import * as NestJS from '@nestjs/common';
 import { ChatRoom, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
@@ -13,7 +15,7 @@ export class ChatRoomService {
   async create(
     createChatroomDto: CreateChatRoomDto,
     userId: string
-  ): Promise<void> {
+  ): Promise<Omit<ChatRoom, 'password'>> {
     const { name, password } = createChatroomDto;
     Logger.debug(`createChatRoom: ${JSON.stringify(createChatroomDto)}`);
 
@@ -21,24 +23,38 @@ export class ChatRoomService {
     if (password !== undefined) {
       hashedPassword = await bcrypt.hash(password, 10);
     }
-    const chatRoom = await this.prisma.chatRoom.create({
-      data: {
-        name,
-        status:
-          password === undefined
-            ? ChatRoomStatus.PUBLIC
-            : ChatRoomStatus.PROTECTED,
-        password: hashedPassword,
-        chatRoomUsers: {
-          create: {
-            userId,
-            status: ChatUserStatus.ADMIN,
+    try {
+      const chatRoom = await this.prisma.chatRoom.create({
+        data: {
+          name,
+          status:
+            password === undefined
+              ? ChatRoomStatus.PUBLIC
+              : ChatRoomStatus.PROTECTED,
+          password: hashedPassword,
+          chatRoomUsers: {
+            create: {
+              userId,
+              status: ChatUserStatus.ADMIN,
+            },
           },
         },
-      },
-    });
+      });
+      Logger.debug(`createChatRoom: ${JSON.stringify(chatRoom)}`);
 
-    Logger.debug(`createChatRoom: ${JSON.stringify(chatRoom)}`);
+      return chatRoom;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          Logger.warn(`createChatRoom: chatRoom is already exists`);
+          throw new NestJS.HttpException(
+            'ChatRoom is already exists',
+            NestJS.HttpStatus.CONFLICT
+          );
+        }
+      }
+      throw error;
+    }
   }
 
   // 自分が入っていないチャット全部
@@ -56,6 +72,7 @@ export class ChatRoomService {
       select: {
         id: true,
         name: true,
+        status: true,
         chatMessages: {
           select: {
             content: true,
@@ -86,6 +103,7 @@ export class ChatRoomService {
       select: {
         id: true,
         name: true,
+        status: true,
         chatMessages: {
           select: {
             content: true,
