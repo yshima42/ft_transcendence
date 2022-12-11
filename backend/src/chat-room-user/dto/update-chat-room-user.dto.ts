@@ -1,4 +1,8 @@
-// import { PartialType } from '@nestjs/swagger';
-// import { CreateChatRoomUserDto } from './create-chat-room-user.dto';
+import { ChatUserStatus } from '@prisma/client';
+import * as CV from 'class-validator';
 
-// export class UpdateChatRoomUserDto extends PartialType(CreateChatRoomUserDto) {}
+export class UpdateChatRoomUserDto {
+  @CV.IsNotEmpty()
+  @CV.IsEnum(ChatUserStatus)
+  status!: ChatUserStatus;
+}

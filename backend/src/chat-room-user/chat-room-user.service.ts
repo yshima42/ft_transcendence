@@ -1,22 +1,27 @@
 import { Injectable } from '@nestjs/common';
-// import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
-// import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
+import { ChatUserStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoomUser } from './chat-room-user.interface';
+import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
 @Injectable()
 export class ChatRoomUserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // create(createChatRoomUserDto: CreateChatRoomUserDto) {
-  //   Logger.log(createChatRoomUserDto);
-  //   return 'This action adds a new chatRoomUser';
-  // }
+  async create(chatRoomId: string, userId: string): Promise<void> {
+    await this.prisma.chatRoomUser.create({
+      data: {
+        chatRoomId,
+        userId,
+        status: ChatUserStatus.NORMAL,
+      },
+    });
+  }
 
   async findAll(chatRoomId: string): Promise<ResponseChatRoomUser[]> {
     const chatRoomUsers = await this.prisma.chatRoomUser.findMany({
       where: {
-        chatRoomId: chatRoomId,
+        chatRoomId,
       },
       select: {
         user: {
@@ -33,16 +38,32 @@ export class ChatRoomUserService {
     return chatRoomUsers;
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} chatRoomUser`;
-  // }
+  async update(
+    chatRoomId: string,
+    userId: string,
+    updateChatRoomUserDto: UpdateChatRoomUserDto
+  ): Promise<void> {
+    await this.prisma.chatRoomUser.update({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+      data: {
+        status: updateChatRoomUserDto.status,
+      },
+    });
+  }
 
-  // update(id: number, updateChatRoomUserDto: UpdateChatRoomUserDto) {
-  //   Logger.log(updateChatRoomUserDto);
-  //   return `This action updates a #${id} chatRoomUser`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} chatRoomUser`;
-  // }
+  async remove(chatRoomId: string, userId: string): Promise<void> {
+    await this.prisma.chatRoomUser.delete({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+  }
 }
