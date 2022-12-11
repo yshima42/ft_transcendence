@@ -28,10 +28,18 @@ export class ChatRoomController {
     return await this.chatRoomService.create(createChatroomDto, user.id);
   }
 
+  // 自分が入っていないチャット全部
   @Get()
   @UseGuards(JwtAuthGuard)
-  async findAll(): Promise<ResponseChatRoom[]> {
-    return await this.chatRoomService.findAll();
+  async findAll(@GetUser() user: User): Promise<ResponseChatRoom[]> {
+    return await this.chatRoomService.findAll(user.id);
+  }
+
+  // 自分が入っているチャット全部
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async findAllByMe(@GetUser() user: User): Promise<ResponseChatRoom[]> {
+    return await this.chatRoomService.findAllByMe(user.id);
   }
 
   @Get(':id')
