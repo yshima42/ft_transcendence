@@ -13,11 +13,11 @@ type ResponseChatRoom = {
   }>;
 };
 
-export const ChatRooms: React.FC = React.memo(() => {
+export const ChatRoomsMe: React.FC = React.memo(() => {
   const [chatRooms, setChatRooms] = React.useState<ResponseChatRoom[]>([]);
 
   async function getAllChatRoom(): Promise<void> {
-    const res: { data: ResponseChatRoom[] } = await axios.get('/chat/room');
+    const res: { data: ResponseChatRoom[] } = await axios.get('/chat/room/me');
     setChatRooms(res.data);
   }
 
@@ -27,24 +27,14 @@ export const ChatRooms: React.FC = React.memo(() => {
 
   return (
     <>
-      <ContentLayout title="Chat">
-        <C.Flex justifyContent="flex-end" mb={4}>
-          <C.Button
-            colorScheme="blue"
-            as={Link}
-            to="create"
-            data-testid="create-chat-room"
-          >
-            Create Chat Room
-          </C.Button>
-        </C.Flex>
+      <ContentLayout title="My Chat">
         <C.Divider />
         <C.List spacing={3} data-testid="chat-room-list">
           {chatRooms.map((chatRoom) => (
             <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
               <C.Link
                 as={Link}
-                to={`${chatRoom.id}/confirmation`}
+                to={`/app/chat/${chatRoom.id}`}
                 state={{ chatRoomId: chatRoom.id, name: chatRoom.name }}
               >
                 <C.Box p={5} shadow="md" borderWidth="1px">

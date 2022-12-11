@@ -14,7 +14,9 @@ export const CreateChatRooms: React.FC = React.memo(() => {
     const res = await axios.post('/chat/room', { name });
     const chatRoom = res.data as ChatRoom;
     // 作成したチャットルームに遷移する
-    navigate(`/app/chat/${chatRoom.id}`, { state: { id: chatRoom.id } });
+    navigate(`/app/chat/${chatRoom.id}`, {
+      state: { chatRoomId: chatRoom.id, name: chatRoom.name },
+    });
   }
 
   return (

@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { OnlineStatus } from '@prisma/client';
 import { axios } from 'lib/axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -14,17 +13,17 @@ type ResponseChatMessage = {
   sender: {
     name: string;
     avatarImageUrl: string;
-    onlineStatus: OnlineStatus;
   };
 };
 
 type State = {
-  id: string;
+  chatRoomId: string;
+  name: string;
 };
 
 export const ChatRoom: React.FC = React.memo(() => {
   const location = useLocation();
-  const { id: chatRoomId } = location.state as State;
+  const { chatRoomId, name } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
 
   async function getAllChatMessage(): Promise<void> {
@@ -45,7 +44,17 @@ export const ChatRoom: React.FC = React.memo(() => {
 
   return (
     <>
-      <ContentLayout title="Chat Room">
+      <ContentLayout title={name}>
+        {/* チャットの設定ボタン */}
+        <C.Flex justifyContent="flex-end" mb={4}>
+          <C.Link
+            as={Link}
+            to={`/app/chat/${chatRoomId}/settings`}
+            state={{ chatRoomId }}
+          >
+            <C.Button colorScheme="blue">Settings</C.Button>
+          </C.Link>
+        </C.Flex>
         <C.Divider />
         <C.Flex
           flexDir="column"
