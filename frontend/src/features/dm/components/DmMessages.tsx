@@ -5,11 +5,16 @@ import { ResponseDm } from '../types';
 
 type Props = {
   messages: ResponseDm[];
-  scrollBottomRef: React.RefObject<HTMLDivElement>;
 };
 
 export const DmMessages: React.FC<Props> = React.memo((props) => {
-  const { messages, scrollBottomRef } = props;
+  const { messages } = props;
+  const scrollBottomRef = React.useRef<HTMLDivElement>(null);
+
+  // 更新時の自動スクロール
+  React.useEffect(() => {
+    scrollBottomRef.current?.scrollIntoView();
+  }, [messages]);
 
   return (
     <C.Flex
