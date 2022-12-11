@@ -160,7 +160,7 @@ for (let i = 0; i < 1; i++) {
 }
 
 const dmRooms: DmRoom[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 2; i++) {
   const id = uuidv4();
   dmRooms.push({
     id,
@@ -170,7 +170,7 @@ for (let i = 0; i < 1; i++) {
 }
 
 const dmRoomUsers: DmRoomUser[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 2; i++) {
   const dmRoomId = dmRooms[i].id;
   const userId = idMap.get('dummy1');
   if (userId !== undefined) {
@@ -179,7 +179,8 @@ for (let i = 0; i < 1; i++) {
       userId,
     });
   }
-  const userId2 = idMap.get('dummy2');
+  // const userId2 = idMap.get('dummy2');
+  const userId2 = idMap.get(`dummy${i + 2}`);
   if (userId2 !== undefined) {
     dmRoomUsers.push({
       dmRoomId,
@@ -189,7 +190,7 @@ for (let i = 0; i < 1; i++) {
 }
 
 const dms: Dm[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 2; i++) {
   const id = uuidv4();
   const content = 'Hello' + id;
   const dmRoomId = dmRooms[i].id;
