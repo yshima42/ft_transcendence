@@ -32,8 +32,48 @@ export class ChatRoomService {
     return chatRoom;
   }
 
-  async findAll(): Promise<ResponseChatRoom[]> {
+  // 自分が入っていないチャット全部
+  async findAll(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
+      where: {
+        chatRoomUsers: {
+          every: {
+            userId: {
+              not: userId,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        chatMessages: {
+          select: {
+            content: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+    Logger.debug(`findAllChatRoom: ${JSON.stringify(chatRooms)}`);
+
+    return chatRooms;
+  }
+
+  // 自分が入っているチャット全部
+  async findAllByMe(userId: string): Promise<ResponseChatRoom[]> {
+    const chatRooms = await this.prisma.chatRoom.findMany({
+      where: {
+        chatRoomUsers: {
+          some: {
+            userId,
+          },
+        },
+      },
       select: {
         id: true,
         name: true,
