@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Dm } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDm } from './dm.interface';
@@ -43,7 +43,6 @@ export class DmService {
         },
       },
     });
-    Logger.debug(`findDms: ${JSON.stringify(dms)}`);
 
     return dms;
   }
