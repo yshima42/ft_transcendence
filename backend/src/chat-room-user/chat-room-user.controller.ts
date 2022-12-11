@@ -1,29 +1,33 @@
 import {
   Controller,
   Get,
-  // Post,
-  // Body,
-  // Patch,
+  Post,
+  Body,
+  Patch,
   Param,
-  // Delete,
+  Delete,
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
-// import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
-// import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
+import { User } from '@prisma/client';
+import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResponseChatRoomUser } from './chat-room-user.interface';
 import { ChatRoomUserService } from './chat-room-user.service';
+import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
 @Controller('chat/:chatRoomId/user')
 export class ChatRoomUserController {
   constructor(private readonly chatRoomUserService: ChatRoomUserService) {}
 
-  // @Post()
-  // @UseGuards(JwtAuthGuard)
-  // create(@Body() createChatRoomUserDto: CreateChatRoomUserDto) {
-  //   return this.chatRoomUserService.create(createChatRoomUserDto);
-  // }
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  async create(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @GetUser() user: User
+  ): Promise<void> {
+    return await this.chatRoomUserService.create(chatRoomId, user.id);
+  }
 
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -33,23 +37,25 @@ export class ChatRoomUserController {
     return await this.chatRoomUserService.findAll(chatRoomId);
   }
 
-  // @Get(':id')
-  // @UseGuards(JwtAuthGuard)
-  // findOne(@Param('id') id: string) {
-  //   return this.chatRoomUserService.findOne(+id);
-  // }
+  @Patch(':userId')
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @Param('userId', new ParseUUIDPipe()) id: string,
+    @Body() updateChatRoomUserDto: UpdateChatRoomUserDto
+  ): Promise<void> {
+    return await this.chatRoomUserService.update(
+      chatRoomId,
+      id,
+      updateChatRoomUserDto
+    );
+  }
 
-  // @Patch(':id')
-  // @UseGuards(JwtAuthGuard)
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateChatRoomUserDto: UpdateChatRoomUserDto
-  // ) {
-  //   return this.chatRoomUserService.update(+id, updateChatRoomUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.chatRoomUserService.remove(+id);
-  // }
+  @Delete(':id')
+  async remove(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @Param('id', new ParseUUIDPipe()) id: string
+  ): Promise<void> {
+    return await this.chatRoomUserService.remove(chatRoomId, id);
+  }
 }
