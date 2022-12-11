@@ -8,10 +8,11 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 // ボタンを押すと、作成したチャットルームに遷移する
 export const CreateChatRooms: React.FC = React.memo(() => {
   const [name, setName] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const navigate = useNavigate();
 
   async function CreateChatRooms() {
-    const res = await axios.post('/chat/room', { name });
+    const res = await axios.post('/chat/room', { name, password });
     const chatRoom = res.data as ChatRoom;
     // 作成したチャットルームに遷移する
     navigate(`/app/chat/${chatRoom.id}`, {
@@ -22,24 +23,25 @@ export const CreateChatRooms: React.FC = React.memo(() => {
   return (
     <>
       <ContentLayout title="Create Chat Room">
-        <C.Flex justifyContent="center" alignItems="center" h="100vh">
-          <C.Box p={5} shadow="md" borderWidth="1px">
-            <C.Flex>
-              <C.Box>
-                <C.Text fontSize="sm">Create Chat Room</C.Text>
-                <C.Heading fontSize="xl">{`Chat Room Name`}</C.Heading>
-                <C.Input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <C.Button colorScheme="blue" onClick={CreateChatRooms}>
-                  Create
-                </C.Button>
-              </C.Box>
-            </C.Flex>
-          </C.Box>
-        </C.Flex>
+        {/*
+          name: 必須
+          password: 任意
+        */}
+        <C.VStack>
+          <C.Input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <C.Input
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <C.Button onClick={CreateChatRooms} colorScheme="teal">
+            Create Chat Room
+          </C.Button>
+        </C.VStack>
       </ContentLayout>
     </>
   );
