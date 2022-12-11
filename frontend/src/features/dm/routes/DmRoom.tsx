@@ -32,6 +32,7 @@ export const DmRoom: React.FC = React.memo(() => {
   const [messages, setMessages] = React.useState<ResponseDm[]>([]);
   // TODO: ゲームとソケットを共有する
   const [socket] = React.useState<Socket>(io('http://localhost:3000'));
+  const scrollBottomRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     socket.emit('join_room', dmRoomId);
@@ -79,6 +80,11 @@ export const DmRoom: React.FC = React.memo(() => {
     getAllDm().catch((err) => console.error(err));
   }, []);
 
+  // 更新時の自動スクロール
+  React.useEffect(() => {
+    scrollBottomRef.current?.scrollIntoView();
+  }, [messages]);
+
   return (
     <>
       <ContentLayout title="Direct Message">
@@ -89,6 +95,7 @@ export const DmRoom: React.FC = React.memo(() => {
           padding={4}
           overflowY="auto"
           overflowX="hidden"
+          height="70vh"
         >
           {messages.map((message) => (
             <Message
@@ -100,6 +107,7 @@ export const DmRoom: React.FC = React.memo(() => {
               avatarImageUrl={message.sender.avatarImageUrl}
             />
           ))}
+          <div ref={scrollBottomRef} />
         </C.Flex>
         <C.Divider />
         <MessageSendForm onSubmit={sendMessage} />
