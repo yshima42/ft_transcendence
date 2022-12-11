@@ -41,13 +41,15 @@ export class ChatRoomUserController {
   @UseGuards(JwtAuthGuard)
   async update(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Param('userId', new ParseUUIDPipe()) id: string,
-    @Body() updateChatRoomUserDto: UpdateChatRoomUserDto
+    @Param('userId', new ParseUUIDPipe()) userId: string,
+    @Body() updateChatRoomUserDto: UpdateChatRoomUserDto,
+    @GetUser() user: User
   ): Promise<void> {
     return await this.chatRoomUserService.update(
       chatRoomId,
-      id,
-      updateChatRoomUserDto
+      userId,
+      updateChatRoomUserDto,
+      user.id
     );
   }
 
