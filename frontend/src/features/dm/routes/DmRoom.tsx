@@ -10,13 +10,13 @@ import { DmMessages } from '../components/DmMessages';
 import { ResponseDm } from '../types';
 
 type State = {
-  id: string;
+  dmRoomId: string;
 };
 
 export const DmRoom: React.FC = React.memo(() => {
   const { user } = useProfile();
   const location = useLocation();
-  const { id: dmRoomId } = location.state as State;
+  const { dmRoomId } = location.state as State;
   const { savedDms } = useSavedDms(dmRoomId);
   const [messages, setMessages] = React.useState<ResponseDm[]>(savedDms);
   // TODO: ゲームとソケットを共有する
