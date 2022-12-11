@@ -182,6 +182,20 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
                         {/* userがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
                         {loginUser?.user.id !== user.user.id &&
                           loginUser?.status === ChatUserStatus.ADMIN &&
+                          user.status !== ChatUserStatus.ADMIN &&
+                          user.status !== ChatUserStatus.NORMAL && (
+                            <C.Flex>
+                              <UserActionButton
+                                userId={user.user.id}
+                                status={ChatUserStatus.NORMAL}
+                                text={actionButtonTexts[user.status]}
+                              />
+                            </C.Flex>
+                          )}
+                        {loginUser?.user.id !== user.user.id &&
+                          loginUser?.status === ChatUserStatus.MODERATOR &&
+                          user.status !== ChatUserStatus.MODERATOR &&
+                          user.status !== ChatUserStatus.ADMIN &&
                           user.status !== ChatUserStatus.NORMAL && (
                             <C.Flex>
                               <UserActionButton
