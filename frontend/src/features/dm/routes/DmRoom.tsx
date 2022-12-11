@@ -7,19 +7,9 @@ import { useLocation } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
-
-export type ResponseDm = {
-  id: string;
-  content: string;
-  createdAt: Date;
-  sender: {
-    name: string;
-    avatarImageUrl: string;
-    onlineStatus: OnlineStatus;
-  };
-};
+import { DmMessages } from '../components/DmMessages';
+import { ResponseDm } from '../types';
 
 type State = {
   id: string;
@@ -89,26 +79,7 @@ export const DmRoom: React.FC = React.memo(() => {
     <>
       <ContentLayout title="Direct Message">
         <C.Divider />
-        <C.Flex
-          flexDir="column"
-          alignItems="flex-start"
-          padding={4}
-          overflowY="auto"
-          overflowX="hidden"
-          height="70vh"
-        >
-          {messages.map((message) => (
-            <Message
-              key={message.id}
-              id={message.id}
-              content={message.content}
-              createdAt={message.createdAt}
-              name={message.sender.name}
-              avatarImageUrl={message.sender.avatarImageUrl}
-            />
-          ))}
-          <div ref={scrollBottomRef} />
-        </C.Flex>
+        <DmMessages messages={messages} scrollBottomRef={scrollBottomRef} />
         <C.Divider />
         <MessageSendForm onSubmit={sendMessage} />
       </ContentLayout>
