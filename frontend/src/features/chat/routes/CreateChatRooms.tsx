@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoom } from '@prisma/client';
+import { AxiosError } from 'axios';
 import { axios } from 'lib/axios';
 import { useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -12,9 +13,35 @@ export const CreateChatRooms: React.FC = React.memo(() => {
   const navigate = useNavigate();
 
   async function CreateChatRooms() {
-    const res = await axios.post('/chat/room', { name, password });
-    const chatRoom = res.data as ChatRoom;
-    // 作成したチャットルームに遷移する
+    if (name === '') {
+      alert('チャットルーム名を入力してください');
+
+      return;
+    }
+    let chatRoom: ChatRoom;
+    try {
+      if (password === '') {
+        const response = await axios.post<ChatRoom>('/chat/room', {
+          name,
+        });
+        chatRoom = response.data;
+      } else {
+        const response = await axios.post<ChatRoom>('/chat/room', {
+          name,
+          password,
+        });
+        chatRoom = response.data;
+      }
+    } catch (e) {
+      const error = e as AxiosError;
+      // 409
+      if (error.response?.status === 409) {
+        alert('既に存在するチャットルーム名です');
+      }
+
+      return;
+    }
+
     navigate(`/app/chat/${chatRoom.id}`, {
       state: { chatRoomId: chatRoom.id, name: chatRoom.name },
     });
@@ -24,24 +51,32 @@ export const CreateChatRooms: React.FC = React.memo(() => {
     <>
       <ContentLayout title="Create Chat Room">
         {/*
-          name: 必須
-          password: 任意
+          From
+            name: 必須
+            password: 任意
         */}
-        <C.VStack>
-          <C.Input
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <C.Input
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <C.Button onClick={CreateChatRooms} colorScheme="teal">
-            Create Chat Room
-          </C.Button>
-        </C.VStack>
+        <C.Box>
+          <C.Heading as="h2" size="md">
+            チャットルームを作成する
+          </C.Heading>
+          <C.FormControl id="name">
+            <C.FormLabel>チャットルーム名</C.FormLabel>
+            <C.Input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </C.FormControl>
+          <C.FormControl id="password">
+            <C.FormLabel>パスワード</C.FormLabel>
+            <C.Input
+              type="text"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </C.FormControl>
+          <C.Button onClick={CreateChatRooms}>作成</C.Button>
+        </C.Box>
       </ContentLayout>
     </>
   );

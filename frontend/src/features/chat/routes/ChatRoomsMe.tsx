@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { ChatRoomStatus } from '@prisma/client';
 import { axios } from 'lib/axios';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -7,12 +8,12 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 type ResponseChatRoom = {
   id: string;
   name: string;
+  status: ChatRoomStatus;
   chatMessages: Array<{
     content: string;
     createdAt: Date;
   }>;
 };
-
 export const ChatRoomsMe: React.FC = React.memo(() => {
   const [chatRooms, setChatRooms] = React.useState<ResponseChatRoom[]>([]);
 
@@ -51,6 +52,14 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
                         )}
                       </C.Text>
                       <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
+                      {/* PROTECTED */}
+                      <C.Text fontSize="sm">
+                        {chatRoom.status === 'PROTECTED' ? (
+                          <C.Badge colorScheme="red">PROTECTED</C.Badge>
+                        ) : (
+                          <></>
+                        )}
+                      </C.Text>
                     </C.Box>
                   </C.Flex>
                 </C.Box>

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { ChatRoomStatus } from '@prisma/client';
 import { axios } from 'lib/axios';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -7,6 +8,7 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 type ResponseChatRoom = {
   id: string;
   name: string;
+  status: ChatRoomStatus;
   chatMessages: Array<{
     content: string;
     createdAt: Date;
@@ -45,7 +47,11 @@ export const ChatRooms: React.FC = React.memo(() => {
               <C.Link
                 as={Link}
                 to={`${chatRoom.id}/confirmation`}
-                state={{ chatRoomId: chatRoom.id, name: chatRoom.name }}
+                state={{
+                  chatRoomId: chatRoom.id,
+                  name: chatRoom.name,
+                  status: chatRoom.status,
+                }}
               >
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
@@ -61,6 +67,14 @@ export const ChatRooms: React.FC = React.memo(() => {
                         )}
                       </C.Text>
                       <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
+                      {/* PROTECTED の場合 */}
+                      <C.Text fontSize="sm">
+                        {chatRoom.status === 'PROTECTED' ? (
+                          <C.Badge colorScheme="red">PROTECTED</C.Badge>
+                        ) : (
+                          <></>
+                        )}
+                      </C.Text>
                     </C.Box>
                   </C.Flex>
                 </C.Box>
