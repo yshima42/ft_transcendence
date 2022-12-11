@@ -1,13 +1,14 @@
 import { ChangeEvent, FC, FormEvent, memo, useContext, useState } from 'react';
 import { Button } from '@chakra-ui/react';
+import SocketContext from 'contexts/SocketContext';
 import gameContext from '../utils/gameContext';
 import gameService from '../utils/gameService';
-import socketService from '../utils/socketService';
 
 export const JoinRoom: FC = memo(() => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [roomName, setRoomName] = useState('');
   const [isJoining, setJoining] = useState(false);
+  const { socket } = useContext(SocketContext).SocketState;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setInRoom, isInRoom } = useContext(gameContext);
@@ -21,7 +22,6 @@ export const JoinRoom: FC = memo(() => {
     // 何も入力してない時の処理
     e.preventDefault();
 
-    const socket = socketService.socket;
     if (roomName === '' || roomName.trim() === '' || socket == null) return;
 
     setJoining(true);

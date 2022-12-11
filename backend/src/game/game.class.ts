@@ -1,4 +1,6 @@
+import { Server } from 'socket.io';
 import { BALL_COLOR, BALL_SIZE, BALL_SPEED } from './config/game-config';
+import { UserData } from './game.interface';
 
 export class Vector {
   x: number;
@@ -68,13 +70,20 @@ export class Paddle {
 
 export class GameRoom {
   id: string;
-  player1Id: string;
-  player2Id: string;
+  server: Server;
+  player1: UserData;
+  player2: UserData;
 
-  constructor(id: string, player1Id: string, player2Id: string) {
+  constructor(
+    id: string,
+    server: Server,
+    player1: UserData,
+    player2: UserData
+  ) {
     this.id = id;
-    this.player1Id = player1Id;
-    this.player2Id = player2Id;
+    this.server = server;
+    this.player1 = player1;
+    this.player2 = player2;
   }
 }
 
