@@ -65,6 +65,7 @@
           "strategy": "always",
           "guard": "always",
           "decorator": "always",
+          "gateway": "always",
           /*
            * swagger用のentityファイルがuser.entity.tsで、
            * import { UserEntity } from 'src/users/entities/user.entity'
