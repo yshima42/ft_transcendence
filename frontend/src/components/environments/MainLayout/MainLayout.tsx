@@ -32,6 +32,12 @@ export const MainLayout: FC<MainProps> = memo((props) => {
       iconComponent: <EmailIcon />,
     },
     {
+      title: 'MyChat',
+      to: 'chat/me',
+      icon: ChatIcon,
+      iconComponent: <ChatIcon />,
+    },
+    {
       title: 'Chat',
       to: 'chat',
       icon: ChatIcon,
