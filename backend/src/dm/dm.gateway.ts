@@ -7,7 +7,6 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ResponseDm } from './dm.interface';
 import { DmService } from './dm.service';
 
 @WebSocketGateway({
@@ -23,16 +22,20 @@ export class DmGateway {
   @SubscribeMessage('send_message')
   async handleMessage(
     @MessageBody()
-    data: { message: ResponseDm; senderId: string; dmRoomId: string },
-    @ConnectedSocket() client: Socket
+    data: {
+      content: string;
+      senderId: string;
+      dmRoomId: string;
+    }
   ): Promise<void> {
-    const { message, senderId, dmRoomId } = data;
-    await this.dmService.create(
-      { content: message.content },
+    const { content, senderId, dmRoomId } = data;
+    // TODO:エラー処理
+    const newMessage = await this.dmService.create(
+      { content },
       senderId,
       dmRoomId
     );
-    client.to(dmRoomId).emit('receive_message', message);
+    this.server.in(dmRoomId).emit('receive_message', newMessage);
   }
 
   @SubscribeMessage('join_room')

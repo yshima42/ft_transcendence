@@ -1,11 +1,9 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { OnlineStatus } from '@prisma/client';
 import { useProfile } from 'hooks/api';
 import { axios } from 'lib/axios';
 import { useLocation } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import { v4 as uuidv4 } from 'uuid';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
 import { DmMessages } from '../components/DmMessages';
@@ -41,19 +39,8 @@ export const DmRoom: React.FC = React.memo(() => {
 
   // 送信ボタンを押したときの処理
   function sendMessage(content: string): void {
-    const newMessage: ResponseDm = {
-      id: uuidv4(),
-      content,
-      createdAt: new Date(),
-      sender: {
-        name: user.name,
-        avatarImageUrl: user.avatarImageUrl,
-        onlineStatus: OnlineStatus.ONLINE,
-      },
-    };
-    setMessages([...messages, newMessage]);
     socket.emit('send_message', {
-      message: newMessage,
+      content,
       senderId: user.id,
       dmRoomId,
     });
