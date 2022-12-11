@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ChatRoom, ChatUserStatus } from '@prisma/client';
+import { ChatRoom, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
@@ -12,12 +13,22 @@ export class ChatRoomService {
   async create(
     createChatroomDto: CreateChatRoomDto,
     userId: string
-  ): Promise<ChatRoom> {
-    const { name } = createChatroomDto;
+  ): Promise<void> {
+    const { name, password } = createChatroomDto;
+    Logger.debug(`createChatRoom: ${JSON.stringify(createChatroomDto)}`);
 
+    let hashedPassword: string | undefined;
+    if (password !== undefined) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
     const chatRoom = await this.prisma.chatRoom.create({
       data: {
         name,
+        status:
+          password === undefined
+            ? ChatRoomStatus.PUBLIC
+            : ChatRoomStatus.PROTECTED,
+        password: hashedPassword,
         chatRoomUsers: {
           create: {
             userId,
@@ -28,8 +39,6 @@ export class ChatRoomService {
     });
 
     Logger.debug(`createChatRoom: ${JSON.stringify(chatRoom)}`);
-
-    return chatRoom;
   }
 
   // 自分が入っていないチャット全部
@@ -113,17 +122,41 @@ export class ChatRoomService {
 
   // update
   async update(
-    id: string,
-    updateChatroomDto: UpdateChatRoomDto
+    chatRoomId: string,
+    updateChatroomDto: UpdateChatRoomDto,
+    userId: string
   ): Promise<ChatRoom> {
-    const { name } = updateChatroomDto;
+    const { password } = updateChatroomDto;
+    let hashedPassword: string | undefined;
+    if (password !== undefined) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+    // userのチャットでの権限を取得
+    const chatRoomUser = await this.prisma.chatRoomUser.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    // もしADMINじゃなかったらエラー
+    if (chatRoomUser?.status !== ChatUserStatus.ADMIN) {
+      Logger.warn(`updateChatRoom: user is not admin`);
+
+      throw new Error('User is not admin');
+    }
 
     const chatRoom = await this.prisma.chatRoom.update({
       where: {
-        id,
+        id: chatRoomId,
       },
       data: {
-        name,
+        password: hashedPassword,
+        status:
+          password === undefined
+            ? ChatRoomStatus.PUBLIC
+            : ChatRoomStatus.PROTECTED,
       },
     });
     Logger.debug(`updateChatRoom: ${JSON.stringify(chatRoom)}`);

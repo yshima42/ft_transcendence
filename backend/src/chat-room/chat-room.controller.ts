@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  // Patch,
+  Patch,
   Param,
   // Delete,
   UseGuards,
@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResponseChatRoom } from './chat-room.interface';
 import { ChatRoomService } from './chat-room.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
+import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @Controller('chat/room')
 export class ChatRoomController {
@@ -24,7 +25,7 @@ export class ChatRoomController {
   async create(
     @Body() createChatroomDto: CreateChatRoomDto,
     @GetUser() user: User
-  ): Promise<ChatRoom> {
+  ): Promise<void> {
     return await this.chatRoomService.create(createChatroomDto, user.id);
   }
 
@@ -46,5 +47,16 @@ export class ChatRoomController {
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string): Promise<ChatRoom> {
     return await this.chatRoomService.findOne(id);
+  }
+
+  // update
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @Param('id') id: string,
+    @Body() updateChatRoomDto: UpdateChatRoomDto,
+    @GetUser() user: User
+  ): Promise<ChatRoom> {
+    return await this.chatRoomService.update(id, updateChatRoomDto, user.id);
   }
 }
