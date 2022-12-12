@@ -112,17 +112,7 @@ export class ChatRoomUserService {
   ): Promise<void> {
     const status = updateChatRoomUserDto.status;
     // loginUserIdのchatRoomでのステータスを取得
-    const loginChatRoomUser = await this.prisma.chatRoomUser.findUnique({
-      where: {
-        chatRoomId_userId: {
-          chatRoomId,
-          userId: loginUserId,
-        },
-      },
-    });
-    if (loginChatRoomUser === null) {
-      return;
-    }
+    const loginChatRoomUser = await this.findOne(chatRoomId, loginUserId);
     // ADMIN -> すべての変更を許可
     // PROMOTER -> KICKED, BANED, MUTEDの変更を許可
     // NORMAL -> 何も変更を許可しない
