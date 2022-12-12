@@ -257,12 +257,12 @@ export class GameGateway {
     @MessageBody()
     data: {
       roomId: string;
-      coommand: { up: boolean; down: boolean; isLeftSide: boolean };
+      userCommands: { up: boolean; down: boolean; isLeftSide: boolean };
     }
   ): void {
     const gameRoom = this.gameRooms[data.roomId];
     const { paddle1, paddle2 } = gameRoom;
-    const command = data.coommand;
+    const command = data.userCommands;
 
     // player1操作
     if (command.isLeftSide && command.down) {
