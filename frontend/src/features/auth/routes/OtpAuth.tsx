@@ -9,7 +9,7 @@ import {
   Input,
 } from '@chakra-ui/react';
 
-export const TwoFactorAuth: FC = memo(() => {
+export const OtpAuth: FC = memo(() => {
   const [token, setToken] = useState('');
 
   const onChangeToken = (e: ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +34,7 @@ export const TwoFactorAuth: FC = memo(() => {
             bg="teal.300"
             color="white"
             as="a"
-            href={`http://localhost:3000/auth/2fa/validation?oneTimePassword=${token}`}
+            href={`http://localhost:3000/auth/otp/validation?oneTimePassword=${token}`}
           >
             submit
           </Button>

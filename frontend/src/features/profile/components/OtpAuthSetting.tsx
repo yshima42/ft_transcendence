@@ -1,38 +1,38 @@
 import { FC, memo, useState } from 'react';
 import { Button, FormLabel } from '@chakra-ui/react';
-import { useQrcodeUrl } from 'hooks/api/auth/useQrcodeUrl';
-import { useTwoFactorAuthCreate } from 'hooks/api/auth/useTwoFactorAuthCreate';
-import { useTwoFactorAuthDelete } from 'hooks/api/auth/useTwoFactorAuthDelete';
-import { useTwoFactorAuthState } from 'hooks/api/auth/useTwoFactorAuthState';
+import { useIsOtpAuthEnabled } from 'hooks/api/auth/useIsOtpAuthEnabled';
+import { useOtpAuthCreate } from 'hooks/api/auth/useOtpAuthCreate';
+import { useOtpAuthDelete } from 'hooks/api/auth/useOtpAuthDelete';
+import { useOtpQrcodeUrl } from 'hooks/api/auth/useOtpQrcodeUrl';
 import { useQRCode } from 'next-qrcode';
 
-export const TwoFactorAuthSetting: FC = memo(() => {
-  const { createTwoFactorAuth } = useTwoFactorAuthCreate();
-  const { deleteTwoFactorAuth } = useTwoFactorAuthDelete();
+export const OtpAuthSetting: FC = memo(() => {
+  const { createOtpAuth } = useOtpAuthCreate();
+  const { deleteOtpAuth } = useOtpAuthDelete();
   const { Canvas } = useQRCode();
-  const { qrcodeUrl } = useQrcodeUrl();
+  const { qrcodeUrl } = useOtpQrcodeUrl();
   console.log(qrcodeUrl);
 
-  const [twoFactorAuthState, setTwoFactorAuthState] = useState(
-    useTwoFactorAuthState().twoFactorAuthState
+  const [isOtpAuthEnabled, setIsOtpAuthEnabled] = useState(
+    useIsOtpAuthEnabled().isOtpAuthEnabled
   );
-  console.log(twoFactorAuthState);
+  console.log(isOtpAuthEnabled);
 
   const onClickSwitchButton = async () => {
-    const newTwoFactorAuthState = !twoFactorAuthState;
-    if (newTwoFactorAuthState) {
-      await createTwoFactorAuth({});
+    const newIsOTPAuthEnabled = !isOtpAuthEnabled;
+    if (newIsOTPAuthEnabled) {
+      await createOtpAuth({});
     } else {
-      await deleteTwoFactorAuth();
+      await deleteOtpAuth();
     }
-    setTwoFactorAuthState(newTwoFactorAuthState);
+    setIsOtpAuthEnabled(newIsOTPAuthEnabled);
   };
 
   return (
     <>
       <FormLabel>Two Factor</FormLabel>
 
-      {twoFactorAuthState ? (
+      {isOtpAuthEnabled ? (
         <Button
           size="xs"
           bg="teal.200"
@@ -46,7 +46,7 @@ export const TwoFactorAuthSetting: FC = memo(() => {
           inactive
         </Button>
       )}
-      {twoFactorAuthState && qrcodeUrl !== '' ? (
+      {isOtpAuthEnabled && qrcodeUrl !== '' ? (
         <Canvas
           text={qrcodeUrl}
           options={{
