@@ -1,74 +1,12 @@
-import { memo, FC, useState } from 'react';
-import { Button, Flex, Spacer, Text } from '@chakra-ui/react';
-import { useCreateTwoFactorAuth } from 'hooks/api/auth/useCreateTwoFactorAuth';
-import { useDeleteTwoFactorAuth } from 'hooks/api/auth/useDeleteTwoFactorAuth';
-import { useGetTwoFactorAuthState } from 'hooks/api/auth/useGetTwoFactorAuthState';
-import { useQRCode } from 'next-qrcode';
+import { memo, FC } from 'react';
+import { Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfileSetting: FC = memo(() => {
-  const { createTwoFactorAuth } = useCreateTwoFactorAuth();
-  const { deleteTwoFactorAuth } = useDeleteTwoFactorAuth();
-  const { Canvas } = useQRCode();
   const navigate = useNavigate();
-
-  const [twoFactorAuthState, setTwoFactorAuthState] = useState(
-    useGetTwoFactorAuthState().twoFactorAuthState
-  );
-
-  const [url, setUrl] = useState('');
-
-  const onClickSwitchButton = async () => {
-    const newTwoFactorAuthState = !twoFactorAuthState;
-    if (newTwoFactorAuthState) {
-      const { url } = await createTwoFactorAuth({});
-      setUrl(url);
-    } else {
-      await deleteTwoFactorAuth({});
-      setUrl('');
-    }
-    setTwoFactorAuthState(newTwoFactorAuthState);
-  };
 
   return (
     <>
-      <Flex mt="2">
-        <Text fontSize="sm" pr={2}>
-          Two-Factor
-        </Text>
-        {twoFactorAuthState ? (
-          <Button
-            size="xs"
-            bg="teal.200"
-            _hover={{ opacity: 0.8 }}
-            onClick={onClickSwitchButton}
-          >
-            active
-          </Button>
-        ) : (
-          <Button size="xs" bg="red.200" onClick={onClickSwitchButton}>
-            inactive
-          </Button>
-        )}
-      </Flex>
-      <Spacer />
-      {twoFactorAuthState && url !== '' ? (
-        <Canvas
-          text={url}
-          options={{
-            level: 'M',
-            margin: 3,
-            scale: 4,
-            width: 200,
-            color: {
-              dark: '#010599FF',
-              light: '#FFBF60FF',
-            },
-          }}
-        />
-      ) : (
-        <></>
-      )}
       <Button size="xs" onClick={() => navigate('/app/profile/edit')}>
         Edit
       </Button>
