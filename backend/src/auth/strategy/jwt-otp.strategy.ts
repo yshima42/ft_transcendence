@@ -7,10 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuthService } from '../auth.service';
 
 @Injectable()
-export class JwtTwoFactorStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-two-factor'
-) {
+export class JwtOtpStrategy extends PassportStrategy(Strategy, 'jwt-otp') {
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
@@ -37,11 +34,9 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
     const { id, isOtpValid } = payload;
     const user = await this.prismaService.user.findUnique({ where: { id } });
     if (user === null) throw new UnauthorizedException();
-    const twoFactorAuthState = await this.authService.getTwoFactorAuthState(
-      user.id
-    );
+    const isOtpAuthEnabled = await this.authService.isOtpAuthEnabled(user.id);
 
-    if (twoFactorAuthState && !isOtpValid) {
+    if (isOtpAuthEnabled && !isOtpValid) {
       throw new UnauthorizedException();
     }
 
