@@ -16,12 +16,10 @@ import {
   CANVAS_WIDTH,
   PADDLE_HEIGHT,
   PADDLE_SPEED,
-  PADDLE_START_POS,
-  PADDLE_WIDTH,
 } from './config/game-config';
 // TODO: 名前変更
 // eslint-disable-next-line import/extensions
-import { Ball, GameRoom, GameRoomDict, Paddle } from './game.class';
+import { GameRoom, GameRoomDict } from './game.class';
 import { UserData } from './game.interface';
 import { GameService } from './game.service';
 
@@ -57,20 +55,20 @@ export class GameGateway {
   private readonly matchWaitingUsers: UserData[] = [];
 
   // サーバー側でのオブジェクト作成
-  player1 = new Paddle(0, PADDLE_START_POS);
-  player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
-  ball = new Ball(BALL_START_X, BALL_START_Y);
+  // player1 = new Paddle(0, PADDLE_START_POS);
+  // player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
+  // ball = new Ball(BALL_START_X, BALL_START_Y);
 
   // 現在接続してるsocketのroomIdを取得
-  getSocketGameRoom = (socket: Socket): string => {
-    const socketRooms = Array.from(socket.rooms.values()).filter(
-      (r) => r !== socket.id
-    );
-    console.log(socketRooms);
-    const gameRoom = socketRooms?.[0];
+  // getSocketGameRoom = (socket: Socket): string => {
+  //   const socketRooms = Array.from(socket.rooms.values()).filter(
+  //     (r) => r !== socket.id
+  //   );
+  //   console.log(socketRooms);
+  //   const gameRoom = socketRooms?.[0];
 
-    return gameRoom;
-  };
+  //   return gameRoom;
+  // };
 
   // 本来はhandleConnectionでやりたいが、authGuardで対応できないため、こちらでUser情報セット
   @SubscribeMessage('set_user')
@@ -152,81 +150,86 @@ export class GameGateway {
   }
 
   @SubscribeMessage('connect_pong')
-  handleConnectPong(@ConnectedSocket() socket: Socket): void {
-    const gameRoom = this.getSocketGameRoom(socket);
+  handleConnectPong(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() roomId: string
+  ): void {
+    // const gameRoom = this.getSocketGameRoom(socket);
+    const gameRoom = this.gameRooms[roomId];
+    const { ball, paddle1, paddle2 } = gameRoom;
 
     // console.log(`new client: ${socket.id}`);
 
     setInterval(() => {
       // パドルで跳ね返る処理・ゲームオーバー処理
       // TODO: 壁で跳ね返る処理はcanvasのwallを使えるかも
-      if (this.ball.pos.x + this.ball.dx > CANVAS_WIDTH - BALL_SIZE) {
+      if (ball.pos.x + ball.dx > CANVAS_WIDTH - BALL_SIZE) {
         if (
-          this.ball.pos.y > this.player2.pos.y &&
-          this.ball.pos.y < this.player2.pos.y + PADDLE_HEIGHT
+          ball.pos.y > paddle2.pos.y &&
+          ball.pos.y < paddle2.pos.y + PADDLE_HEIGHT
         ) {
-          this.ball.dx = -this.ball.dx;
+          ball.dx = -ball.dx;
         } else {
-          this.player1.score++;
-          this.ball.setPosition(BALL_START_X, BALL_START_Y);
+          paddle1.score++;
+          ball.setPosition(BALL_START_X, BALL_START_Y);
         }
-      } else if (this.ball.pos.x + this.ball.dx < BALL_SIZE) {
+      } else if (ball.pos.x + ball.dx < BALL_SIZE) {
         if (
-          this.ball.pos.y > this.player1.pos.y &&
-          this.ball.pos.y < this.player1.pos.y + PADDLE_HEIGHT
+          ball.pos.y > paddle1.pos.y &&
+          ball.pos.y < paddle1.pos.y + PADDLE_HEIGHT
         ) {
-          this.ball.dx = -this.ball.dx;
+          ball.dx = -ball.dx;
         } else {
-          this.player2.score++;
-          this.ball.setPosition(BALL_START_X, BALL_START_Y);
+          paddle2.score++;
+          ball.setPosition(BALL_START_X, BALL_START_Y);
         }
       }
 
       // ゲーム終了
-      if (this.player1.score === 5 || this.player2.score === 5) {
+      if (paddle1.score === 5 || paddle2.score === 5) {
         // 結果をデータベースに保存
         // const muchResult: CreateMatchResultDto = {
-        //   playerOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-        //   playerTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-        //   playerOneScore: this.player1.score,
-        //   playerTwoScore: this.player2.score,
+        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
+        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
+        //   paddleOneScore: paddle1.score,
+        //   paddleTwoScore: paddle2.score,
         // };
-        // await this.gameService.addMatchResult(muchResult);
+        // await gameService.addMatchResult(muchResult);
 
-        socket.to(gameRoom).emit('done_game', {
-          player1score: this.player1.score,
-          player2score: this.player2.score,
+        socket.to(roomId).emit('done_game', {
+          paddle1score: paddle1.score,
+          paddle2score: paddle2.score,
         });
-        this.player1.score = 0;
-        this.player2.score = 0;
+        paddle1.score = 0;
+        paddle2.score = 0;
       }
 
       // ボールの動き
       if (
-        this.ball.pos.y + this.ball.dy > CANVAS_HEIGHT - BALL_SIZE ||
-        this.ball.pos.y + this.ball.dy < BALL_SIZE
+        ball.pos.y + ball.dy > CANVAS_HEIGHT - BALL_SIZE ||
+        ball.pos.y + ball.dy < BALL_SIZE
       ) {
-        this.ball.dy = -this.ball.dy;
+        ball.dy = -ball.dy;
       }
 
       // frameごとに進む
-      this.ball.pos.x += this.ball.dx * 0.5;
-      this.ball.pos.y += this.ball.dy * 0.5;
+      ball.pos.x += ball.dx * 0.5;
+      ball.pos.y += ball.dy * 0.5;
 
       // frameごとにplayer1,2,ballの位置を送信
-      socket.to(gameRoom).emit('player1_update', {
-        x: this.player1.pos.x,
-        y: this.player1.pos.y,
-        score: this.player1.score,
+      socket.to(roomId).emit('player1_update', {
+        x: paddle1.pos.x,
+        y: paddle1.pos.y,
+        score: paddle1.score,
       });
-      socket.to(gameRoom).emit('player2_update', {
-        x: this.player2.pos.x,
-        y: this.player2.pos.y,
-        score: this.player2.score,
+      socket.to(roomId).emit('player2_update', {
+        x: paddle2.pos.x,
+        y: paddle2.pos.y,
+        score: paddle2.score,
       });
-      socket.to(gameRoom).emit('ball_update', {
-        x: this.ball.pos.x,
-        y: this.ball.pos.y,
+      socket.to(roomId).emit('ball_update', {
+        x: ball.pos.x,
+        y: ball.pos.y,
       });
     }, 33);
 
@@ -251,31 +254,39 @@ export class GameGateway {
 
   @SubscribeMessage('user_commands')
   handleUserCommands(
-    @MessageBody() data: { up: boolean; down: boolean; isLeftSide: boolean }
+    @MessageBody()
+    data: {
+      roomId: string;
+      coommand: { up: boolean; down: boolean; isLeftSide: boolean };
+    }
   ): void {
+    const gameRoom = this.gameRooms[data.roomId];
+    const { paddle1, paddle2 } = gameRoom;
+    const command = data.coommand;
+
     // player1操作
-    if (data.isLeftSide && data.down) {
-      this.player1.pos.y += PADDLE_SPEED;
-      if (this.player1.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
-        this.player1.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
+    if (command.isLeftSide && command.down) {
+      paddle1.pos.y += PADDLE_SPEED;
+      if (paddle1.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
+        paddle1.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (data.isLeftSide && data.up) {
-      this.player1.pos.y -= PADDLE_SPEED;
-      if (this.player1.pos.y < 0) {
-        this.player1.pos.y = 0;
+    } else if (command.isLeftSide && command.up) {
+      paddle1.pos.y -= PADDLE_SPEED;
+      if (paddle1.pos.y < 0) {
+        paddle1.pos.y = 0;
       }
     }
 
     // player2操作
-    if (!data.isLeftSide && data.down) {
-      this.player2.pos.y += PADDLE_SPEED;
-      if (this.player2.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
-        this.player2.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
+    if (!command.isLeftSide && command.down) {
+      paddle2.pos.y += PADDLE_SPEED;
+      if (paddle2.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
+        paddle2.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
-    } else if (!data.isLeftSide && data.up) {
-      this.player2.pos.y -= PADDLE_SPEED;
-      if (this.player2.pos.y < 0) {
-        this.player2.pos.y = 0;
+    } else if (!command.isLeftSide && command.up) {
+      paddle2.pos.y -= PADDLE_SPEED;
+      if (paddle2.pos.y < 0) {
+        paddle2.pos.y = 0;
       }
     }
 

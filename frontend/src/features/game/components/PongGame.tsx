@@ -26,6 +26,7 @@ export type StartGame = {
 let justPressed = false;
 export const userInput = (
   socket: Socket | undefined,
+  roomName: string,
   obj: Paddle,
   isLeftSide: boolean
 ): void => {
@@ -46,7 +47,7 @@ export const userInput = (
       }
       if (justPressed) {
         if (socket != null) {
-          void gameService.emitUserCommands(socket, obj, isLeftSide);
+          void gameService.emitUserCommands(socket, roomName, obj, isLeftSide);
           justPressed = false;
         }
       }
@@ -64,7 +65,7 @@ export const userInput = (
       }
       if (justPressed) {
         if (socket != null) {
-          void gameService.emitUserCommands(socket, obj, isLeftSide);
+          void gameService.emitUserCommands(socket, roomName, obj, isLeftSide);
         }
       }
     },
@@ -79,7 +80,7 @@ export const PongGame: FC = memo(() => {
   const ball = new Ball(BALL_START_X, BALL_START_Y);
   const { socket } = useContext(SocketContext).SocketState;
 
-  const { isGameStarted, setGameStarted } = useContext(gameContext);
+  const { isGameStarted, setGameStarted, roomName } = useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
 
   // TODO: これをuseStateにしたら動かなくなる理由検証・修正
@@ -110,8 +111,8 @@ export const PongGame: FC = memo(() => {
   }, []);
 
   useEffect(() => {
-    // TODO: RoomIdを指定する
-    socket?.emit('connect_pong');
+    // TODO: RoomNameを指定する
+    socket?.emit('connect_pong', roomName);
 
     // TODO: Roomがなかった時のエラー処理
 
@@ -160,7 +161,7 @@ export const PongGame: FC = memo(() => {
     ball.draw(ctx);
 
     // TODO: player1だけになってるの修正
-    userInput(socket, player1, isLeftSide);
+    userInput(socket, roomName, player1, isLeftSide);
 
     // スコアの表示
     ctx.font = '48px serif';

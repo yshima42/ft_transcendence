@@ -7,6 +7,8 @@ export type GameContextProps = {
   setLeftSide: (role: boolean) => void;
   isGameStarted: boolean;
   setGameStarted: (started: boolean) => void;
+  roomName: string;
+  setRoomName: (roomName: string) => void;
 };
 
 const defaultState: GameContextProps = {
@@ -19,6 +21,9 @@ const defaultState: GameContextProps = {
   isGameStarted: false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setGameStarted: () => {},
+  roomName: '',
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setRoomName: () => {},
 };
 
 export default createContext(defaultState);

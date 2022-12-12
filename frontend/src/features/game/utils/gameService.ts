@@ -13,6 +13,7 @@ class GameService {
 
   public async emitUserCommands(
     socket: Socket,
+    roomId: string,
     obj: Paddle,
     isLeftSide: boolean
   ) {
@@ -23,7 +24,7 @@ class GameService {
     };
 
     return await new Promise(() => {
-      socket.emit('user_commands', userCommands);
+      socket.emit('user_commands', { roomId, userCommands });
     });
   }
 
