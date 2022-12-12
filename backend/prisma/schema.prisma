@@ -37,7 +37,7 @@ model User {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  twoFactorAuth TwoFactorAuth?
+  oneTimePasswordAuth OneTimePasswordAuth?
   creator       FriendRequest[] @relation("creator")
   receiver      FriendRequest[] @relation("receiver")
   blocking      Block[]         @relation("source")
@@ -57,7 +57,7 @@ enum OnlineStatus {
   INGAME
 }
 
-model TwoFactorAuth {
+model OneTimePasswordAuth {
   authUser   User     @relation(fields: [authUserId], references: [id])
   authUserId String   @unique
   qrcodeUrl  String
