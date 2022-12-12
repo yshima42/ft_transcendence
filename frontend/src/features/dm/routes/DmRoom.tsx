@@ -20,7 +20,7 @@ export const DmRoom: React.FC = React.memo(() => {
   const { savedDms } = useSavedDms(dmRoomId);
   const [messages, setMessages] = React.useState<ResponseDm[]>(savedDms);
   // TODO: ゲームとソケットを共有する
-  const [socket] = React.useState<Socket>(io('http://localhost:3000'));
+  const [socket] = React.useState<Socket>(io('http://localhost:3000/dm'));
 
   React.useEffect(() => {
     socket.emit('join_room', dmRoomId);

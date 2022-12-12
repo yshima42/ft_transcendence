@@ -13,6 +13,7 @@ import { DmService } from './dm.service';
   cors: {
     origin: '*',
   },
+  namespace: 'dm',
 })
 export class DmGateway {
   constructor(private readonly dmService: DmService) {}
