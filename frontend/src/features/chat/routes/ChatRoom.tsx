@@ -29,12 +29,11 @@ export const ChatRoom: React.FC = React.memo(() => {
   const location = useLocation();
   const { id: chatRoomId } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
+  // TODO: ソケットの生成、破棄をちゃんとやる
   const [socket] = React.useState<Socket>(io('http://localhost:3000/chat'));
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    console.log('useEffect from chat');
-    console.log('chatRoomId: ' + chatRoomId);
     socket.emit('join_room', chatRoomId);
     socket.on('receive_message', (payload: ResponseChatMessage) => {
       setMessages((prev) => {
