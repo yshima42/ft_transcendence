@@ -5,9 +5,9 @@ import { Paddle } from './gameObjs';
 class GameService {
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
     return await new Promise((resolve, reject) => {
-      socket.emit('joinRoom', { roomId });
-      socket.on('roomJoined', () => resolve(true));
-      socket.on('roomJoinError', (error) => reject(error));
+      socket.emit('join_room', { roomId });
+      socket.on('room_joined', () => resolve(true));
+      socket.on('room_join_error', (error) => reject(error));
     });
   }
 
@@ -23,7 +23,7 @@ class GameService {
     };
 
     return await new Promise(() => {
-      socket.emit('userCommands', userCommands);
+      socket.emit('user_commands', userCommands);
     });
   }
 
@@ -32,7 +32,7 @@ class GameService {
   // }
 
   public onStartGame(socket: Socket, listener: (options: StartGame) => void) {
-    socket.on('startGame', listener);
+    socket.on('start_game', listener);
   }
 }
 

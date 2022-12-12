@@ -101,7 +101,7 @@ export const PongGame: FC = memo(() => {
   }, []);
 
   useEffect(() => {
-    socket?.on('initReturn', () => {
+    socket?.on('init_return', () => {
       setInterval(() => {
         // TODO: ここからユーザーインプットを送って反応を良くする
         socket.emit('tick', 'hello');
@@ -111,16 +111,16 @@ export const PongGame: FC = memo(() => {
 
   useEffect(() => {
     // TODO: RoomIdを指定する
-    socket?.emit('connectPong');
+    socket?.emit('connect_pong');
 
     // TODO: Roomがなかった時のエラー処理
 
     // TODO: Player1か2の決定
-    socket?.on('connectedPlayer', (data) => {
+    socket?.on('connected_player', (data) => {
       console.log(data);
     });
 
-    socket?.on('doneGame', () => {
+    socket?.on('done_game', () => {
       setDoneGame(true);
     });
   }, []);
@@ -133,7 +133,7 @@ export const PongGame: FC = memo(() => {
 
     // ここをpositionUpdateにする
     socket?.on(
-      'player1Update',
+      'player1_update',
       (data: { x: number; y: number; score: number }) => {
         player1.pos.x = data.x;
         player1.pos.y = data.y;
@@ -142,7 +142,7 @@ export const PongGame: FC = memo(() => {
     );
 
     socket?.on(
-      'player2Update',
+      'player2_update',
       (data: { x: number; y: number; score: number }) => {
         player2.pos.x = data.x;
         player2.pos.y = data.y;
@@ -150,7 +150,7 @@ export const PongGame: FC = memo(() => {
       }
     );
 
-    socket?.on('ballUpdate', (data: { x: number; y: number }) => {
+    socket?.on('ball_update', (data: { x: number; y: number }) => {
       ball.pos.x = data.x;
       ball.pos.y = data.y;
     });
