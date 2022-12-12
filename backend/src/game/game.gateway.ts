@@ -19,7 +19,6 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from './config/game-config';
-import { CreateMatchResultDto } from './dto/create-match-result.dto';
 // TODO: 名前変更
 // eslint-disable-next-line import/extensions
 import { Ball, GameRoom, GameRoomDict, Paddle } from './game.class';
@@ -90,25 +89,32 @@ export class GameGateway {
     const userData: UserData = {
       socket,
       id: socket.data.userId as string,
-      nickname: socket.data.nickname as string,
+      nickname: socket.data.userNickname as string,
       inGame: true,
     };
     // 1人目の場合2人目ユーザーを待つ
     if (this.matchWaitingUsers.length === 0) {
       userData.isLeftSide = true;
-
       this.matchWaitingUsers.push(userData);
     } else {
       // 2人揃ったらマッチルーム作る
       userData.isLeftSide = false;
+      const roomId = this.createGameRoom(this.matchWaitingUsers[0], userData);
+      this.server.to(socket.id).emit('go_game_room', roomId);
+      this.server
+        .to(this.matchWaitingUsers[0].socket.id)
+        .emit('go_game_room', roomId);
+
+      this.matchWaitingUsers.splice(0, 1);
     }
   }
 
   createGameRoom(player1: UserData, player2: UserData): string {
     const id = uuidv4();
     const gameRoom = new GameRoom(id, this.server, player1, player2);
+    this.gameRooms[id] = gameRoom;
 
-    return gameRoom.id;
+    return id;
   }
 
   // @SubscribeMessage('joinRoom')
@@ -120,45 +126,45 @@ export class GameGateway {
   // }
 
   // room関連;
-  // @SubscribeMessage('joinRoom')
-  // async joinRoom(
-  //   @MessageBody() message: { roomId: string },
-  //   @ConnectedSocket() socket: Socket
-  // ): Promise<void> {
-  //   const connectedSockets = this.server.sockets.adapter.rooms.get(
-  //     message.roomId
-  //   );
-  //   const socketRooms = Array.from(socket.rooms.values()).filter(
-  //     (r) => r !== socket.id
-  //   );
-  //   if (
-  //     socketRooms.length > 0 ||
-  //     (connectedSockets != null && connectedSockets.size === 2)
-  //   ) {
-  //     socket.emit('roomJoinError', {
-  //       error: 'Room is full',
-  //     });
-  //   } else {
-  //     await socket.join(message.roomId);
-  //     socket.emit('roomJoined');
-  //     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+  @SubscribeMessage('join_room')
+  async joinRoom(
+    @MessageBody() message: { roomId: string },
+    @ConnectedSocket() socket: Socket
+  ): Promise<void> {
+    const connectedSockets = this.server.sockets.adapter.rooms.get(
+      message.roomId
+    );
+    const socketRooms = Array.from(socket.rooms.values()).filter(
+      (r) => r !== socket.id
+    );
+    if (
+      socketRooms.length > 0 ||
+      (connectedSockets != null && connectedSockets.size === 2)
+    ) {
+      socket.emit('room_join_error', {
+        error: 'Room is full',
+      });
+    } else {
+      await socket.join(message.roomId);
+      socket.emit('room_joined');
+      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
-  //     if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
-  //       socket.emit('startGame', { start: true, isLeftSide: false });
-  //       socket
-  //         .to(message.roomId)
-  //         .emit('startGame', { start: false, isLeftSide: true });
-  //     }
-  //   }
-  // }
+      if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
+        socket.emit('start_game', { start: true, isLeftSide: false });
+        socket
+          .to(message.roomId)
+          .emit('start_game', { start: false, isLeftSide: true });
+      }
+    }
+  }
 
-  @SubscribeMessage('connectPong')
+  @SubscribeMessage('connect_pong')
   handleConnectPong(@ConnectedSocket() socket: Socket): void {
     const gameRoom = this.getSocketGameRoom(socket);
 
     // console.log(`new client: ${socket.id}`);
 
-    setInterval(async () => {
+    setInterval(() => {
       // パドルで跳ね返る処理・ゲームオーバー処理
       // TODO: 壁で跳ね返る処理はcanvasのwallを使えるかも
       if (this.ball.pos.x + this.ball.dx > CANVAS_WIDTH - BALL_SIZE) {
@@ -185,15 +191,16 @@ export class GameGateway {
 
       // ゲーム終了
       if (this.player1.score === 5 || this.player2.score === 5) {
-        const muchResult: CreateMatchResultDto = {
-          playerOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-          playerTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-          playerOneScore: this.player1.score,
-          playerTwoScore: this.player2.score,
-        };
-        await this.gameService.addMatchResult(muchResult);
+        // 結果をデータベースに保存
+        // const muchResult: CreateMatchResultDto = {
+        //   playerOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
+        //   playerTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
+        //   playerOneScore: this.player1.score,
+        //   playerTwoScore: this.player2.score,
+        // };
+        // await this.gameService.addMatchResult(muchResult);
 
-        socket.to(gameRoom).emit('doneGame', {
+        socket.to(gameRoom).emit('done_game', {
           player1score: this.player1.score,
           player2score: this.player2.score,
         });
@@ -214,23 +221,23 @@ export class GameGateway {
       this.ball.pos.y += this.ball.dy * 0.5;
 
       // frameごとにplayer1,2,ballの位置を送信
-      socket.to(gameRoom).emit('player1Update', {
+      socket.to(gameRoom).emit('player1_update', {
         x: this.player1.pos.x,
         y: this.player1.pos.y,
         score: this.player1.score,
       });
-      socket.to(gameRoom).emit('player2Update', {
+      socket.to(gameRoom).emit('player2_update', {
         x: this.player2.pos.x,
         y: this.player2.pos.y,
         score: this.player2.score,
       });
-      socket.to(gameRoom).emit('ballUpdate', {
+      socket.to(gameRoom).emit('ball_update', {
         x: this.ball.pos.x,
         y: this.ball.pos.y,
       });
     }, 33);
 
-    socket.emit('initReturn');
+    socket.emit('init_return');
   }
 
   // @SubscribeMessage('tick')
@@ -249,7 +256,7 @@ export class GameGateway {
   //     .catch(() => {});
   // }
 
-  @SubscribeMessage('userCommands')
+  @SubscribeMessage('user_commands')
   handleUserCommands(
     @MessageBody() data: { up: boolean; down: boolean; isLeftSide: boolean }
   ): void {
