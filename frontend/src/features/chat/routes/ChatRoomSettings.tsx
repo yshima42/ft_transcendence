@@ -1,12 +1,19 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { User, ChatUserStatus } from '@prisma/client';
+import { User, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
 import { axios } from 'lib/axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+import {
+  UserActionButtons,
+  actionButtonTexts,
+} from 'features/chat/components/atoms/UserActionButtons';
+import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
 
 type State = {
   chatRoomId: string;
+  name: string;
+  status: ChatRoomStatus;
 };
 
 type ResponseChatRoomUser = {
@@ -21,8 +28,10 @@ type ResponseChatRoomUser = {
 export const ChatRoomSettings: React.FC = React.memo(() => {
   const [loginUser, setLoginUser] = React.useState<ResponseChatRoomUser>();
   const [users, setUsers] = React.useState<ResponseChatRoomUser[]>([]);
+  const [password, setPassword] = React.useState('');
   const location = useLocation();
-  const { chatRoomId } = location.state as State;
+  const navigate = useNavigate();
+  const { chatRoomId, name, status } = location.state as State;
 
   async function getLoginUser() {
     console.log('getLoginUser');
@@ -40,6 +49,26 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     setUsers(res.data);
   }
 
+  async function onClickUnLock() {
+    await axios.patch(`/chat/room/${chatRoomId}`, {
+      status: ChatRoomStatus.PUBLIC,
+    });
+    navigate(`/app/chat/${chatRoomId}`, {
+      state: { chatRoomId, name, status: ChatRoomStatus.PUBLIC },
+    });
+  }
+
+  async function onClickLock() {
+    await axios.patch(`/chat/room/${chatRoomId}`, {
+      password,
+      status: ChatRoomStatus.PROTECTED,
+    });
+    navigate(`/app/chat/${chatRoomId}`, {
+      state: { chatRoomId, name, status: ChatRoomStatus.PROTECTED },
+    });
+  }
+
+  // 画面読み込み前に
   React.useEffect(() => {
     console.log('useEffect');
     getLoginUser().catch((err) => console.log(err));
@@ -50,97 +79,17 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     getAllUsers().catch((err) => console.log(err));
   }, []);
 
-  const UserActionButton: React.FC<{
-    userId: string;
-    status: ChatUserStatus;
-    text: string;
-  }> = ({ userId, status, text }) => {
-    async function onClickAction(): Promise<void> {
-      console.log('onClickAction');
-      await axios.patch(`/chat/${chatRoomId}/user/${userId}`, {
-        status,
-      });
-      getAllUsers().catch((err) => console.log(err));
-    }
-
-    return (
-      <>
-        <C.Button colorScheme="red" onClick={onClickAction}>
-          {text}
-        </C.Button>
-      </>
-    );
-  };
-
-  const UserActionButtons: {
-    [key in ChatUserStatus]: (userId: string) => React.ReactNode;
-  } = {
-    ADMIN: (userId: string) => (
-      <>
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.KICKED}
-          text="Kick"
-        />
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.BANNED}
-          text="Ban"
-        />
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.MUTE}
-          text="Mute"
-        />
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.MODERATOR}
-          text="Promote"
-        />
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.ADMIN}
-          text="Appoint"
-        />
-      </>
-    ),
-    MODERATOR: (userId: string) => (
-      <>
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.KICKED}
-          text="Kick"
-        />
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.BANNED}
-          text="Ban"
-        />
-        <UserActionButton
-          userId={userId}
-          status={ChatUserStatus.MUTE}
-          text="Mute"
-        />
-      </>
-    ),
-    NORMAL: () => <></>,
-    KICKED: () => <></>,
-    BANNED: () => <></>,
-    MUTE: () => <></>,
-  };
-
-  const actionButtonTexts: { [key in ChatUserStatus]: string } = {
-    ADMIN: '',
-    MODERATOR: 'Demote',
-    NORMAL: '',
-    KICKED: 'Rejoin',
-    BANNED: 'Unban',
-    MUTE: 'Unmute',
-  };
+  async function onClickAction(userId: string, status: ChatUserStatus) {
+    console.log('onClickAction');
+    await axios.patch(`/chat/${chatRoomId}/user/${userId}`, {
+      status,
+    });
+    getAllUsers().catch((err) => console.log(err));
+  }
 
   return (
     <>
-      <ContentLayout title="Chat Room Setting">
+      <ContentLayout title="Chat Room Settings">
         <C.Accordion allowToggle>
           <C.AccordionItem>
             <C.AccordionButton>
@@ -169,40 +118,63 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
                           </C.Flex>
                         )}
                         {/* userがLoginUserでない、かつ、(LoginUserがADMIN または MODERATOR) かつ、userがNORMALのとき */}
-                        {loginUser?.user.id !== user.user.id &&
+                        {loginUser !== undefined &&
+                          loginUser.user.id !== user.user.id &&
                           user.status === ChatUserStatus.NORMAL &&
-                          (loginUser?.status === ChatUserStatus.MODERATOR ||
-                            loginUser?.status === ChatUserStatus.ADMIN) && (
+                          (loginUser.status === ChatUserStatus.MODERATOR ||
+                            loginUser.status === ChatUserStatus.ADMIN) && (
                             <C.Flex>
-                              {UserActionButtons[loginUser.status](
-                                user.user.id
-                              )}
-                            </C.Flex>
-                          )}
-                        {/* userがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
-                        {loginUser?.user.id !== user.user.id &&
-                          loginUser?.status === ChatUserStatus.ADMIN &&
-                          user.status !== ChatUserStatus.ADMIN &&
-                          user.status !== ChatUserStatus.NORMAL && (
-                            <C.Flex>
-                              <UserActionButton
+                              <UserActionButtons
                                 userId={user.user.id}
-                                status={ChatUserStatus.NORMAL}
-                                text={actionButtonTexts[user.status]}
+                                status={loginUser.status}
+                                onClickAction={onClickAction}
                               />
                             </C.Flex>
                           )}
-                        {loginUser?.user.id !== user.user.id &&
-                          loginUser?.status === ChatUserStatus.MODERATOR &&
+                        {/* userがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
+                        {loginUser !== undefined &&
+                          loginUser.user.id !== user.user.id &&
+                          loginUser.status === ChatUserStatus.ADMIN &&
+                          user.status !== ChatUserStatus.ADMIN &&
+                          user.status !== ChatUserStatus.NORMAL && (
+                            <C.Flex>
+                              <C.Button
+                                onClick={async () =>
+                                  await onClickAction(
+                                    user.user.id,
+                                    ChatUserStatus.NORMAL
+                                  )
+                                }
+                              >
+                                {
+                                  actionButtonTexts[
+                                    user.status as ChatUserStatus
+                                  ]
+                                }
+                              </C.Button>
+                            </C.Flex>
+                          )}
+                        {loginUser !== undefined &&
+                          loginUser.user.id !== user.user.id &&
+                          loginUser.status === ChatUserStatus.MODERATOR &&
                           user.status !== ChatUserStatus.MODERATOR &&
                           user.status !== ChatUserStatus.ADMIN &&
                           user.status !== ChatUserStatus.NORMAL && (
                             <C.Flex>
-                              <UserActionButton
-                                userId={user.user.id}
-                                status={ChatUserStatus.NORMAL}
-                                text={actionButtonTexts[user.status]}
-                              />
+                              <C.Button
+                                onClick={async () =>
+                                  await onClickAction(
+                                    user.user.id,
+                                    ChatUserStatus.NORMAL
+                                  )
+                                }
+                              >
+                                {
+                                  actionButtonTexts[
+                                    user.status as ChatUserStatus
+                                  ]
+                                }
+                              </C.Button>
                             </C.Flex>
                           )}
                       </C.Flex>
@@ -212,17 +184,18 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
               </C.List>
             </C.AccordionPanel>
           </C.AccordionItem>
-          <C.AccordionItem>
-            <C.AccordionButton>
-              <C.Box flex="1" textAlign="left">
-                Security
-              </C.Box>
-              <C.AccordionIcon />
-            </C.AccordionButton>
-            <C.AccordionPanel pb={4}>
-              <C.Text>Security</C.Text>
-            </C.AccordionPanel>
-          </C.AccordionItem>
+          {/* LoginUserがADMINならセキュリティタブを出す */}
+          {loginUser !== undefined &&
+            loginUser.status === ChatUserStatus.ADMIN && (
+              <SecurityAccordionItem
+                status={status}
+                lockFunc={async () => await onClickLock()}
+                unLockFunc={async () => await onClickUnLock()}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setPassword(e.target.value);
+                }}
+              />
+            )}
         </C.Accordion>
         {/* 退出ボタン */}
         <C.Button colorScheme="red">Exit</C.Button>

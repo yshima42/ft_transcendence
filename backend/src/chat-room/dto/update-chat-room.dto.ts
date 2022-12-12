@@ -1,6 +1,6 @@
-import { PickType } from '@nestjs/swagger';
+import { PickType, PartialType } from '@nestjs/mapped-types';
 import { CreateChatRoomDto } from './create-chat-room.dto';
 
-export class UpdateChatRoomDto extends PickType(CreateChatRoomDto, [
-  'password',
-]) {}
+export class UpdateChatRoomDto extends PartialType(
+  PickType(CreateChatRoomDto, ['password', 'status'] as const)
+) {}

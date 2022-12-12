@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus } from '@prisma/client';
 import { axios } from 'lib/axios';
-import { useLocation , useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 type State = {
@@ -31,7 +31,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
     } else {
       await axios.post(`/chat/${chatRoomId}/user`);
       navigate(`/app/chat/${chatRoomId}`, {
-        state: { chatRoomId, name },
+        state: { chatRoomId, name, status },
       });
     }
   }

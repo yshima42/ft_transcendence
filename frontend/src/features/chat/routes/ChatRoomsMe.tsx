@@ -36,7 +36,11 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
               <C.Link
                 as={Link}
                 to={`/app/chat/${chatRoom.id}`}
-                state={{ chatRoomId: chatRoom.id, name: chatRoom.name }}
+                state={{
+                  chatRoomId: chatRoom.id,
+                  name: chatRoom.name,
+                  status: chatRoom.status,
+                }}
               >
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
