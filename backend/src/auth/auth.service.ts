@@ -1,11 +1,12 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { TwoFactorAuth, User } from '@prisma/client';
 import { authenticator } from 'otplib';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignupUser } from './interfaces/signup-user.interface';
@@ -70,52 +71,63 @@ export class AuthService {
   }
 
   /**
-   * ワンタイムパスワード生成用のシークレットを生成し、
+   * ワンタイムパスワード生成用のシークレットとurlを生成し。
    * TwoFactorAuthテーブルに新規レコード作成。
    * @param user
-   * @returns ワンタイムパスワード生成用URL
+   * @returns 登録されたTwoFactorAuthレコード
    */
-  async createTwoFactorAuth(user: User): Promise<{
-    otpAuthUrl: string;
-  }> {
+  async createTwoFactorAuth(user: User): Promise<TwoFactorAuth> {
     const secret = authenticator.generateSecret();
 
-    const otpAuthUrl = authenticator.keyuri(
+    const qrcodeUrl = authenticator.keyuri(
       user.name,
       this.config.get<string>('TWO_FACTOR_AUTHENTICATION_APP_NAME') as string,
       secret
     );
 
-    await this.prisma.twoFactorAuth.create({
-      data: {
-        authUserId: user.id,
-        secret,
-      },
-    });
-
-    return { otpAuthUrl };
+    try {
+      return await this.prisma.twoFactorAuth.create({
+        data: {
+          authUserId: user.id,
+          qrcodeUrl,
+          secret,
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException('createTwoFactorAuth failed.');
+    }
   }
 
   /**
    * TwoFactorAuthテーブルからレコードを削除。
    * データベースに該当がなければ例外送出。
    * @param user
-   * @returns 対象ユーザー
+   * @returns 削除されたTwoFactorAuthレコード
    */
-  async deleteTwoFactorAuth(user: User): Promise<User> {
+  async deleteTwoFactorAuth(user: User): Promise<TwoFactorAuth> {
     try {
-      await this.prisma.twoFactorAuth.delete({
+      return await this.prisma.twoFactorAuth.delete({
         where: {
           authUserId: user.id,
         },
       });
-
-      return user;
     } catch (error) {
-      throw new NotFoundException(
-        'This user does not exist in TwoFactorAuth table.'
-      );
+      throw new BadRequestException('deleteTwoFactorAuth failed.');
     }
+  }
+
+  /**
+   * 対象ユーザーのワンタイムパスワード生成用QRコードのURLを返す。
+   * @param user
+   * @returns qurcodeUrl
+   */
+  async getQrcodeUrl(user: User): Promise<{ qrcodeUrl: string }> {
+    const ret = await this.prisma.twoFactorAuth.findUnique({
+      where: { authUserId: user.id },
+    });
+    if (ret === null) return { qrcodeUrl: '' };
+
+    return { qrcodeUrl: ret.qrcodeUrl };
   }
 
   /**

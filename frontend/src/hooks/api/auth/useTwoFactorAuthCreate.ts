@@ -14,14 +14,14 @@ export type CreateTwoFactorAuth = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useCreateTwoFactorAuth = (): {
+export const useTwoFactorAuthCreate = (): {
   createTwoFactorAuth: CreateTwoFactorAuth;
   isLoading: boolean;
 } => {
   const { postFunc: createTwoFactorAuth, isLoading } = usePostApi<
     CreateTwoFactorAuthReqBody,
     CreateTwoFactorAuthResBody
-  >('/auth/2fa');
+  >('/auth/2fa', [['/auth/2fa'], ['/auth/2fa/state']]);
 
   return { createTwoFactorAuth, isLoading };
 };
