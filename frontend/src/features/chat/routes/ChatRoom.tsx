@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomStatus } from '@prisma/client';
+import { ChatRoomStatus, ChatUserStatus } from '@prisma/client';
 import { axios } from 'lib/axios';
 import { useLocation, Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -17,6 +17,15 @@ type ResponseChatMessage = {
   };
 };
 
+type ResponseChatRoomUser = {
+  user: {
+    id: string;
+    nickname: string;
+    avatarImageUrl: string;
+  };
+  status: ChatUserStatus;
+};
+
 type State = {
   chatRoomId: string;
   name: string;
@@ -27,6 +36,7 @@ export const ChatRoom: React.FC = React.memo(() => {
   const location = useLocation();
   const { chatRoomId, name, status } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
+  const [loginUser, setLoginUser] = React.useState<ResponseChatRoomUser>();
 
   async function getAllChatMessage(): Promise<void> {
     const res: { data: ResponseChatMessage[] } = await axios.get(
@@ -40,8 +50,16 @@ export const ChatRoom: React.FC = React.memo(() => {
     getAllChatMessage().catch((err) => console.error(err));
   }
 
+  async function getLoginUser() {
+    const res: { data: ResponseChatRoomUser } = await axios.get(
+      `/chat/${chatRoomId}/user/me`
+    );
+    setLoginUser(res.data);
+  }
+
   React.useEffect(() => {
     getAllChatMessage().catch((err) => console.error(err));
+    getLoginUser().catch((err) => console.error(err));
   }, []);
 
   return (
@@ -77,7 +95,16 @@ export const ChatRoom: React.FC = React.memo(() => {
           ))}
         </C.Flex>
         <C.Divider />
-        <MessageSendForm onSubmit={sendMessage} />
+        {/* メッセージ送信フォーム  loginUserがMUTEのときは送信できないようにする */}
+        {loginUser?.status === ChatUserStatus.MUTE && (
+          <C.Alert status="warning" mb={4}>
+            <C.AlertIcon />
+            You are muted.
+          </C.Alert>
+        )}
+        {loginUser?.status !== ChatUserStatus.MUTE && (
+          <MessageSendForm onSubmit={sendMessage} />
+        )}
       </ContentLayout>
     </>
   );

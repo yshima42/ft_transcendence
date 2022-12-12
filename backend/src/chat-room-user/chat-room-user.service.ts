@@ -71,6 +71,39 @@ export class ChatRoomUserService {
     return chatRoomUsers;
   }
 
+  // me
+  async findOne(
+    chatRoomId: string,
+    userId: string
+  ): Promise<ResponseChatRoomUser> {
+    const chatRoomUser = await this.prisma.chatRoomUser.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+            avatarImageUrl: true,
+          },
+        },
+        status: true,
+      },
+    });
+    if (chatRoomUser === null) {
+      throw new NestJS.HttpException(
+        'ChatRoomUser not found',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
+
+    return chatRoomUser;
+  }
+
   async update(
     chatRoomId: string,
     userId: string,
