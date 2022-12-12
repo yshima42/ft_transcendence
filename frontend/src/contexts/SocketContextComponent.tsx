@@ -42,6 +42,8 @@ const SocketContextComponent: React.FunctionComponent<
     socket.emit('connect_user', user.id, (users: string[]) => {
       SocketDispatch({ type: 'update_users', payload: users });
     });
+    SocketDispatch({ type: 'update_user', payload: user });
+    // TODO: uidは必要か検討
     SocketDispatch({ type: 'update_uid', payload: user.id });
 
     setLoading(false);

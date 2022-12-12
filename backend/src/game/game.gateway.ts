@@ -38,12 +38,16 @@ import { GameService } from './game.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
-  public users: { [id: string]: string };
+  public onlineUsers: { [id: string]: string };
+  public inGameUsers: { [id: string]: string };
+  public onWaitUsers: { [id: string]: string };
 
   // gameServiceを使うのに必要
   constructor(private readonly gameService: GameService) {
     // オンラインユーザー一覧
-    this.users = {};
+    this.onlineUsers = {};
+    this.inGameUsers = {};
+    this.onWaitUsers = {};
   }
 
   @WebSocketServer()
@@ -71,7 +75,7 @@ export class GameGateway {
   };
 
   // 本来はhandleConnectionでやりたいが、authGuardで対応できないため、こちらでUser情報セット
-  @SubscribeMessage('setUser')
+  @SubscribeMessage('set_user')
   setUserToSocket(
     @MessageBody() user: User,
     @ConnectedSocket() socket: Socket
@@ -81,7 +85,7 @@ export class GameGateway {
     socket.data.userNickname = user.nickname;
   }
 
-  @SubscribeMessage('randomMatch')
+  @SubscribeMessage('random_match')
   randomMatch(@ConnectedSocket() socket: Socket): void {
     const userData: UserData = {
       socket,
@@ -116,37 +120,37 @@ export class GameGateway {
   // }
 
   // room関連;
-  @SubscribeMessage('joinRoom')
-  async joinRoom(
-    @MessageBody() message: { roomId: string },
-    @ConnectedSocket() socket: Socket
-  ): Promise<void> {
-    const connectedSockets = this.server.sockets.adapter.rooms.get(
-      message.roomId
-    );
-    const socketRooms = Array.from(socket.rooms.values()).filter(
-      (r) => r !== socket.id
-    );
-    if (
-      socketRooms.length > 0 ||
-      (connectedSockets != null && connectedSockets.size === 2)
-    ) {
-      socket.emit('roomJoinError', {
-        error: 'Room is full',
-      });
-    } else {
-      await socket.join(message.roomId);
-      socket.emit('roomJoined');
-      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+  // @SubscribeMessage('joinRoom')
+  // async joinRoom(
+  //   @MessageBody() message: { roomId: string },
+  //   @ConnectedSocket() socket: Socket
+  // ): Promise<void> {
+  //   const connectedSockets = this.server.sockets.adapter.rooms.get(
+  //     message.roomId
+  //   );
+  //   const socketRooms = Array.from(socket.rooms.values()).filter(
+  //     (r) => r !== socket.id
+  //   );
+  //   if (
+  //     socketRooms.length > 0 ||
+  //     (connectedSockets != null && connectedSockets.size === 2)
+  //   ) {
+  //     socket.emit('roomJoinError', {
+  //       error: 'Room is full',
+  //     });
+  //   } else {
+  //     await socket.join(message.roomId);
+  //     socket.emit('roomJoined');
+  //     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
-      if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
-        socket.emit('startGame', { start: true, isLeftSide: false });
-        socket
-          .to(message.roomId)
-          .emit('startGame', { start: false, isLeftSide: true });
-      }
-    }
-  }
+  //     if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
+  //       socket.emit('startGame', { start: true, isLeftSide: false });
+  //       socket
+  //         .to(message.roomId)
+  //         .emit('startGame', { start: false, isLeftSide: true });
+  //     }
+  //   }
+  // }
 
   @SubscribeMessage('connectPong')
   handleConnectPong(@ConnectedSocket() socket: Socket): void {
@@ -289,19 +293,19 @@ export class GameGateway {
     if (uid != null) {
       // TODO: ここのeslint回避がわからない、できれば修正したい(shimazu)
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete this.users[uid];
+      delete this.onlineUsers[uid];
     }
 
-    const users = Object.values(this.users);
+    const onlineUsers = Object.values(this.onlineUsers);
 
     this.SendMessage(
       socket,
       'user_disconnected',
-      users.filter((id) => id !== socket.id),
-      users
+      onlineUsers.filter((id) => id !== socket.id),
+      onlineUsers
     );
 
-    return users;
+    return onlineUsers;
   }
 
   @SubscribeMessage('connect_user')
@@ -310,31 +314,33 @@ export class GameGateway {
     @MessageBody() userId: string
   ): string[] {
     console.log(userId);
-    this.users[userId] = socket.id;
+    this.onlineUsers[userId] = socket.id;
 
-    const users = Object.values(this.users);
+    const onlineUsers = Object.values(this.onlineUsers);
 
     this.SendMessage(
       socket,
       'user_connected',
-      users.filter((id) => id !== socket.id),
-      users
+      onlineUsers.filter((id) => id !== socket.id),
+      onlineUsers
     );
 
-    return users;
+    return onlineUsers;
   }
 
   GetUidFromSocketID = (id: string): string | undefined => {
-    return Object.keys(this.users).find((uid) => this.users[uid] === id);
+    return Object.keys(this.onlineUsers).find(
+      (uid) => this.onlineUsers[uid] === id
+    );
   };
 
   SendMessage = (
     socket: Socket,
     name: string,
-    users: string[],
+    onlineUsers: string[],
     payload?: unknown
   ): void => {
-    users.forEach((id) =>
+    onlineUsers.forEach((id) =>
       payload != null
         ? socket.to(id).emit(name, payload)
         : socket.to(id).emit(name)
