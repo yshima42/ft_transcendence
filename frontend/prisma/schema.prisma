@@ -38,11 +38,12 @@ model ChatRoom {
 }
 
 model ChatRoomUser {
-  chatRoomId String         @db.Uuid
-  userId     String         @db.Uuid
-  status     ChatUserStatus @default(NORMAL)
-  ChatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id])
-  User       User           @relation(fields: [userId], references: [id])
+  chatRoomId  String         @db.Uuid
+  userId      String         @db.Uuid
+  status      ChatUserStatus @default(NORMAL)
+  statusUntil DateTime?
+  ChatRoom    ChatRoom       @relation(fields: [chatRoomId], references: [id])
+  User        User           @relation(fields: [userId], references: [id])
 
   @@id([chatRoomId, userId])
 }

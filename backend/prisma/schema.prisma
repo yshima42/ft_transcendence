@@ -124,6 +124,7 @@ model ChatRoomUser {
   user       User           @relation(fields: [userId], references: [id]) // チャットの参加者
   userId     String         @db.Uuid
   status     ChatUserStatus @default(NORMAL)
+  statusUntil DateTime?
 
   @@id([chatRoomId, userId])
 }

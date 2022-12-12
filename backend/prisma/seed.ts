@@ -133,6 +133,7 @@ for (let i = 0; i < 100; i++) {
       chatRoomId,
       userId,
       status,
+      statusUntil: null,
     });
   }
 }
@@ -145,6 +146,7 @@ for (let i = 2; i < 100; i++) {
       chatRoomId,
       userId,
       status,
+      statusUntil: null,
     });
   }
 }
