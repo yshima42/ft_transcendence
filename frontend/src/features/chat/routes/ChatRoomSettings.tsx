@@ -197,8 +197,6 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
               />
             )}
         </C.Accordion>
-        {/* 退出ボタン */}
-        <C.Button colorScheme="red">Exit</C.Button>
       </ContentLayout>
     </>
   );
