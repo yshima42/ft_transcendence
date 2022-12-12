@@ -3,7 +3,7 @@ import { Box, Button, Center } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import SocketContext from 'contexts/SocketContext';
-import { JoinRandom } from '../components/JoinRandom';
+import { JoinRoom } from '../components/JoinRoom';
 import { PongGame } from '../components/PongGame';
 import GameContext, { GameContextProps } from '../utils/gameContext';
 
@@ -27,7 +27,7 @@ export const GameTop: FC = memo(() => {
     <GameContext.Provider value={gameContextValue}>
       <ContentLayout title="">
         <Center>
-          {!isInRoom && <JoinRandom />}
+          {!isInRoom && <JoinRoom />}
           {isInRoom && <PongGame />}
         </Center>
         <Center>
