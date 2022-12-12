@@ -18,7 +18,10 @@ export const useTwoFactorAuthDelete = (): {
   isLoading: boolean;
 } => {
   const { deleteFunc: deleteTwoFactorAuth, isLoading } =
-    useDeleteApi<DeleteTwoFactorAuthResBody>(`/auth/2fa`);
+    useDeleteApi<DeleteTwoFactorAuthResBody>(`/auth/2fa`, [
+      ['/auth/2fa'],
+      ['/auth/2fa/state'],
+    ]);
 
   return { deleteTwoFactorAuth, isLoading };
 };

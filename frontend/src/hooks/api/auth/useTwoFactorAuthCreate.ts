@@ -21,7 +21,7 @@ export const useTwoFactorAuthCreate = (): {
   const { postFunc: createTwoFactorAuth, isLoading } = usePostApi<
     CreateTwoFactorAuthReqBody,
     CreateTwoFactorAuthResBody
-  >('/auth/2fa');
+  >('/auth/2fa', [['/auth/2fa'], ['/auth/2fa/state']]);
 
   return { createTwoFactorAuth, isLoading };
 };
