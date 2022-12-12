@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-// import { Dm } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDm } from './dm.interface';
 import { CreateDmDto } from './dto/create-dm.dto';
-// import { UpdateDmDto } from './dto/update-dm.dto';
 
 @Injectable()
 export class DmService {
