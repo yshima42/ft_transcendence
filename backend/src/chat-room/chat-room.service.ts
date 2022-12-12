@@ -90,13 +90,16 @@ export class ChatRoomService {
     return chatRooms;
   }
 
-  // 自分が入っているチャット全部
+  // 自分が入っているチャット全部 自分のステータスがBANのものは除く
   async findAllByMe(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
         chatRoomUsers: {
           some: {
             userId,
+            status: {
+              not: ChatUserStatus.BANNED,
+            },
           },
         },
       },
