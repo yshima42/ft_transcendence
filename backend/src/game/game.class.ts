@@ -1,5 +1,14 @@
 import { Server } from 'socket.io';
-import { BALL_COLOR, BALL_SIZE, BALL_SPEED } from './config/game-config';
+import {
+  BALL_COLOR,
+  BALL_SIZE,
+  BALL_SPEED,
+  BALL_START_X,
+  BALL_START_Y,
+  CANVAS_WIDTH,
+  PADDLE_START_POS,
+  PADDLE_WIDTH,
+} from './config/game-config';
 import { UserData } from './game.interface';
 
 export class Vector {
@@ -73,6 +82,9 @@ export class GameRoom {
   server: Server;
   player1: UserData;
   player2: UserData;
+  ball: Ball;
+  paddle1: Paddle;
+  paddle2: Paddle;
 
   constructor(
     id: string,
@@ -84,6 +96,9 @@ export class GameRoom {
     this.server = server;
     this.player1 = player1;
     this.player2 = player2;
+    this.paddle1 = new Paddle(0, PADDLE_START_POS);
+    this.paddle2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
+    this.ball = new Ball(BALL_START_X, BALL_START_Y);
   }
 }
 

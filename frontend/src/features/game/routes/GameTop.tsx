@@ -11,6 +11,7 @@ export const GameTop: FC = memo(() => {
   const [isInRoom, setInRoom] = useState(false);
   const [isLeftSide, setLeftSide] = useState(true);
   const [isGameStarted, setGameStarted] = useState(false);
+  const [roomName, setRoomName] = useState('');
 
   const gameContextValue: GameContextProps = {
     isInRoom,
@@ -19,6 +20,8 @@ export const GameTop: FC = memo(() => {
     setLeftSide,
     isGameStarted,
     setGameStarted,
+    roomName,
+    setRoomName,
   };
 
   const { socket, uid, users } = useContext(SocketContext).SocketState;
