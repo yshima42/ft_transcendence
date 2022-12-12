@@ -13,13 +13,14 @@ import { ChatMessageService } from './chat-message.service';
   cors: {
     origin: '*',
   },
+  namespace: 'chat',
 })
 export class ChatMessageGateway {
   constructor(private readonly chatMessageService: ChatMessageService) {}
   @WebSocketServer()
   server!: Server;
 
-  @SubscribeMessage('chat:send_message')
+  @SubscribeMessage('send_message')
   async handleMessage(
     @MessageBody()
     data: {
@@ -36,10 +37,10 @@ export class ChatMessageGateway {
       senderId
     );
     Logger.log(newMessage);
-    this.server.in(chatRoomId).emit('chat:receive_message', newMessage);
+    this.server.in(chatRoomId).emit('receive_message', newMessage);
   }
 
-  @SubscribeMessage('chat:join_room')
+  @SubscribeMessage('join_room')
   joinRoom(
     @MessageBody() chatRoomId: string,
     @ConnectedSocket() client: Socket
@@ -48,7 +49,7 @@ export class ChatMessageGateway {
     void client.join(chatRoomId);
   }
 
-  @SubscribeMessage('chat:leave_room')
+  @SubscribeMessage('leave_room')
   leaveRoom(
     @MessageBody() chatRoomId: string,
     @ConnectedSocket() client: Socket
