@@ -11,10 +11,12 @@ export const TwoFactorAuthSetting: FC = memo(() => {
   const { deleteTwoFactorAuth } = useTwoFactorAuthDelete();
   const { Canvas } = useQRCode();
   const { qrcodeUrl } = useQrcodeUrl();
+  console.log(qrcodeUrl);
 
   const [twoFactorAuthState, setTwoFactorAuthState] = useState(
     useTwoFactorAuthState().twoFactorAuthState
   );
+  console.log(twoFactorAuthState);
 
   const onClickSwitchButton = async () => {
     const newTwoFactorAuthState = !twoFactorAuthState;
