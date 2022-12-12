@@ -54,7 +54,6 @@ export class GameGateway {
 
   // このクラスで使う配列・変数
   private readonly gameRooms: GameRoomDict = {};
-  // private readonly onlineUsers: UserDict = {};
   private readonly matchWaitingUsers: UserData[] = [];
 
   // サーバー側でのオブジェクト作成
@@ -100,6 +99,8 @@ export class GameGateway {
       // 2人揃ったらマッチルーム作る
       userData.isLeftSide = false;
       const roomId = this.createGameRoom(this.matchWaitingUsers[0], userData);
+
+      // TODO: このemitのやり方微妙な気がするので修正
       this.server.to(socket.id).emit('go_game_room', roomId);
       this.server
         .to(this.matchWaitingUsers[0].socket.id)
@@ -116,14 +117,6 @@ export class GameGateway {
 
     return id;
   }
-
-  // @SubscribeMessage('joinRoom')
-  // joinRoom(
-  //   @MessageBody() message: { userId: string },
-  //   @ConnectedSocket() socket: Socket
-  // ): void {
-  //   console.log(socket.id);
-  // }
 
   // room関連;
   @SubscribeMessage('join_room')
