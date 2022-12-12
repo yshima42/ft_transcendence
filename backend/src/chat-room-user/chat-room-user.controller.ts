@@ -43,6 +43,16 @@ export class ChatRoomUserController {
     return await this.chatRoomUserService.findAll(chatRoomId);
   }
 
+  // me
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async findMe(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @GetUser() user: User
+  ): Promise<ResponseChatRoomUser> {
+    return await this.chatRoomUserService.findOne(chatRoomId, user.id);
+  }
+
   @Patch(':userId')
   @UseGuards(JwtAuthGuard)
   async update(
