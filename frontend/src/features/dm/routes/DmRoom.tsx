@@ -31,7 +31,6 @@ export const DmRoom: React.FC = React.memo(() => {
     });
 
     return () => {
-      socket.off('join_room');
       socket.off('receive_message');
       socket.emit('leave_room', dmRoomId);
     };
