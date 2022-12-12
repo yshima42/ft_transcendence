@@ -3,6 +3,7 @@ import { Spinner } from '@chakra-ui/react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from 'components/environments/MainLayout/MainLayout';
+import SocketContextComponent from 'contexts/SocketContextComponent';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { TwoFactorAuth } from 'features/auth/routes/TwoFactorAuth';
@@ -21,17 +22,20 @@ import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
 
 const App = () => {
   return (
-    <MainLayout>
-      <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
-        <Suspense
-          fallback={
-            <Spinner emptyColor="gray.200" color="blue.500" size="xl" />
-          }
-        >
-          <Outlet />
-        </Suspense>
-      </ErrorBoundary>
-    </MainLayout>
+    // TODO:Providerにしたい？
+    <SocketContextComponent>
+      <MainLayout>
+        <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
+          <Suspense
+            fallback={
+              <Spinner emptyColor="gray.200" color="blue.500" size="xl" />
+            }
+          >
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
+      </MainLayout>
+    </SocketContextComponent>
   );
 };
 
