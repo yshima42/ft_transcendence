@@ -1,30 +1,12 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatUserStatus } from '@prisma/client';
+import { ResponseChatRoomUser, ResponseChatMessage } from 'features/chat/types';
 import { axios } from 'lib/axios';
 import { useLocation, Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
-
-type ResponseChatMessage = {
-  id: string;
-  createdAt: Date;
-  content: string;
-  sender: {
-    name: string;
-    avatarImageUrl: string;
-  };
-};
-
-type ResponseChatRoomUser = {
-  user: {
-    id: string;
-    nickname: string;
-    avatarImageUrl: string;
-  };
-  status: ChatUserStatus;
-};
 
 type State = {
   chatRoomId: string;

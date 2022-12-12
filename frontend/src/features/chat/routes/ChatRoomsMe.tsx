@@ -1,19 +1,10 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomStatus } from '@prisma/client';
+import { ResponseChatRoom } from 'features/chat/types';
 import { axios } from 'lib/axios';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
-type ResponseChatRoom = {
-  id: string;
-  name: string;
-  status: ChatRoomStatus;
-  chatMessages: Array<{
-    content: string;
-    createdAt: Date;
-  }>;
-};
 export const ChatRoomsMe: React.FC = React.memo(() => {
   const [chatRooms, setChatRooms] = React.useState<ResponseChatRoom[]>([]);
 
