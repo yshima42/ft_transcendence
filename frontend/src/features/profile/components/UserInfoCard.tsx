@@ -10,6 +10,7 @@ type UserInfoCardProps = {
   isBlockedUser: boolean;
 };
 
+// TODO フレンド追加ボタンを実装する。
 export const UserInfoCard: FC<UserInfoCardProps> = memo(
   ({ user, isLoginUser, isBlockedUser }: UserInfoCardProps) => {
     return (
