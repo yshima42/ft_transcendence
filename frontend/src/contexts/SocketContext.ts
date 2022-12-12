@@ -1,24 +1,28 @@
 import { createContext } from 'react';
+import { User } from '@prisma/client';
 import { Socket } from 'socket.io-client';
 
 export interface ISocketContextState {
   socket: Socket | undefined;
+  user: User | undefined;
   uid: string;
   users: string[];
 }
 
 export const defaultSocketContextState: ISocketContextState = {
   socket: undefined,
+  user: undefined,
   uid: '',
   users: [],
 };
 
 export type TSocketContextActions =
   | 'update_socket'
+  | 'update_user'
   | 'update_uid'
   | 'update_users'
   | 'remove_user';
-export type TSocketContextPayload = string | string[] | Socket;
+export type TSocketContextPayload = string | User | string[] | Socket;
 
 export interface ISocketContextActions {
   type: TSocketContextActions;
@@ -34,9 +38,12 @@ export const SocketReducer = (
   //   action.payload
   // );
 
+  // TODO: update_in_game_usersを追加するか検討
   switch (action.type) {
     case 'update_socket':
       return { ...state, socket: action.payload as Socket };
+    case 'update_user':
+      return { ...state, user: action.payload as unknown as User };
     case 'update_uid':
       return { ...state, uid: action.payload as string };
     case 'update_users':

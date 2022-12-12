@@ -111,20 +111,18 @@ export const PongGame: FC = memo(() => {
 
   useEffect(() => {
     // TODO: RoomIdを指定する
-    if (socket != null) socket.emit('connectPong');
+    socket?.emit('connectPong');
 
     // TODO: Roomがなかった時のエラー処理
 
     // TODO: Player1か2の決定
-    if (socket != null)
-      socket.on('connectedPlayer', (data) => {
-        console.log(data);
-      });
+    socket?.on('connectedPlayer', (data) => {
+      console.log(data);
+    });
 
-    if (socket != null)
-      socket.on('doneGame', () => {
-        setDoneGame(true);
-      });
+    socket?.on('doneGame', () => {
+      setDoneGame(true);
+    });
   }, []);
 
   // このdrawの中にcanvasで表示したいものを書く
@@ -134,31 +132,28 @@ export const PongGame: FC = memo(() => {
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // ここをpositionUpdateにする
-    if (socket != null)
-      socket.on(
-        'player1Update',
-        (data: { x: number; y: number; score: number }) => {
-          player1.pos.x = data.x;
-          player1.pos.y = data.y;
-          player1.score = data.score;
-        }
-      );
+    socket?.on(
+      'player1Update',
+      (data: { x: number; y: number; score: number }) => {
+        player1.pos.x = data.x;
+        player1.pos.y = data.y;
+        player1.score = data.score;
+      }
+    );
 
-    if (socket != null)
-      socket.on(
-        'player2Update',
-        (data: { x: number; y: number; score: number }) => {
-          player2.pos.x = data.x;
-          player2.pos.y = data.y;
-          player2.score = data.score;
-        }
-      );
+    socket?.on(
+      'player2Update',
+      (data: { x: number; y: number; score: number }) => {
+        player2.pos.x = data.x;
+        player2.pos.y = data.y;
+        player2.score = data.score;
+      }
+    );
 
-    if (socket != null)
-      socket.on('ballUpdate', (data: { x: number; y: number }) => {
-        ball.pos.x = data.x;
-        ball.pos.y = data.y;
-      });
+    socket?.on('ballUpdate', (data: { x: number; y: number }) => {
+      ball.pos.x = data.x;
+      ball.pos.y = data.y;
+    });
 
     player1.draw(ctx);
     player2.draw(ctx);

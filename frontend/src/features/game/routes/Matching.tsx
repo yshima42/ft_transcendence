@@ -6,14 +6,19 @@ import { useNavigate } from 'react-router-dom';
 // import { io, Socket } from 'socket.io-client';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+import { PongGame } from '../components/PongGame';
 
 export const Matching: FC = memo(() => {
   const navigate = useNavigate();
   const [matched, setMatched] = useState(false);
 
+  // const onClickMatch = () => {
+  //   setMatched(true);
+  //   setTimeout(() => navigate('/app/game'), 0 * 1000);
+  // };
+
   const onClickMatch = () => {
     setMatched(true);
-    setTimeout(() => navigate('/app/game'), 0 * 1000);
   };
 
   const onClickCancel = () => {
@@ -39,7 +44,7 @@ export const Matching: FC = memo(() => {
             <Stack spacing={4} py={4} px={10} align="center">
               {matched ? <Box>Starting in 0 seconds</Box> : <Spinner />}
               {matched ? (
-                <></>
+                <PongGame />
               ) : (
                 <PrimaryButton
                   onClick={onClickMatch}
