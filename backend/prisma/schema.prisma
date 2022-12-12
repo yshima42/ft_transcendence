@@ -38,12 +38,12 @@ model User {
   updatedAt      DateTime     @updatedAt
 
   oneTimePasswordAuth OneTimePasswordAuth?
-  creator       FriendRequest[] @relation("creator")
-  receiver      FriendRequest[] @relation("receiver")
-  blocking      Block[]         @relation("source")
-  blockedBy     Block[]         @relation("target")
-  playerOne     MatchResult[]   @relation("playerOne")
-  playerTwo     MatchResult[]   @relation("playerTwo")
+  creator             FriendRequest[]      @relation("creator")
+  receiver            FriendRequest[]      @relation("receiver")
+  blocking            Block[]              @relation("source")
+  blockedBy           Block[]              @relation("target")
+  playerOne           MatchResult[]        @relation("playerOne")
+  playerTwo           MatchResult[]        @relation("playerTwo")
 
   chatMessages ChatMessage[]  @relation("messageSender") // ユーザーが送信したチャットメッセージ
   dms          Dm[]           @relation("dmSender") // ユーザーが送信したDMメッセージ
