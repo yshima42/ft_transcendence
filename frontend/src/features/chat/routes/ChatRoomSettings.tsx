@@ -1,14 +1,11 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { User, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
+import { ChatUserStatus, ChatRoomStatus } from '@prisma/client';
 import { ResponseChatRoomUser } from 'features/chat/types';
 import { axios } from 'lib/axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import {
-  UserActionButtons,
-  actionButtonTexts,
-} from 'features/chat/components/atoms/UserActionButtons';
+import { ChatRoomUserList } from 'features/chat/components/organisms/ChatRoomUserList';
 import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
 
 type State = {
@@ -26,12 +23,10 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
   const { chatRoomId, name, status } = location.state as State;
 
   async function getLoginUser() {
-    console.log('getLoginUser');
-    console.log('chatRoomId: ' + chatRoomId);
-    console.log('users: ' + JSON.stringify(users));
-    const res: { data: User } = await axios.get('/users/me/profile');
-    const loginUser = users.find((user) => user.user.id === res.data.id);
-    setLoginUser(loginUser);
+    const res: { data: ResponseChatRoomUser } = await axios.get(
+      `/chat/${chatRoomId}/user/me`
+    );
+    setLoginUser(res.data);
   }
 
   async function getAllUsers() {
@@ -60,16 +55,15 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     });
   }
 
-  // 画面読み込み前に
-  React.useEffect(() => {
-    console.log('useEffect');
-    getLoginUser().catch((err) => console.log(err));
-  }, [users]);
-
   React.useEffect(() => {
     console.log('useEffect');
     getAllUsers().catch((err) => console.log(err));
   }, []);
+
+  React.useEffect(() => {
+    console.log('useEffect');
+    getLoginUser().catch((err) => console.log(err));
+  }, [users]);
 
   async function onClickAction(userId: string, status: ChatUserStatus) {
     console.log('onClickAction');
@@ -91,89 +85,13 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
               <C.AccordionIcon />
             </C.AccordionButton>
             <C.AccordionPanel pb={4}>
-              <C.List spacing={3}>
-                {users.map((user) => (
-                  <C.ListItem key={user.user.id}>
-                    <C.Flex>
-                      <C.Avatar
-                        size="sm"
-                        name={user.user.nickname}
-                        src={user.user.avatarImageUrl}
-                      ></C.Avatar>
-                      <C.Text ml={10}>{user.user.nickname}</C.Text>
-                      <C.Spacer />
-                      <C.Flex>
-                        <C.Text mr={5}>{user.status}</C.Text>
-                        {loginUser?.user.id === user.user.id && (
-                          <C.Flex>
-                            <C.Text mr={5}>me</C.Text>
-                          </C.Flex>
-                        )}
-                        {/* userがLoginUserでない、かつ、(LoginUserがADMIN または MODERATOR) かつ、userがNORMALのとき */}
-                        {loginUser !== undefined &&
-                          loginUser.user.id !== user.user.id &&
-                          user.status === ChatUserStatus.NORMAL &&
-                          (loginUser.status === ChatUserStatus.MODERATOR ||
-                            loginUser.status === ChatUserStatus.ADMIN) && (
-                            <C.Flex>
-                              <UserActionButtons
-                                userId={user.user.id}
-                                status={loginUser.status}
-                                onClickAction={onClickAction}
-                              />
-                            </C.Flex>
-                          )}
-                        {/* userがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
-                        {loginUser !== undefined &&
-                          loginUser.user.id !== user.user.id &&
-                          loginUser.status === ChatUserStatus.ADMIN &&
-                          user.status !== ChatUserStatus.ADMIN &&
-                          user.status !== ChatUserStatus.NORMAL && (
-                            <C.Flex>
-                              <C.Button
-                                onClick={async () =>
-                                  await onClickAction(
-                                    user.user.id,
-                                    ChatUserStatus.NORMAL
-                                  )
-                                }
-                              >
-                                {
-                                  actionButtonTexts[
-                                    user.status as ChatUserStatus
-                                  ]
-                                }
-                              </C.Button>
-                            </C.Flex>
-                          )}
-                        {loginUser !== undefined &&
-                          loginUser.user.id !== user.user.id &&
-                          loginUser.status === ChatUserStatus.MODERATOR &&
-                          user.status !== ChatUserStatus.MODERATOR &&
-                          user.status !== ChatUserStatus.ADMIN &&
-                          user.status !== ChatUserStatus.NORMAL && (
-                            <C.Flex>
-                              <C.Button
-                                onClick={async () =>
-                                  await onClickAction(
-                                    user.user.id,
-                                    ChatUserStatus.NORMAL
-                                  )
-                                }
-                              >
-                                {
-                                  actionButtonTexts[
-                                    user.status as ChatUserStatus
-                                  ]
-                                }
-                              </C.Button>
-                            </C.Flex>
-                          )}
-                      </C.Flex>
-                    </C.Flex>
-                  </C.ListItem>
-                ))}
-              </C.List>
+              {loginUser !== undefined && (
+                <ChatRoomUserList
+                  loginUser={loginUser}
+                  users={users}
+                  onClickAction={onClickAction}
+                />
+              )}
             </C.AccordionPanel>
           </C.AccordionItem>
           {/* LoginUserがADMINならセキュリティタブを出す */}
