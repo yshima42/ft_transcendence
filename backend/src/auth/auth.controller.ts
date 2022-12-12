@@ -20,7 +20,7 @@ import { GetFtProfile } from './decorator/get-ft-profile.decorator';
 import { GetUser } from './decorator/get-user.decorator';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { JwtTwoFactorAuthGuard } from './guards/jwt-two-factor-auth.guard';
+import { JwtOtpAuthGuard } from './guards/jwt-otp-auth.guard';
 import { FtProfile } from './interfaces/ft-profile.interface';
 
 @Controller('auth')
@@ -56,7 +56,7 @@ export class AuthController {
       nickname: name,
       avatarImageUrl: ftProfile.imageUrl,
     };
-    const { accessToken, twoFactorAuthState } = await this.authService.login(
+    const { accessToken, isOtpAuthEnabled } = await this.authService.login(
       name,
       signupUser
     );
@@ -65,8 +65,8 @@ export class AuthController {
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
 
-    if (twoFactorAuthState) {
-      return { url: 'http://localhost:5173/twofactor' };
+    if (isOtpAuthEnabled) {
+      return { url: 'http://localhost:5173/otp' };
     } else {
       return { url: 'http://localhost:5173/app' };
     }
@@ -94,13 +94,13 @@ export class AuthController {
     @Query('name') name: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ url: string }> {
-    const { accessToken, twoFactorAuthState } = await this.authService.login(
+    const { accessToken, isOtpAuthEnabled } = await this.authService.login(
       name
     );
     res.cookie('access_token', accessToken, this.cookieOptions);
 
-    if (twoFactorAuthState) {
-      return { url: 'http://localhost:5173/twofactor' };
+    if (isOtpAuthEnabled) {
+      return { url: 'http://localhost:5173/otp' };
     } else {
       return { url: 'http://localhost:5173/app' };
     }
@@ -116,18 +116,18 @@ export class AuthController {
   }
 
   /**
-   * TwoFactorAuthテーブルに新規レコードを追加。
+   * OneTimePasswordAuthテーブルに新規レコードを追加。
    * @param user - 対象ユーザー
    * @param res - cookie用
    * @returns message
    */
-  @Post('2fa')
-  @UseGuards(JwtTwoFactorAuthGuard)
-  async createTwoFactorAuth(
+  @Post('otp')
+  @UseGuards(JwtOtpAuthGuard)
+  async createOtpAuth(
     @GetUser() user: User,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    await this.authService.createTwoFactorAuth(user);
+    await this.authService.createOtpAuth(user);
 
     const { accessToken } = await this.authService.generateJwt(
       user.id,
@@ -141,18 +141,18 @@ export class AuthController {
   }
 
   /**
-   * TwoFactorAuthテーブルからレコード削除。
+   * OneTimePasswordAuthテーブルからレコード削除。
    * @param user - 対象ユーザー
    * @param res - cookie用
    * @returns message
    */
-  @Delete('2fa')
-  @UseGuards(JwtTwoFactorAuthGuard)
-  async deleteTwoFactorAuth(
+  @Delete('otp')
+  @UseGuards(JwtOtpAuthGuard)
+  async deleteOtpAuth(
     @GetUser() user: User,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ message: string }> {
-    await this.authService.deleteTwoFactorAuth(user);
+    await this.authService.deleteOtpAuth(user);
 
     const { accessToken } = await this.authService.generateJwt(
       user.id,
@@ -170,21 +170,21 @@ export class AuthController {
    * @param user
    * @returns
    */
-  @Get('2fa')
-  @UseGuards(JwtTwoFactorAuthGuard)
-  async getQrcodeUrl(@GetUser() user: User): Promise<{ qrcodeUrl: string }> {
-    return await this.authService.getQrcodeUrl(user);
+  @Get('otp/qrcode-url')
+  @UseGuards(JwtOtpAuthGuard)
+  async getOtpQrcodeUrl(@GetUser() user: User): Promise<{ qrcodeUrl: string }> {
+    return await this.authService.getOtpQrcodeUrl(user);
   }
 
   /**
-   * TwoFactorAuthテーブル上に、特定のユーザーのレコードが存在するか確認。
+   * OneTimePasswordAuthテーブル上に、特定のユーザーのレコードが存在するか確認。
    * @param user
-   * @returns trueなら2FA有効。falseなら無効。
+   * @returns trueならOTP有効。falseなら無効。
    */
-  @Get('2fa/state')
-  @UseGuards(JwtTwoFactorAuthGuard)
-  async getTwoFactorAuthState(@GetUser() user: User): Promise<boolean> {
-    return await this.authService.getTwoFactorAuthState(user.id);
+  @Get('otp')
+  @UseGuards(JwtOtpAuthGuard)
+  async isOtpAuthEnabled(@GetUser() user: User): Promise<boolean> {
+    return await this.authService.isOtpAuthEnabled(user.id);
   }
 
   /**
@@ -197,16 +197,16 @@ export class AuthController {
    * @param res - cookie用
    * @returns リダイレクト先
    */
-  @Get('2fa/validation')
+  @Get('otp/validation')
   @HttpCode(200)
   @Redirect('http://localhost:5173/app')
   @UseGuards(JwtAuthGuard)
-  async validateOneTimePassword(
+  async validateOtp(
     @GetUser() user: User,
     @Query('oneTimePassword') oneTimePassword: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ url: string }> {
-    const isCodeValid = await this.authService.oneTimePasswordValidate(
+    const isCodeValid = await this.authService.validateOtp(
       oneTimePassword,
       user
     );

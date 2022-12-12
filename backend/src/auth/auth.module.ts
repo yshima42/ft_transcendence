@@ -6,7 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { FtStrategy } from './strategy/ft.strategy';
-import { JwtTwoFactorStrategy } from './strategy/jwt-two-factor.strategy';
+import { JwtOtpStrategy } from './strategy/jwt-otp.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 
 @Module({
@@ -17,7 +17,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     JwtStrategy,
     JwtAuthGuard,
     FtStrategy,
-    JwtTwoFactorStrategy,
+    JwtOtpStrategy,
   ],
   exports: [JwtStrategy, JwtAuthGuard],
 })
