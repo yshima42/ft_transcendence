@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { ChatRoomStatus } from '@prisma/client';
 import { axios } from 'lib/axios';
 import { useLocation, Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -19,11 +20,12 @@ type ResponseChatMessage = {
 type State = {
   chatRoomId: string;
   name: string;
+  status: ChatRoomStatus;
 };
 
 export const ChatRoom: React.FC = React.memo(() => {
   const location = useLocation();
-  const { chatRoomId, name } = location.state as State;
+  const { chatRoomId, name, status } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
 
   async function getAllChatMessage(): Promise<void> {
@@ -50,7 +52,7 @@ export const ChatRoom: React.FC = React.memo(() => {
           <C.Link
             as={Link}
             to={`/app/chat/${chatRoomId}/settings`}
-            state={{ chatRoomId }}
+            state={{ chatRoomId, name, status }}
           >
             <C.Button colorScheme="blue">Settings</C.Button>
           </C.Link>

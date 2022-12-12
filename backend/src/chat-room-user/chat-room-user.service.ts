@@ -134,6 +134,19 @@ export class ChatRoomUserService {
 
       return;
     }
+    // KICKEDの場合は、テーブルから消去する
+    if (status === ChatUserStatus.KICKED) {
+      await this.prisma.chatRoomUser.delete({
+        where: {
+          chatRoomId_userId: {
+            chatRoomId,
+            userId,
+          },
+        },
+      });
+
+      return;
+    }
     await this.prisma.chatRoomUser.update({
       where: {
         chatRoomId_userId: {
