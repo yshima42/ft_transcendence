@@ -1,12 +1,14 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { TwoFactorAuth, User } from '@prisma/client';
+import { OneTimePasswordAuth, User } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { authenticator } from 'otplib';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignupUser } from './interfaces/signup-user.interface';
@@ -24,7 +26,7 @@ export class AuthService {
     signupUser?: SignupUser
   ): Promise<{
     accessToken: string;
-    twoFactorAuthState: boolean;
+    isOtpAuthEnabled: boolean;
   }> {
     let user = await this.prisma.user.findUnique({ where: { name } });
     if (user === null) {
@@ -36,9 +38,9 @@ export class AuthService {
 
     const { accessToken } = await this.generateJwt(user.id, user.name);
 
-    const twoFactorAuthState = await this.getTwoFactorAuthState(user.id);
+    const isOtpAuthEnabled = await this.isOtpAuthEnabled(user.id);
 
-    return { accessToken, twoFactorAuthState };
+    return { accessToken, isOtpAuthEnabled };
   }
 
   async generateJwt(
@@ -58,12 +60,12 @@ export class AuthService {
   /**
    * 特定のユーザーが２要素認証を有効にしているかどうか確認する。
    * TwoFactorAuthテーブルにレコードがあるかどうかで確認。
-   * 存在すれば、2FAが有効。存在しなければ無効。
+   * 存在すれば、OTPが有効。存在しなければ無効。
    * @param authUserId
    * @returns bool値
    */
-  async getTwoFactorAuthState(authUserId: string): Promise<boolean> {
-    const ret = await this.prisma.twoFactorAuth.findUnique({
+  async isOtpAuthEnabled(authUserId: string): Promise<boolean> {
+    const ret = await this.prisma.oneTimePasswordAuth.findUnique({
       where: { authUserId },
     });
 
@@ -76,7 +78,7 @@ export class AuthService {
    * @param user
    * @returns 登録されたTwoFactorAuthレコード
    */
-  async createTwoFactorAuth(user: User): Promise<TwoFactorAuth> {
+  async createOtpAuth(user: User): Promise<OneTimePasswordAuth> {
     const secret = authenticator.generateSecret();
 
     const qrcodeUrl = authenticator.keyuri(
@@ -86,14 +88,24 @@ export class AuthService {
     );
 
     try {
-      return await this.prisma.twoFactorAuth.create({
+      const oneTimePasswordAuth = await this.prisma.oneTimePasswordAuth.create({
         data: {
           authUserId: user.id,
           qrcodeUrl,
           secret,
         },
       });
+
+      return oneTimePasswordAuth;
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new HttpException(
+            'OneTimePassword is already exists',
+            HttpStatus.CONFLICT
+          );
+        }
+      }
       throw new BadRequestException('createTwoFactorAuth failed.');
     }
   }
@@ -104,9 +116,9 @@ export class AuthService {
    * @param user
    * @returns 削除されたTwoFactorAuthレコード
    */
-  async deleteTwoFactorAuth(user: User): Promise<TwoFactorAuth> {
+  async deleteOtpAuth(user: User): Promise<OneTimePasswordAuth> {
     try {
-      return await this.prisma.twoFactorAuth.delete({
+      return await this.prisma.oneTimePasswordAuth.delete({
         where: {
           authUserId: user.id,
         },
@@ -119,10 +131,10 @@ export class AuthService {
   /**
    * 対象ユーザーのワンタイムパスワード生成用QRコードのURLを返す。
    * @param user
-   * @returns qurcodeUrl
+   * @returns qrcodeUrl
    */
-  async getQrcodeUrl(user: User): Promise<{ qrcodeUrl: string }> {
-    const ret = await this.prisma.twoFactorAuth.findUnique({
+  async getOtpQrcodeUrl(user: User): Promise<{ qrcodeUrl: string }> {
+    const ret = await this.prisma.oneTimePasswordAuth.findUnique({
       where: { authUserId: user.id },
     });
     if (ret === null) return { qrcodeUrl: '' };
@@ -136,16 +148,13 @@ export class AuthService {
    * @param user - ログインユーザー
    * @returns bool値(検証結果)
    */
-  async oneTimePasswordValidate(
-    oneTimePassword: string,
-    user: User
-  ): Promise<boolean> {
-    const ret = await this.prisma.twoFactorAuth.findUnique({
+  async validateOtp(oneTimePassword: string, user: User): Promise<boolean> {
+    const ret = await this.prisma.oneTimePasswordAuth.findUnique({
       where: { authUserId: user.id },
     });
     if (ret === null)
-      throw new NotFoundException(
-        'This user does not exist in TwoFactorAuth table.'
+      throw new BadRequestException(
+        'This user does not exist in OneTimePassword table.'
       );
 
     return authenticator.verify({
