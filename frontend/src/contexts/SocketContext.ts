@@ -51,7 +51,9 @@ export const SocketReducer = (
     case 'remove_user':
       return {
         ...state,
-        users: state.users.filter((uid) => uid !== (action.payload as string)),
+        // 型が合わなくてエラーになる。あとで保持する変数の型を変える
+        // eslint-disable-next-line eqeqeq
+        users: state.users.filter((uid) => uid != action.payload),
       };
     default:
       return state;
