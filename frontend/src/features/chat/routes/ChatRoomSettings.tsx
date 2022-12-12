@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { User, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
+import { ResponseChatRoomUser } from 'features/chat/types';
 import { axios } from 'lib/axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -14,15 +15,6 @@ type State = {
   chatRoomId: string;
   name: string;
   status: ChatRoomStatus;
-};
-
-type ResponseChatRoomUser = {
-  user: {
-    id: string;
-    nickname: string;
-    avatarImageUrl: string;
-  };
-  status: ChatUserStatus;
 };
 
 export const ChatRoomSettings: React.FC = React.memo(() => {
