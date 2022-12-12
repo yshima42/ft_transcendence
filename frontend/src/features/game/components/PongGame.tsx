@@ -1,6 +1,5 @@
 import { memo, FC, useCallback, useEffect, useContext, useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
-import { Socket } from 'socket.io-client';
 import SocketContext from 'contexts/SocketContext';
 import {
   BALL_START_X,
@@ -13,64 +12,13 @@ import {
 } from '../utils/gameConfig';
 import gameContext from '../utils/gameContext';
 import { Ball, Paddle } from '../utils/gameObjs';
-import gameService from '../utils/gameService';
+import { userInput } from '../utils/userInput';
 import { Canvas } from './Canvas';
 import { Result } from './Result';
 
 export type StartGame = {
   start: boolean;
   isLeftSide: boolean;
-};
-
-// emitの回数を減らすため
-let justPressed = false;
-export const userInput = (
-  socket: Socket | undefined,
-  roomName: string,
-  obj: Paddle,
-  isLeftSide: boolean
-): void => {
-  if (socket == null) return;
-  document.addEventListener(
-    'keydown',
-    (e: KeyboardEvent) => {
-      if (e.key === 'Down' || e.key === 'ArrowDown') {
-        if (!obj.down) {
-          justPressed = true;
-        }
-        obj.down = true;
-      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-        if (!obj.up) {
-          justPressed = true;
-        }
-        obj.up = true;
-      }
-      if (justPressed) {
-        if (socket != null) {
-          void gameService.emitUserCommands(socket, roomName, obj, isLeftSide);
-          justPressed = false;
-        }
-      }
-    },
-    false
-  );
-
-  document.addEventListener(
-    'keyup',
-    (e: KeyboardEvent) => {
-      if (e.key === 'Down' || e.key === 'ArrowDown') {
-        obj.down = false;
-      } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-        obj.up = false;
-      }
-      if (justPressed) {
-        if (socket != null) {
-          void gameService.emitUserCommands(socket, roomName, obj, isLeftSide);
-        }
-      }
-    },
-    false
-  );
 };
 
 export const PongGame: FC = memo(() => {
@@ -87,7 +35,7 @@ export const PongGame: FC = memo(() => {
   let isLeftSide: boolean;
   const handleGameStart = () => {
     if (socket != null) {
-      gameService.onStartGame(socket, (options: StartGame) => {
+      socket.on('start_game', (options: StartGame) => {
         // 2プレーヤーが揃うとゲームスタート
         setGameStarted(true);
 
@@ -124,15 +72,7 @@ export const PongGame: FC = memo(() => {
     socket?.on('done_game', () => {
       setDoneGame(true);
     });
-  }, []);
 
-  // このdrawの中にcanvasで表示したいものを書く
-  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    // ここをpositionUpdateにする
     socket?.on(
       'player1_update',
       (data: { x: number; y: number; score: number }) => {
@@ -155,6 +95,13 @@ export const PongGame: FC = memo(() => {
       ball.pos.x = data.x;
       ball.pos.y = data.y;
     });
+  }, []);
+
+  // このdrawの中にcanvasで表示したいものを書く
+  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     player1.draw(ctx);
     player2.draw(ctx);
