@@ -1,4 +1,5 @@
 import {
+  QueryKey,
   UseMutateAsyncFunction,
   useMutation,
   useQueryClient,
@@ -8,7 +9,7 @@ import { axios } from '../../../lib/axios';
 // 返り値のpostFunc を使う際は、await すること。
 export function usePostApi<ReqBody, ResBody>(
   endpoint: string,
-  queryKeys?: string[]
+  queryKeys?: QueryKey[]
 ): {
   postFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
   isLoading: boolean;
@@ -24,7 +25,9 @@ export function usePostApi<ReqBody, ResBody>(
   const { mutateAsync: postFunc, isLoading } = useMutation(axiosPost, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
-        void queryClient.invalidateQueries([...queryKeys]);
+        queryKeys.forEach((queryKey) => {
+          void queryClient.invalidateQueries([queryKey]);
+        });
       }
     },
   });
