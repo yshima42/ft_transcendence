@@ -11,7 +11,6 @@ export const CreateChatRooms: React.FC = React.memo(() => {
   const [name, setName] = React.useState('');
   const [password, setPassword] = React.useState('');
   const navigate = useNavigate();
-
   async function CreateChatRooms() {
     if (name === '') {
       alert('チャットルーム名を入力してください');

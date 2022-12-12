@@ -110,7 +110,7 @@ export class ChatRoomUserService {
     updateChatRoomUserDto: UpdateChatRoomUserDto,
     loginUserId: string
   ): Promise<void> {
-    const status = updateChatRoomUserDto.status;
+    const { status, limit } = updateChatRoomUserDto;
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomUser = await this.findOne(chatRoomId, loginUserId);
     // ADMIN -> すべての変更を許可
@@ -170,6 +170,34 @@ export class ChatRoomUserService {
 
       return;
     }
+    let limitDate: Date | undefined;
+    if (limit !== undefined) {
+      // 現在時刻からlimitを足した時間を取得
+      limitDate = new Date();
+      // '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
+      switch (limit) {
+        case '1m':
+          limitDate.setMinutes(limitDate.getMinutes() + 1);
+          break;
+        case '1h':
+          limitDate.setHours(limitDate.getHours() + 1);
+          break;
+        case '1d':
+          limitDate.setDate(limitDate.getDate() + 1);
+          break;
+        case '1w':
+          limitDate.setDate(limitDate.getDate() + 7);
+          break;
+        case '1M':
+          limitDate.setMonth(limitDate.getMonth() + 1);
+          break;
+        case 'unlimited':
+          limitDate.setFullYear(limitDate.getFullYear() + 100);
+          break;
+        default:
+          break;
+      }
+    }
     await this.prisma.chatRoomUser.update({
       where: {
         chatRoomId_userId: {
@@ -179,6 +207,7 @@ export class ChatRoomUserService {
       },
       data: {
         status: updateChatRoomUserDto.status,
+        statusUntil: limitDate,
       },
     });
   }

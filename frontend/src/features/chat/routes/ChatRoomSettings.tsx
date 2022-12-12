@@ -5,6 +5,7 @@ import { ResponseChatRoomUser } from 'features/chat/types';
 import { axios } from 'lib/axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+import { ChatRoomUserActionModal } from 'features/chat/components/organisms/ChatRoomUserActionModal';
 import { ChatRoomUserList } from 'features/chat/components/organisms/ChatRoomUserList';
 import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
 
@@ -14,13 +15,20 @@ type State = {
   status: ChatRoomStatus;
 };
 
+type limit = '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
+
 export const ChatRoomSettings: React.FC = React.memo(() => {
   const [loginUser, setLoginUser] = React.useState<ResponseChatRoomUser>();
   const [users, setUsers] = React.useState<ResponseChatRoomUser[]>([]);
+  const [limit, setLimit] = React.useState<limit>('unlimited');
+  const [selectedStatus, setSelectedStatus] = React.useState<ChatUserStatus>();
+  const [selectedUserId, setSelectedUserId] = React.useState<string>();
   const [password, setPassword] = React.useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const { chatRoomId, name, status } = location.state as State;
+  const [isOpen, setIsOpen] = React.useState(false);
+  const onClose = () => setIsOpen(false);
 
   async function getLoginUser() {
     const res: { data: ResponseChatRoomUser } = await axios.get(
@@ -55,23 +63,49 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     });
   }
 
+  function setLimitAction(limit: limit) {
+    setLimit(limit);
+    console.log(limit);
+    onClose();
+  }
+
   React.useEffect(() => {
-    console.log('useEffect');
     getAllUsers().catch((err) => console.log(err));
   }, []);
 
   React.useEffect(() => {
-    console.log('useEffect');
     getLoginUser().catch((err) => console.log(err));
   }, [users]);
 
   async function onClickAction(userId: string, status: ChatUserStatus) {
-    console.log('onClickAction');
+    // BANNED, MUTEならモーダルを出す
+    if (status === ChatUserStatus.BANNED || status === ChatUserStatus.MUTE) {
+      setSelectedStatus(status);
+      setSelectedUserId(userId);
+      setIsOpen(true);
+
+      return;
+    }
     await axios.patch(`/chat/${chatRoomId}/user/${userId}`, {
       status,
     });
     getAllUsers().catch((err) => console.log(err));
   }
+
+  async function onClickLimitAction() {
+    if (selectedUserId === undefined || selectedStatus === undefined) {
+      return;
+    }
+    await axios.patch(`/chat/${chatRoomId}/user/${selectedUserId}`, {
+      status: selectedStatus,
+      limit,
+    });
+    getAllUsers().catch((err) => console.log(err));
+  }
+
+  React.useEffect(() => {
+    onClickLimitAction().catch((err) => console.log(err));
+  }, [limit]);
 
   return (
     <>
@@ -108,6 +142,11 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
             )}
         </C.Accordion>
       </ContentLayout>
+      <ChatRoomUserActionModal
+        isOpen={isOpen}
+        onClose={onClose}
+        onClick={setLimitAction}
+      />
     </>
   );
 });
