@@ -199,7 +199,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async validateOtp(
     @GetUser() user: User,
-    @Query('oneTimePassword') oneTimePassword: string,
+    @Query('one-time-password') oneTimePassword: string,
     @Res({ passthrough: true }) res: Response
   ): Promise<{ url: string }> {
     const isCodeValid = await this.authService.validateOtp(
