@@ -9,9 +9,7 @@ import { User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  BALL_SIZE,
   CANVAS_HEIGHT,
-  CANVAS_WIDTH,
   PADDLE_HEIGHT,
   PADDLE_SPEED,
 } from './config/game-config';
@@ -110,104 +108,10 @@ export class GameGateway {
     @ConnectedSocket() socket: Socket,
     @MessageBody() roomId: string
   ): void {
-    // const gameRoom = this.getSocketGameRoom(socket);
     const gameRoom = this.gameRooms[roomId];
-    const { ball, paddle1, paddle2 } = gameRoom;
 
-    // console.log(`new client: ${socket.id}`);
-
-    setInterval(() => {
-      // ゲーム終了
-      if (paddle1.score === 5 || paddle2.score === 5) {
-        // 結果をデータベースに保存
-        // const muchResult: CreateMatchResultDto = {
-        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-        //   paddleOneScore: paddle1.score,
-        //   paddleTwoScore: paddle2.score,
-        // };
-        // await gameService.addMatchResult(muchResult);
-
-        socket.emit('done_game');
-        socket.to(roomId).emit('done_game', {
-          paddle1score: paddle1.score,
-          paddle2score: paddle2.score,
-        });
-        paddle1.score = 0;
-        paddle2.score = 0;
-      }
-
-      // パドルで跳ね返る処理
-      if (ball.pos.x + ball.dx > CANVAS_WIDTH - BALL_SIZE) {
-        if (
-          ball.pos.y > paddle2.pos.y &&
-          ball.pos.y < paddle2.pos.y + PADDLE_HEIGHT
-        ) {
-          ball.dx = -ball.dx;
-        } else {
-          paddle1.score++;
-          gameRoom.setBallCenter();
-        }
-      } else if (ball.pos.x + ball.dx < BALL_SIZE) {
-        if (
-          ball.pos.y > paddle1.pos.y &&
-          ball.pos.y < paddle1.pos.y + PADDLE_HEIGHT
-        ) {
-          ball.dx = -ball.dx;
-        } else {
-          paddle2.score++;
-          gameRoom.setBallCenter();
-        }
-      }
-
-      // ボールの動き
-      if (
-        ball.pos.y + ball.dy > CANVAS_HEIGHT - BALL_SIZE ||
-        ball.pos.y + ball.dy < BALL_SIZE
-      ) {
-        ball.dy = -ball.dy;
-      }
-
-      // frameごとに進む
-      ball.pos.x += ball.dx * 0.5;
-      ball.pos.y += ball.dy * 0.5;
-
-      // frameごとにplayer1,2,ballの位置を送信
-      // TODO: 全て一緒にする
-      socket.to(roomId).emit('player1_update', {
-        x: paddle1.pos.x,
-        y: paddle1.pos.y,
-        score: paddle1.score,
-      });
-      socket.to(roomId).emit('player2_update', {
-        x: paddle2.pos.x,
-        y: paddle2.pos.y,
-        score: paddle2.score,
-      });
-      socket.to(roomId).emit('ball_update', {
-        x: ball.pos.x,
-        y: ball.pos.y,
-      });
-    }, 33);
-
-    // socket.emit('init_return');
+    gameRoom.start(socket, roomId);
   }
-
-  // @SubscribeMessage('tick')
-  // handleNewPlayer(@ConnectedSocket() socket: Socket): void {
-  //   // ゲーム終了処理
-  //   const doneGame = finishGame(this.player1, this.player2);
-  //   doneGame
-  //     .then((data) => {
-  //       socket.emit('doneGame', {
-  //         winner: data,
-  //       });
-  //       this.player1.score = 0;
-  //       this.player2.score = 0;
-  //     })
-  //     // eslint-disable-next-line @typescript-eslint/no-empty-function
-  //     .catch(() => {});
-  // }
 
   @SubscribeMessage('user_commands')
   handleUserCommands(
@@ -223,27 +127,27 @@ export class GameGateway {
 
     // player1操作
     if (command.isLeftSide && command.down) {
-      paddle1.pos.y += PADDLE_SPEED;
-      if (paddle1.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
-        paddle1.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
+      paddle1.y += PADDLE_SPEED;
+      if (paddle1.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
+        paddle1.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
     } else if (command.isLeftSide && command.up) {
-      paddle1.pos.y -= PADDLE_SPEED;
-      if (paddle1.pos.y < 0) {
-        paddle1.pos.y = 0;
+      paddle1.y -= PADDLE_SPEED;
+      if (paddle1.y < 0) {
+        paddle1.y = 0;
       }
     }
 
     // player2操作
     if (!command.isLeftSide && command.down) {
-      paddle2.pos.y += PADDLE_SPEED;
-      if (paddle2.pos.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
-        paddle2.pos.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
+      paddle2.y += PADDLE_SPEED;
+      if (paddle2.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
+        paddle2.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
       }
     } else if (!command.isLeftSide && command.up) {
-      paddle2.pos.y -= PADDLE_SPEED;
-      if (paddle2.pos.y < 0) {
-        paddle2.pos.y = 0;
+      paddle2.y -= PADDLE_SPEED;
+      if (paddle2.y < 0) {
+        paddle2.y = 0;
       }
     }
 
