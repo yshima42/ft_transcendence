@@ -10,8 +10,6 @@ import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import {
   BALL_SIZE,
-  BALL_START_X,
-  BALL_START_Y,
   CANVAS_HEIGHT,
   CANVAS_WIDTH,
   PADDLE_HEIGHT,
@@ -148,7 +146,7 @@ export class GameGateway {
           ball.dx = -ball.dx;
         } else {
           paddle1.score++;
-          ball.setPosition(BALL_START_X, BALL_START_Y);
+          gameRoom.setBallCenter();
         }
       } else if (ball.pos.x + ball.dx < BALL_SIZE) {
         if (
@@ -158,7 +156,7 @@ export class GameGateway {
           ball.dx = -ball.dx;
         } else {
           paddle2.score++;
-          ball.setPosition(BALL_START_X, BALL_START_Y);
+          gameRoom.setBallCenter();
         }
       }
 
