@@ -28,19 +28,16 @@ export const PongGame: FC = memo(() => {
   const ball = new Ball(BALL_START_X, BALL_START_Y);
   const { socket } = useContext(SocketContext).SocketState;
 
-  const { isGameStarted, setGameStarted, roomName } = useContext(gameContext);
+  const { isLeftSide, isGameStarted, setGameStarted, roomName } =
+    useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
 
-  // TODO: これをuseStateにしたら動かなくなる理由検証・修正
-  let isLeftSide: boolean;
+  // TODO: これをuse;
   const handleGameStart = () => {
     if (socket != null) {
-      socket.on('start_game', (options: StartGame) => {
+      socket.on('start_game', () => {
         // 2プレーヤーが揃うとゲームスタート
         setGameStarted(true);
-
-        // プレーヤーのサイド決定
-        isLeftSide = options.isLeftSide;
       });
     }
   };
@@ -65,9 +62,6 @@ export const PongGame: FC = memo(() => {
     // TODO: Roomがなかった時のエラー処理
 
     // TODO: Player1か2の決定
-    socket?.on('connected_player', (data) => {
-      console.log(data);
-    });
 
     socket?.on('done_game', () => {
       setDoneGame(true);
