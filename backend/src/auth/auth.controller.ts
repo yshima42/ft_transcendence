@@ -58,14 +58,16 @@ export class AuthController {
       nickname: name,
       avatarImageUrl: ftProfile.imageUrl,
     };
-    const { accessToken, isTwoFactorAuthEnabled } =
+    const { accessToken, isTwoFactorAuthEnabled, isSignup } =
       await this.authService.login(name, signupUser);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
 
-    if (isTwoFactorAuthEnabled) {
+    if (isSignup) {
+      return { url: 'http://localhost:5173/app/profile/edit' };
+    } else if (isTwoFactorAuthEnabled) {
       return { url: 'http://localhost:5173/twofactor' };
     } else {
       return { url: 'http://localhost:5173/app' };
