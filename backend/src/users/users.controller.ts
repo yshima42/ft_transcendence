@@ -35,6 +35,7 @@ import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
+import { FriendRelation } from 'src/friend-requests/types/friend-relation';
 import { GameStatsEntity } from 'src/game/entities/game-stats.entity';
 import { MatchResultEntity } from 'src/game/entities/match-result.entity';
 import { GameService } from 'src/game/game.service';
@@ -372,5 +373,17 @@ export class UsersController {
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findRequetableUsers(@GetUser() user: User): Promise<User[]> {
     return await this.friendRequestService.findRequestableUsers(user.id);
+  }
+
+  @Get('me/friend-relation/:id')
+  @ApiOperation({
+    summary: '自分から見た特定ユーザーとの関係取得',
+  })
+  @ApiOkResponse({ type: UserEntity, isArray: true })
+  async getFriendRelation(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) otherId: string
+  ): Promise<FriendRelation> {
+    return await this.friendRequestService.getFriendRelation(user.id, otherId);
   }
 }

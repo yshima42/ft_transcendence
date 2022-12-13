@@ -6,6 +6,7 @@ import {
 import { FriendRequest, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateFriendRequestDto } from './dto/update-friend-request.dto';
+import { FriendRelation } from './types/friend-relation';
 
 @Injectable()
 export class FriendRequestsService {
@@ -198,5 +199,41 @@ export class FriendRequestsService {
     }
 
     return await this.removeTwo(userId, friendId);
+  }
+
+  async getFriendRelation(
+    meId: string,
+    otherId: string
+  ): Promise<FriendRelation> {
+    const ret = await this.prisma.friendRequest.findMany({
+      where: {
+        OR: [
+          {
+            AND: [{ creatorId: meId }, { receiverId: otherId }],
+          },
+          {
+            AND: [{ creatorId: otherId }, { receiverId: meId }],
+          },
+        ],
+      },
+    });
+
+    let friendRelation: 'NONE' | 'ACCEPTED' | 'PENDING' | 'RECOGNITION';
+
+    if (ret.length === 0) {
+      friendRelation = 'NONE';
+    } else {
+      if (ret[0].status === 'ACCEPTED') {
+        friendRelation = 'ACCEPTED';
+      } else {
+        if (ret[0].creatorId === meId) {
+          friendRelation = 'PENDING';
+        } else {
+          friendRelation = 'RECOGNITION';
+        }
+      }
+    }
+
+    return { friendRelation };
   }
 }
