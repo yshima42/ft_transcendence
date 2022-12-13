@@ -21,7 +21,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
   async function joinChatRoom() {
     if (status === ChatRoomStatus.PROTECTED) {
       const res = await axios.post(`/chat/${chatRoomId}/user`, { password });
-      if (res.status === 200) {
+      if (res.status === 201) {
         navigate(`/app/chat/${chatRoomId}`, {
           state: { chatRoomId, name },
         });
