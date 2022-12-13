@@ -5,13 +5,10 @@ import gameContext from '../utils/gameContext';
 import gameService from '../utils/gameService';
 
 export const JoinRoom: FC = memo(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isJoining, setJoining] = useState(false);
   const { socket, user } = useContext(SocketContext).SocketState;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { setLeftSide, setInRoom, isInRoom, setRoomName } =
-    useContext(gameContext);
+  const { setLeftSide, setInRoom, setRoomName } = useContext(gameContext);
 
   const onClickMatch = () => {
     // 何も入力してない時の処理

@@ -120,8 +120,7 @@ export class GameGateway {
     // console.log(`new client: ${socket.id}`);
 
     setInterval(() => {
-      // パドルで跳ね返る処理・ゲームオーバー処理
-      // TODO: 壁で跳ね返る処理はcanvasのwallを使えるかも
+      // パドルで跳ね返る処理
       if (ball.pos.x + ball.dx > CANVAS_WIDTH - BALL_SIZE) {
         if (
           ball.pos.y > paddle2.pos.y &&

@@ -32,32 +32,28 @@ export const PongGame: FC = memo(() => {
     useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
 
-  // TODO: これをuse;
   const handleGameStart = () => {
     if (socket != null) {
       socket.on('start_game', () => {
-        // 2プレーヤーが揃うとゲームスタート
         setGameStarted(true);
       });
     }
   };
-
-  useEffect(() => {
-    handleGameStart();
-  }, []);
-
-  useEffect(() => {
-    socket?.on('init_return', () => {
-      setInterval(() => {
-        // TODO: ここからユーザーインプットを送って反応を良くする
-        socket.emit('tick', 'hello');
-      }, 33);
-    });
-  }, []);
+  // useEffect(() => {
+  //   socket?.on('init_return', () => {
+  //     setInterval(() => {
+  //       // TODO: ここからユーザーインプットを送って反応を良くする
+  //       socket.emit('tick', 'hello');
+  //     }, 33);
+  //   });
+  // }, []);
 
   useEffect(() => {
     // TODO: RoomNameを指定する
     socket?.emit('connect_pong', roomName);
+
+    // ゲームスタート処理
+    handleGameStart();
 
     // TODO: Roomがなかった時のエラー処理
 
