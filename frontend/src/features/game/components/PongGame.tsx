@@ -34,7 +34,7 @@ export const PongGame: FC = memo(() => {
 
   useEffect(() => {
     // TODO: Roomがなかった時のエラー処理
-    socket?.emit('connect_pong', roomName);
+    // socket?.emit('connect_pong', roomName);
 
     // ゲームスタート処理
     socket?.on('start_game', () => {

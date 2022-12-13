@@ -26,6 +26,7 @@ const SocketContextComponent: React.FunctionComponent<
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
     autoConnect: false,
+    transports: ['websocket'],
   });
 
   const [SocketState, SocketDispatch] = useReducer(
