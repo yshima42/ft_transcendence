@@ -1,4 +1,4 @@
-import { Server, Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import {
   BALL_SIZE,
   BALL_SPEED,
@@ -11,78 +11,6 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from './config/game-config';
-import { UserData } from './game.interface';
-
-// export class Vector {
-//   x: number;
-//   y: number;
-
-//   constructor(x: number, y: number) {
-//     this.x = x;
-//     this.y = y;
-//   }
-
-//   set(x: number, y: number): void {
-//     this.x = x;
-//     this.y = y;
-//   }
-// }
-
-// export class Ball {
-//   up: boolean;
-//   down: boolean;
-//   pos: { x: number; y: number };
-//   dx: number;
-//   dy: number;
-
-//   constructor(x: number, y: number) {
-//     this.pos = new Vector(x, y);
-//     this.up = false;
-//     this.down = false;
-//     this.dx = BALL_SPEED;
-//     this.dy = -BALL_SPEED;
-//   }
-
-//   draw = (ctx: CanvasRenderingContext2D): void => {
-//     ctx.fillStyle = BALL_COLOR;
-//     ctx.beginPath();
-//     ctx.arc(this.pos.x, this.pos.y, BALL_SIZE, 0, 2 * Math.PI);
-//     ctx.fill();
-//     ctx.closePath();
-//   };
-
-//   setPosition = (x: number, y: number): void => {
-//     this.pos.x = x;
-//     this.pos.y = y;
-//   };
-// }
-
-// export class Paddle {
-//   id: string;
-//   role: 'Player1' | 'Player2';
-//   up: boolean;
-//   down: boolean;
-//   pos: { x: number; y: number };
-//   score: number;
-//   dx: number;
-//   dy: number;
-
-//   constructor(x: number, y: number) {
-//     this.id = '';
-//     this.role = 'Player1';
-//     this.pos = new Vector(x, y);
-//     this.up = false;
-//     this.down = false;
-//     this.score = 0;
-//     this.dx = 0;
-//     this.dy = 0;
-//   }
-// }
-
-// export type Position = {
-//   x: number;
-//   y: number;
-// };
 
 export type Ball = {
   x: number;
@@ -108,6 +36,7 @@ export type Paddle = {
   dy: number;
 };
 
+// xの値はpaddleごとに設定する
 const defaultPaddle = {
   up: false,
   down: false,
@@ -117,7 +46,23 @@ const defaultPaddle = {
   dy: PADDLE_SPEED,
 };
 
-// TODO: ここにプレーヤームーブを入れる
+export type GameRoomDict = {
+  [id: string]: GameRoom;
+};
+
+export type UserData = {
+  isLeftSide?: boolean;
+  socket: Socket;
+  id: string;
+  nickname: string;
+  inGame: boolean;
+};
+
+export type UserDict = {
+  [id: string]: UserData;
+};
+
+// このクラスに全て集約
 export class GameRoom {
   id: string;
   server: Server;
@@ -188,6 +133,7 @@ export class GameRoom {
       this.ball.y += this.ball.dy * 0.5;
 
       // frameごとにplayer1,2,ballの位置を送信
+      // TODO: 全て一緒にする
       socket.to(roomId).emit('position_update', {
         paddle1X: this.paddle1.x,
         paddle1Y: this.paddle1.y,
@@ -221,7 +167,3 @@ export class GameRoom {
     }, 33);
   }
 }
-
-export type GameRoomDict = {
-  [id: string]: GameRoom;
-};

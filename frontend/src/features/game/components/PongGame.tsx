@@ -51,6 +51,7 @@ export const PongGame: FC = memo(() => {
     userInput(socket, roomName, player1, isLeftSide);
 
     // ゲームで表示するオブジェクトのポジション受け取り
+    // TODO: score_updateと分けたい(分けて得点入ったときにbackendでemitするとうまく受け取れない)
     socket?.on(
       'position_update',
       (data: {

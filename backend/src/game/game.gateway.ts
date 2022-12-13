@@ -15,8 +15,7 @@ import {
 } from './config/game-config';
 // TODO: 名前変更
 // eslint-disable-next-line import/extensions
-import { GameRoom, GameRoomDict } from './game.class';
-import { UserData } from './game.interface';
+import { UserData, GameRoom, GameRoomDict } from './game.object';
 import { GameService } from './game.service';
 
 // const finishGame = async (player1: Paddle, player2: Paddle) => {
