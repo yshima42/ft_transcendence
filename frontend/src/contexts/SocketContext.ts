@@ -22,6 +22,7 @@ export type TSocketContextActions =
   | 'update_uid'
   | 'update_users'
   | 'remove_user';
+
 export type TSocketContextPayload = string | User | string[] | Socket;
 
 export interface ISocketContextActions {

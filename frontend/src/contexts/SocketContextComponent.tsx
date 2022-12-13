@@ -22,7 +22,7 @@ const SocketContextComponent: React.FunctionComponent<
 
   const { user } = useProfile();
 
-  const socket = useSocket('http://localhost:3000', {
+  const socket = useSocket('http://localhost:3000/game', {
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
     autoConnect: false,

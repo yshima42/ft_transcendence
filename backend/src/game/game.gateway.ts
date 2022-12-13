@@ -33,19 +33,10 @@ import { GameService } from './game.service';
 //   });
 // };
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/game' })
 export class GameGateway {
-  public onlineUsers: { [id: string]: string };
-  public inGameUsers: { [id: string]: string };
-  public onWaitUsers: { [id: string]: string };
-
   // gameServiceを使うのに必要
-  constructor(private readonly gameService: GameService) {
-    // オンラインユーザー一覧
-    this.onlineUsers = {};
-    this.inGameUsers = {};
-    this.onWaitUsers = {};
-  }
+  constructor(private readonly gameService: GameService) {}
 
   @WebSocketServer()
   private readonly server!: Server;
@@ -53,22 +44,6 @@ export class GameGateway {
   // このクラスで使う配列・変数
   private readonly gameRooms: GameRoomDict = {};
   private readonly matchWaitingUsers: UserData[] = [];
-
-  // サーバー側でのオブジェクト作成
-  // player1 = new Paddle(0, PADDLE_START_POS);
-  // player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
-  // ball = new Ball(BALL_START_X, BALL_START_Y);
-
-  // 現在接続してるsocketのroomIdを取得
-  // getSocketGameRoom = (socket: Socket): string => {
-  //   const socketRooms = Array.from(socket.rooms.values()).filter(
-  //     (r) => r !== socket.id
-  //   );
-  //   console.log(socketRooms);
-  //   const gameRoom = socketRooms?.[0];
-
-  //   return gameRoom;
-  // };
 
   // 本来はhandleConnectionでやりたいが、authGuardで対応できないため、こちらでUser情報セット
   @SubscribeMessage('set_user')
@@ -98,11 +73,13 @@ export class GameGateway {
       userData.isLeftSide = false;
       const roomId = this.createGameRoom(this.matchWaitingUsers[0], userData);
 
-      // TODO: このemitのやり方微妙な気がするので修正
-      this.server.to(socket.id).emit('go_game_room', roomId);
+      // isLeftSide, true or falseで良い
+      this.server
+        .to(socket.id)
+        .emit('go_game_room', roomId, userData.isLeftSide);
       this.server
         .to(this.matchWaitingUsers[0].socket.id)
-        .emit('go_game_room', roomId);
+        .emit('go_game_room', roomId, this.matchWaitingUsers[0].isLeftSide);
 
       this.matchWaitingUsers.splice(0, 1);
     }
@@ -122,31 +99,12 @@ export class GameGateway {
     @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
-    const connectedSockets = this.server.sockets.adapter.rooms.get(
-      message.roomId
-    );
-    const socketRooms = Array.from(socket.rooms.values()).filter(
-      (r) => r !== socket.id
-    );
-    if (
-      socketRooms.length > 0 ||
-      (connectedSockets != null && connectedSockets.size === 2)
-    ) {
-      socket.emit('room_join_error', {
-        error: 'Room is full',
-      });
-    } else {
-      await socket.join(message.roomId);
-      socket.emit('room_joined');
-      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+    await socket.join(message.roomId);
+    console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
-      if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
-        socket.emit('start_game', { start: true, isLeftSide: false });
-        socket
-          .to(message.roomId)
-          .emit('start_game', { start: false, isLeftSide: true });
-      }
-    }
+    // TODO: 一つにできないか
+    socket.emit('start_game');
+    socket.to(message.roomId).emit('start_game');
   }
 
   @SubscribeMessage('connect_pong')
@@ -161,8 +119,27 @@ export class GameGateway {
     // console.log(`new client: ${socket.id}`);
 
     setInterval(() => {
-      // パドルで跳ね返る処理・ゲームオーバー処理
-      // TODO: 壁で跳ね返る処理はcanvasのwallを使えるかも
+      // ゲーム終了
+      if (paddle1.score === 5 || paddle2.score === 5) {
+        // 結果をデータベースに保存
+        // const muchResult: CreateMatchResultDto = {
+        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
+        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
+        //   paddleOneScore: paddle1.score,
+        //   paddleTwoScore: paddle2.score,
+        // };
+        // await gameService.addMatchResult(muchResult);
+
+        socket.emit('done_game');
+        socket.to(roomId).emit('done_game', {
+          paddle1score: paddle1.score,
+          paddle2score: paddle2.score,
+        });
+        paddle1.score = 0;
+        paddle2.score = 0;
+      }
+
+      // パドルで跳ね返る処理
       if (ball.pos.x + ball.dx > CANVAS_WIDTH - BALL_SIZE) {
         if (
           ball.pos.y > paddle2.pos.y &&
@@ -185,25 +162,6 @@ export class GameGateway {
         }
       }
 
-      // ゲーム終了
-      if (paddle1.score === 5 || paddle2.score === 5) {
-        // 結果をデータベースに保存
-        // const muchResult: CreateMatchResultDto = {
-        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-        //   paddleOneScore: paddle1.score,
-        //   paddleTwoScore: paddle2.score,
-        // };
-        // await gameService.addMatchResult(muchResult);
-
-        socket.to(roomId).emit('done_game', {
-          paddle1score: paddle1.score,
-          paddle2score: paddle2.score,
-        });
-        paddle1.score = 0;
-        paddle2.score = 0;
-      }
-
       // ボールの動き
       if (
         ball.pos.y + ball.dy > CANVAS_HEIGHT - BALL_SIZE ||
@@ -217,6 +175,7 @@ export class GameGateway {
       ball.pos.y += ball.dy * 0.5;
 
       // frameごとにplayer1,2,ballの位置を送信
+      // TODO: 全て一緒にする
       socket.to(roomId).emit('player1_update', {
         x: paddle1.pos.x,
         y: paddle1.pos.y,
@@ -233,7 +192,7 @@ export class GameGateway {
       });
     }, 33);
 
-    socket.emit('init_return');
+    // socket.emit('init_return');
   }
 
   // @SubscribeMessage('tick')
@@ -293,68 +252,4 @@ export class GameGateway {
     // TODO: 最後に消す
     console.log(data);
   }
-
-  handleConnection(@ConnectedSocket() socket: Socket): void {
-    console.log('connected: ' + socket.id);
-  }
-
-  handleDisconnect(@ConnectedSocket() socket: Socket): string[] {
-    console.log('disconnected: ' + socket.id);
-    const uid = this.GetUidFromSocketID(socket.id);
-    if (uid != null) {
-      // TODO: ここのeslint回避がわからない、できれば修正したい(shimazu)
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete this.onlineUsers[uid];
-    }
-
-    const onlineUsers = Object.values(this.onlineUsers);
-
-    this.SendMessage(
-      socket,
-      'user_disconnected',
-      onlineUsers.filter((id) => id !== socket.id),
-      onlineUsers
-    );
-
-    return onlineUsers;
-  }
-
-  @SubscribeMessage('connect_user')
-  handshake(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() userId: string
-  ): string[] {
-    console.log(userId);
-    this.onlineUsers[userId] = socket.id;
-
-    const onlineUsers = Object.values(this.onlineUsers);
-
-    this.SendMessage(
-      socket,
-      'user_connected',
-      onlineUsers.filter((id) => id !== socket.id),
-      onlineUsers
-    );
-
-    return onlineUsers;
-  }
-
-  GetUidFromSocketID = (id: string): string | undefined => {
-    return Object.keys(this.onlineUsers).find(
-      (uid) => this.onlineUsers[uid] === id
-    );
-  };
-
-  SendMessage = (
-    socket: Socket,
-    name: string,
-    onlineUsers: string[],
-    payload?: unknown
-  ): void => {
-    onlineUsers.forEach((id) =>
-      payload != null
-        ? socket.to(id).emit(name, payload)
-        : socket.to(id).emit(name)
-    );
-  };
 }
