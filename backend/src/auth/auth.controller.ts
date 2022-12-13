@@ -14,7 +14,6 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { CookieOptions } from 'csurf';
 import { Response } from 'express';
-import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
 import { GetUser } from './decorator/get-user.decorator';
@@ -26,10 +25,7 @@ import { FtProfile } from './interfaces/ft-profile.interface';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,
