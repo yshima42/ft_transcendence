@@ -26,7 +26,7 @@ export function usePostApi<ReqBody, ResBody>(
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries([queryKey]);
+          void queryClient.invalidateQueries({ queryKey });
         });
       }
     },
