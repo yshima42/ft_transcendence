@@ -11,11 +11,6 @@ export const Top: FC = memo(() => {
           <Button>Match</Button>
         </Link>
       </Center>
-      <Center>
-        <Link to="matching">
-          <Button>Rank Match</Button>
-        </Link>
-      </Center>
     </ContentLayout>
   );
 });
