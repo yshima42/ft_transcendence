@@ -2,7 +2,6 @@ import { FC, memo, useContext, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import SocketContext from 'contexts/SocketContext';
 import gameContext from '../utils/gameContext';
-import gameService from '../utils/gameService';
 
 export const JoinRoom: FC = memo(() => {
   const [isJoining, setJoining] = useState(false);
@@ -16,17 +15,13 @@ export const JoinRoom: FC = memo(() => {
     setJoining(true);
     socket?.emit('set_user', user);
     socket?.emit('random_match');
-    socket?.on('go_game_room', async (roomId: string, isLeftSide: boolean) => {
+    socket?.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
       setRoomName(roomId);
       setLeftSide(isLeftSide);
       setInRoom(true);
       setJoining(false);
 
-      await gameService
-        .joinGameRoom(socket, roomId)
-        .catch((e: { error: string }) => {
-          alert(e.error);
-        });
+      socket.emit('join_room', { roomId });
     });
   };
 

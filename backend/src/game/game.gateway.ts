@@ -100,7 +100,7 @@ export class GameGateway {
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
     await socket.join(message.roomId);
-    socket.emit('room_joined');
+    // socket.emit('room_joined');
     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
     // TODO: 一つにできないか
