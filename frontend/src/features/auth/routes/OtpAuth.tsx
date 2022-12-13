@@ -34,7 +34,7 @@ export const OtpAuth: FC = memo(() => {
             bg="teal.300"
             color="white"
             as="a"
-            href={`http://localhost:3000/auth/otp/validation?oneTimePassword=${token}`}
+            href={`http://localhost:3000/auth/otp/validation?one-time-password=${token}`}
           >
             submit
           </Button>
