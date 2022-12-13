@@ -55,6 +55,10 @@ export const PongGame: FC = memo(() => {
       setDoneGame(true);
     });
 
+    // プレーヤー操作
+    // TODO: player1だけになってるのを修正
+    userInput(socket, roomName, player1, isLeftSide);
+
     // ゲームで表示するオブジェクトのポジション受け取り
     socket?.on(
       'player1_update',
@@ -80,18 +84,17 @@ export const PongGame: FC = memo(() => {
     });
   }, []);
 
-  // このdrawの中にcanvasで表示したいものを書く
+  // draw関数の中にcanvasで表示したいものを書く
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
+    // canvas背景の設定
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    // ゲームオブジェクトの表示
     player1.draw(ctx);
     player2.draw(ctx);
     ball.draw(ctx);
-
-    // TODO: player1だけになってるの修正
-    userInput(socket, roomName, player1, isLeftSide);
 
     // スコアの表示
     ctx.font = '48px serif';
