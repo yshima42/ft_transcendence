@@ -114,6 +114,10 @@ export class GameRoom {
           this.ball.dx = -this.ball.dx;
         } else {
           this.paddle1.score++;
+          this.server.in(roomId).emit('update_score', {
+            paddle1Score: this.paddle1.score,
+            paddle2Score: this.paddle2.score,
+          });
           this.setBallCenter();
         }
       } else if (this.ball.x + this.ball.dx < BALL_SIZE) {
@@ -124,6 +128,10 @@ export class GameRoom {
           this.ball.dx = -this.ball.dx;
         } else {
           this.paddle2.score++;
+          this.server.in(roomId).emit('update_score', {
+            paddle1Score: this.paddle1.score,
+            paddle2Score: this.paddle2.score,
+          });
           this.setBallCenter();
         }
       }
@@ -146,8 +154,6 @@ export class GameRoom {
         paddle1Y: this.paddle1.y,
         paddle2X: this.paddle2.x,
         paddle2Y: this.paddle2.y,
-        paddle1Score: this.paddle1.score,
-        paddle2Score: this.paddle2.score,
         ballX: this.ball.x,
         ballY: this.ball.y,
       });
