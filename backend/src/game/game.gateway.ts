@@ -110,6 +110,7 @@ export class GameGateway {
   ): void {
     const gameRoom = this.gameRooms[roomId];
 
+    // ゲーム開始
     gameRoom.start(socket, roomId);
   }
 
