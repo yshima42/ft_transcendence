@@ -12,6 +12,7 @@ export const Game: FC = memo(() => {
   const [isGameStarted, setGameStarted] = useState(false);
   const [roomName, setRoomName] = useState('');
 
+  // TODO: Propsで渡してcontext使わなくても良い
   const gameContextValue: GameContextProps = {
     isInRoom,
     setInRoom,

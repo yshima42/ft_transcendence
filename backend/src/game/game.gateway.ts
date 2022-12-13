@@ -100,7 +100,6 @@ export class GameGateway {
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
     await socket.join(message.roomId);
-    // socket.emit('room_joined');
     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
     // TODO: 一つにできないか
@@ -120,6 +119,26 @@ export class GameGateway {
     // console.log(`new client: ${socket.id}`);
 
     setInterval(() => {
+      // ゲーム終了
+      if (paddle1.score === 5 || paddle2.score === 5) {
+        // 結果をデータベースに保存
+        // const muchResult: CreateMatchResultDto = {
+        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
+        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
+        //   paddleOneScore: paddle1.score,
+        //   paddleTwoScore: paddle2.score,
+        // };
+        // await gameService.addMatchResult(muchResult);
+
+        socket.emit('done_game');
+        socket.to(roomId).emit('done_game', {
+          paddle1score: paddle1.score,
+          paddle2score: paddle2.score,
+        });
+        paddle1.score = 0;
+        paddle2.score = 0;
+      }
+
       // パドルで跳ね返る処理
       if (ball.pos.x + ball.dx > CANVAS_WIDTH - BALL_SIZE) {
         if (
@@ -143,25 +162,6 @@ export class GameGateway {
         }
       }
 
-      // ゲーム終了
-      if (paddle1.score === 5 || paddle2.score === 5) {
-        // 結果をデータベースに保存
-        // const muchResult: CreateMatchResultDto = {
-        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-        //   paddleOneScore: paddle1.score,
-        //   paddleTwoScore: paddle2.score,
-        // };
-        // await gameService.addMatchResult(muchResult);
-
-        socket.to(roomId).emit('done_game', {
-          paddle1score: paddle1.score,
-          paddle2score: paddle2.score,
-        });
-        paddle1.score = 0;
-        paddle2.score = 0;
-      }
-
       // ボールの動き
       if (
         ball.pos.y + ball.dy > CANVAS_HEIGHT - BALL_SIZE ||
@@ -175,6 +175,7 @@ export class GameGateway {
       ball.pos.y += ball.dy * 0.5;
 
       // frameごとにplayer1,2,ballの位置を送信
+      // TODO: 全て一緒にする
       socket.to(roomId).emit('player1_update', {
         x: paddle1.pos.x,
         y: paddle1.pos.y,
@@ -191,7 +192,7 @@ export class GameGateway {
       });
     }, 33);
 
-    socket.emit('init_return');
+    // socket.emit('init_return');
   }
 
   // @SubscribeMessage('tick')

@@ -77,6 +77,7 @@ export class Paddle {
   }
 }
 
+// TODO: ここにプレーヤームーブを入れる
 export class GameRoom {
   id: string;
   server: Server;
