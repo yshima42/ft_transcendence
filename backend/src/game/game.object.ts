@@ -63,7 +63,7 @@ export type UserDict = {
   [id: string]: UserData;
 };
 
-// このクラスに全て集約
+// このクラスでゲーム操作を行う
 export class GameRoom {
   gameService: GameService;
   id: string;
@@ -105,73 +105,86 @@ export class GameRoom {
 
   gameStart(socket: Socket, roomId: string): void {
     this.interval = setInterval(() => {
-      // パドルで跳ね返る処理
-      if (this.ball.x + this.ball.dx > CANVAS_WIDTH - BALL_SIZE) {
-        if (
-          this.ball.y > this.paddle2.y &&
-          this.ball.y < this.paddle2.y + PADDLE_HEIGHT
-        ) {
-          this.ball.dx = -this.ball.dx;
-        } else {
-          this.paddle1.score++;
-          this.server.in(roomId).emit('update_score', {
-            paddle1Score: this.paddle1.score,
-            paddle2Score: this.paddle2.score,
-          });
-          this.setBallCenter();
-        }
-      } else if (this.ball.x + this.ball.dx < BALL_SIZE) {
-        if (
-          this.ball.y > this.paddle1.y &&
-          this.ball.y < this.paddle1.y + PADDLE_HEIGHT
-        ) {
-          this.ball.dx = -this.ball.dx;
-        } else {
-          this.paddle2.score++;
-          this.server.in(roomId).emit('update_score', {
-            paddle1Score: this.paddle1.score,
-            paddle2Score: this.paddle2.score,
-          });
-          this.setBallCenter();
-        }
-      }
-
-      // ボールの動き
-      if (
-        this.ball.y + this.ball.dy > CANVAS_HEIGHT - BALL_SIZE ||
-        this.ball.y + this.ball.dy < BALL_SIZE
-      ) {
-        this.ball.dy = -this.ball.dy;
-      }
-
-      // frameごとに進む
-      this.ball.x += this.ball.dx;
-      this.ball.y += this.ball.dy;
-
-      // frameごとにplayer1,2,ballの位置を送信
-      this.server.in(roomId).emit('position_update', {
-        paddle1X: this.paddle1.x,
-        paddle1Y: this.paddle1.y,
-        paddle2X: this.paddle2.x,
-        paddle2Y: this.paddle2.y,
-        ballX: this.ball.x,
-        ballY: this.ball.y,
-      });
-
-      // ゲーム終了処理
-      if (this.paddle1.score === 5 || this.paddle2.score === 5) {
-        // const muchResult: CreateMatchResultDto = {
-        //   playerOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-        //   playerTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-        //   playerOneScore: this.paddle1.score,
-        //   playerTwoScore: this.paddle2.score,
-        // };
-        // await this.gameService.addMatchResult(muchResult);
-
-        this.server.in(roomId).emit('done_game');
-        clearInterval(this.interval);
-      }
+      this.gameLogic(roomId);
+      this.updatePosition(roomId);
     }, 33);
+  }
+
+  gameLogic(roomId: string): void {
+    // パドルで跳ね返る処理
+    if (this.ball.x + this.ball.dx > CANVAS_WIDTH - BALL_SIZE) {
+      if (
+        this.ball.y > this.paddle2.y &&
+        this.ball.y < this.paddle2.y + PADDLE_HEIGHT
+      ) {
+        this.ball.dx = -this.ball.dx;
+      } else {
+        this.paddle1.score++;
+        this.updateScore(roomId);
+        this.setBallCenter();
+      }
+    } else if (this.ball.x + this.ball.dx < BALL_SIZE) {
+      if (
+        this.ball.y > this.paddle1.y &&
+        this.ball.y < this.paddle1.y + PADDLE_HEIGHT
+      ) {
+        this.ball.dx = -this.ball.dx;
+      } else {
+        this.paddle2.score++;
+        this.updateScore(roomId);
+        this.setBallCenter();
+      }
+    }
+
+    // ボールの動き
+    if (
+      this.ball.y + this.ball.dy > CANVAS_HEIGHT - BALL_SIZE ||
+      this.ball.y + this.ball.dy < BALL_SIZE
+    ) {
+      this.ball.dy = -this.ball.dy;
+    }
+
+    // frameごとに進む
+    this.ball.x += this.ball.dx;
+    this.ball.y += this.ball.dy;
+
+    // ゲーム終了処理
+    if (this.paddle1.score === 5 || this.paddle2.score === 5) {
+      this.doneGame(roomId);
+    }
+  }
+
+  doneGame(roomId: string): void {
+    // const muchResult: CreateMatchResultDto = {
+    //   playerOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
+    //   playerTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
+    //   playerOneScore: this.paddle1.score,
+    //   playerTwoScore: this.paddle2.score,
+    // };
+    // await this.gameService.addMatchResult(muchResult);
+
+    this.server.in(roomId).emit('done_game');
+
+    // setIntervalを止める処理
+    clearInterval(this.interval);
+  }
+
+  updatePosition(roomId: string): void {
+    this.server.in(roomId).emit('position_update', {
+      paddle1X: this.paddle1.x,
+      paddle1Y: this.paddle1.y,
+      paddle2X: this.paddle2.x,
+      paddle2Y: this.paddle2.y,
+      ballX: this.ball.x,
+      ballY: this.ball.y,
+    });
+  }
+
+  updateScore(roomId: string): void {
+    this.server.in(roomId).emit('update_score', {
+      paddle1Score: this.paddle1.score,
+      paddle2Score: this.paddle2.score,
+    });
   }
 
   handleInput(
