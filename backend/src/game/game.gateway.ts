@@ -33,19 +33,10 @@ import { GameService } from './game.service';
 //   });
 // };
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/game' })
 export class GameGateway {
-  public onlineUsers: { [id: string]: string };
-  public inGameUsers: { [id: string]: string };
-  public onWaitUsers: { [id: string]: string };
-
   // gameServiceを使うのに必要
-  constructor(private readonly gameService: GameService) {
-    // オンラインユーザー一覧
-    this.onlineUsers = {};
-    this.inGameUsers = {};
-    this.onWaitUsers = {};
-  }
+  constructor(private readonly gameService: GameService) {}
 
   @WebSocketServer()
   private readonly server!: Server;
@@ -53,22 +44,6 @@ export class GameGateway {
   // このクラスで使う配列・変数
   private readonly gameRooms: GameRoomDict = {};
   private readonly matchWaitingUsers: UserData[] = [];
-
-  // サーバー側でのオブジェクト作成
-  // player1 = new Paddle(0, PADDLE_START_POS);
-  // player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
-  // ball = new Ball(BALL_START_X, BALL_START_Y);
-
-  // 現在接続してるsocketのroomIdを取得
-  // getSocketGameRoom = (socket: Socket): string => {
-  //   const socketRooms = Array.from(socket.rooms.values()).filter(
-  //     (r) => r !== socket.id
-  //   );
-  //   console.log(socketRooms);
-  //   const gameRoom = socketRooms?.[0];
-
-  //   return gameRoom;
-  // };
 
   // 本来はhandleConnectionでやりたいが、authGuardで対応できないため、こちらでUser情報セット
   @SubscribeMessage('set_user')
@@ -98,11 +73,13 @@ export class GameGateway {
       userData.isLeftSide = false;
       const roomId = this.createGameRoom(this.matchWaitingUsers[0], userData);
 
-      // TODO: このemitのやり方微妙な気がするので修正
-      this.server.to(socket.id).emit('go_game_room', roomId);
+      // isLeftSide, true or falseで良い
+      this.server
+        .to(socket.id)
+        .emit('go_game_room', roomId, userData.isLeftSide);
       this.server
         .to(this.matchWaitingUsers[0].socket.id)
-        .emit('go_game_room', roomId);
+        .emit('go_game_room', roomId, this.matchWaitingUsers[0].isLeftSide);
 
       this.matchWaitingUsers.splice(0, 1);
     }
@@ -122,31 +99,13 @@ export class GameGateway {
     @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
-    const connectedSockets = this.server.sockets.adapter.rooms.get(
-      message.roomId
-    );
-    const socketRooms = Array.from(socket.rooms.values()).filter(
-      (r) => r !== socket.id
-    );
-    if (
-      socketRooms.length > 0 ||
-      (connectedSockets != null && connectedSockets.size === 2)
-    ) {
-      socket.emit('room_join_error', {
-        error: 'Room is full',
-      });
-    } else {
-      await socket.join(message.roomId);
-      socket.emit('room_joined');
-      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+    await socket.join(message.roomId);
+    socket.emit('room_joined');
+    console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
-      if (this.server.sockets.adapter.rooms.get(message.roomId)?.size === 2) {
-        socket.emit('start_game', { start: true, isLeftSide: false });
-        socket
-          .to(message.roomId)
-          .emit('start_game', { start: false, isLeftSide: true });
-      }
-    }
+    // TODO: 一つにできないか
+    socket.emit('start_game');
+    socket.to(message.roomId).emit('start_game');
   }
 
   @SubscribeMessage('connect_pong')
