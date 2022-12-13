@@ -152,26 +152,6 @@ export class GameRoom {
 
   start(socket: Socket, roomId: string): void {
     setInterval(() => {
-      // ゲーム終了
-      if (this.paddle1.score === 5 || this.paddle2.score === 5) {
-        // 結果をデータベースに保存
-        // const muchResult: CreateMatchResultDto = {
-        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-        //   paddleOneScore: paddle1.score,
-        //   paddleTwoScore: paddle2.score,
-        // };
-        // await gameService.addMatchResult(muchResult);
-
-        socket.emit('done_game');
-        socket.to(roomId).emit('done_game', {
-          paddle1score: this.paddle1.score,
-          paddle2score: this.paddle2.score,
-        });
-        this.paddle1.score = 0;
-        this.paddle2.score = 0;
-      }
-
       // パドルで跳ね返る処理
       if (this.ball.x + this.ball.dx > CANVAS_WIDTH - BALL_SIZE) {
         if (
@@ -208,21 +188,36 @@ export class GameRoom {
       this.ball.y += this.ball.dy * 0.5;
 
       // frameごとにplayer1,2,ballの位置を送信
-      // TODO: 全て一緒にする
-      socket.to(roomId).emit('player1_update', {
-        x: this.paddle1.x,
-        y: this.paddle1.y,
-        score: this.paddle1.score,
+      socket.to(roomId).emit('position_update', {
+        paddle1X: this.paddle1.x,
+        paddle1Y: this.paddle1.y,
+        paddle2X: this.paddle2.x,
+        paddle2Y: this.paddle2.y,
+        paddle1Score: this.paddle1.score,
+        paddle2Score: this.paddle2.score,
+        ballX: this.ball.x,
+        ballY: this.ball.y,
       });
-      socket.to(roomId).emit('player2_update', {
-        x: this.paddle2.x,
-        y: this.paddle2.y,
-        score: this.paddle2.score,
-      });
-      socket.to(roomId).emit('ball_update', {
-        x: this.ball.x,
-        y: this.ball.y,
-      });
+
+      // ゲーム終了処理
+      if (this.paddle1.score === 5 || this.paddle2.score === 5) {
+        // 結果をデータベースに保存
+        // const muchResult: CreateMatchResultDto = {
+        //   paddleOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
+        //   paddleTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
+        //   paddleOneScore: paddle1.score,
+        //   paddleTwoScore: paddle2.score,
+        // };
+        // await gameService.addMatchResult(muchResult);
+
+        socket.emit('done_game');
+        socket.to(roomId).emit('done_game', {
+          paddle1score: this.paddle1.score,
+          paddle2score: this.paddle2.score,
+        });
+        this.paddle1.score = 0;
+        this.paddle2.score = 0;
+      }
     }, 33);
   }
 }

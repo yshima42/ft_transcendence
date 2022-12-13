@@ -52,27 +52,27 @@ export const PongGame: FC = memo(() => {
 
     // ゲームで表示するオブジェクトのポジション受け取り
     socket?.on(
-      'player1_update',
-      (data: { x: number; y: number; score: number }) => {
-        player1.pos.x = data.x;
-        player1.pos.y = data.y;
-        player1.score = data.score;
+      'position_update',
+      (data: {
+        paddle1X: number;
+        paddle1Y: number;
+        paddle2X: number;
+        paddle2Y: number;
+        paddle1Score: number;
+        paddle2Score: number;
+        ballX: number;
+        ballY: number;
+      }) => {
+        player1.pos.x = data.paddle1X;
+        player1.pos.y = data.paddle1Y;
+        player1.score = data.paddle1Score;
+        player2.pos.x = data.paddle2X;
+        player2.pos.y = data.paddle2Y;
+        player2.score = data.paddle2Score;
+        ball.pos.x = data.ballX;
+        ball.pos.y = data.ballY;
       }
     );
-
-    socket?.on(
-      'player2_update',
-      (data: { x: number; y: number; score: number }) => {
-        player2.pos.x = data.x;
-        player2.pos.y = data.y;
-        player2.score = data.score;
-      }
-    );
-
-    socket?.on('ball_update', (data: { x: number; y: number }) => {
-      ball.pos.x = data.x;
-      ball.pos.y = data.y;
-    });
   }, []);
 
   // draw関数の中にcanvasで表示したいものを書く
