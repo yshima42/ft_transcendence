@@ -1,11 +1,9 @@
 import { memo, FC } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
-import {
-  useFriendRequest,
-  useFriendRequestRespond,
-  useFriendUnregister,
-} from 'hooks/api';
 import { useFriendRelation } from 'hooks/api/relations/useFriendRelation';
+import { useFriendRequestInProfile } from 'hooks/api/relations/useFriendRequestInProfile';
+import { useFriendRequestRespondInProfile } from 'hooks/api/relations/useFriendRequestRespondInProfile';
+import { useFriendUnregisterInProfile } from 'hooks/api/relations/useFriendUnregisterInProfile';
 
 type Props = {
   otherId: string;
@@ -14,20 +12,28 @@ type Props = {
 export const FriendButton: FC<Props> = memo((props) => {
   const { otherId } = props;
   const { friendRelation } = useFriendRelation(otherId);
-  const { requestFriend } = useFriendRequest();
-  const { unregisterFriend } = useFriendUnregister(otherId);
-  const { respondFriendRequest } = useFriendRequestRespond();
+  const { requestFriendInProfile } = useFriendRequestInProfile(otherId);
+  const { unregisterFriendInProfile } = useFriendUnregisterInProfile(otherId);
+  const { respondFriendRequestInProfile } =
+    useFriendRequestRespondInProfile(otherId);
 
   const onClickRequestButton = async () => {
-    await requestFriend({ receiverId: otherId });
+    await requestFriendInProfile({ receiverId: otherId });
   };
 
   const onClickUnfriendButton = async () => {
-    await unregisterFriend();
+    await unregisterFriendInProfile();
+  };
+
+  const onClickCancelButton = () => {
+    alert('test');
   };
 
   const onClickAcceptButton = async () => {
-    await respondFriendRequest({ creatorId: otherId, status: 'ACCEPTED' });
+    await respondFriendRequestInProfile({
+      creatorId: otherId,
+      status: 'ACCEPTED',
+    });
   };
 
   return (
@@ -38,7 +44,7 @@ export const FriendButton: FC<Props> = memo((props) => {
         ) : friendRelation === 'ACCEPTED' ? (
           <Button onClick={onClickUnfriendButton}>Unfriend</Button>
         ) : friendRelation === 'PENDING' ? (
-          <Button>Cancel</Button>
+          <Button onClick={onClickCancelButton}>Cancel</Button>
         ) : friendRelation === 'RECOGNITION' ? (
           <Button onClick={onClickAcceptButton}>Accept</Button>
         ) : (
