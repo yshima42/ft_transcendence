@@ -22,8 +22,11 @@ export class AuthService {
   ): Promise<{
     accessToken: string;
     isTwoFactorAuthEnabled: boolean;
+    isSignup: boolean;
   }> {
     let user = await this.prisma.user.findUnique({ where: { name } });
+    const isSignup = user === null;
+
     if (user === null) {
       if (signupUser === undefined) {
         throw new UnauthorizedException('Name incorrect');
@@ -34,7 +37,7 @@ export class AuthService {
     const { accessToken } = await this.generateJwt(user.id, user.name);
     const { isTwoFactorAuthEnabled } = user;
 
-    return { accessToken, isTwoFactorAuthEnabled };
+    return { accessToken, isTwoFactorAuthEnabled, isSignup };
   }
 
   async generateJwt(
