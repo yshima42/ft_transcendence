@@ -8,25 +8,9 @@ import {
 import { User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  CANVAS_HEIGHT,
-  PADDLE_HEIGHT,
-  PADDLE_SPEED,
-} from './config/game-config';
-// TODO: 名前変更
 // eslint-disable-next-line import/extensions
 import { UserData, GameRoom, GameRoomDict } from './game.object';
 import { GameService } from './game.service';
-
-// const finishGame = async (player1: Paddle, player2: Paddle) => {
-//   return await new Promise((resolve) => {
-//     if (player1.score === 5) {
-//       resolve('player1');
-//     } else if (player2.score === 5) {
-//       resolve('player2');
-//     }
-//   });
-// };
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: '/game' })
 export class GameGateway {
@@ -77,12 +61,22 @@ export class GameGateway {
         .emit('go_game_room', roomId, this.matchWaitingUsers[0].isLeftSide);
 
       this.matchWaitingUsers.splice(0, 1);
+
+      const gameRoom = this.gameRooms[roomId];
+      // ゲーム開始
+      gameRoom.gameStart(socket, roomId);
     }
   }
 
   createGameRoom(player1: UserData, player2: UserData): string {
     const id = uuidv4();
-    const gameRoom = new GameRoom(id, this.server, player1, player2);
+    const gameRoom = new GameRoom(
+      this.gameService,
+      id,
+      this.server,
+      player1,
+      player2
+    );
     this.gameRooms[id] = gameRoom;
 
     return id;
@@ -97,20 +91,7 @@ export class GameGateway {
     await socket.join(message.roomId);
     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
-    // TODO: 一つにできないか
     socket.emit('start_game');
-    socket.to(message.roomId).emit('start_game');
-  }
-
-  @SubscribeMessage('connect_pong')
-  handleConnectPong(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() roomId: string
-  ): void {
-    const gameRoom = this.gameRooms[roomId];
-
-    // ゲーム開始
-    gameRoom.start(socket, roomId);
   }
 
   @SubscribeMessage('user_commands')
@@ -122,36 +103,7 @@ export class GameGateway {
     }
   ): void {
     const gameRoom = this.gameRooms[data.roomId];
-    const { paddle1, paddle2 } = gameRoom;
-    const command = data.userCommands;
 
-    // player1操作
-    if (command.isLeftSide && command.down) {
-      paddle1.y += PADDLE_SPEED;
-      if (paddle1.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
-        paddle1.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
-      }
-    } else if (command.isLeftSide && command.up) {
-      paddle1.y -= PADDLE_SPEED;
-      if (paddle1.y < 0) {
-        paddle1.y = 0;
-      }
-    }
-
-    // player2操作
-    if (!command.isLeftSide && command.down) {
-      paddle2.y += PADDLE_SPEED;
-      if (paddle2.y + PADDLE_HEIGHT > CANVAS_HEIGHT) {
-        paddle2.y = CANVAS_HEIGHT - PADDLE_HEIGHT;
-      }
-    } else if (!command.isLeftSide && command.up) {
-      paddle2.y -= PADDLE_SPEED;
-      if (paddle2.y < 0) {
-        paddle2.y = 0;
-      }
-    }
-
-    // TODO: 最後に消す
-    console.log(data);
+    gameRoom.handleInput(data.roomId, data.userCommands);
   }
 }
