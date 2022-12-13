@@ -22,7 +22,6 @@ export type StartGame = {
 };
 
 export const PongGame: FC = memo(() => {
-  // TODO: classでnewするよりtypeで型定義するほうが良さそう?(プレーヤーを増やす、ボールを増やす等ゲーム拡張するならnewの方が良い)
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
@@ -33,9 +32,6 @@ export const PongGame: FC = memo(() => {
   const [doneGame, setDoneGame] = useState(false);
 
   useEffect(() => {
-    // TODO: Roomがなかった時のエラー処理
-    // socket?.emit('connect_pong', roomName);
-
     // ゲームスタート処理
     socket?.on('start_game', () => {
       setGameStarted(true);
@@ -50,8 +46,16 @@ export const PongGame: FC = memo(() => {
     // TODO: player1だけになってるのを修正
     userInput(socket, roomName, player1, isLeftSide);
 
+    // スコア受け取り
+    socket?.on(
+      'update_score',
+      (data: { paddle1Score: number; paddle2Score: number }) => {
+        player1.score = data.paddle1Score;
+        player2.score = data.paddle2Score;
+      }
+    );
+
     // ゲームで表示するオブジェクトのポジション受け取り
-    // TODO: score_updateと分けたい(分けて得点入ったときにbackendでemitするとうまく受け取れない)
     socket?.on(
       'position_update',
       (data: {
@@ -59,17 +63,13 @@ export const PongGame: FC = memo(() => {
         paddle1Y: number;
         paddle2X: number;
         paddle2Y: number;
-        paddle1Score: number;
-        paddle2Score: number;
         ballX: number;
         ballY: number;
       }) => {
         player1.pos.x = data.paddle1X;
         player1.pos.y = data.paddle1Y;
-        player1.score = data.paddle1Score;
         player2.pos.x = data.paddle2X;
         player2.pos.y = data.paddle2Y;
-        player2.score = data.paddle2Score;
         ball.pos.x = data.ballX;
         ball.pos.y = data.ballY;
       }
