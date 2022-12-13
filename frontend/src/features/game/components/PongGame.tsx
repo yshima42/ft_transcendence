@@ -32,15 +32,6 @@ export const PongGame: FC = memo(() => {
     useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
 
-  // useEffect(() => {
-  //   socket?.on('init_return', () => {
-  //     setInterval(() => {
-  //       // TODO: ここからユーザーインプットを送って反応を良くする
-  //       socket.emit('tick', 'hello');
-  //     }, 33);
-  //   });
-  // }, []);
-
   useEffect(() => {
     // TODO: Roomがなかった時のエラー処理
     socket?.emit('connect_pong', roomName);
