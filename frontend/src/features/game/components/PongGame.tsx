@@ -32,13 +32,6 @@ export const PongGame: FC = memo(() => {
     useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
 
-  const handleGameStart = () => {
-    if (socket != null) {
-      socket.on('start_game', () => {
-        setGameStarted(true);
-      });
-    }
-  };
   // useEffect(() => {
   //   socket?.on('init_return', () => {
   //     setInterval(() => {
@@ -49,20 +42,20 @@ export const PongGame: FC = memo(() => {
   // }, []);
 
   useEffect(() => {
-    // TODO: RoomNameを指定する
+    // TODO: Roomがなかった時のエラー処理
     socket?.emit('connect_pong', roomName);
 
     // ゲームスタート処理
-    handleGameStart();
+    socket?.on('start_game', () => {
+      setGameStarted(true);
+    });
 
-    // TODO: Roomがなかった時のエラー処理
-
-    // TODO: Player1か2の決定
-
+    // ゲーム終了処理
     socket?.on('done_game', () => {
       setDoneGame(true);
     });
 
+    // ゲームで表示するオブジェクトのポジション受け取り
     socket?.on(
       'player1_update',
       (data: { x: number; y: number; score: number }) => {
@@ -104,8 +97,6 @@ export const PongGame: FC = memo(() => {
     ctx.font = '48px serif';
     ctx.fillText(player1.score.toString(), 20, 50);
     ctx.fillText(player2.score.toString(), 960, 50);
-
-    // socket.emit('update', { x: paddle1.pos.x, y: paddle1.pos.y });
   }, []);
 
   return (
