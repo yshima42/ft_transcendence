@@ -25,7 +25,6 @@ export const PongGame: FC = memo(() => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
-  // const { socket } = useContext(SocketContext).SocketState;
 
   const { isLeftSide, isGameStarted, setGameStarted, roomName } =
     useContext(gameContext);
@@ -35,12 +34,16 @@ export const PongGame: FC = memo(() => {
     const socket = socketService.socket;
     if (socket === null) return;
     // ゲームスタート処理
-    socket?.on('start_game', () => {
+    console.log(socket.hasListeners('start_game'));
+
+    socket.on('start_game', () => {
       setGameStarted(true);
+
+      socket.emit('connect_pong', { roomId: roomName });
     });
 
     // ゲーム終了処理
-    socket?.on('done_game', () => {
+    socket.on('done_game', () => {
       setDoneGame(true);
     });
 
@@ -49,7 +52,7 @@ export const PongGame: FC = memo(() => {
     userInput(socket, roomName, player1, isLeftSide);
 
     // スコア受け取り
-    socket?.on(
+    socket.on(
       'update_score',
       (data: { paddle1Score: number; paddle2Score: number }) => {
         player1.score = data.paddle1Score;
@@ -58,7 +61,7 @@ export const PongGame: FC = memo(() => {
     );
 
     // ゲームで表示するオブジェクトのポジション受け取り
-    socket?.on(
+    socket.on(
       'position_update',
       (data: {
         paddle1X: number;
@@ -76,6 +79,13 @@ export const PongGame: FC = memo(() => {
         ball.pos.y = data.ballY;
       }
     );
+
+    return () => {
+      socket?.off('start_game');
+      socket?.off('done_game');
+      socket?.off('update_score');
+      socket?.off('position_update');
+    };
   }, []);
 
   // draw関数の中にcanvasで表示したいものを書く
