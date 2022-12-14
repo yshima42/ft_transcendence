@@ -31,7 +31,7 @@ import {
   MatchResult,
   User,
 } from '@prisma/client';
-import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
+import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
@@ -50,7 +50,7 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 @ApiTags('users')
-@UseGuards(JwtTwoFactorAuthGuard)
+@UseGuards(JwtOtpAuthGuard)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
