@@ -44,8 +44,6 @@ idMap.forEach((value, key) => {
     avatarImageUrl:
       'https://placehold.jp/2b52ee/ffffff/150x150.png?text=' + key,
     nickname: 'nickname' + key,
-    twoFactorAuthSecret: '',
-    isTwoFactorAuthEnabled: false,
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
