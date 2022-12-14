@@ -1,7 +1,7 @@
-import { FC, memo, useContext } from 'react';
+import { FC, memo } from 'react';
 import { AvatarBadge } from '@chakra-ui/react';
+import { useFriendStatus } from 'hooks/utils/useFriendStatus';
 import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
-import { OnlineUsersContext } from 'providers/OnlineUsersProvider';
 
 type Props = {
   id: string;
@@ -10,11 +10,7 @@ type Props = {
 
 export const FriendAvatar: FC<Props> = memo((props) => {
   const { id, src } = props;
-  const onlineUsers = useContext(OnlineUsersContext);
-  // console.info(onlineUsers);
-  // const isOnline =
-  //   onlineUsers.find((onlineUserId) => onlineUserId === id) !== undefined;
-  const isOnline = onlineUsers.length > 1;
+  const { isOnline } = useFriendStatus(id);
   const badgeColor = isOnline ? 'green.500' : 'gray';
 
   return (
