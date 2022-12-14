@@ -47,6 +47,9 @@ export class FriendRequestsService {
           },
         },
       },
+      orderBy: {
+        nickname: 'asc',
+      },
     });
   }
 
@@ -60,6 +63,9 @@ export class FriendRequestsService {
             status: 'PENDING',
           },
         },
+      },
+      orderBy: {
+        nickname: 'asc',
       },
     });
   }
@@ -85,6 +91,9 @@ export class FriendRequestsService {
             },
           },
         ],
+      },
+      orderBy: {
+        nickname: 'asc',
       },
     });
   }
