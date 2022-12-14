@@ -93,8 +93,7 @@ model MatchResult {
   playerTwoId    String
   playerOneScore Int
   playerTwoScore Int
-  startedAt      DateTime @default(now())
-  finishedAt     DateTime @updatedAt
+  finishedAt     DateTime @default(now())
 }
 
 model ChatMessage {

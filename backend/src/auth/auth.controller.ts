@@ -53,19 +53,21 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<{ url: string }> {
     const name = ftProfile.intraName;
-    const signupUser = {
+    const signUpUser = {
       name,
       nickname: name,
       avatarImageUrl: ftProfile.imageUrl,
     };
-    const { accessToken, isTwoFactorAuthEnabled } =
-      await this.authService.login(name, signupUser);
+    const { accessToken, isTwoFactorAuthEnabled, isSignUp } =
+      await this.authService.login(name, signUpUser);
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
 
-    if (isTwoFactorAuthEnabled) {
+    if (isSignUp) {
+      return { url: 'http://localhost:5173/app/profile/edit' };
+    } else if (isTwoFactorAuthEnabled) {
       return { url: 'http://localhost:5173/twofactor' };
     } else {
       return { url: 'http://localhost:5173/app' };
