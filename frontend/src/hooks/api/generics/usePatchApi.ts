@@ -25,7 +25,7 @@ export function usePatchApi<ReqBody, ResBody>(
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries({ queryKey });
+          void queryClient.invalidateQueries(queryKey);
         });
       }
     },

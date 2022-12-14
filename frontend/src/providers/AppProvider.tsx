@@ -1,6 +1,7 @@
 import { FC, memo } from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { BrowserRouter } from 'react-router-dom';
 import theme from '../theme/theme';
 
@@ -24,6 +25,7 @@ export const AppProvider: FC<Props> = memo((props) => {
       <ChakraProvider theme={theme}>
         <BrowserRouter>{children}</BrowserRouter>
       </ChakraProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 });
