@@ -100,8 +100,7 @@ model MatchResult {
   playerTwoId    String   @db.Uuid
   playerOneScore Int
   playerTwoScore Int
-  startedAt      DateTime @default(now())
-  finishedAt     DateTime @updatedAt
+  finishedAt     DateTime @default(now())
 }
 
 model ChatMessage {

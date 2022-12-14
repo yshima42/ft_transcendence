@@ -11,7 +11,7 @@ import { OneTimePasswordAuth, User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { authenticator } from 'otplib';
 import { PrismaService } from '../prisma/prisma.service';
-import { SignupUser } from './interfaces/signup-user.interface';
+import { SignUpUser } from './interfaces/sign-up-user.interface';
 
 @Injectable()
 export class AuthService {
@@ -23,24 +23,27 @@ export class AuthService {
 
   async login(
     name: string,
-    signupUser?: SignupUser
+    signUpUser?: SignUpUser
   ): Promise<{
     accessToken: string;
     isOtpAuthEnabled: boolean;
+    isSignUp: boolean;
   }> {
     let user = await this.prisma.user.findUnique({ where: { name } });
+    const isSignUp = user === null;
+
     if (user === null) {
-      if (signupUser === undefined) {
+      if (signUpUser === undefined) {
         throw new UnauthorizedException('Name incorrect');
       }
-      user = await this.prisma.user.create({ data: signupUser });
+      user = await this.prisma.user.create({ data: signUpUser });
     }
 
     const { accessToken } = await this.generateJwt(user.id, user.name);
 
     const isOtpAuthEnabled = await this.isOtpAuthEnabled(user.id);
 
-    return { accessToken, isOtpAuthEnabled };
+    return { accessToken, isOtpAuthEnabled, isSignUp };
   }
 
   async generateJwt(
