@@ -2,7 +2,7 @@ import { FriendRequest } from '@prisma/client';
 import {
   UseMutateAsyncFunction,
   useMutation,
-  // useQueryClient,
+  useQueryClient,
 } from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
@@ -17,8 +17,9 @@ export type CancelFriendRequestInProfile = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useFriendRequestCancelInProfile = (): // otherId: string
-{
+export const useFriendRequestCancelInProfile = (
+  otherId: string
+): {
   cancelFriendRequestInProfile: CancelFriendRequestInProfile;
   isLoading: boolean;
 } => {
@@ -30,15 +31,18 @@ export const useFriendRequestCancelInProfile = (): // otherId: string
     return result.data;
   };
 
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-  const { mutateAsync: cancelFriendRequestInProfile, isLoading } =
-    useMutation(axiosDelete);
-  // useMutation(axiosDelete, {
-  //   onSuccess: () => {
-  //     void queryClient.invalidateQueries({[[`/users/me/friend-relation/${otherId}`]]});
-  //   }
-  // });
+  const { mutateAsync: cancelFriendRequestInProfile, isLoading } = useMutation(
+    axiosDelete,
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries([
+          `/users/me/friend-relation/${otherId}`,
+        ]);
+      },
+    }
+  );
 
   return { cancelFriendRequestInProfile, isLoading };
 };
