@@ -1,15 +1,18 @@
 import { FC, memo, useContext, useState } from 'react';
 import { Button } from '@chakra-ui/react';
-import SocketContext from 'contexts/SocketContext';
+import { useProfile } from 'hooks/api';
 import gameContext from '../utils/gameContext';
+import socketService from '../utils/socketService';
 
 export const JoinRoom: FC = memo(() => {
   const [isJoining, setJoining] = useState(false);
-  const { socket, user } = useContext(SocketContext).SocketState;
+  const { user } = useProfile();
 
   const { setLeftSide, setInRoom, setRoomName } = useContext(gameContext);
 
   const onClickMatch = () => {
+    const socket = socketService.socket;
+    if (socket === null) return;
     // 何も入力してない時の処理
 
     setJoining(true);

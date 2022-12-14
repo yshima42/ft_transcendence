@@ -1,6 +1,5 @@
 import { memo, FC, useCallback, useEffect, useContext, useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
-import SocketContext from 'contexts/SocketContext';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -12,6 +11,7 @@ import {
 } from '../utils/gameConfig';
 import gameContext from '../utils/gameContext';
 import { Ball, Paddle } from '../utils/gameObjs';
+import socketService from '../utils/socketService';
 import { userInput } from '../utils/userInput';
 import { Canvas } from './Canvas';
 import { Result } from './Result';
@@ -25,13 +25,15 @@ export const PongGame: FC = memo(() => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
-  const { socket } = useContext(SocketContext).SocketState;
+  // const { socket } = useContext(SocketContext).SocketState;
 
   const { isLeftSide, isGameStarted, setGameStarted, roomName } =
     useContext(gameContext);
   const [doneGame, setDoneGame] = useState(false);
 
   useEffect(() => {
+    const socket = socketService.socket;
+    if (socket === null) return;
     // ゲームスタート処理
     socket?.on('start_game', () => {
       setGameStarted(true);
