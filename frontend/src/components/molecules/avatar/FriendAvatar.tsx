@@ -1,7 +1,7 @@
 import { FC, memo, useContext } from 'react';
 import { AvatarBadge } from '@chakra-ui/react';
 import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
-import SocketContext from 'contexts/SocketContext';
+import { OnlineUsersContext } from 'providers/OnlineUsersProvider';
 
 type Props = {
   id: string;
@@ -10,8 +10,8 @@ type Props = {
 
 export const FriendAvatar: FC<Props> = memo((props) => {
   const { id, src } = props;
-  const { users: onlineUsers } = useContext(SocketContext).SocketState;
-  console.info(onlineUsers);
+  const onlineUsers = useContext(OnlineUsersContext);
+  // console.info(onlineUsers);
   // const isOnline =
   //   onlineUsers.find((onlineUserId) => onlineUserId === id) !== undefined;
   const isOnline = onlineUsers.length > 1;
