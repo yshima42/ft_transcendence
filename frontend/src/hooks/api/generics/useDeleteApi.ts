@@ -1,4 +1,5 @@
 import {
+  QueryKey,
   UseMutateAsyncFunction,
   useMutation,
   useQueryClient,
@@ -7,7 +8,7 @@ import { axios } from '../../../lib/axios';
 
 export function useDeleteApi<ResBody>(
   endpoint: string,
-  queryKeys?: string[]
+  queryKeys?: QueryKey[]
 ): {
   deleteFunc: UseMutateAsyncFunction<ResBody, unknown, void, unknown>;
   isLoading: boolean;
@@ -23,7 +24,9 @@ export function useDeleteApi<ResBody>(
   const { mutateAsync: deleteFunc, isLoading } = useMutation(axiosDelete, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
-        void queryClient.invalidateQueries([...queryKeys]);
+        queryKeys.forEach((queryKey) => {
+          void queryClient.invalidateQueries([queryKey]);
+        });
       }
     },
   });
