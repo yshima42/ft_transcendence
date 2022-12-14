@@ -1,5 +1,6 @@
-import React, { memo, FC, useCallback, useEffect, useState } from 'react';
+import { memo, FC, useCallback, useEffect, useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
+import { useGame } from '../hooks/useGame';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -20,26 +21,15 @@ export type StartGame = {
   isLeftSide: boolean;
 };
 
-type Props = {
-  gameContextValue: {
-    isInRoom: boolean;
-    setInRoom: React.Dispatch<React.SetStateAction<boolean>>;
-    isLeftSide: boolean;
-    setLeftSide: React.Dispatch<React.SetStateAction<boolean>>;
-    isGameStarted: boolean;
-    setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
-    roomName: string;
-    setRoomName: React.Dispatch<React.SetStateAction<string>>;
-  };
-};
-
-export const PongGame: FC<Props> = memo((props) => {
+export const PongGame: FC = memo(() => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
-  const { isLeftSide, isGameStarted, setGameStarted, roomName } =
-    props.gameContextValue;
+  // const { isLeftSide, isGameStarted, setGameStarted, roomName } =
+  //   props.gameContextValue;
+  const { room, isGameStarted, setIsGameStarted } = useGame().gameState;
+  const { roomId: roomName, isLeftSide } = room;
   const [doneGame, setDoneGame] = useState(false);
 
   useEffect(() => {
@@ -48,7 +38,7 @@ export const PongGame: FC<Props> = memo((props) => {
 
     // ゲームスタート処理
     socket.on('start_game', () => {
-      setGameStarted(true);
+      setIsGameStarted(true);
 
       socket.emit('connect_pong', { roomId: roomName });
     });
