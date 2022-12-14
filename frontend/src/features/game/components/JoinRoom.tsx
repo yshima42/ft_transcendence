@@ -1,27 +1,19 @@
 import React, { FC, memo, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
+import { Room } from '../hooks/useGame';
 import { Matching } from '../routes/Matching';
 import socketService from '../utils/socketService';
 
 type Props = {
-  gameContextValue: {
-    isInRoom: boolean;
-    setInRoom: React.Dispatch<React.SetStateAction<boolean>>;
-    isLeftSide: boolean;
-    setLeftSide: React.Dispatch<React.SetStateAction<boolean>>;
-    isGameStarted: boolean;
-    setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
-    roomName: string;
-    setRoomName: React.Dispatch<React.SetStateAction<string>>;
-  };
+  setRoom: React.Dispatch<React.SetStateAction<Room>>;
 };
 
 export const JoinRoom: FC<Props> = memo((props) => {
   const [isJoining, setJoining] = useState(false);
   const { user } = useProfile();
 
-  const { setLeftSide, setInRoom, setRoomName } = props.gameContextValue;
+  const { setRoom } = props;
 
   const onClickMatch = () => {
     const socket = socketService.socket;
@@ -31,9 +23,7 @@ export const JoinRoom: FC<Props> = memo((props) => {
     socket.emit('set_user', user);
     socket.emit('random_match');
     socket.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
-      setRoomName(roomId);
-      setLeftSide(isLeftSide);
-      setInRoom(true);
+      setRoom({ id: roomId, isLeftSide });
       setJoining(false);
 
       socket.emit('join_room', { roomId });
