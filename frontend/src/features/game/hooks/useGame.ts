@@ -1,34 +1,44 @@
 import { useState } from 'react';
 
-export interface Room {
-  roomId: string;
-  isLeftSide: boolean;
-}
-
 type GameState = {
-  room: Room;
-  setRoom: React.Dispatch<React.SetStateAction<Room>>;
+  isInRoom: boolean;
+  setInRoom: React.Dispatch<React.SetStateAction<boolean>>;
+  isLeftSide: boolean;
+  setLeftSide: React.Dispatch<React.SetStateAction<boolean>>;
   isGameStarted: boolean;
-  setIsGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
+  setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
+  roomName: string;
+  setRoomName: React.Dispatch<React.SetStateAction<string>>;
   isConfirmed: boolean;
   setIsConfirmed: React.Dispatch<React.SetStateAction<boolean>>;
+  isJoining: boolean;
+  setJoining: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 // ここでuseRefを使ってsocketのconnect処理ができたら理想
 export const useGame = (): {
   gameState: GameState;
 } => {
-  const [room, setRoom] = useState({ roomId: '', isLeftSide: true });
-  const [isGameStarted, setIsGameStarted] = useState(false);
+  const [isInRoom, setInRoom] = useState(false);
+  const [isLeftSide, setLeftSide] = useState(true);
+  const [isGameStarted, setGameStarted] = useState(false);
+  const [roomName, setRoomName] = useState('');
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isJoining, setJoining] = useState(false);
 
   const data = {
-    room,
-    setRoom,
+    isInRoom,
+    setInRoom,
+    isLeftSide,
+    setLeftSide,
     isGameStarted,
-    setIsGameStarted,
+    setGameStarted,
+    roomName,
+    setRoomName,
     isConfirmed,
     setIsConfirmed,
+    isJoining,
+    setJoining,
   };
 
   // const onClickMatch = () => {
