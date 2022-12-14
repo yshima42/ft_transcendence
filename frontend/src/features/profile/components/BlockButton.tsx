@@ -24,7 +24,7 @@ export const BlockButton: FC<BlockButtonProps> = memo(
       <Box h="80px">
         <Flex justify="center" align="center">
           <Button
-            mx={8}
+            size="sm"
             onClick={isBlockedUser ? onClickCancelBlock : onClickBlock}
           >
             {isBlockedUser ? 'unblock' : 'block'}
