@@ -1,6 +1,7 @@
 import { memo, FC } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
 import { useFriendRelation } from 'hooks/api/relations/useFriendRelation';
+import { useFriendRequestCancelInProfile } from 'hooks/api/relations/useFriendRequestCancelInProfile';
 import { useFriendRequestInProfile } from 'hooks/api/relations/useFriendRequestInProfile';
 import { useFriendRequestRespondInProfile } from 'hooks/api/relations/useFriendRequestRespondInProfile';
 import { useFriendUnregisterInProfile } from 'hooks/api/relations/useFriendUnregisterInProfile';
@@ -14,6 +15,8 @@ export const FriendButton: FC<Props> = memo((props) => {
   const { friendRelation } = useFriendRelation(otherId);
   const { requestFriendInProfile } = useFriendRequestInProfile(otherId);
   const { unregisterFriendInProfile } = useFriendUnregisterInProfile(otherId);
+  const { cancelFriendRequestInProfile } =
+    useFriendRequestCancelInProfile(otherId);
   const { respondFriendRequestInProfile } =
     useFriendRequestRespondInProfile(otherId);
 
@@ -25,8 +28,8 @@ export const FriendButton: FC<Props> = memo((props) => {
     await unregisterFriendInProfile();
   };
 
-  const onClickCancelButton = () => {
-    alert('test');
+  const onClickCancelButton = async () => {
+    await cancelFriendRequestInProfile(otherId);
   };
 
   const onClickAcceptButton = async () => {
