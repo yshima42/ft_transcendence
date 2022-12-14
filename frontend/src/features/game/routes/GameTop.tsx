@@ -2,18 +2,18 @@ import { memo, FC, useContext } from 'react';
 import { Box, Button, Center } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { UserAvatarContainser } from 'components/molecules/avatar/UserAvatarContainer';
-import SocketContext from 'contexts/SocketContext';
+import { OnlineUsersContext } from 'providers/OnlineUsersProvider';
+// import { UserAvatarContainser } from 'components/molecules/avatar/UserAvatarContainer';
 
 export const GameTop: FC = memo(() => {
-  const { socket, uid, users } = useContext(SocketContext).SocketState;
+  const users = useContext(OnlineUsersContext);
 
   return (
     <ContentLayout title="">
-      <UserAvatarContainser
+      {/* <UserAvatarContainser
         id="1927390d-db63-4700-875c-f8bb74dcb562"
         src="https://cdn.intra.42.fr/users/01632fdcc806e2656d87a8e9150f74f1/hyoshie.jpg"
-      />
+      /> */}
       <Center>
         <Link to="matching">
           <Button>Rank Match</Button>
@@ -23,11 +23,7 @@ export const GameTop: FC = memo(() => {
         <Box>
           <h2>Socket IO Information:</h2>
           <p>
-            Your user ID: <strong>{uid}</strong>
-            <br />
             Users online: <strong>{users.length}</strong>
-            <br />
-            Socket ID: <strong>{socket?.id}</strong>
             <br />
           </p>
         </Box>

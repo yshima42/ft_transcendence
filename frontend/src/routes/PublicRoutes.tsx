@@ -3,7 +3,6 @@ import { Spinner } from '@chakra-ui/react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from 'components/environments/MainLayout/MainLayout';
-import SocketContextComponent from 'contexts/SocketContextComponent';
 import { Login } from 'features/auth/routes/Login';
 import { Page404 } from 'features/auth/routes/Page404';
 import { TwoFactorAuth } from 'features/auth/routes/TwoFactorAuth';
@@ -19,11 +18,11 @@ import { Games } from 'features/game/routes/Games';
 import { Matching } from 'features/game/routes/Matching';
 import { Profile } from 'features/profile/routes/Profile';
 import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
+import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
   return (
-    // TODO:Providerにしたい？
-    <SocketContextComponent>
+    <OnlineUsersProvider>
       <MainLayout>
         <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
           <Suspense
@@ -35,7 +34,7 @@ const App = () => {
           </Suspense>
         </ErrorBoundary>
       </MainLayout>
-    </SocketContextComponent>
+    </OnlineUsersProvider>
   );
 };
 

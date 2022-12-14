@@ -8,10 +8,18 @@ export const useSocket = (
   opts?: Partial<ManagerOptions & SocketOptions> | undefined
 ): Socket => {
   const { current: socket } = useRef(io(uri, opts));
+  console.log('useSocket');
 
   useEffect(() => {
+    socket.connect();
+    console.log('useSocket: useEffect');
+
     return () => {
-      if (socket != null) socket.close();
+      console.log('useSocket: unmount');
+      if (socket != null) {
+        console.log('useSocket: close');
+        socket.disconnect();
+      }
     };
   }, [socket]);
 

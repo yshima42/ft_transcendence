@@ -11,15 +11,11 @@ import { Server, Socket } from 'socket.io';
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
   public onlineUsers: { [id: string]: string };
-  public inGameUsers: { [id: string]: string };
-  public onWaitUsers: { [id: string]: string };
 
   // gameServiceを使うのに必要
   constructor() {
     // オンラインユーザー一覧
     this.onlineUsers = {};
-    this.inGameUsers = {};
-    this.onWaitUsers = {};
   }
 
   @WebSocketServer()
@@ -44,13 +40,13 @@ export class UsersGateway {
       socket,
       'user_disconnected',
       onlineUsers.filter((id) => id !== socket.id),
-      onlineUsers
+      socket.id
     );
 
     return onlineUsers;
   }
 
-  @SubscribeMessage('connect_user')
+  @SubscribeMessage('handshake')
   handshake(
     @ConnectedSocket() socket: Socket,
     @MessageBody() userId: string
@@ -64,7 +60,7 @@ export class UsersGateway {
       socket,
       'user_connected',
       onlineUsers.filter((id) => id !== socket.id),
-      onlineUsers
+      socket.id
     );
 
     return onlineUsers;
