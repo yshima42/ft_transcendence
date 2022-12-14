@@ -3,7 +3,7 @@ import { Box, Button, Flex, HStack } from '@chakra-ui/react';
 import { useFriendRelation } from 'hooks/api/relations/useFriendRelation';
 import { useFriendRequestCancelInProfile } from 'hooks/api/relations/useFriendRequestCancelInProfile';
 import { useFriendRequestInProfile } from 'hooks/api/relations/useFriendRequestInProfile';
-import { useFriendRequestRejectInProfile } from 'hooks/api/relations/useFriendRequestReject';
+import { useFriendRequestRejectInProfile } from 'hooks/api/relations/useFriendRequestRejectInProfile';
 import { useFriendRequestRespondInProfile } from 'hooks/api/relations/useFriendRequestRespondInProfile';
 
 type Props = {
