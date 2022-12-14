@@ -24,8 +24,5 @@ export class MatchResultEntity implements MatchResult {
   playerTwoScore!: number;
 
   @ApiProperty()
-  startedAt!: Date;
-
-  @ApiProperty()
   finishedAt!: Date;
 }
