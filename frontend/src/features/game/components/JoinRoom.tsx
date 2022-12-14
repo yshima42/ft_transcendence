@@ -1,14 +1,26 @@
-import { FC, memo, useContext, useState } from 'react';
+import React, { FC, memo, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
-import gameContext from '../utils/gameContext';
 import socketService from '../utils/socketService';
 
-export const JoinRoom: FC = memo(() => {
+type Props = {
+  gameContextValue: {
+    isInRoom: boolean;
+    setInRoom: React.Dispatch<React.SetStateAction<boolean>>;
+    isLeftSide: boolean;
+    setLeftSide: React.Dispatch<React.SetStateAction<boolean>>;
+    isGameStarted: boolean;
+    setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
+    roomName: string;
+    setRoomName: React.Dispatch<React.SetStateAction<string>>;
+  };
+};
+
+export const JoinRoom: FC<Props> = memo((props) => {
   const [isJoining, setJoining] = useState(false);
   const { user } = useProfile();
 
-  const { setLeftSide, setInRoom, setRoomName } = useContext(gameContext);
+  const { setLeftSide, setInRoom, setRoomName } = props.gameContextValue;
 
   const onClickMatch = () => {
     const socket = socketService.socket;

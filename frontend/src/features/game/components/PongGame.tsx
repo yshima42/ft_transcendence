@@ -1,4 +1,4 @@
-import { memo, FC, useCallback, useEffect, useContext, useState } from 'react';
+import React, { memo, FC, useCallback, useEffect, useState } from 'react';
 import { Spinner } from '@chakra-ui/react';
 import {
   BALL_START_X,
@@ -9,7 +9,6 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from '../utils/gameConfig';
-import gameContext from '../utils/gameContext';
 import { Ball, Paddle } from '../utils/gameObjs';
 import socketService from '../utils/socketService';
 import { userInput } from '../utils/userInput';
@@ -21,13 +20,26 @@ export type StartGame = {
   isLeftSide: boolean;
 };
 
-export const PongGame: FC = memo(() => {
+type Props = {
+  gameContextValue: {
+    isInRoom: boolean;
+    setInRoom: React.Dispatch<React.SetStateAction<boolean>>;
+    isLeftSide: boolean;
+    setLeftSide: React.Dispatch<React.SetStateAction<boolean>>;
+    isGameStarted: boolean;
+    setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
+    roomName: string;
+    setRoomName: React.Dispatch<React.SetStateAction<string>>;
+  };
+};
+
+export const PongGame: FC<Props> = memo((props) => {
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
   const ball = new Ball(BALL_START_X, BALL_START_Y);
 
   const { isLeftSide, isGameStarted, setGameStarted, roomName } =
-    useContext(gameContext);
+    props.gameContextValue;
   const [doneGame, setDoneGame] = useState(false);
 
   useEffect(() => {
