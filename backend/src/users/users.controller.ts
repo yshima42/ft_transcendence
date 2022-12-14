@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseEnumPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -24,13 +23,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  Block,
-  FriendRequest,
-  FriendRequestStatus,
-  MatchResult,
-  User,
-} from '@prisma/client';
+import { Block, FriendRequest, MatchResult, User } from '@prisma/client';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
@@ -279,11 +272,10 @@ export class UsersController {
   @Patch('me/friend-requests/incoming')
   @ApiOperation({
     summary: 'フレンドリクエストの承認',
-    description:
-      'フレンドリクエストが自分に来ている相手に対してのみ使用可</br>承認する時はACCEPTEDをstatusに設定する',
+    description: 'フレンドリクエストが自分に来ている相手に対してのみ使用可',
   })
   @ApiBody({
-    description: 'statusは承認(ACCEPTED)',
+    description: '',
     schema: {
       type: 'object',
       properties: {
@@ -291,21 +283,18 @@ export class UsersController {
           type: 'UUID',
           example: '21514d8b-e6af-490c-bc51-d0c7a359a267',
         },
-        status: { type: 'FriendRequestStatus', example: 'ACCEPTED' },
       },
     },
   })
   @ApiOkResponse({ type: FriendRequestEntity })
-  async respondFriendRequest(
+  async acceptFriendRequest(
     @GetUser() user: User,
-    @Body('creatorId', ParseUUIDPipe) creatorId: string,
-    @Body('status', new ParseEnumPipe(FriendRequestStatus))
-    status: FriendRequestStatus
+    @Body('creatorId', ParseUUIDPipe) creatorId: string
   ): Promise<FriendRequest> {
     return await this.friendRequestService.update({
       creatorId,
       receiverId: user.id,
-      status,
+      status: 'ACCEPTED',
     });
   }
 
