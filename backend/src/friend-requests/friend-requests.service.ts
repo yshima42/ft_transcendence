@@ -181,7 +181,14 @@ export class FriendRequestsService {
     });
   }
 
-  async removePending(
+  /**
+   * 特定のユーザーからのフレンドリクエストを拒否する際に使用。
+   * PENDINGになっているレコードを削除する。
+   * @param userId - 自分のID
+   * @param requestUserId - フレンドリクエストを送ったユーザー
+   * @returns count
+   */
+  async removePendingRequest(
     userId: string,
     requestUserId: string
   ): Promise<{ count: number }> {
