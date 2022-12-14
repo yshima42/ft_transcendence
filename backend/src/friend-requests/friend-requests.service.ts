@@ -181,6 +181,32 @@ export class FriendRequestsService {
     });
   }
 
+  /**
+   * 特定のユーザーからのフレンドリクエストを拒否する際に使用。
+   * PENDINGになっているレコードを削除する。
+   * @param userId - 自分のID
+   * @param requestUserId - フレンドリクエストを送ったユーザー
+   * @returns count
+   */
+  async removePendingRequest(
+    userId: string,
+    requestUserId: string
+  ): Promise<{ count: number }> {
+    const pendingRequests = await this.prisma.friendRequest.findMany({
+      where: {
+        creatorId: requestUserId,
+        receiverId: userId,
+        status: 'PENDING',
+      },
+    });
+
+    if (pendingRequests.length === 0) {
+      throw new NotFoundException('This user do not request.');
+    }
+
+    return await this.removeTwo(userId, requestUserId);
+  }
+
   // 命名に違和感あり
   async removeBetweenFriends(
     userId: string,
