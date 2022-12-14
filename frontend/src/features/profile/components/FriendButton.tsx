@@ -44,15 +44,23 @@ export const FriendButton: FC<Props> = memo((props) => {
     <Box h="80px">
       <Flex justify="center" align="center">
         {friendRelation === 'NONE' ? (
-          <Button onClick={onClickRequestButton}>Request</Button>
+          <Button size="sm" onClick={onClickRequestButton}>
+            Request
+          </Button>
         ) : friendRelation === 'ACCEPTED' ? (
           <></>
         ) : friendRelation === 'PENDING' ? (
-          <Button onClick={onClickCancelButton}>Cancel</Button>
+          <Button size="sm" onClick={onClickCancelButton}>
+            Cancel
+          </Button>
         ) : friendRelation === 'RECOGNITION' ? (
           <HStack>
-            <Button onClick={onClickAcceptButton}>Accept</Button>
-            <Button onClick={onClickRejectButton}>Reject</Button>
+            <Button size="sm" onClick={onClickAcceptButton}>
+              Accept
+            </Button>
+            <Button size="sm" onClick={onClickRejectButton}>
+              Reject
+            </Button>
           </HStack>
         ) : (
           <></>
