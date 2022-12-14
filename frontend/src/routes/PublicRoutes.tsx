@@ -12,7 +12,6 @@ import { CreateChatRooms } from 'features/chat/routes/CreateChatRooms';
 import { DmRoom } from 'features/dm/routes/DmRoom';
 import { DmRooms } from 'features/dm/routes/DmRooms';
 import { Users } from 'features/friends/routes/Users';
-import { Game } from 'features/game/routes/Game';
 import { Games } from 'features/game/routes/Games';
 import { Matching } from 'features/game/routes/Matching';
 import { Top } from 'features/game/routes/Top';
@@ -52,7 +51,6 @@ export const publicRoutes = [
       { path: 'chat/create', element: <CreateChatRooms /> },
       { path: 'chat/:id', element: <ChatRoom /> },
       { path: 'games', element: <Games /> },
-      { path: 'game', element: <Game /> },
       { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
       { path: 'dm', element: <DmRooms /> },

@@ -45,9 +45,8 @@ export const PongGame: FC<Props> = memo((props) => {
   useEffect(() => {
     const socket = socketService.socket;
     if (socket === null) return;
-    // ゲームスタート処理
-    console.log(socket.hasListeners('start_game'));
 
+    // ゲームスタート処理
     socket.on('start_game', () => {
       setGameStarted(true);
 
