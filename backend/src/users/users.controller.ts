@@ -309,6 +309,21 @@ export class UsersController {
     });
   }
 
+  @Delete('me/friend-requests/incoming/:id')
+  @ApiOperation({
+    summary: 'フレンド申請拒否',
+    description: '',
+  })
+  async reject(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) requestUserId: string
+  ): Promise<{ count: number }> {
+    return await this.friendRequestService.removePending(
+      user.id,
+      requestUserId
+    );
+  }
+
   // numberがレスポンスとして返ってくるのは修正するべきでは
   // 上記検討次第swagger対応予定
   @Delete('me/friends/:id')
