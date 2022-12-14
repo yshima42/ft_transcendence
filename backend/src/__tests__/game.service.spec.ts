@@ -45,7 +45,6 @@ const matchResultArray: MatchResult[] = [
     playerTwoId: userArray[1].id,
     playerOneScore: 5,
     playerTwoScore: 0,
-    startedAt: new Date(date),
     finishedAt: new Date(date),
   },
   {
@@ -54,7 +53,6 @@ const matchResultArray: MatchResult[] = [
     playerTwoId: userArray[0].id,
     playerOneScore: 5,
     playerTwoScore: 1,
-    startedAt: new Date(date),
     finishedAt: new Date(date),
   },
   {
@@ -63,7 +61,6 @@ const matchResultArray: MatchResult[] = [
     playerTwoId: userArray[2].id,
     playerOneScore: 5,
     playerTwoScore: 0,
-    startedAt: new Date(date),
     finishedAt: new Date(date),
   },
 ];

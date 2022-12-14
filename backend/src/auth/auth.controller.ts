@@ -47,21 +47,23 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ): Promise<{ url: string }> {
     const name = ftProfile.intraName;
-    const signupUser = {
+    const signUpUser = {
       name,
       nickname: name,
       avatarImageUrl: ftProfile.imageUrl,
     };
-    const { accessToken, isOtpAuthEnabled } = await this.authService.login(
-      name,
-      signupUser
-    );
+
+    const { accessToken, isOtpAuthEnabled, isSignUp } =
+      await this.authService.login(name, signUpUser);
+
     res.cookie('access_token', accessToken, this.cookieOptions);
 
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
 
-    if (isOtpAuthEnabled) {
+    if (isSignUp) {
+      return { url: 'http://localhost:5173/app/profile/edit' };
+    } else if (isOtpAuthEnabled) {
       return { url: 'http://localhost:5173/otp' };
     } else {
       return { url: 'http://localhost:5173/app' };

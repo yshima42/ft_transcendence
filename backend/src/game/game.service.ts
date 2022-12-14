@@ -47,6 +47,9 @@ export class GameService {
         playerOne: true,
         playerTwo: true,
       },
+      orderBy: {
+        finishedAt: 'desc',
+      },
     });
 
     return matchResults;
