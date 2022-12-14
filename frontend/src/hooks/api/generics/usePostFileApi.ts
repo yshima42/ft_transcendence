@@ -1,4 +1,5 @@
 import {
+  QueryKey,
   UseMutateAsyncFunction,
   useMutation,
   useQueryClient,
@@ -9,7 +10,10 @@ export interface FileReqBody {
   file: File;
 }
 
-export function usePostFileApi<ResBody>(endpoint: string): {
+export function usePostFileApi<ResBody>(
+  endpoint: string,
+  queryKeys?: QueryKey[]
+): {
   postFunc: UseMutateAsyncFunction<ResBody, unknown, FileReqBody, unknown>;
   isLoading: boolean;
 } {
@@ -26,7 +30,11 @@ export function usePostFileApi<ResBody>(endpoint: string): {
 
   const { mutateAsync: postFunc, isLoading } = useMutation(axiosPost, {
     onSuccess: () => {
-      void queryClient.invalidateQueries(['/users/me/profile']);
+      if (queryKeys !== undefined) {
+        queryKeys.forEach((queryKey) => {
+          void queryClient.invalidateQueries([queryKey]);
+        });
+      }
     },
   });
 
