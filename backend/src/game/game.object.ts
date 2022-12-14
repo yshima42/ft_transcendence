@@ -11,6 +11,7 @@ import {
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from './config/game-config';
+import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import { GameService } from './game.service';
 
 export type Ball = {
@@ -107,7 +108,8 @@ export class GameRoom {
     this.interval = setInterval(() => {
       this.gameLogic(roomId);
       this.updatePosition(roomId);
-    }, 33);
+      // フレームレート60で計算、負荷が高い場合は数字をあげる
+    }, 17);
   }
 
   gameLogic(roomId: string): void {
@@ -150,24 +152,27 @@ export class GameRoom {
 
     // ゲーム終了処理
     if (this.paddle1.score === 5 || this.paddle2.score === 5) {
-      this.doneGame(roomId);
+      void this.doneGame(roomId);
     }
   }
 
-  doneGame(roomId: string): void {
-    // const muchResult: CreateMatchResultDto = {
-    //   playerOneId: 'e8f67e5d-47fb-4a0e-8a3b-aa818eb3ce1a',
-    //   playerTwoId: 'c89ae673-b6fb-415e-9389-5276bbba7a4c',
-    //   playerOneScore: this.paddle1.score,
-    //   playerTwoScore: this.paddle2.score,
-    // };
-    // await this.gameService.addMatchResult(muchResult);
-
-    this.server.in(roomId).emit('done_game');
-
+  async doneGame(roomId: string): Promise<void> {
     // setIntervalを止める処理
     clearInterval(this.interval);
+
+    // データベースへスコアの保存
+    const muchResult: CreateMatchResultDto = {
+      playerOneId: this.player1.id,
+      playerTwoId: this.player2.id,
+      playerOneScore: this.paddle1.score,
+      playerTwoScore: this.paddle2.score,
+    };
+    await this.gameService.addMatchResult(muchResult);
+
+    this.server.in(roomId).emit('done_game');
   }
+
+  // TODO: disconnect処理を実行
 
   updatePosition(roomId: string): void {
     this.server.in(roomId).emit('position_update', {

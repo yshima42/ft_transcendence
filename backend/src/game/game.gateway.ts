@@ -52,7 +52,6 @@ export class GameGateway {
       userData.isLeftSide = false;
       const roomId = this.createGameRoom(this.matchWaitingUsers[0], userData);
 
-      // isLeftSide, true or falseで良い
       this.server
         .to(socket.id)
         .emit('go_game_room', roomId, userData.isLeftSide);
@@ -65,6 +64,8 @@ export class GameGateway {
       const gameRoom = this.gameRooms[roomId];
       // ゲーム開始
       gameRoom.gameStart(socket, roomId);
+
+      // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
     }
   }
 
