@@ -86,6 +86,7 @@ export class GameGateway {
     await socket.join(message.roomId);
     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
+    // socket.emit('check_confirmation');
     socket.emit('start_game');
   }
 

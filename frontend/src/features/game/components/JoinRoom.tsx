@@ -1,6 +1,7 @@
 import React, { FC, memo, useState } from 'react';
 import { Button } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
+import { Matching } from '../routes/Matching';
 import socketService from '../utils/socketService';
 
 type Props = {
@@ -40,8 +41,14 @@ export const JoinRoom: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button onClick={onClickMatch} disabled={isJoining}>
-      {isJoining ? 'Matching...' : 'Match'}
-    </Button>
+    <>
+      {isJoining ? (
+        <Matching />
+      ) : (
+        <Button onClick={onClickMatch} disabled={isJoining}>
+          Match
+        </Button>
+      )}
+    </>
   );
 });
