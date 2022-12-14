@@ -278,12 +278,12 @@ export class UsersController {
 
   @Patch('me/friend-requests/incoming')
   @ApiOperation({
-    summary: 'フレンドリクエストの承認・拒否',
+    summary: 'フレンドリクエストの承認',
     description:
-      'フレンドリクエストが自分に来ている相手に対してのみ使用可</br>承認する時はACCEPTED、拒否する時はDECLINEをstatusに設定する',
+      'フレンドリクエストが自分に来ている相手に対してのみ使用可</br>承認する時はACCEPTEDをstatusに設定する',
   })
   @ApiBody({
-    description: 'statusは承認(ACCEPTED)または拒否(DECLINE)',
+    description: 'statusは承認(ACCEPTED)',
     schema: {
       type: 'object',
       properties: {
@@ -312,13 +312,13 @@ export class UsersController {
   @Delete('me/friend-requests/incoming/:id')
   @ApiOperation({
     summary: 'フレンド申請拒否',
-    description: '',
+    description: 'フレンドリクエストが自分に来ている相手にのみ使用可</br>',
   })
   async reject(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) requestUserId: string
   ): Promise<{ count: number }> {
-    return await this.friendRequestService.removePending(
+    return await this.friendRequestService.removePendingRequest(
       user.id,
       requestUserId
     );
