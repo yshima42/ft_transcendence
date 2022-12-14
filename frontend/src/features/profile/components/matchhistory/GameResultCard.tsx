@@ -18,7 +18,7 @@ export const GameResultCard: FC<Props> = memo((props) => {
   // TODO:spinnerつける？使うフックを変更し、一時的にspinner表示を削除した
   return (
     <>
-      <Box h="90px" bg="gray.200" borderRadius={20} px={4}>
+      <Box h="100px" bg="gray.200" borderRadius={20} px={4}>
         <HStack>
           <AvatarWithName
             name={playerOne.nickname}
