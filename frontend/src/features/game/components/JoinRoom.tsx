@@ -23,7 +23,7 @@ export const JoinRoom: FC<Props> = memo((props) => {
     socket.emit('set_user', user);
     socket.emit('random_match');
     socket.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
-      setRoom({ id: roomId, isLeftSide });
+      setRoom({ roomId: roomId, isLeftSide });
       setJoining(false);
 
       socket.emit('join_room', { roomId });
