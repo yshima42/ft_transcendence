@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { JoinRoom } from '../components/JoinRoom';
 import { PongGame } from '../components/PongGame';
-import GameContext, { GameContextProps } from '../utils/gameContext';
 import socketService from '../utils/socketService';
 
 export const Game: FC = memo(() => {
@@ -14,7 +13,7 @@ export const Game: FC = memo(() => {
   const [roomName, setRoomName] = useState('');
 
   // TODO: Propsで渡してcontext使わなくても良い
-  const gameContextValue: GameContextProps = {
+  const gameContextValue = {
     isInRoom,
     setInRoom,
     isLeftSide,
@@ -36,18 +35,16 @@ export const Game: FC = memo(() => {
   }, []);
 
   return (
-    <GameContext.Provider value={gameContextValue}>
-      <ContentLayout>
-        <Center>
-          {!isInRoom && <JoinRoom />}
-          {isInRoom && <PongGame />}
-        </Center>
-        <Center>
-          <Link to="/app">
-            <Button>Back</Button>
-          </Link>
-        </Center>
-      </ContentLayout>
-    </GameContext.Provider>
+    <ContentLayout>
+      <Center>
+        {!isInRoom && <JoinRoom gameContextValue={gameContextValue} />}
+        {isInRoom && <PongGame gameContextValue={gameContextValue} />}
+      </Center>
+      <Center>
+        <Link to="/app">
+          <Button>Back</Button>
+        </Link>
+      </Center>
+    </ContentLayout>
   );
 });
