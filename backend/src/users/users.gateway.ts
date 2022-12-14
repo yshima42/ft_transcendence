@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -6,44 +7,29 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-// eslint-disable-next-line import/extensions
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
-  public onlineUsers: { [id: string]: string };
+  public onlineUserIdTosocketId: Map<string, string>;
 
-  // gameServiceを使うのに必要
   constructor() {
-    // オンラインユーザー一覧
-    this.onlineUsers = {};
+    this.onlineUserIdTosocketId = new Map<string, string>();
   }
 
   @WebSocketServer()
   private readonly server!: Server;
 
   handleConnection(@ConnectedSocket() socket: Socket): void {
-    console.log('connected: ' + socket.id);
+    Logger.debug('connected: ' + socket.id);
   }
 
-  handleDisconnect(@ConnectedSocket() socket: Socket): string[] {
-    console.log('disconnected: ' + socket.id);
-    const uid = this.GetUidFromSocketID(socket.id);
-    if (uid != null) {
-      // TODO: ここのeslint回避がわからない、できれば修正したい(shimazu)
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete this.onlineUsers[uid];
+  handleDisconnect(@ConnectedSocket() socket: Socket): void {
+    Logger.debug('disconnected: ' + socket.id);
+    const onlineUserId = this.getUserIdBySocketId(socket.id);
+    if (onlineUserId !== undefined) {
+      this.onlineUserIdTosocketId.delete(onlineUserId);
     }
-
-    const onlineUsers = Object.values(this.onlineUsers);
-
-    this.SendMessage(
-      socket,
-      'user_disconnected',
-      onlineUsers.filter((id) => id !== socket.id),
-      socket.id
-    );
-
-    return onlineUsers;
+    socket.broadcast.emit('user_disconnected', socket.id);
   }
 
   @SubscribeMessage('handshake')
@@ -51,37 +37,21 @@ export class UsersGateway {
     @ConnectedSocket() socket: Socket,
     @MessageBody() userId: string
   ): string[] {
-    console.log(userId);
-    this.onlineUsers[userId] = socket.id;
+    this.onlineUserIdTosocketId.set(userId, socket.id);
+    socket.broadcast.emit('user_connected', socket.id);
 
-    const onlineUsers = Object.values(this.onlineUsers);
-
-    this.SendMessage(
-      socket,
-      'user_connected',
-      onlineUsers.filter((id) => id !== socket.id),
-      socket.id
-    );
-
-    return onlineUsers;
+    return [...this.onlineUserIdTosocketId.values()];
   }
 
-  GetUidFromSocketID = (id: string): string | undefined => {
-    return Object.keys(this.onlineUsers).find(
-      (uid) => this.onlineUsers[uid] === id
-    );
-  };
+  private readonly getUserIdBySocketId = (id: string): string | undefined => {
+    const keyValues = this.onlineUserIdTosocketId.entries();
+    let userId;
+    for (const keyValue of keyValues) {
+      if (keyValue[1] === id) {
+        userId = keyValue[0];
+      }
+    }
 
-  SendMessage = (
-    socket: Socket,
-    name: string,
-    onlineUsers: string[],
-    payload?: unknown
-  ): void => {
-    onlineUsers.forEach((id) =>
-      payload != null
-        ? socket.to(id).emit(name, payload)
-        : socket.to(id).emit(name)
-    );
+    return userId;
   };
 }
