@@ -1,48 +1,32 @@
 import { FriendRequest } from '@prisma/client';
-import {
-  UseMutateAsyncFunction,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
-export interface FriendRequestRejectInProfileResBody {
+export interface FriendRequestRejectResBody {
   friendRequest: FriendRequest;
 }
 
-export type RejectFriendRequestInProfile = UseMutateAsyncFunction<
-  FriendRequestRejectInProfileResBody,
+export type RejectFriendRequest = UseMutateAsyncFunction<
+  FriendRequestRejectResBody,
   unknown,
   string,
   unknown
 >;
 
-export const useFriendRequestRejectInProfile = (
-  otherId: string
-): {
-  rejectFriendRequestInProfile: RejectFriendRequestInProfile;
+export const useFriendRequestReject = (): {
+  rejectFriendRequest: RejectFriendRequest;
   isLoading: boolean;
 } => {
   const axiosDelete = async (userId: string) => {
-    const result = await axios.delete<FriendRequestRejectInProfileResBody>(
+    const result = await axios.delete<FriendRequestRejectResBody>(
       '/users/me/friend-requests/incoming/' + userId
     );
 
     return result.data;
   };
 
-  const queryClient = useQueryClient();
+  const { mutateAsync: rejectFriendRequest, isLoading } =
+    useMutation(axiosDelete);
 
-  const { mutateAsync: rejectFriendRequestInProfile, isLoading } = useMutation(
-    axiosDelete,
-    {
-      onSuccess: () => {
-        void queryClient.invalidateQueries([
-          `/users/me/friend-relation/${otherId}`,
-        ]);
-      },
-    }
-  );
-
-  return { rejectFriendRequestInProfile, isLoading };
+  return { rejectFriendRequest, isLoading };
 };
