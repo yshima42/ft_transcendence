@@ -181,6 +181,25 @@ export class FriendRequestsService {
     });
   }
 
+  async removePending(
+    userId: string,
+    requestUserId: string
+  ): Promise<{ count: number }> {
+    const pendingRequests = await this.prisma.friendRequest.findMany({
+      where: {
+        creatorId: requestUserId,
+        receiverId: userId,
+        status: 'PENDING',
+      },
+    });
+
+    if (pendingRequests.length === 0) {
+      throw new NotFoundException('This user do not request.');
+    }
+
+    return await this.removeTwo(userId, requestUserId);
+  }
+
   // 命名に違和感あり
   async removeBetweenFriends(
     userId: string,
