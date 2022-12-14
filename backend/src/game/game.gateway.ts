@@ -60,12 +60,6 @@ export class GameGateway {
         .emit('go_game_room', roomId, this.matchWaitingUsers[0].isLeftSide);
 
       this.matchWaitingUsers.splice(0, 1);
-
-      const gameRoom = this.gameRooms[roomId];
-      // ゲーム開始
-      gameRoom.gameStart(socket, roomId);
-
-      // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
     }
   }
 
@@ -93,6 +87,23 @@ export class GameGateway {
     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
     socket.emit('start_game');
+  }
+
+  @SubscribeMessage('connect_pong')
+  connectPong(
+    @MessageBody() message: { roomId: string },
+    @ConnectedSocket() socket: Socket
+  ): void {
+    // player1のsocketでゲームオブジェクトを作る
+    if (socket.id === this.gameRooms[message.roomId].player2.socket.id) {
+      return;
+    }
+
+    const gameRoom = this.gameRooms[message.roomId];
+    // ゲーム開始
+    gameRoom.gameStart(socket, message.roomId);
+
+    // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
   }
 
   @SubscribeMessage('user_commands')
