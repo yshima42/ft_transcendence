@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Block {
-  sourceId                  String
-  targetId                  String
+  sourceId                  String @db.Uuid
+  targetId                  String @db.Uuid
   User_Block_sourceIdToUser User   @relation("Block_sourceIdToUser", fields: [sourceId], references: [id])
   User_Block_targetIdToUser User   @relation("Block_targetIdToUser", fields: [targetId], references: [id])
 
@@ -17,17 +17,17 @@ model Block {
 }
 
 model ChatMessage {
-  id         String   @id
+  id         String   @id @db.Uuid
   content    String
   createdAt  DateTime @default(now())
-  chatRoomId String
-  senderId   String
+  chatRoomId String   @db.Uuid
+  senderId   String   @db.Uuid
   ChatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
   User       User     @relation(fields: [senderId], references: [id])
 }
 
 model ChatRoom {
-  id           String         @id
+  id           String         @id @db.Uuid
   name         String         @unique
   createdAt    DateTime       @default(now())
   updatedAt    DateTime
@@ -36,8 +36,8 @@ model ChatRoom {
 }
 
 model ChatRoomUser {
-  chatRoomId String
-  userId     String
+  chatRoomId String         @db.Uuid
+  userId     String         @db.Uuid
   status     ChatUserStatus
   ChatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id])
   User       User           @relation(fields: [userId], references: [id])
@@ -46,17 +46,17 @@ model ChatRoomUser {
 }
 
 model Dm {
-  id        String   @id
+  id        String   @id @db.Uuid
   content   String
   createdAt DateTime @default(now())
-  dmRoomId  String
-  senderId  String
+  dmRoomId  String   @db.Uuid
+  senderId  String   @db.Uuid
   DmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id])
   User      User     @relation(fields: [senderId], references: [id])
 }
 
 model DmRoom {
-  id         String       @id
+  id         String       @id @db.Uuid
   createdAt  DateTime     @default(now())
   updatedAt  DateTime
   Dm         Dm[]
@@ -64,8 +64,8 @@ model DmRoom {
 }
 
 model DmRoomUser {
-  dmRoomId String
-  userId   String
+  dmRoomId String @db.Uuid
+  userId   String @db.Uuid
   DmRoom   DmRoom @relation(fields: [dmRoomId], references: [id])
   User     User   @relation(fields: [userId], references: [id])
 
@@ -73,8 +73,8 @@ model DmRoomUser {
 }
 
 model FriendRequest {
-  creatorId                           String
-  receiverId                          String
+  creatorId                           String              @db.Uuid
+  receiverId                          String              @db.Uuid
   status                              FriendRequestStatus
   createdAt                           DateTime            @default(now())
   updatedAt                           DateTime
@@ -85,37 +85,43 @@ model FriendRequest {
 }
 
 model MatchResult {
-  id                                 String   @id
-  playerOneId                        String
-  playerTwoId                        String
+  id                                 String   @id @db.Uuid
+  playerOneId                        String   @db.Uuid
+  playerTwoId                        String   @db.Uuid
   playerOneScore                     Int
   playerTwoScore                     Int
-  startedAt                          DateTime @default(now())
-  finishedAt                         DateTime
+  finishedAt                         DateTime @default(now())
   User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
   User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
 }
 
 model User {
-  id                                           String          @id
-  name                                         String          @unique
+  id                                           String               @id @db.Uuid
+  name                                         String               @unique
   avatarImageUrl                               String
-  nickname                                     String          @unique
-  isTwoFactorAuthEnabled                       Boolean         @default(false)
-  twoFactorAuthSecret                          String?
-  onlineStatus                                 OnlineStatus    @default(ONLINE)
-  createdAt                                    DateTime        @default(now())
+  nickname                                     String               @unique
+  onlineStatus                                 OnlineStatus         @default(ONLINE)
+  createdAt                                    DateTime             @default(now())
   updatedAt                                    DateTime
-  Block_Block_sourceIdToUser                   Block[]         @relation("Block_sourceIdToUser")
-  Block_Block_targetIdToUser                   Block[]         @relation("Block_targetIdToUser")
+  Block_Block_sourceIdToUser                   Block[]              @relation("Block_sourceIdToUser")
+  Block_Block_targetIdToUser                   Block[]              @relation("Block_targetIdToUser")
   ChatMessage                                  ChatMessage[]
   ChatRoomUser                                 ChatRoomUser[]
   Dm                                           Dm[]
   DmRoomUser                                   DmRoomUser[]
-  FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[] @relation("FriendRequest_creatorIdToUser")
-  FriendRequest_FriendRequest_receiverIdToUser FriendRequest[] @relation("FriendRequest_receiverIdToUser")
-  MatchResult_MatchResult_playerOneIdToUser    MatchResult[]   @relation("MatchResult_playerOneIdToUser")
-  MatchResult_MatchResult_playerTwoIdToUser    MatchResult[]   @relation("MatchResult_playerTwoIdToUser")
+  FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[]      @relation("FriendRequest_creatorIdToUser")
+  FriendRequest_FriendRequest_receiverIdToUser FriendRequest[]      @relation("FriendRequest_receiverIdToUser")
+  MatchResult_MatchResult_playerOneIdToUser    MatchResult[]        @relation("MatchResult_playerOneIdToUser")
+  MatchResult_MatchResult_playerTwoIdToUser    MatchResult[]        @relation("MatchResult_playerTwoIdToUser")
+  OneTimePasswordAuth                          OneTimePasswordAuth?
+}
+
+model OneTimePasswordAuth {
+  authUserId String   @id @db.Uuid
+  qrcodeUrl  String
+  secret     String
+  createdAt  DateTime @default(now())
+  User       User     @relation(fields: [authUserId], references: [id])
 }
 
 enum ChatUserStatus {

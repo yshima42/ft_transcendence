@@ -44,8 +44,6 @@ idMap.forEach((value, key) => {
     avatarImageUrl:
       'https://placehold.jp/2b52ee/ffffff/150x150.png?text=' + key,
     nickname: 'nickname' + key,
-    twoFactorAuthSecret: '',
-    isTwoFactorAuthEnabled: false,
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -224,14 +222,15 @@ for (let i = 0; i < 30; i++) {
   const playerOneId = idMap.get('dummy1');
   const playerTwoId = idMap.get('dummy' + (i + 1).toString());
   if (playerOneId !== undefined && playerTwoId !== undefined) {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() + i);
     matchResultData.push({
       id: uuidv4(),
       playerOneId,
       playerTwoId,
       playerOneScore: matchScoreData[i][0],
       playerTwoScore: matchScoreData[i][1],
-      startedAt: new Date(),
-      finishedAt: new Date(),
+      finishedAt: date,
     });
   }
 }
@@ -240,14 +239,15 @@ for (let i = 0; i < 30; i++) {
   const playerOneId = idMap.get('dummy' + (i + 1).toString());
   const playerTwoId = idMap.get('dummy' + (i + 2).toString());
   if (playerOneId !== undefined && playerTwoId !== undefined) {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() + i);
     matchResultData.push({
       id: uuidv4(),
       playerOneId,
       playerTwoId,
       playerOneScore: matchScoreData[i][0],
       playerTwoScore: matchScoreData[i][1],
-      startedAt: new Date(),
-      finishedAt: new Date(),
+      finishedAt: date,
     });
   }
 }

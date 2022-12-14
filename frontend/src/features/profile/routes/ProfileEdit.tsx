@@ -1,13 +1,5 @@
 import { ChangeEvent, FC, memo, SyntheticEvent, useRef, useState } from 'react';
-import {
-  Avatar,
-  Button,
-  Flex,
-  FormLabel,
-  Input,
-  Switch,
-  Text,
-} from '@chakra-ui/react';
+import { Avatar, Button, Flex, FormLabel, Input, Text } from '@chakra-ui/react';
 import { AvatarFormData, useAvatarUpload } from 'hooks/api';
 import { useProfile } from 'hooks/api/profile/useProfile';
 import {
@@ -15,6 +7,7 @@ import {
   useProfileEdit,
 } from 'hooks/api/profile/useProfileEdit';
 import { useNavigate } from 'react-router-dom';
+import { OtpAuthSetting } from 'features/profile/components/OtpAuthSetting';
 
 export const ProfileEdit: FC = memo(() => {
   const { user } = useProfile();
@@ -85,15 +78,13 @@ export const ProfileEdit: FC = memo(() => {
           // value={profileFormData?.nickname}
           onChange={onProfileChange}
         />
-        <FormLabel>Two Factor</FormLabel>
-        <Switch
-          name="twoFactor"
-          // isChecked={profileFormData?.twoFactor}
-          onChange={onProfileChange}
-        />
+
         <Button type="submit" isLoading={isLoading1 && isLoading2}>
           Save
         </Button>
+        <br />
+        <br />
+        <OtpAuthSetting />
       </form>
     </Flex>
   );
