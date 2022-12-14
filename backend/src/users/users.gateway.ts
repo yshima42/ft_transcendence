@@ -29,7 +29,7 @@ export class UsersGateway {
     if (onlineUserId !== undefined) {
       this.onlineUserIdTosocketId.delete(onlineUserId);
     }
-    socket.broadcast.emit('user_disconnected', socket.id);
+    socket.broadcast.emit('user_disconnected', onlineUserId);
   }
 
   @SubscribeMessage('handshake')
@@ -38,9 +38,9 @@ export class UsersGateway {
     @MessageBody() userId: string
   ): string[] {
     this.onlineUserIdTosocketId.set(userId, socket.id);
-    socket.broadcast.emit('user_connected', socket.id);
+    socket.broadcast.emit('user_connected', userId);
 
-    return [...this.onlineUserIdTosocketId.values()];
+    return [...this.onlineUserIdTosocketId.keys()];
   }
 
   private readonly getUserIdBySocketId = (id: string): string | undefined => {
