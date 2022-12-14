@@ -35,6 +35,9 @@ export class BlocksService {
           },
         },
       },
+      orderBy: {
+        nickname: 'asc',
+      },
     });
   }
 
