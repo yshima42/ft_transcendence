@@ -90,8 +90,7 @@ model MatchResult {
   playerTwoId                        String
   playerOneScore                     Int
   playerTwoScore                     Int
-  startedAt                          DateTime @default(now())
-  finishedAt                         DateTime
+  finishedAt                         DateTime @default(now())
   User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
   User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
 }
