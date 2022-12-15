@@ -17,7 +17,7 @@ import { ChatRoomUserService } from './chat-room-user.service';
 import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
 import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
-@Controller('chat/:chatRoomId/user')
+@Controller('chat/room/:chatRoomId/user')
 export class ChatRoomUserController {
   constructor(private readonly chatRoomUserService: ChatRoomUserService) {}
 

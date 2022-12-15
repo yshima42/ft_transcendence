@@ -21,7 +21,7 @@ export const useCreateChatRoom: () => {
         password === undefined ? { name, password } : { name }
       );
       const chatRoom = response.data;
-      navigate(`/app/chat/${chatRoom.id}`, {
+      navigate(`/app/chat/room/${chatRoom.id}`, {
         state: { chatRoomId: chatRoom.id, name: chatRoom.name },
       });
     } catch (e) {

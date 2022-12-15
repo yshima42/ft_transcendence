@@ -32,14 +32,14 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
 
   async function getLoginUser() {
     const res: { data: ResponseChatRoomUser } = await axios.get(
-      `/chat/${chatRoomId}/user/me`
+      `/chat/room/${chatRoomId}/user/me`
     );
     setLoginUser(res.data);
   }
 
   async function getAllUsers() {
     const res: { data: ResponseChatRoomUser[] } = await axios.get(
-      `/chat/${chatRoomId}/user`
+      `/chat/room/${chatRoomId}/user`
     );
     setUsers(res.data);
   }
@@ -48,7 +48,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     await axios.patch(`/chat/room/${chatRoomId}`, {
       status: ChatRoomStatus.PUBLIC,
     });
-    navigate(`/app/chat/${chatRoomId}`, {
+    navigate(`/app/chat/room/${chatRoomId}`, {
       state: { chatRoomId, name, status: ChatRoomStatus.PUBLIC },
     });
   }
@@ -58,7 +58,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
       password,
       status: ChatRoomStatus.PROTECTED,
     });
-    navigate(`/app/chat/${chatRoomId}`, {
+    navigate(`/app/chat/room/${chatRoomId}`, {
       state: { chatRoomId, name, status: ChatRoomStatus.PROTECTED },
     });
   }
@@ -86,7 +86,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
 
       return;
     }
-    await axios.patch(`/chat/${chatRoomId}/user/${userId}`, {
+    await axios.patch(`/chat/room/${chatRoomId}/user/${userId}`, {
       status,
     });
     getAllUsers().catch((err) => console.log(err));
@@ -96,7 +96,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     if (selectedUserId === undefined || selectedStatus === undefined) {
       return;
     }
-    await axios.patch(`/chat/${chatRoomId}/user/${selectedUserId}`, {
+    await axios.patch(`/chat/room/${chatRoomId}/user/${selectedUserId}`, {
       status: selectedStatus,
       limit,
     });

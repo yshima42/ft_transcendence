@@ -25,19 +25,19 @@ export const ChatRoom: React.FC = React.memo(() => {
 
   async function getAllChatMessage(): Promise<void> {
     const res: { data: ResponseChatMessage[] } = await axios.get(
-      `/chat/${chatRoomId}/message/all`
+      `/chat/room/${chatRoomId}/message/all`
     );
     setMessages(res.data);
   }
   // 送信ボタンを押したときの処理
   async function sendMessage(content: string): Promise<void> {
-    await axios.post(`/chat/${chatRoomId}/message`, { content });
+    await axios.post(`/chat/room/${chatRoomId}/message`, { content });
     getAllChatMessage().catch((err) => console.error(err));
   }
 
   async function getLoginUser() {
     const res: { data: ResponseChatRoomUser } = await axios.get(
-      `/chat/${chatRoomId}/user/me`
+      `/chat/room/${chatRoomId}/user/me`
     );
     setLoginUser(res.data);
   }
@@ -54,7 +54,7 @@ export const ChatRoom: React.FC = React.memo(() => {
         <C.Flex justifyContent="flex-end" mb={4}>
           <C.Link
             as={Link}
-            to={`/app/chat/${chatRoomId}/settings`}
+            to={`/app/chat/room/${chatRoomId}/settings`}
             state={{ chatRoomId, name, status }}
           >
             <C.Button colorScheme="blue">Settings</C.Button>
