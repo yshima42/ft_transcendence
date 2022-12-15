@@ -9,20 +9,22 @@ import {
   UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import * as Sw from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
 import { ResponseChatRoomUser } from './chat-room-user.interface';
 import { ChatRoomUserService } from './chat-room-user.service';
 import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
 import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
 @Controller('chat/room/:chatRoomId/user')
+@Sw.ApiTags('chat-room-user')
+@UseGuards(JwtTwoFactorAuthGuard)
 export class ChatRoomUserController {
   constructor(private readonly chatRoomUserService: ChatRoomUserService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   async create(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Body() createChatRoomUserDto: CreateChatRoomUserDto,
@@ -36,7 +38,6 @@ export class ChatRoomUserController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
   ): Promise<ResponseChatRoomUser[]> {
@@ -45,7 +46,6 @@ export class ChatRoomUserController {
 
   // me
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   async findMe(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
@@ -54,7 +54,6 @@ export class ChatRoomUserController {
   }
 
   @Patch(':userId')
-  @UseGuards(JwtAuthGuard)
   async update(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Param('userId', new ParseUUIDPipe()) userId: string,
@@ -70,7 +69,6 @@ export class ChatRoomUserController {
   }
 
   @Delete(':userId')
-  @UseGuards(JwtAuthGuard)
   async remove(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Param('userId', new ParseUUIDPipe()) userId: string
