@@ -6,3 +6,10 @@ export const useFriends = (): { users: User[] } => {
 
   return { users };
 };
+
+export const useIsFriend = (userId: string): { isFriend: boolean } => {
+  const { users: friends } = useFriends();
+  const isFriend = friends.find((friend) => friend.id === userId) !== undefined;
+
+  return { isFriend };
+};
