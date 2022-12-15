@@ -21,7 +21,7 @@ export const BlockButton: FC<BlockButtonProps> = memo(
     };
 
     return (
-      <Box h="80px">
+      <Box>
         <Flex justify="center" align="center">
           <Button
             size="sm"
