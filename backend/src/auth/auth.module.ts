@@ -5,6 +5,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtOtpAuthGuard } from './guards/jwt-otp-auth.guard';
+import { JwtSocketAuthGuard } from './guards/jwt-socket-auth.guard';
 import { FtStrategy } from './strategy/ft.strategy';
 import { JwtOtpStrategy } from './strategy/jwt-otp.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
@@ -19,7 +20,14 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     FtStrategy,
     JwtOtpStrategy,
     JwtOtpAuthGuard,
+    JwtSocketAuthGuard,
   ],
-  exports: [JwtStrategy, JwtAuthGuard, JwtOtpStrategy, JwtOtpAuthGuard],
+  exports: [
+    JwtStrategy,
+    JwtAuthGuard,
+    JwtOtpStrategy,
+    JwtOtpAuthGuard,
+    JwtSocketAuthGuard,
+  ],
 })
 export class AuthModule {}

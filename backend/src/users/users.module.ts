@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { BlocksModule } from 'src/blocks/blocks.module';
 import { FileModule } from 'src/file/file.module';
 import { FriendRequestsModule } from 'src/friend-requests/friend-requests.module';
@@ -15,6 +16,7 @@ import { UsersService } from './users.service';
     GameModule,
     BlocksModule,
     FriendRequestsModule,
+    JwtModule.register({}),
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersGateway],
