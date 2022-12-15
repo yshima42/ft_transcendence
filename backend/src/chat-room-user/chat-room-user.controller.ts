@@ -18,7 +18,7 @@ import { ChatRoomUserService } from './chat-room-user.service';
 import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
 import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
-@Controller('chat/room/:chatRoomId/user')
+@Controller('chat/rooms/:chatRoomId/users')
 @Sw.ApiTags('chat-room-user')
 @UseGuards(JwtOtpAuthGuard)
 export class ChatRoomUserController {

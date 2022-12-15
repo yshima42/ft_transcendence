@@ -15,13 +15,14 @@ export const useCreateChatRoom: () => {
 
   async function CreateChatRoom(data: ChatRoomCreateFormValues) {
     const { name, password } = data;
+    console.log(data);
     try {
       const response = await axios.post<ChatRoom>(
-        '/chat/room',
+        '/chat/rooms',
         password !== undefined ? { name, password } : { name }
       );
       const chatRoom = response.data;
-      navigate(`/app/chat/room/${chatRoom.id}`, {
+      navigate(`/app/chat/rooms/${chatRoom.id}`, {
         state: { chatRoomId: chatRoom.id, name: chatRoom.name },
       });
     } catch (e) {

@@ -17,7 +17,7 @@ import { ChatRoomService } from './chat-room.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
 import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
-@Controller('chat/room')
+@Controller('chat/rooms')
 @Sw.ApiTags('chat-room')
 @UseGuards(JwtOtpAuthGuard)
 export class ChatRoomController {
@@ -32,7 +32,7 @@ export class ChatRoomController {
   }
 
   // 自分が入っていないチャット全部
-  @Get('all')
+  @Get()
   async findAllWithOutMe(@GetUser() user: User): Promise<ResponseChatRoom[]> {
     return await this.chatRoomService.findAllWithOutMe(user.id);
   }
@@ -41,11 +41,6 @@ export class ChatRoomController {
   @Get('me')
   async findAllByMe(@GetUser() user: User): Promise<ResponseChatRoom[]> {
     return await this.chatRoomService.findAllByMe(user.id);
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ChatRoom> {
-    return await this.chatRoomService.findOne(id);
   }
 
   // update

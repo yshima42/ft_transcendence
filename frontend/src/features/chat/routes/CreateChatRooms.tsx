@@ -17,7 +17,7 @@ const schema = yup.object().shape(
       .optional()
       .when('password', {
         is: (value: string) => value?.length !== 0,
-        then: (rule) => rule.max(255),
+        then: (rule) => rule.min(8).max(255),
       }),
   },
   [['password', 'password']]

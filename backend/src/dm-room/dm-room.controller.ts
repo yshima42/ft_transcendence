@@ -6,7 +6,7 @@ import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseDmRoom } from './dm-room.interface';
 import { DmRoomService } from './dm-room.service';
 
-@Controller('dm/room')
+@Controller('dm/rooms')
 @Sw.ApiTags('dm-room')
 @UseGuards(JwtOtpAuthGuard)
 export class DmRoomController {

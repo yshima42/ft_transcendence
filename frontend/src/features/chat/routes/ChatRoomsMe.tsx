@@ -9,7 +9,7 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
   const [chatRooms, setChatRooms] = React.useState<ResponseChatRoom[]>([]);
 
   async function getAllChatRoom(): Promise<void> {
-    const res: { data: ResponseChatRoom[] } = await axios.get('/chat/room/me');
+    const res: { data: ResponseChatRoom[] } = await axios.get('/chat/rooms/me');
     setChatRooms(res.data);
   }
 
@@ -26,7 +26,7 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
             <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
               <C.Link
                 as={Link}
-                to={`/app/chat/room/${chatRoom.id}`}
+                to={`/app/chat/rooms/${chatRoom.id}`}
                 state={{
                   chatRoomId: chatRoom.id,
                   name: chatRoom.name,

@@ -32,33 +32,33 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
 
   async function getLoginUser() {
     const res: { data: ResponseChatRoomUser } = await axios.get(
-      `/chat/room/${chatRoomId}/user/me`
+      `/chat/rooms/${chatRoomId}/users/me`
     );
     setLoginUser(res.data);
   }
 
   async function getAllUsers() {
     const res: { data: ResponseChatRoomUser[] } = await axios.get(
-      `/chat/room/${chatRoomId}/user`
+      `/chat/rooms/${chatRoomId}/users`
     );
     setUsers(res.data);
   }
 
   async function onClickUnLock() {
-    await axios.patch(`/chat/room/${chatRoomId}`, {
+    await axios.patch(`/chat/rooms/${chatRoomId}`, {
       status: ChatRoomStatus.PUBLIC,
     });
-    navigate(`/app/chat/room/${chatRoomId}`, {
+    navigate(`/app/chat/rooms/${chatRoomId}`, {
       state: { chatRoomId, name, status: ChatRoomStatus.PUBLIC },
     });
   }
 
   async function onClickLock() {
-    await axios.patch(`/chat/room/${chatRoomId}`, {
+    await axios.patch(`/chat/rooms/${chatRoomId}`, {
       password,
       status: ChatRoomStatus.PROTECTED,
     });
-    navigate(`/app/chat/room/${chatRoomId}`, {
+    navigate(`/app/chat/rooms/${chatRoomId}`, {
       state: { chatRoomId, name, status: ChatRoomStatus.PROTECTED },
     });
   }
@@ -86,7 +86,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
 
       return;
     }
-    await axios.patch(`/chat/room/${chatRoomId}/user/${userId}`, {
+    await axios.patch(`/chat/rooms/${chatRoomId}/users/${userId}`, {
       status,
     });
     getAllUsers().catch((err) => console.log(err));
@@ -96,7 +96,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     if (selectedUserId === undefined || selectedStatus === undefined) {
       return;
     }
-    await axios.patch(`/chat/room/${chatRoomId}/user/${selectedUserId}`, {
+    await axios.patch(`/chat/rooms/${chatRoomId}/users/${selectedUserId}`, {
       status: selectedStatus,
       limit,
     });
@@ -129,16 +129,16 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
             </C.AccordionPanel>
           </C.AccordionItem>
           {/* LoginUserがADMINならセキュリティタブを出す */}
-          <C.AccordionItem>
-            <C.AccordionButton>
-              <C.Box flex="1" textAlign="left">
-                Security
-              </C.Box>
-              <C.AccordionIcon />
-            </C.AccordionButton>
-            <C.AccordionPanel pb={4}>
-              {loginUser !== undefined &&
-                loginUser.status === ChatUserStatus.ADMIN && (
+          {loginUser !== undefined &&
+            loginUser.status === ChatUserStatus.ADMIN && (
+              <C.AccordionItem>
+                <C.AccordionButton>
+                  <C.Box flex="1" textAlign="left">
+                    Security
+                  </C.Box>
+                  <C.AccordionIcon />
+                </C.AccordionButton>
+                <C.AccordionPanel pb={4}>
                   <SecurityAccordionItem
                     status={status}
                     lockFunc={async () => await onClickLock()}
@@ -147,9 +147,9 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
                       setPassword(e.target.value);
                     }}
                   />
-                )}
-            </C.AccordionPanel>
-          </C.AccordionItem>
+                </C.AccordionPanel>
+              </C.AccordionItem>
+            )}
         </C.Accordion>
       </ContentLayout>
       <ChatRoomUserActionTimeSetModal

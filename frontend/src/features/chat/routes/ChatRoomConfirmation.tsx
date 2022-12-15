@@ -20,19 +20,19 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
   // その後、チャットルームのページに遷移する。
   async function joinChatRoom() {
     if (status === ChatRoomStatus.PROTECTED) {
-      const res = await axios.post(`/chat/room/${chatRoomId}/user`, {
+      const res = await axios.post(`/chat/rooms/${chatRoomId}/users`, {
         password,
       });
       if (res.status === 201) {
-        navigate(`/app/chat/room/${chatRoomId}`, {
+        navigate(`/app/chat/rooms/${chatRoomId}`, {
           state: { chatRoomId, name },
         });
       } else {
         alert('パスワードが違います。');
       }
     } else {
-      await axios.post(`/chat/room/${chatRoomId}/user`);
-      navigate(`/app/chat/room/${chatRoomId}`, {
+      await axios.post(`/chat/rooms/${chatRoomId}/users`);
+      navigate(`/app/chat/rooms/${chatRoomId}`, {
         state: { chatRoomId, name, status },
       });
     }
