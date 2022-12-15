@@ -70,6 +70,7 @@ export class ChatRoomUserController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async remove(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Param('id', new ParseUUIDPipe()) id: string
