@@ -6,3 +6,10 @@ export const useProfile = (userId = 'me'): { user: User } => {
 
   return { user };
 };
+
+export const useIsLoginUser = (userId: string): { isLoginUser: boolean } => {
+  const { user } = useProfile();
+  const isLoginUser = userId === user.id;
+
+  return { isLoginUser };
+};
