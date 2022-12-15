@@ -1,5 +1,5 @@
 import { memo, FC, useEffect, useCallback } from 'react';
-import { useGame } from '../hooks/useGame';
+import { Socket } from 'socket.io-client';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -13,8 +13,14 @@ import { Ball, Paddle } from '../utils/gameObjs';
 import { userInput } from '../utils/userInput';
 import { Canvas } from './Canvas';
 
-export const PongGame: FC = memo(() => {
-  const { socket, roomId, isLeftSide } = useGame();
+type Props = {
+  socket: Socket;
+  roomId: string;
+  isLeftSide: boolean;
+};
+
+export const PongGame: FC<Props> = memo((props) => {
+  const { socket, roomId, isLeftSide } = props;
 
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
