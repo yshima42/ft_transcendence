@@ -25,7 +25,7 @@ export const useProfileFriendRequestCancel = (
 } => {
   const axiosDelete = async (userId: string) => {
     const result = await axios.delete<CancelFriendRequestInProfileResBody>(
-      '/users/me/friend-requests/' + userId
+      `/users/me/friend-requests/${userId}`
     );
 
     return result.data;
