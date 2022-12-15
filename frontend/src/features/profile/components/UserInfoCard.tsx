@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatarContainer';
+import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { BlockButton } from './BlockButton';
 import { ProfileSetting } from './ProfileSetting';
 
