@@ -22,7 +22,6 @@ export class UsersGateway {
   @WebSocketServer()
   private readonly server!: Server;
 
-  // userIdを渡せないから使わない。guardがついたら使えるかも
   @UseGuards(JwtSocketAuthGuard)
   handleConnection(@ConnectedSocket() socket: Socket): void {
     Logger.debug('connected: ' + socket.id);
