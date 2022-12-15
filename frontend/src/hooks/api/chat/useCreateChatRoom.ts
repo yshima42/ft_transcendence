@@ -18,7 +18,7 @@ export const useCreateChatRoom: () => {
     try {
       const response = await axios.post<ChatRoom>(
         '/chat/room',
-        password === undefined ? { name, password } : { name }
+        password !== undefined ? { name, password } : { name }
       );
       const chatRoom = response.data;
       navigate(`/app/chat/room/${chatRoom.id}`, {
