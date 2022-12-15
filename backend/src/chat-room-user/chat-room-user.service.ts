@@ -16,8 +16,8 @@ export class ChatRoomUserService {
     createChatRoomUserDto: CreateChatRoomUserDto,
     userId: string
   ): Promise<void> {
-    const password = createChatRoomUserDto.password;
-    if (password !== undefined) {
+    const chatRoomPassword = createChatRoomUserDto.chatRoomPassword;
+    if (chatRoomPassword !== undefined) {
       // ChatRoomのパスワードを取得
       const chatRoom = await this.prisma.chatRoom.findUnique({
         where: {
@@ -34,7 +34,10 @@ export class ChatRoomUserService {
         );
       }
       // パスワードが一致しない場合はエラー
-      const isPasswordMatch = await bcrypt.compare(password, chatRoom.password);
+      const isPasswordMatch = await bcrypt.compare(
+        chatRoomPassword,
+        chatRoom.password
+      );
       if (!isPasswordMatch) {
         throw new NestJS.HttpException(
           'Password not match',
