@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -7,6 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JwtSocketAuthGuard } from 'src/auth/guards/jwt-socket-auth.guard';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
@@ -22,9 +23,10 @@ export class UsersGateway {
   private readonly server!: Server;
 
   // userIdを渡せないから使わない。guardがついたら使えるかも
-  // handleConnection(@ConnectedSocket() socket: Socket): void {
-  //   Logger.debug('connected: ' + socket.id);
-  // }
+  @UseGuards(JwtSocketAuthGuard)
+  handleConnection(@ConnectedSocket() socket: Socket): void {
+    Logger.debug('connected: ' + socket.id);
+  }
 
   handleDisconnect(@ConnectedSocket() socket: Socket): void {
     const targetUserId = this.socketIdToUserId.get(socket.id);
