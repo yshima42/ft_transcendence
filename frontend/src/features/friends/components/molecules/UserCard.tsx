@@ -1,6 +1,6 @@
 import { FC, memo, ReactNode } from 'react';
 import { Box, Flex, Text, Spacer, Heading } from '@chakra-ui/react';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatarContainer';
+import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 type Props = {
   id: string;

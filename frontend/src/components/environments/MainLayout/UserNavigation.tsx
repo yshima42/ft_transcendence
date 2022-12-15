@@ -2,7 +2,7 @@ import { FC, memo } from 'react';
 import { Button, Flex, Heading } from '@chakra-ui/react';
 import { useLogout, useProfile } from 'hooks/api';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatarContainer';
+import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 export const UserNavigation: FC = memo(() => {
   const { logout } = useLogout();
