@@ -55,4 +55,17 @@ export class BlocksService {
       throw new NotFoundException('You have not blocked this user.');
     }
   }
+
+  async isBlockedUser(sourceId: string, targetId: string): Promise<boolean> {
+    const ret = await this.prisma.block.findUnique({
+      where: {
+        sourceId_targetId: {
+          sourceId,
+          targetId,
+        },
+      },
+    });
+
+    return ret !== null;
+  }
 }

@@ -138,4 +138,18 @@ describe('BlocksService', () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('isBlockedUser', () => {
+    it('should be blocked', async () => {
+      await expect(
+        blocksService.isBlockedUser(userArray[0].id, userArray[1].id)
+      ).resolves.toBe(true);
+    });
+
+    it('should not be blocked', async () => {
+      await expect(
+        blocksService.isBlockedUser(userArray[1].id, userArray[0].id)
+      ).resolves.toBe(false);
+    });
+  });
 });
