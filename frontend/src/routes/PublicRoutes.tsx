@@ -22,6 +22,7 @@ import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
   return (
+    // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
     <OnlineUsersProvider>
       <MainLayout>
         <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
