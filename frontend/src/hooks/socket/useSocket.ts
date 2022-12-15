@@ -7,7 +7,12 @@ export const useSocket = (
   uri: string,
   opts?: Partial<ManagerOptions & SocketOptions> | undefined
 ): Socket => {
-  const { current: socket } = useRef(io(uri, opts));
+  const { current: socket } = useRef(
+    io(uri, {
+      transports: ['websocket'],
+      ...opts,
+    })
+  );
 
   useEffect(() => {
     socket.connect();
