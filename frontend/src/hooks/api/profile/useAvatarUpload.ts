@@ -22,7 +22,9 @@ export const useAvatarUpload = (): {
   isLoading: boolean;
 } => {
   const { postFunc: uploadAvatar, isLoading } =
-    usePostFileApi<AvatarUploadResBody>('/users/me/avatar');
+    usePostFileApi<AvatarUploadResBody>('/users/me/avatar', [
+      ['/users/me/profile'],
+    ]);
 
   return { uploadAvatar, isLoading };
 };

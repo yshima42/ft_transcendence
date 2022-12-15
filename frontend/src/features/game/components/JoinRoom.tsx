@@ -1,33 +1,15 @@
-import { FC, memo, useContext, useState } from 'react';
+import React, { FC, memo } from 'react';
 import { Button } from '@chakra-ui/react';
-import SocketContext from 'contexts/SocketContext';
-import gameContext from '../utils/gameContext';
+import { GamePhase } from '../hooks/useGame';
 
-export const JoinRoom: FC = memo(() => {
-  const [isJoining, setJoining] = useState(false);
-  const { socket, user } = useContext(SocketContext).SocketState;
+type Props = {
+  setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
+};
 
-  const { setLeftSide, setInRoom, setRoomName } = useContext(gameContext);
-
-  const onClickMatch = () => {
-    // 何も入力してない時の処理
-
-    setJoining(true);
-    socket?.emit('set_user', user);
-    socket?.emit('random_match');
-    socket?.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
-      setRoomName(roomId);
-      setLeftSide(isLeftSide);
-      setInRoom(true);
-      setJoining(false);
-
-      socket.emit('join_room', { roomId });
-    });
-  };
+export const JoinRoom: FC<Props> = memo((props) => {
+  const { setGamePhase } = props;
 
   return (
-    <Button onClick={onClickMatch} disabled={isJoining}>
-      {isJoining ? 'Matching...' : 'Match'}
-    </Button>
+    <Button onClick={() => setGamePhase(GamePhase.Matching)}>Match</Button>
   );
 });
