@@ -1,8 +1,6 @@
 import { memo, FC } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
-import { useProfile } from 'hooks/api';
-import { useIsBlockedUser } from 'hooks/utils/useIsBlockedUser';
-import { useIsLoginUser } from 'hooks/utils/useIsLoginUser';
+import { useIsBlockedUser, useIsLoginUser, useProfile } from 'hooks/api';
 import { useParams } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
