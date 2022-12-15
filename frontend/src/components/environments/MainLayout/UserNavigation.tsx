@@ -1,8 +1,8 @@
 import { FC, memo } from 'react';
-import { AvatarBadge, Button, Flex, Heading } from '@chakra-ui/react';
+import { Button, Flex, Heading } from '@chakra-ui/react';
 import { useLogout, useProfile } from 'hooks/api';
 import { Link, useNavigate } from 'react-router-dom';
-import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
+import { UserAvatarContainer } from 'components/molecules/avatar/UserAvatarContainer';
 
 export const UserNavigation: FC = memo(() => {
   const { logout } = useLogout();
@@ -17,9 +17,7 @@ export const UserNavigation: FC = memo(() => {
 
   return (
     <Flex p="5%" mt={4} align="center">
-      <LinkedAvatar size="sm" src={user.avatarImageUrl} linkUrl="/app/profile">
-        <AvatarBadge boxSize="1.1em" bg="green.500" />
-      </LinkedAvatar>
+      <UserAvatarContainer size="sm" src={user.avatarImageUrl} id={user.id} />
       <Flex flexDir="column" ml={4}>
         <Link to="/app/profile">
           <Heading as="h3" size="sm">

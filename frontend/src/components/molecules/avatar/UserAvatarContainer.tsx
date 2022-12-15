@@ -1,23 +1,28 @@
 import { FC, memo } from 'react';
 import { AvatarProps } from '@chakra-ui/react';
-import { useFriends } from 'hooks/api';
-import { FriendAvatar } from './FriendAvatar';
+import { useFriends, useProfile } from 'hooks/api';
 import { UserAvatar } from './UserAvatar';
+import { UserAvatarWithBadge } from './UserAvatarWithBadge';
 
 type Props = AvatarProps & {
   id: string;
   src: string;
 };
 
-export const UserAvatarContainser: FC<Props> = memo((props) => {
+export const UserAvatarContainer: FC<Props> = memo((props) => {
   const { id, src, ...avatarProps } = props;
   const { users: friends } = useFriends();
+  const { user } = useProfile();
   const isFriend = friends.find((friend) => friend.id === id) !== undefined;
+  const isLoginUser = id === user.id;
 
   return (
     <>
-      {isFriend && <FriendAvatar id={id} src={src} {...avatarProps} />}
-      {!isFriend && <UserAvatar id={id} src={src} />}
+      {isFriend || isLoginUser ? (
+        <UserAvatarWithBadge id={id} src={src} {...avatarProps} />
+      ) : (
+        <UserAvatar id={id} src={src} {...avatarProps} />
+      )}
     </>
   );
 });

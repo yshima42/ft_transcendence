@@ -8,7 +8,7 @@ type Props = AvatarProps & {
   src: string;
 };
 
-export const FriendAvatar: FC<Props> = memo((props) => {
+export const UserAvatarWithBadge: FC<Props> = memo((props) => {
   const { id, src, ...avatarProps } = props;
   const { isOnline } = useFriendStatus(id);
   const badgeColor = isOnline ? 'green.500' : 'gray';
