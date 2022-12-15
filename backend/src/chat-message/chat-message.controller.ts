@@ -11,13 +11,14 @@ import {
 import * as Sw from '@nestjs/swagger';
 import { ChatMessage, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
-import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
+import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseChatMessage } from './chat-message.interface';
 import { ChatMessageService } from './chat-message.service';
 import { CreateChatMessageDto } from './dto/create-chat-message.dto';
+
 @Controller('chat/room/:chatRoomId/message')
 @Sw.ApiTags('chat-message')
-@UseGuards(JwtTwoFactorAuthGuard)
+@UseGuards(JwtOtpAuthGuard)
 export class ChatMessageController {
   constructor(private readonly chatMessageService: ChatMessageService) {}
 

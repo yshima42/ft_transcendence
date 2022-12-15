@@ -4,8 +4,8 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
+import { OtpAuth } from 'features/auth/routes/OtpAuth';
 import { Page404 } from 'features/auth/routes/Page404';
-import { TwoFactorAuth } from 'features/auth/routes/TwoFactorAuth';
 import { ChatRoom } from 'features/chat/routes/ChatRoom';
 import { ChatRoomConfirmation } from 'features/chat/routes/ChatRoomConfirmation';
 import { ChatRoomSettings } from 'features/chat/routes/ChatRoomSettings';
@@ -44,7 +44,7 @@ export const publicRoutes = [
     path: '/',
     element: <Login />,
   },
-  { path: '/twofactor', element: <TwoFactorAuth /> },
+  { path: '/otp', element: <OtpAuth /> },
   { path: '/app/game', element: <Game /> },
   { path: '*', element: <Page404 /> },
   {
