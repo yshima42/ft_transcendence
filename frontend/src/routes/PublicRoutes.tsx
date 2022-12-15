@@ -17,20 +17,24 @@ import { Games } from 'features/game/routes/Games';
 import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
 import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
+import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
   return (
-    <MainLayout>
-      <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
-        <Suspense
-          fallback={
-            <Spinner emptyColor="gray.200" color="blue.500" size="xl" />
-          }
-        >
-          <Outlet />
-        </Suspense>
-      </ErrorBoundary>
-    </MainLayout>
+    // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
+    <OnlineUsersProvider>
+      <MainLayout>
+        <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
+          <Suspense
+            fallback={
+              <Spinner emptyColor="gray.200" color="blue.500" size="xl" />
+            }
+          >
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
+      </MainLayout>
+    </OnlineUsersProvider>
   );
 };
 
