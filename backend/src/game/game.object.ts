@@ -75,6 +75,7 @@ export class GameRoom {
   paddle1: Paddle;
   paddle2: Paddle;
   interval: NodeJS.Timer;
+  ready: boolean;
 
   constructor(
     gameService: GameService,
@@ -97,6 +98,7 @@ export class GameRoom {
     this.interval = setInterval(() => {
       // イニシャライズのための空変数
     });
+    this.ready = false;
   }
 
   setBallCenter(): void {
@@ -169,7 +171,12 @@ export class GameRoom {
     };
     await this.gameService.addMatchResult(muchResult);
 
-    this.server.in(roomId).emit('done_game');
+    this.server.in(roomId).emit('done_game', {
+      player1Nickname: this.player1.nickname,
+      player2Nickname: this.player2.nickname,
+      player1Score: this.paddle1.score,
+      player2Score: this.paddle2.score,
+    });
   }
 
   // TODO: disconnect処理を実行
