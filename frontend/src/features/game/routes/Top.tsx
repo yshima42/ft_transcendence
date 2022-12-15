@@ -1,47 +1,36 @@
-import { memo, FC, useState, useEffect } from 'react';
-import { Center } from '@chakra-ui/react';
+import { memo, FC, useMemo } from 'react';
+import { Center, Spinner } from '@chakra-ui/react';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { JoinRoom } from '../components/JoinRoom';
 import { PongGame } from '../components/PongGame';
-import socketService from '../utils/socketService';
+import { Result } from '../components/Result';
+import { GamePhase, useGame } from '../hooks/useGame';
+import { Matching } from './Matching';
 
 export const Top: FC = memo(() => {
-  const [isInRoom, setInRoom] = useState(false);
-  const [isLeftSide, setLeftSide] = useState(true);
-  const [isGameStarted, setGameStarted] = useState(false);
-  const [roomName, setRoomName] = useState('');
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const { gamePhase, setGamePhase } = useGame();
 
-  // TODO: Propsで渡してcontext使わなくても良い
-  const gameContextValue = {
-    isInRoom,
-    setInRoom,
-    isLeftSide,
-    setLeftSide,
-    isGameStarted,
-    setGameStarted,
-    roomName,
-    setRoomName,
-    isConfirmed,
-    setIsConfirmed,
-  };
-
-  const connectSocket = async () => {
-    await socketService.connect('http://localhost:3000/game').catch((err) => {
-      console.log('Error: ', err);
-    });
-  };
-
-  useEffect(() => {
-    void connectSocket();
-  }, []);
+  const gamePage = useMemo(() => {
+    switch (gamePhase) {
+      case GamePhase.Top:
+        return <JoinRoom setGamePhase={setGamePhase} />;
+      case GamePhase.Matching:
+        return <Matching />;
+      case GamePhase.WaitStart:
+        return <Spinner />;
+      case GamePhase.InGame:
+        return <PongGame />;
+      case GamePhase.Result:
+        return <Result />;
+      // TODO: 仮実装
+      default:
+        return <p>Error</p>;
+    }
+  }, [gamePhase, setGamePhase]);
 
   return (
     <ContentLayout title="">
-      <Center>
-        {!isInRoom && <JoinRoom gameContextValue={gameContextValue} />}
-        {isInRoom && <PongGame gameContextValue={gameContextValue} />}
-      </Center>
+      <Center>{gamePage}</Center>
     </ContentLayout>
   );
 });
