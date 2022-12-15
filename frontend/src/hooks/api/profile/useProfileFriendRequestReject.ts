@@ -6,25 +6,25 @@ import {
 } from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
-export interface FriendRequestRejectInProfileResBody {
+export interface RejectFriendRequestInProfileResBody {
   friendRequest: FriendRequest;
 }
 
 export type RejectFriendRequestInProfile = UseMutateAsyncFunction<
-  FriendRequestRejectInProfileResBody,
+  RejectFriendRequestInProfileResBody,
   unknown,
   string,
   unknown
 >;
 
-export const useFriendRequestRejectInProfile = (
+export const useProfileFriendRequestReject = (
   otherId: string
 ): {
   rejectFriendRequestInProfile: RejectFriendRequestInProfile;
   isLoading: boolean;
 } => {
   const axiosDelete = async (userId: string) => {
-    const result = await axios.delete<FriendRequestRejectInProfileResBody>(
+    const result = await axios.delete<RejectFriendRequestInProfileResBody>(
       '/users/me/friend-requests/incoming/' + userId
     );
 

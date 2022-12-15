@@ -1,10 +1,10 @@
 import { memo, FC } from 'react';
 import { Box, Button, Flex, HStack } from '@chakra-ui/react';
-import { useFriendRelation } from 'hooks/api/relations/useFriendRelation';
-import { useFriendRequestCancelInProfile } from 'hooks/api/relations/useFriendRequestCancelInProfile';
-import { useFriendRequestInProfile } from 'hooks/api/relations/useFriendRequestInProfile';
-import { useFriendRequestRejectInProfile } from 'hooks/api/relations/useFriendRequestRejectInProfile';
-import { useFriendRequestRespondInProfile } from 'hooks/api/relations/useFriendRequestRespondInProfile';
+import { useFriendRelation } from 'hooks/api/profile/useFriendRelation';
+import { useProfileFriendRequest } from 'hooks/api/profile/useProfileFriendRequest';
+import { useProfileFriendRequestAccept } from 'hooks/api/profile/useProfileFriendRequestAccept';
+import { useProfileFriendRequestCancel } from 'hooks/api/profile/useProfileFriendRequestCancel';
+import { useProfileFriendRequestReject } from 'hooks/api/profile/useProfileFriendRequestReject';
 
 type Props = {
   otherId: string;
@@ -13,13 +13,13 @@ type Props = {
 export const FriendButton: FC<Props> = memo((props) => {
   const { otherId } = props;
   const { friendRelation } = useFriendRelation(otherId);
-  const { requestFriendInProfile } = useFriendRequestInProfile(otherId);
+  const { requestFriendInProfile } = useProfileFriendRequest(otherId);
   const { cancelFriendRequestInProfile } =
-    useFriendRequestCancelInProfile(otherId);
-  const { respondFriendRequestInProfile } =
-    useFriendRequestRespondInProfile(otherId);
+    useProfileFriendRequestCancel(otherId);
+  const { acceptFriendRequestInProfile } =
+    useProfileFriendRequestAccept(otherId);
   const { rejectFriendRequestInProfile } =
-    useFriendRequestRejectInProfile(otherId);
+    useProfileFriendRequestReject(otherId);
 
   const onClickRequestButton = async () => {
     await requestFriendInProfile({ receiverId: otherId });
@@ -30,9 +30,8 @@ export const FriendButton: FC<Props> = memo((props) => {
   };
 
   const onClickAcceptButton = async () => {
-    await respondFriendRequestInProfile({
+    await acceptFriendRequestInProfile({
       creatorId: otherId,
-      status: 'ACCEPTED',
     });
   };
 
