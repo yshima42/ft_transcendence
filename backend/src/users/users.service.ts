@@ -53,9 +53,6 @@ export class UsersService {
       if (attrs.includes('nickname')) {
         userDto.nickname = user.nickname;
       }
-      if (attrs.includes('isTwoFactorAuthEnabled?')) {
-        userDto.isTwoFactorAuthEnabled = user.isTwoFactorAuthEnabled;
-      }
       if (attrs.includes('onlineStatus')) {
         userDto.onlineStatus = user.onlineStatus;
       }

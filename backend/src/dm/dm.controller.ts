@@ -11,14 +11,14 @@ import {
 import * as Sw from '@nestjs/swagger';
 import { User, Dm } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
-import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
+import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseDm } from './dm.interface';
 import { DmService } from './dm.service';
 import { CreateDmDto } from './dto/create-dm.dto';
 
 @Controller('dm/:dmRoomId/message')
 @Sw.ApiTags('dm')
-@UseGuards(JwtTwoFactorAuthGuard)
+@UseGuards(JwtOtpAuthGuard)
 export class DmController {
   constructor(private readonly dmService: DmService) {}
 

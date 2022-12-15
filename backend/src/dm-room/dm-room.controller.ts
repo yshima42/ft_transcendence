@@ -2,12 +2,13 @@ import { Controller, Get, UseGuards } from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
-import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
+import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseDmRoom } from './dm-room.interface';
 import { DmRoomService } from './dm-room.service';
+
 @Controller('dm/room')
 @Sw.ApiTags('dm-room')
-@UseGuards(JwtTwoFactorAuthGuard)
+@UseGuards(JwtOtpAuthGuard)
 export class DmRoomController {
   constructor(private readonly dmRoomService: DmRoomService) {}
 

@@ -1,4 +1,5 @@
 import {
+  QueryKey,
   UseMutateAsyncFunction,
   useMutation,
   useQueryClient,
@@ -7,7 +8,7 @@ import { axios } from '../../../lib/axios';
 
 export function usePatchApi<ReqBody, ResBody>(
   endpoint: string,
-  queryKeys?: string[]
+  queryKeys?: QueryKey[]
 ): {
   patchFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
   isLoading: boolean;
@@ -23,7 +24,9 @@ export function usePatchApi<ReqBody, ResBody>(
   const { mutateAsync: patchFunc, isLoading } = useMutation(axiosPatch, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
-        void queryClient.invalidateQueries([...queryKeys]);
+        queryKeys.forEach((queryKey) => {
+          void queryClient.invalidateQueries({ queryKey });
+        });
       }
     },
   });

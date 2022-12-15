@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { MatchResult, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
-import { JwtTwoFactorAuthGuard } from 'src/auth/guards/jwt-two-factor-auth.guard';
+import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import { GameStatsEntity } from './entities/game-stats.entity';
 import { MatchResultEntity } from './entities/match-result.entity';
@@ -19,7 +19,7 @@ import {
 
 @Controller('game')
 @ApiTags('game')
-@UseGuards(JwtTwoFactorAuthGuard)
+@UseGuards(JwtOtpAuthGuard)
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
