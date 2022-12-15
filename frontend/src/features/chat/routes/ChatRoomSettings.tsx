@@ -65,7 +65,6 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
 
   function setLimitAction(limit: limit) {
     setLimit(limit);
-    console.log(limit);
     onClose();
   }
 
@@ -112,6 +111,11 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
 
   async function exitChatRoom() {
     await axios.delete(`/chat/rooms/${chatRoomId}/users/me`);
+    navigate('/app/chat/me');
+  }
+
+  async function onClickDeleteChatRoom() {
+    await axios.delete(`/chat/rooms/${chatRoomId}`);
     navigate('/app/chat/me');
   }
 
@@ -168,6 +172,16 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
               onClick={async () => await exitChatRoom()}
             >
               Exit
+            </C.Button>
+          )}
+        {/* LoginUserがADMINなら消去ボタンを出す */}
+        {loginUser !== undefined &&
+          loginUser.status === ChatUserStatus.ADMIN && (
+            <C.Button
+              colorScheme="red"
+              onClick={async () => await onClickDeleteChatRoom()}
+            >
+              Delete
             </C.Button>
           )}
       </ContentLayout>

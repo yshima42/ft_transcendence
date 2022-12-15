@@ -3,6 +3,7 @@ import * as NestJS from '@nestjs/common';
 import { ChatRoom, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
+import { ChatRoomUserService } from 'src/chat-room-user/chat-room-user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
@@ -10,7 +11,10 @@ import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @Injectable()
 export class ChatRoomService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly chatRoomUserService: ChatRoomUserService
+  ) {}
 
   async create(
     createChatroomDto: CreateChatRoomDto,
@@ -171,14 +175,34 @@ export class ChatRoomService {
   }
 
   // remove
-  async remove(id: string): Promise<ChatRoom> {
+  async remove(chatRoomId: string, userId: string): Promise<void> {
+    // userのチャットでの権限を取得
+    const loginChatRoomUser = await this.chatRoomUserService.findOne(
+      chatRoomId,
+      userId
+    );
+    if (loginChatRoomUser === undefined) {
+      Logger.warn(`removeChatRoom: user is not in chatRoom`);
+
+      throw new NestJS.HttpException(
+        'User is not in chatRoom',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
+    // もしADMINじゃなかったらエラー
+    if (loginChatRoomUser.status !== ChatUserStatus.ADMIN) {
+      Logger.warn(`removeChatRoom: user is not admin`);
+
+      throw new NestJS.HttpException(
+        'User is not admin',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
     const chatRoom = await this.prisma.chatRoom.delete({
       where: {
-        id,
+        id: chatRoomId,
       },
     });
     Logger.debug(`removeChatRoom: ${JSON.stringify(chatRoom)}`);
-
-    return chatRoom;
   }
 }
