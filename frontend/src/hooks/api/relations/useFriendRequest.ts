@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { QueryKey, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { usePostApi } from '../generics/usePostApi';
 
 export interface FriendRequestReqBody {
@@ -17,14 +17,16 @@ export type RequestFriend = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useFriendRequest = (): {
+export const useFriendRequest = (
+  queryKeys: QueryKey[] = []
+): {
   requestFriend: RequestFriend;
   isLoading: boolean;
 } => {
   const { postFunc: requestFriend, isLoading } = usePostApi<
     FriendRequestReqBody,
     FriendRequestResBody
-  >(`/users/me/friend-requests`);
+  >(`/users/me/friend-requests`, queryKeys);
 
   return { requestFriend, isLoading };
 };
