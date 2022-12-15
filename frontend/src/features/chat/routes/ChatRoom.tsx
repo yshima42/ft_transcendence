@@ -7,6 +7,7 @@ import {
 } from 'hooks/api/chat/types';
 import { axios } from 'lib/axios';
 import { useLocation, Link } from 'react-router-dom';
+import { io, Socket } from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -23,6 +24,24 @@ export const ChatRoom: React.FC = React.memo(() => {
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
   const [loginUser, setLoginUser] = React.useState<ResponseChatRoomUser>();
 
+  // TODO: ソケットの生成、破棄をちゃんとやる
+  const [socket] = React.useState<Socket>(io('http://localhost:3000/chat'));
+  const scrollBottomRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    socket.emit('join_room', chatRoomId);
+    socket.on('receive_message', (payload: ResponseChatMessage) => {
+      setMessages((prev) => {
+        return [...prev, payload];
+      });
+    });
+
+    return () => {
+      socket.off('receive_message');
+      socket.emit('leave_room', chatRoomId);
+    };
+  }, [chatRoomId, socket]);
+
   async function getAllChatMessage(): Promise<void> {
     const res: { data: ResponseChatMessage[] } = await axios.get(
       `/chat/rooms/${chatRoomId}/messages`
@@ -30,9 +49,13 @@ export const ChatRoom: React.FC = React.memo(() => {
     setMessages(res.data);
   }
   // 送信ボタンを押したときの処理
-  async function sendMessage(content: string): Promise<void> {
-    await axios.post(`/chat/rooms/${chatRoomId}/messages`, { content });
-    getAllChatMessage().catch((err) => console.error(err));
+  function sendMessage(content: string): void {
+    if (loginUser == null) return;
+    socket.emit('send_message', {
+      content,
+      senderId: loginUser.user.id,
+      chatRoomId,
+    });
   }
 
   async function getLoginUser() {
@@ -46,6 +69,11 @@ export const ChatRoom: React.FC = React.memo(() => {
     getAllChatMessage().catch((err) => console.error(err));
     getLoginUser().catch((err) => console.error(err));
   }, []);
+
+  // 更新時の自動スクロール
+  React.useEffect(() => {
+    scrollBottomRef.current?.scrollIntoView();
+  }, [messages]);
 
   return (
     <>
@@ -67,6 +95,7 @@ export const ChatRoom: React.FC = React.memo(() => {
           padding={4}
           overflowY="auto"
           overflowX="hidden"
+          height="70vh"
         >
           {messages.map((message) => (
             <Message
@@ -78,6 +107,7 @@ export const ChatRoom: React.FC = React.memo(() => {
               avatarImageUrl={message.sender.avatarImageUrl}
             />
           ))}
+          <div ref={scrollBottomRef} />
         </C.Flex>
         <C.Divider />
         {/* メッセージ送信フォーム  loginUserがMUTEのときは送信できないようにする */}

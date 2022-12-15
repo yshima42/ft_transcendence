@@ -9,7 +9,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
-import { ChatMessage, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseChatMessage } from './chat-message.interface';
@@ -28,7 +28,7 @@ export class ChatMessageController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Body() createChatMessageDto: CreateChatMessageDto,
     @GetUser() user: User
-  ): Promise<ChatMessage> {
+  ): Promise<ResponseChatMessage> {
     Logger.debug(
       `createChatMessageDto: ${JSON.stringify(createChatMessageDto)}`
     );
