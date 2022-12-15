@@ -26,7 +26,7 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
             <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
               <C.Link
                 as={Link}
-                to={`/app/chat/${chatRoom.id}`}
+                to={`/app/chat/room/${chatRoom.id}`}
                 state={{
                   chatRoomId: chatRoom.id,
                   name: chatRoom.name,
