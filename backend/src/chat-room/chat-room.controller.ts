@@ -30,10 +30,10 @@ export class ChatRoomController {
   }
 
   // 自分が入っていないチャット全部
-  @Get()
+  @Get('all')
   @UseGuards(JwtAuthGuard)
-  async findAll(@GetUser() user: User): Promise<ResponseChatRoom[]> {
-    return await this.chatRoomService.findAll(user.id);
+  async findAllWithOutMe(@GetUser() user: User): Promise<ResponseChatRoom[]> {
+    return await this.chatRoomService.findAllWithOutMe(user.id);
   }
 
   // 自分が入っているチャット全部

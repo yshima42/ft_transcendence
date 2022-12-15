@@ -58,7 +58,7 @@ export class ChatRoomService {
   }
 
   // 自分が入っていないチャット全部
-  async findAll(userId: string): Promise<ResponseChatRoom[]> {
+  async findAllWithOutMe(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
         chatRoomUsers: {
