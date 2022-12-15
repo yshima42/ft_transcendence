@@ -2,7 +2,6 @@ import { memo, FC } from 'react';
 import { Box, Stack, Text, VStack } from '@chakra-ui/react';
 import { useMatchHistory } from 'hooks/api/game/useMatchHistory';
 import { GameResultCard } from './GameResultCard';
-import { PrevAndNextButton } from './PrevAndNextButton';
 
 type MatchHistoryCardProps = {
   id: string;
@@ -13,7 +12,7 @@ export const MatchHistoryCard: FC<MatchHistoryCardProps> = memo(
     const { matchHistory } = useMatchHistory(id);
 
     // TODO:機能要件の時に変更する。フロントでロジックを書きたくない？
-    const latest5Matches = matchHistory.slice(-5);
+    const latest5Matches = matchHistory.slice(0, 5);
 
     return (
       <>
@@ -40,7 +39,6 @@ export const MatchHistoryCard: FC<MatchHistoryCardProps> = memo(
                 </Box>
               ))}
             </VStack>
-            <PrevAndNextButton />
           </Stack>
         </Box>
       </>
