@@ -69,12 +69,12 @@ export class ChatRoomUserController {
     );
   }
 
-  @Delete(':id')
+  @Delete(':userId')
   @UseGuards(JwtAuthGuard)
   async remove(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Param('id', new ParseUUIDPipe()) id: string
+    @Param('userId', new ParseUUIDPipe()) userId: string
   ): Promise<void> {
-    return await this.chatRoomUserService.remove(chatRoomId, id);
+    return await this.chatRoomUserService.remove(chatRoomId, userId);
   }
 }
