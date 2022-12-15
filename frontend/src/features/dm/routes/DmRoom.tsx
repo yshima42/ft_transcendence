@@ -29,13 +29,13 @@ export const DmRoom: React.FC = React.memo(() => {
 
   async function getAllDm(): Promise<void> {
     const res: { data: ResponseDm[] } = await axios.get(
-      `/dm/${dmRoomId}/message`
+      `/dm/${dmRoomId}/messages`
     );
     setMessages(res.data);
   }
   // 送信ボタンを押したときの処理
   async function sendMessage(content: string): Promise<void> {
-    await axios.post(`/dm/${dmRoomId}/message`, { content, dmRoomId });
+    await axios.post(`/dm/${dmRoomId}/messages`, { content, dmRoomId });
     getAllDm().catch((err) => console.error(err));
   }
 

@@ -16,7 +16,7 @@ import { ResponseChatMessage } from './chat-message.interface';
 import { ChatMessageService } from './chat-message.service';
 import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 
-@Controller('chat/room/:chatRoomId/message')
+@Controller('chat/rooms/:chatRoomId/messages')
 @Sw.ApiTags('chat-message')
 @UseGuards(JwtOtpAuthGuard)
 export class ChatMessageController {
@@ -40,7 +40,7 @@ export class ChatMessageController {
     );
   }
 
-  @Get('all')
+  @Get()
   async findAll(
     @Param('chatRoomId') chatRoomId: string
   ): Promise<ResponseChatMessage[]> {

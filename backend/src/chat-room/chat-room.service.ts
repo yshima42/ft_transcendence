@@ -124,23 +124,6 @@ export class ChatRoomService {
     return chatRooms;
   }
 
-  async findOne(id: string): Promise<ChatRoom> {
-    const chatRoom = await this.prisma.chatRoom.findUnique({
-      where: {
-        id,
-      },
-    });
-    Logger.debug(`findOneChatRoom: ${JSON.stringify(chatRoom)}`);
-
-    if (chatRoom === null) {
-      Logger.warn(`findOneChatRoom: chatRoom is null`);
-
-      throw new Error('ChatRoom not found');
-    }
-
-    return chatRoom;
-  }
-
   // update
   async update(
     chatRoomId: string,
@@ -148,8 +131,10 @@ export class ChatRoomService {
     userId: string
   ): Promise<ChatRoom> {
     const { password } = updateChatroomDto;
+    Logger.debug(`updateChatRoom: ${JSON.stringify(updateChatroomDto)}`);
     let hashedPassword: string | undefined;
     if (password !== undefined) {
+      Logger.debug(`updateChatRoom: password is not undefined`);
       hashedPassword = await bcrypt.hash(password, 10);
     }
     // userのチャットでの権限を取得

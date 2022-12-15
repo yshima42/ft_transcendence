@@ -16,7 +16,7 @@ import { ResponseDm } from './dm.interface';
 import { DmService } from './dm.service';
 import { CreateDmDto } from './dto/create-dm.dto';
 
-@Controller('dm/:dmRoomId/message')
+@Controller('dm/:dmRoomId/messages')
 @Sw.ApiTags('dm')
 @UseGuards(JwtOtpAuthGuard)
 export class DmController {

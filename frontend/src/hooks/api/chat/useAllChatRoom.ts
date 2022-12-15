@@ -9,7 +9,7 @@ export const useAllChatRoom = (): {
 
   React.useEffect(() => {
     axios
-      .get('/chat/room/all')
+      .get('/chat/rooms')
       .then((response) => {
         setChatRooms(response.data as ResponseChatRoom[]);
       })
