@@ -40,7 +40,7 @@ export const FriendButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Box h="80px">
+    <Box>
       <Flex justify="center" align="center">
         {friendRelation === 'NONE' ? (
           <Button size="sm" onClick={onClickRequestButton}>

@@ -3,6 +3,7 @@ import { Avatar, Flex, HStack, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { BlockButton } from './BlockButton';
 import { FriendButton } from './FriendButton';
+import { GameButton } from './GameButton';
 import { ProfileSetting } from './ProfileSetting';
 
 type UserInfoCardProps = {
@@ -34,10 +35,13 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
         </Text>
         {isLoginUser && <ProfileSetting />}
         {isLoginUser || (
-          <HStack justify="center" align="center">
-            <FriendButton otherId={user.id} />
-            <BlockButton userId={user.id} isBlockedUser={isBlockedUser} />
-          </HStack>
+          <>
+            <GameButton isGamePlaying={false} />
+            <HStack justify="center" align="center">
+              <FriendButton otherId={user.id} />
+              <BlockButton userId={user.id} isBlockedUser={isBlockedUser} />
+            </HStack>
+          </>
         )}
       </Flex>
     );
