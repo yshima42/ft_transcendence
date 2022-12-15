@@ -10,58 +10,50 @@ type Props = {
 
 export const UserActionButtons: React.FC<Props> = React.memo(
   ({ userId, status, onClickAction }) => {
-    const Buttons: {
-      [key in ChatUserStatus]: (userId: string) => React.ReactNode;
-    } = {
-      ADMIN: (userId: string) => (
-        <>
-          <C.Button
-            onClick={() => onClickAction(userId, ChatUserStatus.KICKED)}
-          >
-            Kick
-          </C.Button>
-          <C.Button
-            onClick={() => onClickAction(userId, ChatUserStatus.BANNED)}
-          >
-            Ban
-          </C.Button>
-          <C.Button onClick={() => onClickAction(userId, ChatUserStatus.MUTE)}>
-            Mute
-          </C.Button>
-          <C.Button
-            onClick={() => onClickAction(userId, ChatUserStatus.MODERATOR)}
-          >
-            Promote
-          </C.Button>
-          <C.Button onClick={() => onClickAction(userId, ChatUserStatus.ADMIN)}>
-            Appoint
-          </C.Button>
-        </>
-      ),
-      MODERATOR: (userId: string) => (
-        <>
-          <C.Button
-            onClick={() => onClickAction(userId, ChatUserStatus.KICKED)}
-          >
-            Kick
-          </C.Button>
-          <C.Button
-            onClick={() => onClickAction(userId, ChatUserStatus.BANNED)}
-          >
-            Ban
-          </C.Button>
-          <C.Button onClick={() => onClickAction(userId, ChatUserStatus.MUTE)}>
-            Mute
-          </C.Button>
-        </>
-      ),
-      NORMAL: () => <></>,
-      KICKED: () => <></>,
-      BANNED: () => <></>,
-      MUTE: () => <></>,
-    };
+    const isAdmin = status === ChatUserStatus.ADMIN;
+    const isModerator = status === ChatUserStatus.MODERATOR;
+    let buttons: React.ReactNode;
 
-    return <>{Buttons[status](userId)}</>;
+    if (isAdmin || isModerator) {
+      const actionButtons: Array<{ status: ChatUserStatus; label: string }> = [
+        {
+          status: ChatUserStatus.KICKED,
+          label: 'Kick',
+        },
+        {
+          status: ChatUserStatus.BANNED,
+          label: 'Ban',
+        },
+        {
+          status: ChatUserStatus.MUTE,
+          label: 'Mute',
+        },
+      ];
+
+      if (isAdmin) {
+        actionButtons.push(
+          {
+            status: ChatUserStatus.MODERATOR,
+            label: 'Promote',
+          },
+          {
+            status: ChatUserStatus.ADMIN,
+            label: 'Appoint',
+          }
+        );
+      }
+
+      buttons = actionButtons.map(({ status, label }) => (
+        <C.Button key={status} onClick={() => onClickAction(userId, status)}>
+          {' '}
+          {label}
+        </C.Button>
+      ));
+    } else {
+      buttons = <></>;
+    }
+
+    return <>{buttons}</>;
   }
 );
 
