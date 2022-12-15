@@ -129,17 +129,27 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
             </C.AccordionPanel>
           </C.AccordionItem>
           {/* LoginUserがADMINならセキュリティタブを出す */}
-          {loginUser !== undefined &&
-            loginUser.status === ChatUserStatus.ADMIN && (
-              <SecurityAccordionItem
-                status={status}
-                lockFunc={async () => await onClickLock()}
-                unLockFunc={async () => await onClickUnLock()}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setPassword(e.target.value);
-                }}
-              />
-            )}
+          <C.AccordionItem>
+            <C.AccordionButton>
+              <C.Box flex="1" textAlign="left">
+                Security
+              </C.Box>
+              <C.AccordionIcon />
+            </C.AccordionButton>
+            <C.AccordionPanel pb={4}>
+              {loginUser !== undefined &&
+                loginUser.status === ChatUserStatus.ADMIN && (
+                  <SecurityAccordionItem
+                    status={status}
+                    lockFunc={async () => await onClickLock()}
+                    unLockFunc={async () => await onClickUnLock()}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setPassword(e.target.value);
+                    }}
+                  />
+                )}
+            </C.AccordionPanel>
+          </C.AccordionItem>
         </C.Accordion>
       </ContentLayout>
       <ChatRoomUserActionModal
