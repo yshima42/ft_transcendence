@@ -45,7 +45,6 @@ export const UserActionButtons: React.FC<Props> = React.memo(
 
       buttons = actionButtons.map(({ status, label }) => (
         <C.Button key={status} onClick={() => onClickAction(userId, status)}>
-          {' '}
           {label}
         </C.Button>
       ));

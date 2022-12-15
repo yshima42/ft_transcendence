@@ -30,7 +30,7 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
                 state={{
                   chatRoomId: chatRoom.id,
                   name: chatRoom.name,
-                  status: chatRoom.status,
+                  chatRoomStatus: chatRoom.status,
                 }}
               >
                 <C.Box p={5} shadow="md" borderWidth="1px">

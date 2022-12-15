@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as NestJS from '@nestjs/common';
 import { ChatUserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -136,14 +136,7 @@ export class ChatRoomUserService {
     switch (status) {
       // KICKEDの場合は、テーブルから消去する
       case ChatUserStatus.KICKED:
-        await this.prisma.chatRoomUser.delete({
-          where: {
-            chatRoomId_userId: {
-              chatRoomId,
-              userId,
-            },
-          },
-        });
+        await this.remove(chatRoomId, userId);
         break;
 
       // ADMIN -> ADMINの場合は変更に加えて、自分のステータスをMODERATORに変更する
@@ -157,7 +150,7 @@ export class ChatRoomUserService {
               },
             },
             data: {
-              status,
+              status: ChatUserStatus.ADMIN,
             },
           }),
           this.prisma.chatRoomUser.update({
@@ -208,13 +201,31 @@ export class ChatRoomUserService {
   }
 
   async remove(chatRoomId: string, userId: string): Promise<void> {
-    await this.prisma.chatRoomUser.delete({
-      where: {
-        chatRoomId_userId: {
-          chatRoomId,
-          userId,
+    Logger.debug(`remove chatRoomId: ${chatRoomId}, userId: ${userId}`);
+    const chatRoomUser = await this.findOne(chatRoomId, userId);
+    // ADMINは退出できない
+    if (chatRoomUser.status === ChatUserStatus.ADMIN) {
+      throw new NestJS.HttpException(
+        'Permission denied',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
+
+    try {
+      await this.prisma.chatRoomUser.delete({
+        where: {
+          chatRoomId_userId: {
+            chatRoomId,
+            userId,
+          },
         },
-      },
-    });
+      });
+    } catch (e) {
+      Logger.error(e);
+      throw new NestJS.HttpException(
+        'ChatRoomUser not found',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
   }
 }
