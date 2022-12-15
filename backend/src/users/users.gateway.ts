@@ -10,48 +10,67 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
-  public onlineUserIdTosocketId: Map<string, string>;
+  public socketIdToUserId: Map<string, string>;
+  public userIds: Set<string>;
 
   constructor() {
-    this.onlineUserIdTosocketId = new Map<string, string>();
+    this.socketIdToUserId = new Map<string, string>();
+    this.userIds = new Set<string>();
   }
 
   @WebSocketServer()
   private readonly server!: Server;
 
-  handleConnection(@ConnectedSocket() socket: Socket): void {
-    Logger.debug('connected: ' + socket.id);
-  }
+  // userIdを渡せないから使わない。guardがついたら使えるかも
+  // handleConnection(@ConnectedSocket() socket: Socket): void {
+  //   Logger.debug('connected: ' + socket.id);
+  // }
 
   handleDisconnect(@ConnectedSocket() socket: Socket): void {
-    Logger.debug('disconnected: ' + socket.id);
-    const onlineUserId = this.getUserIdBySocketId(socket.id);
-    if (onlineUserId !== undefined) {
-      this.onlineUserIdTosocketId.delete(onlineUserId);
+    const targetUserId = this.socketIdToUserId.get(socket.id);
+    if (targetUserId !== undefined) {
+      this.socketIdToUserId.delete(socket.id);
+      if (this.countConnectionByUserId(targetUserId) === 0) {
+        this.userIds.delete(targetUserId);
+        socket.broadcast.emit('user_disconnected', targetUserId);
+      }
     }
-    socket.broadcast.emit('user_disconnected', onlineUserId);
+
+    // debug用
+    Logger.debug('disconnected: ' + socket.id);
+    console.table(this.socketIdToUserId);
+    console.table(this.userIds);
   }
 
   @SubscribeMessage('handshake')
   handshake(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() userId: string
+    @MessageBody() newUserId: string
   ): string[] {
-    this.onlineUserIdTosocketId.set(userId, socket.id);
-    socket.broadcast.emit('user_connected', userId);
+    const reconnected = this.userIds.has(newUserId);
+    if (!reconnected) {
+      socket.broadcast.emit('user_connected', newUserId);
+    }
+    this.socketIdToUserId.set(socket.id, newUserId);
+    this.userIds.add(newUserId);
 
-    return [...this.onlineUserIdTosocketId.keys()];
+    // debug用
+    Logger.debug('handshake: ' + socket.id);
+    console.table(this.socketIdToUserId);
+    console.table(this.userIds);
+
+    return [...this.userIds];
   }
 
-  private readonly getUserIdBySocketId = (id: string): string | undefined => {
-    const keyValues = this.onlineUserIdTosocketId.entries();
-    let userId;
-    for (const keyValue of keyValues) {
-      if (keyValue[1] === id) {
-        userId = keyValue[0];
+  private readonly countConnectionByUserId = (targetUserId: string): number => {
+    const userIds = this.socketIdToUserId.values();
+    let count = 0;
+    for (const userId of userIds) {
+      if (userId === targetUserId) {
+        count += 1;
       }
     }
 
-    return userId;
+    return count;
   };
 }
