@@ -1,37 +1,37 @@
 import { memo, FC } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
-import { useProfileUserBlock } from 'hooks/api/profile/useProfileUserBlock';
-import { useProfileUserBlockCancel } from 'hooks/api/profile/useProfileUserBlockCancel';
+import { useUserBlock, useUserBlockCancel } from 'hooks/api';
 
-type BlockButtonProps = {
+type Props = {
   userId: string;
   isBlockedUser: boolean;
 };
 
-export const BlockButton: FC<BlockButtonProps> = memo(
-  ({ userId, isBlockedUser }: BlockButtonProps) => {
-    const { blockUserInProfile } = useProfileUserBlock(userId);
-    const { cancelUserBlockInProfile } = useProfileUserBlockCancel(userId);
+export const BlockButton: FC<Props> = memo((props) => {
+  const { userId, isBlockedUser } = props;
 
-    const onClickBlock = async () => {
-      await blockUserInProfile({ targetId: userId });
-    };
+  const queryKeys = [[`/users/me/blocks/${userId}`]];
+  const { blockUser } = useUserBlock(queryKeys);
+  const { cancelUserBlock } = useUserBlockCancel(queryKeys);
 
-    const onClickCancelBlock = async () => {
-      await cancelUserBlockInProfile(userId);
-    };
+  const onClickBlock = async () => {
+    await blockUser({ targetId: userId });
+  };
 
-    return (
-      <Box>
-        <Flex justify="center" align="center">
-          <Button
-            size="sm"
-            onClick={isBlockedUser ? onClickCancelBlock : onClickBlock}
-          >
-            {isBlockedUser ? 'unblock' : 'block'}
-          </Button>
-        </Flex>
-      </Box>
-    );
-  }
-);
+  const onClickCancelBlock = async () => {
+    await cancelUserBlock(userId);
+  };
+
+  return (
+    <Box>
+      <Flex justify="center" align="center">
+        <Button
+          size="sm"
+          onClick={isBlockedUser ? onClickCancelBlock : onClickBlock}
+        >
+          {isBlockedUser ? 'unblock' : 'block'}
+        </Button>
+      </Flex>
+    </Box>
+  );
+});

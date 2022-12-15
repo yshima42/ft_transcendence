@@ -1,5 +1,5 @@
 import { Block } from '@prisma/client';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { QueryKey, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { usePostApi } from '../generics/usePostApi';
 
 export interface UserBlockReqBody {
@@ -17,14 +17,16 @@ export type BlockUser = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useUserBlock = (): {
+export const useUserBlock = (
+  queryKeys: QueryKey[] = []
+): {
   blockUser: BlockUser;
   isLoading: boolean;
 } => {
   const { postFunc: blockUser, isLoading } = usePostApi<
     UserBlockReqBody,
     UserBlockResBody
-  >(`/users/me/blocks`, [['/users/me/blocks']]);
+  >(`/users/me/blocks`, queryKeys);
 
   return { blockUser, isLoading };
 };

@@ -1,5 +1,5 @@
 import { FriendRequest } from '@prisma/client';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { QueryKey, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { usePatchApi } from '../generics/usePatchApi';
 
 export type FriendRequestAcceptReqBody = Partial<FriendRequest>;
@@ -15,14 +15,16 @@ export type AcceptFriendRequest = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useFriendRequestAccept = (): {
+export const useFriendRequestAccept = (
+  queryKeys: QueryKey[] = []
+): {
   acceptFriendRequest: AcceptFriendRequest;
   isLoading: boolean;
 } => {
   const { patchFunc: acceptFriendRequest, isLoading } = usePatchApi<
     FriendRequestAcceptReqBody,
     FriendRequestAcceptResBody
-  >(`/users/me/friend-requests/incoming`);
+  >(`/users/me/friend-requests/incoming`, queryKeys);
 
   return { acceptFriendRequest, isLoading };
 };
