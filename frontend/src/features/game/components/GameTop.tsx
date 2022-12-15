@@ -6,7 +6,7 @@ type Props = {
   setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
 };
 
-export const JoinRoom: FC<Props> = memo((props) => {
+export const GameTop: FC<Props> = memo((props) => {
   const { setGamePhase } = props;
 
   return (

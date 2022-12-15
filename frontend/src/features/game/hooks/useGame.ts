@@ -15,21 +15,37 @@ import { userInput } from '../utils/userInput';
 export enum GamePhase {
   Top = 0,
   Matching = 1,
-  // Confim = 2,
-  WaitStart = 3,
+  Confirmation = 2,
+  Waiting = 3,
   InGame = 4,
   Result = 5,
 }
+
+export type GameResult = {
+  player1Nickname: string;
+  player2Nickname: string;
+  player1Score: number;
+  player2Score: number;
+};
+
+const defaultGameResult: GameResult = {
+  player1Nickname: '',
+  player2Nickname: '',
+  player1Score: 0,
+  player2Score: 0,
+};
 
 // ここでuseRefを使ってsocketのconnect処理ができたら理想
 export const useGame = (): {
   gamePhase: GamePhase;
   setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
   draw: (ctx: CanvasRenderingContext2D) => void;
+  gameResult: GameResult;
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.Top);
   const [roomId, setRoomId] = useState('');
   const [isLeftSide, setIsLeftSide] = useState(true);
+  const [gameResult, setGameResult] = useState(defaultGameResult);
   // TODO: socket はとりあえずの仮実装
   const [socket] = useState(io('http://localhost:3000/game'));
   const { user } = useProfile();
@@ -60,16 +76,19 @@ export const useGame = (): {
     socket.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
       setRoomId(roomId);
       setIsLeftSide(isLeftSide);
-      setGamePhase(GamePhase.WaitStart);
+
       socket.emit('join_room', { roomId });
-      socket.emit('connect_pong', { roomId });
+    });
+
+    socket.on('check_confirmation', () => {
+      setGamePhase(GamePhase.Confirmation);
     });
 
     socket.on('start_game', () => {
       setGamePhase(GamePhase.InGame);
     });
 
-    // スコア受け取り
+    // ゲーム中のスコア受け取り
     socket.on(
       'update_score',
       (data: { paddle1Score: number; paddle2Score: number }) => {
@@ -98,13 +117,15 @@ export const useGame = (): {
       }
     );
 
-    socket.on('done_game', () => {
+    socket.on('done_game', (gameResult: GameResult) => {
+      setGameResult(gameResult);
       setGamePhase(GamePhase.Result);
     });
 
     return () => {
       socket.off('go_game_room');
       socket.off('start_game');
+      socket.off('check_confirmation');
       socket.off('done_game');
       socket.off('update_score');
       socket.off('position_update');
@@ -119,12 +140,17 @@ export const useGame = (): {
         socket.emit('random_match');
         break;
       }
+      case GamePhase.Waiting: {
+        socket.emit('confirm', { roomId });
+        break;
+      }
       case GamePhase.InGame: {
+        socket.emit('connect_pong', { roomId });
         userInput(socket, roomId, player1, isLeftSide);
         break;
       }
     }
   }, [gamePhase, user, socket]);
 
-  return { gamePhase, setGamePhase, draw };
+  return { gamePhase, setGamePhase, draw, gameResult };
 };

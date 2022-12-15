@@ -86,8 +86,17 @@ export class GameGateway {
     await socket.join(message.roomId);
     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
 
-    // socket.emit('check_confirmation');
-    socket.emit('start_game');
+    socket.emit('check_confirmation');
+  }
+
+  @SubscribeMessage('confirm')
+  confirm(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { roomId: string }
+  ): void {
+    this.gameRooms[message.roomId].ready
+      ? this.server.in(message.roomId).emit('start_game')
+      : (this.gameRooms[message.roomId].ready = true);
   }
 
   @SubscribeMessage('connect_pong')
@@ -101,7 +110,7 @@ export class GameGateway {
     }
 
     const gameRoom = this.gameRooms[message.roomId];
-    // this.server.in(message.roomId).emit('start_game');
+
     // ゲーム開始
     gameRoom.gameStart(socket, message.roomId);
 
