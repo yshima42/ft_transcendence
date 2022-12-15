@@ -1,7 +1,10 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatUserStatus } from '@prisma/client';
-import { ResponseChatRoomUser, ResponseChatMessage } from 'features/chat/types';
+import {
+  ResponseChatRoomUser,
+  ResponseChatMessage,
+} from 'hooks/api/chat/types';
 import { axios } from 'lib/axios';
 import { useLocation, Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
