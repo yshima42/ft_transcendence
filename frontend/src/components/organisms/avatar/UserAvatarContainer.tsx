@@ -13,16 +13,12 @@ export const UserAvatarContainer: FC<Props> = memo(
   ({ id, ...avatarProps }: Props) => {
     const { isFriend } = useIsFrind(id);
     const { isLoginUser } = useIsLoginUser(id);
-    const link = `/app/users/${id}`;
+    const link = isLoginUser ? `/app/profile` : `/app/users/${id}`;
 
     return (
       <>
         {isFriend || isLoginUser ? (
-          <UserAvatarWithBadge
-            id={id}
-            link={`/app/users/${id}`}
-            {...avatarProps}
-          />
+          <UserAvatarWithBadge id={id} link={link} {...avatarProps} />
         ) : (
           <UserAvatar link={link} {...avatarProps} />
         )}
