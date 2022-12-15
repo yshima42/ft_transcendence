@@ -1,31 +1,11 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomStatus } from '@prisma/client';
-import { axios } from 'lib/axios';
+import { useAllChatRoom } from 'hooks/api/chat/useAllChatRoom';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
-type ResponseChatRoom = {
-  id: string;
-  name: string;
-  status: ChatRoomStatus;
-  chatMessages: Array<{
-    content: string;
-    createdAt: Date;
-  }>;
-};
-
 export const ChatRooms: React.FC = React.memo(() => {
-  const [chatRooms, setChatRooms] = React.useState<ResponseChatRoom[]>([]);
-
-  async function getAllChatRoom(): Promise<void> {
-    const res: { data: ResponseChatRoom[] } = await axios.get('/chat/room');
-    setChatRooms(res.data);
-  }
-
-  React.useEffect(() => {
-    getAllChatRoom().catch((err) => console.error(err));
-  }, []);
+  const { chatRooms } = useAllChatRoom();
 
   return (
     <>
