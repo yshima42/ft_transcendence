@@ -6,8 +6,6 @@ type Props = AvatarProps & {
   link: string;
 };
 
-export const UserAvatar: FC<Props> = memo((props) => {
-  const { link, ...avatarProps } = props;
-
+export const UserAvatar: FC<Props> = memo(({ link, ...avatarProps }: Props) => {
   return <LinkedAvatar link={link} {...avatarProps} />;
 });

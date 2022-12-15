@@ -8,14 +8,15 @@ type Props = AvatarProps & {
   link: string;
 };
 
-export const UserAvatarWithBadge: FC<Props> = memo((props) => {
-  const { id, link, ...avatarProps } = props;
-  const { isOnline } = useFriendStatus(id);
-  const badgeColor = isOnline ? 'green.500' : 'gray';
+export const UserAvatarWithBadge: FC<Props> = memo(
+  ({ id, link, ...avatarProps }: Props) => {
+    const { isOnline } = useFriendStatus(id);
+    const badgeColor = isOnline ? 'green.500' : 'gray';
 
-  return (
-    <LinkedAvatar link={link} {...avatarProps}>
-      <AvatarBadge boxSize="1.1em" bg={badgeColor} />
-    </LinkedAvatar>
-  );
-});
+    return (
+      <LinkedAvatar link={link} {...avatarProps}>
+        <AvatarBadge boxSize="1.1em" bg={badgeColor} />
+      </LinkedAvatar>
+    );
+  }
+);
