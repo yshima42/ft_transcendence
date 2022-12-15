@@ -1,5 +1,6 @@
-import { FriendRelation } from 'types/friend-relation';
 import { useGetApi } from '../generics/useGetApi';
+
+export type FriendRelation = 'NONE' | 'ACCEPTED' | 'PENDING' | 'RECOGNITION';
 
 export const useFriendRelation = (
   otherId: string

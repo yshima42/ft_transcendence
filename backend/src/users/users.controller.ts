@@ -28,7 +28,7 @@ import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
-import { FriendRelation } from 'src/friend-requests/types/friend-relation';
+import { FriendRelation } from 'src/friend-requests/interfaces/friend-relation.interface';
 import { GameStatsEntity } from 'src/game/entities/game-stats.entity';
 import { MatchResultEntity } from 'src/game/entities/match-result.entity';
 import { GameService } from 'src/game/game.service';
