@@ -6,25 +6,25 @@ import {
 } from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
-export interface FriendRequestCancelInProfileResBody {
+export interface CancelFriendRequestInProfileResBody {
   friendRequest: FriendRequest;
 }
 
 export type CancelFriendRequestInProfile = UseMutateAsyncFunction<
-  FriendRequestCancelInProfileResBody,
+  CancelFriendRequestInProfileResBody,
   unknown,
   string,
   unknown
 >;
 
-export const useFriendRequestCancelInProfile = (
+export const useProfileFriendRequestCancel = (
   otherId: string
 ): {
   cancelFriendRequestInProfile: CancelFriendRequestInProfile;
   isLoading: boolean;
 } => {
   const axiosDelete = async (userId: string) => {
-    const result = await axios.delete<FriendRequestCancelInProfileResBody>(
+    const result = await axios.delete<CancelFriendRequestInProfileResBody>(
       '/users/me/friend-requests/' + userId
     );
 
