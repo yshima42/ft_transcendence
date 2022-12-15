@@ -5,7 +5,7 @@ import { ResponseChatRoomUser } from 'hooks/api/chat/types';
 import { axios } from 'lib/axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { ChatRoomUserActionModal } from 'features/chat/components/organisms/ChatRoomUserActionModal';
+import { ChatRoomUserActionTimeSetModal } from 'features/chat/components/organisms/ChatRoomUserActionTimeSetModal';
 import { ChatRoomUserList } from 'features/chat/components/organisms/ChatRoomUserList';
 import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
 
@@ -152,7 +152,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
           </C.AccordionItem>
         </C.Accordion>
       </ContentLayout>
-      <ChatRoomUserActionModal
+      <ChatRoomUserActionTimeSetModal
         isOpen={isOpen}
         onClose={onClose}
         onClick={setLimitAction}

@@ -11,7 +11,7 @@ type Props = {
   onClose: () => void;
 };
 
-export const ChatRoomUserActionModal: React.FC<Props> = React.memo(
+export const ChatRoomUserActionTimeSetModal: React.FC<Props> = React.memo(
   ({ isOpen, onClick, onClose }) => {
     return (
       <C.Modal isOpen={isOpen} onClose={() => onClose()}>
