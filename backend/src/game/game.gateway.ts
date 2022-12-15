@@ -101,6 +101,7 @@ export class GameGateway {
     }
 
     const gameRoom = this.gameRooms[message.roomId];
+    // this.server.in(message.roomId).emit('start_game');
     // ゲーム開始
     gameRoom.gameStart(socket, message.roomId);
 
