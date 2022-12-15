@@ -387,7 +387,7 @@ export class UsersController {
   async getFriendRelation(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) otherId: string
-  ): Promise<FriendRelation> {
+  ): Promise<{ friendRelation: FriendRelation }> {
     return await this.friendRequestService.getFriendRelation(user.id, otherId);
   }
 }
