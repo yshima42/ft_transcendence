@@ -11,8 +11,6 @@ type Props = {
 
 export const SecurityAccordionItem: React.FC<Props> = React.memo(
   ({ chatRoomStatus, unLockFunc, lockFunc, onChange }) => {
-    console.log(`SecurityAccordionItem: ${chatRoomStatus}`);
-
     return (
       <>
         {/*

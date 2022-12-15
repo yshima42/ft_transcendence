@@ -5,7 +5,7 @@ import {
   Body,
   Patch,
   Param,
-  // Delete,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
@@ -44,12 +44,25 @@ export class ChatRoomController {
   }
 
   // update
-  @Patch(':id')
+  @Patch(':chatRoomId')
   async update(
-    @Param('id') id: string,
+    @Param('chatRoomId') chatRoomId: string,
     @Body() updateChatRoomDto: UpdateChatRoomDto,
     @GetUser() user: User
   ): Promise<ChatRoom> {
-    return await this.chatRoomService.update(id, updateChatRoomDto, user.id);
+    return await this.chatRoomService.update(
+      chatRoomId,
+      updateChatRoomDto,
+      user.id
+    );
+  }
+
+  // delete
+  @Delete(':chatRoomId')
+  async remove(
+    @Param('chatRoomId') chatRoomId: string,
+    @GetUser() user: User
+  ): Promise<void> {
+    return await this.chatRoomService.remove(chatRoomId, user.id);
   }
 }

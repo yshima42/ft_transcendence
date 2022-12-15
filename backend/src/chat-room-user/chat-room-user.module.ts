@@ -7,5 +7,6 @@ import { ChatRoomUserService } from './chat-room-user.service';
   imports: [PrismaModule],
   controllers: [ChatRoomUserController],
   providers: [ChatRoomUserService],
+  exports: [ChatRoomUserService],
 })
 export class ChatRoomUserModule {}
