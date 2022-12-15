@@ -23,7 +23,7 @@ export const useUserBlockCancel = (): {
 } => {
   const axiosDelete = async (userId: string) => {
     const result = await axios.delete<UserBlockCancelResBody>(
-      '/users/me/blocks/' + userId
+      `/users/me/blocks/${userId}`
     );
 
     return result.data;

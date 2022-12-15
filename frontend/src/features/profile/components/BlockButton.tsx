@@ -1,6 +1,7 @@
 import { memo, FC } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
-import { useUserBlock, useUserBlockCancel } from 'hooks/api';
+import { useProfileUserBlock } from 'hooks/api/profile/useProfileUserBlock';
+import { useProfileUserBlockCancel } from 'hooks/api/profile/useProfileUserBlockCancel';
 
 type BlockButtonProps = {
   userId: string;
@@ -9,15 +10,15 @@ type BlockButtonProps = {
 
 export const BlockButton: FC<BlockButtonProps> = memo(
   ({ userId, isBlockedUser }: BlockButtonProps) => {
-    const { blockUser } = useUserBlock();
-    const { cancelUserBlock } = useUserBlockCancel();
+    const { blockUserInProfile } = useProfileUserBlock(userId);
+    const { cancelUserBlockInProfile } = useProfileUserBlockCancel(userId);
 
     const onClickBlock = async () => {
-      await blockUser({ targetId: userId });
+      await blockUserInProfile({ targetId: userId });
     };
 
     const onClickCancelBlock = async () => {
-      await cancelUserBlock(userId);
+      await cancelUserBlockInProfile(userId);
     };
 
     return (
