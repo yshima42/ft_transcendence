@@ -6,7 +6,7 @@ import {
 import { FriendRequest, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateFriendRequestDto } from './dto/update-friend-request.dto';
-import { FriendRelation } from './types/friend-relation';
+import { FriendRelation } from './interfaces/friend-relation.interface';
 
 @Injectable()
 export class FriendRequestsService {
