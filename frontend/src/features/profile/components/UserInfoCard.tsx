@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { UserAvatarContainer } from 'components/organisms/avatar/UserAvatarContainer';
+import { UserAvatar } from 'components/organisms/avatar/UserAvatarContainer';
 import { BlockButton } from './BlockButton';
 import { ProfileSetting } from './ProfileSetting';
 
@@ -25,7 +25,7 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
         direction="column"
         align="center"
       >
-        <UserAvatarContainer
+        <UserAvatar
           id={user.id}
           name={user.nickname}
           size="2xl"
