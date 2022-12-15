@@ -46,7 +46,7 @@ export const CreateChatRooms: React.FC = React.memo(() => {
               <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
             </C.FormControl>
             <C.FormControl isInvalid={!(errors.password == null)}>
-              <C.FormLabel>パスワード</C.FormLabel>
+              <C.FormLabel>パスワード (任意)</C.FormLabel>
               <C.Input
                 placeholder="パスワード"
                 {...register('password')}
