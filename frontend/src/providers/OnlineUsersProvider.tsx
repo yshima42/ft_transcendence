@@ -13,7 +13,7 @@ export const OnlineUsersContext = createContext<string[]>([]);
 
 const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useProfile();
-  const socket = useSocket('http://localhost:3000/', {
+  const socket = useSocket(import.meta.env.VITE_WS_BASE_URL, {
     autoConnect: false,
   });
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
