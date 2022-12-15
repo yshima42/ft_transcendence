@@ -68,6 +68,15 @@ export class ChatRoomUserController {
     );
   }
 
+  // 退出
+  @Delete('me')
+  async removeMe(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @GetUser() user: User
+  ): Promise<void> {
+    return await this.chatRoomUserService.remove(chatRoomId, user.id);
+  }
+
   @Delete(':userId')
   async remove(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,

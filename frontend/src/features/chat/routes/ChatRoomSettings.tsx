@@ -12,7 +12,7 @@ import { SecurityAccordionItem } from 'features/chat/components/organisms/Securi
 type State = {
   chatRoomId: string;
   name: string;
-  status: ChatRoomStatus;
+  chatRoomStatus: ChatRoomStatus;
 };
 
 type limit = '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
@@ -26,7 +26,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
   const [password, setPassword] = React.useState('');
   const location = useLocation();
   const navigate = useNavigate();
-  const { chatRoomId, name, status } = location.state as State;
+  const { chatRoomId, name, chatRoomStatus } = location.state as State;
   const [isOpen, setIsOpen] = React.useState(false);
   const onClose = () => setIsOpen(false);
 
@@ -49,7 +49,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
       status: ChatRoomStatus.PUBLIC,
     });
     navigate(`/app/chat/rooms/${chatRoomId}`, {
-      state: { chatRoomId, name, status: ChatRoomStatus.PUBLIC },
+      state: { chatRoomId, name, chatRoomStatus: ChatRoomStatus.PUBLIC },
     });
   }
 
@@ -59,7 +59,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
       status: ChatRoomStatus.PROTECTED,
     });
     navigate(`/app/chat/rooms/${chatRoomId}`, {
-      state: { chatRoomId, name, status: ChatRoomStatus.PROTECTED },
+      state: { chatRoomId, name, chatRoomStatus: ChatRoomStatus.PROTECTED },
     });
   }
 
@@ -77,17 +77,20 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     getLoginUser().catch((err) => console.log(err));
   }, [users]);
 
-  async function onClickAction(userId: string, status: ChatUserStatus) {
+  async function onClickAction(userId: string, chatUserStatus: ChatUserStatus) {
     // BANNED, MUTEならモーダルを出す
-    if (status === ChatUserStatus.BANNED || status === ChatUserStatus.MUTE) {
-      setSelectedStatus(status);
+    if (
+      chatUserStatus === ChatUserStatus.BANNED ||
+      chatUserStatus === ChatUserStatus.MUTE
+    ) {
+      setSelectedStatus(chatUserStatus);
       setSelectedUserId(userId);
       setIsOpen(true);
 
       return;
     }
     await axios.patch(`/chat/rooms/${chatRoomId}/users/${userId}`, {
-      status,
+      status: chatUserStatus,
     });
     getAllUsers().catch((err) => console.log(err));
   }
@@ -106,6 +109,11 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
   React.useEffect(() => {
     onClickLimitAction().catch((err) => console.log(err));
   }, [limit]);
+
+  async function exitChatRoom() {
+    await axios.delete(`/chat/rooms/${chatRoomId}/users/me`);
+    navigate('/app/chat/me');
+  }
 
   return (
     <>
@@ -140,7 +148,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
                 </C.AccordionButton>
                 <C.AccordionPanel pb={4}>
                   <SecurityAccordionItem
-                    status={status}
+                    chatRoomStatus={chatRoomStatus}
                     lockFunc={async () => await onClickLock()}
                     unLockFunc={async () => await onClickUnLock()}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,6 +159,17 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
               </C.AccordionItem>
             )}
         </C.Accordion>
+        {/* 退出ボタン */}
+        {/* ADMINには退出ボタンを表示しない */}
+        {loginUser !== undefined &&
+          loginUser.status !== ChatUserStatus.ADMIN && (
+            <C.Button
+              colorScheme="red"
+              onClick={async () => await exitChatRoom()}
+            >
+              Exit
+            </C.Button>
+          )}
       </ContentLayout>
       <ChatRoomUserActionTimeSetModal
         isOpen={isOpen}

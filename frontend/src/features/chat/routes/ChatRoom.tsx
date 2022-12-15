@@ -14,12 +14,12 @@ import { MessageSendForm } from 'components/molecules/MessageSendForm';
 type State = {
   chatRoomId: string;
   name: string;
-  status: ChatRoomStatus;
+  chatRoomStatus: ChatRoomStatus;
 };
 
 export const ChatRoom: React.FC = React.memo(() => {
   const location = useLocation();
-  const { chatRoomId, name, status } = location.state as State;
+  const { chatRoomId, name, chatRoomStatus } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
   const [loginUser, setLoginUser] = React.useState<ResponseChatRoomUser>();
 
@@ -55,7 +55,7 @@ export const ChatRoom: React.FC = React.memo(() => {
           <C.Link
             as={Link}
             to={`/app/chat/rooms/${chatRoomId}/settings`}
-            state={{ chatRoomId, name, status }}
+            state={{ chatRoomId, name, chatRoomStatus }}
           >
             <C.Button colorScheme="blue">Settings</C.Button>
           </C.Link>
