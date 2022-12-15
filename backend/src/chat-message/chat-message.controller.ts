@@ -15,7 +15,7 @@ import { ResponseChatMessage } from './chat-message.interface';
 import { ChatMessageService } from './chat-message.service';
 import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 
-@Controller('chat/:chatRoomId/message')
+@Controller('chat/room/:chatRoomId/message')
 export class ChatMessageController {
   constructor(private readonly chatMessageService: ChatMessageService) {}
 
