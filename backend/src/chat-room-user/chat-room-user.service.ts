@@ -114,24 +114,81 @@ export class ChatRoomUserService {
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomUser = await this.findOne(chatRoomId, loginUserId);
     // ADMIN -> すべての変更を許可
-    // PROMOTER -> KICKED, BANED, MUTEDの変更を許可
+    // MODERATOR -> KICKED, BANED, MUTEDの変更を許可
     // NORMAL -> 何も変更を許可しない
-    if (loginChatRoomUser.status === ChatUserStatus.NORMAL) {
-      return;
-    } else if (loginChatRoomUser.status === ChatUserStatus.MODERATOR) {
-      if (
-        status === ChatUserStatus.ADMIN ||
-        status === ChatUserStatus.MODERATOR
-      ) {
-        return;
-      }
-    } else if (
-      loginChatRoomUser.status === ChatUserStatus.ADMIN &&
-      status === ChatUserStatus.ADMIN
+    // 権限がないRequestの場合はエラー
+    if (
+      (loginChatRoomUser.status !== ChatUserStatus.ADMIN &&
+        loginChatRoomUser.status !== ChatUserStatus.MODERATOR) ||
+      (loginChatRoomUser.status === ChatUserStatus.MODERATOR &&
+        (status === ChatUserStatus.ADMIN ||
+          status === ChatUserStatus.MODERATOR))
     ) {
-      // ADMIN -> ADMINの場合は通常の変更に加えて、自分のステータスをPROMOTERに変更する
-      await this.prisma.$transaction([
-        this.prisma.chatRoomUser.update({
+      throw new NestJS.HttpException(
+        'Permission denied',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
+
+    switch (status) {
+      // KICKEDの場合は、テーブルから消去する
+      case ChatUserStatus.KICKED:
+        await this.prisma.chatRoomUser.delete({
+          where: {
+            chatRoomId_userId: {
+              chatRoomId,
+              userId,
+            },
+          },
+        });
+        break;
+
+      // ADMIN -> ADMINの場合は変更に加えて、自分のステータスをMODERATORに変更する
+      case ChatUserStatus.ADMIN:
+        await this.prisma.$transaction([
+          this.prisma.chatRoomUser.update({
+            where: {
+              chatRoomId_userId: {
+                chatRoomId,
+                userId,
+              },
+            },
+            data: {
+              status,
+            },
+          }),
+          this.prisma.chatRoomUser.update({
+            where: {
+              chatRoomId_userId: {
+                chatRoomId,
+                userId: loginUserId,
+              },
+            },
+            data: {
+              status: ChatUserStatus.MODERATOR,
+            },
+          }),
+        ]);
+        break;
+
+      default: {
+        let limitDate: Date | undefined;
+        if (limit !== undefined) {
+          // 現在時刻からlimitを足した時間を取得
+          limitDate = new Date();
+          const durationInMilliseconds = {
+            '1m': 60 * 1000,
+            '1h': 60 * 60 * 1000,
+            '1d': 24 * 60 * 60 * 1000,
+            '1w': 7 * 24 * 60 * 60 * 1000,
+            '1M': 30 * 24 * 60 * 60 * 1000,
+            unlimited: 100 * 365 * 24 * 60 * 60 * 1000,
+          };
+          limitDate.setMilliseconds(
+            limitDate.getMilliseconds() + durationInMilliseconds[limit]
+          );
+        }
+        await this.prisma.chatRoomUser.update({
           where: {
             chatRoomId_userId: {
               chatRoomId,
@@ -139,77 +196,12 @@ export class ChatRoomUserService {
             },
           },
           data: {
-            status,
+            status: updateChatRoomUserDto.status,
+            statusUntil: limitDate,
           },
-        }),
-        this.prisma.chatRoomUser.update({
-          where: {
-            chatRoomId_userId: {
-              chatRoomId,
-              userId: loginUserId,
-            },
-          },
-          data: {
-            status: ChatUserStatus.MODERATOR,
-          },
-        }),
-      ]);
-
-      return;
-    }
-    // KICKEDの場合は、テーブルから消去する
-    if (status === ChatUserStatus.KICKED) {
-      await this.prisma.chatRoomUser.delete({
-        where: {
-          chatRoomId_userId: {
-            chatRoomId,
-            userId,
-          },
-        },
-      });
-
-      return;
-    }
-    let limitDate: Date | undefined;
-    if (limit !== undefined) {
-      // 現在時刻からlimitを足した時間を取得
-      limitDate = new Date();
-      // '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
-      switch (limit) {
-        case '1m':
-          limitDate.setMinutes(limitDate.getMinutes() + 1);
-          break;
-        case '1h':
-          limitDate.setHours(limitDate.getHours() + 1);
-          break;
-        case '1d':
-          limitDate.setDate(limitDate.getDate() + 1);
-          break;
-        case '1w':
-          limitDate.setDate(limitDate.getDate() + 7);
-          break;
-        case '1M':
-          limitDate.setMonth(limitDate.getMonth() + 1);
-          break;
-        case 'unlimited':
-          limitDate.setFullYear(limitDate.getFullYear() + 100);
-          break;
-        default:
-          break;
+        });
       }
     }
-    await this.prisma.chatRoomUser.update({
-      where: {
-        chatRoomId_userId: {
-          chatRoomId,
-          userId,
-        },
-      },
-      data: {
-        status: updateChatRoomUserDto.status,
-        statusUntil: limitDate,
-      },
-    });
   }
 
   async remove(chatRoomId: string, userId: string): Promise<void> {
