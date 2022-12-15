@@ -12,7 +12,7 @@ import { DmRoomService } from './dm-room.service';
 export class DmRoomController {
   constructor(private readonly dmRoomService: DmRoomService) {}
 
-  @Get('me')
+  @Get()
   async findAll(@GetUser() user: User): Promise<ResponseDmRoom[]> {
     return await this.dmRoomService.findAll(user.id);
   }

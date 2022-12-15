@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ChatMessage } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatMessage } from './chat-message.interface';
 import { CreateChatMessageDto } from './dto/create-chat-message.dto';
@@ -12,12 +11,24 @@ export class ChatMessageService {
     createChatMessageDto: CreateChatMessageDto,
     chatRoomId: string,
     senderId: string
-  ): Promise<ChatMessage> {
+  ): Promise<ResponseChatMessage> {
     const chatMessage = await this.prisma.chatMessage.create({
       data: {
         content: createChatMessageDto.content,
         chatRoomId,
         senderId,
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        sender: {
+          select: {
+            name: true,
+            avatarImageUrl: true,
+            onlineStatus: true,
+          },
+        },
       },
     });
     Logger.debug(`createChatMessage: ${JSON.stringify(chatMessage)}`);
