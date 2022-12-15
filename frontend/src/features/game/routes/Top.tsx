@@ -8,7 +8,7 @@ import { GamePhase, useGame } from '../hooks/useGame';
 import { Matching } from './Matching';
 
 export const Top: FC = memo(() => {
-  const { gamePhase, setGamePhase, socket, roomId, isLeftSide } = useGame();
+  const { gamePhase, setGamePhase, draw } = useGame();
 
   const gamePage = useMemo(() => {
     switch (gamePhase) {
@@ -19,16 +19,11 @@ export const Top: FC = memo(() => {
       case GamePhase.WaitStart:
         return <Spinner />;
       case GamePhase.InGame:
-        return (
-          <PongGame socket={socket} roomId={roomId} isLeftSide={isLeftSide} />
-        );
+        return <PongGame draw={draw} />;
       case GamePhase.Result:
         return <Result />;
-      // TODO: 仮実装
-      default:
-        return <p>Error</p>;
     }
-  }, [gamePhase, setGamePhase, socket, roomId, isLeftSide]);
+  }, [gamePhase, setGamePhase, draw]);
 
   return (
     <ContentLayout title="">
