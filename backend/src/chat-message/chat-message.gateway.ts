@@ -36,7 +36,7 @@ export class ChatMessageGateway {
       chatRoomId,
       senderId
     );
-    Logger.log(newMessage);
+    Logger.debug(newMessage);
     this.server.in(chatRoomId).emit('receive_message', newMessage);
   }
 
