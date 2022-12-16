@@ -5,9 +5,9 @@ export type FriendRelation = 'NONE' | 'ACCEPTED' | 'PENDING' | 'RECOGNITION';
 export const useFriendRelation = (
   otherId: string
 ): { friendRelation: FriendRelation } => {
-  const { data: friendRelation } = useGetApi<{
-    friendRelation: FriendRelation;
-  }>(`/users/me/friend-relation/${otherId}`);
+  const { data: friendRelation } = useGetApi<FriendRelation>(
+    `/users/me/friend-relation/${otherId}`
+  );
 
-  return friendRelation;
+  return { friendRelation };
 };
