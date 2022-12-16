@@ -7,7 +7,7 @@ import {
   ChatRoomUser,
   ChatMessage,
   DmRoom,
-  DmRoomUser,
+  DmRoomMember,
   Dm,
   MatchResult,
   ChatRoomStatus,
@@ -176,12 +176,12 @@ for (let i = 0; i < 2; i++) {
   });
 }
 
-const dmRoomUsers: DmRoomUser[] = [];
+const dmRoomMembers: DmRoomMember[] = [];
 for (let i = 0; i < 2; i++) {
   const dmRoomId = dmRooms[i].id;
   const userId = idMap.get('dummy1');
   if (userId !== undefined) {
-    dmRoomUsers.push({
+    dmRoomMembers.push({
       dmRoomId,
       userId,
     });
@@ -189,7 +189,7 @@ for (let i = 0; i < 2; i++) {
   // const userId2 = idMap.get('dummy2');
   const userId2 = idMap.get(`dummy${i + 2}`);
   if (userId2 !== undefined) {
-    dmRoomUsers.push({
+    dmRoomMembers.push({
       dmRoomId,
       userId: userId2,
     });
@@ -286,8 +286,8 @@ const main = async () => {
   await prisma.dmRoom.createMany({
     data: dmRooms,
   });
-  await prisma.dmRoomUser.createMany({
-    data: dmRoomUsers,
+  await prisma.dmRoomMember.createMany({
+    data: dmRoomMembers,
   });
   await prisma.dm.createMany({
     data: dms,

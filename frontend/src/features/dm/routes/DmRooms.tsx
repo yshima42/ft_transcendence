@@ -16,7 +16,7 @@ export const DmRooms: React.FC = React.memo(() => {
             <C.ListItem key={dmRoom.id}>
               <Link to={`rooms/${dmRoom.id}`} state={{ dmRoomId: dmRoom.id }}>
                 <DmRoomCard
-                  dmRoomUser={dmRoom.dmRoomUsers[0].user}
+                  dmRoomMember={dmRoom.dmRoomMembers[0].user}
                   lastModified={new Date(dmRoom.dms[0].createdAt)}
                 />
               </Link>

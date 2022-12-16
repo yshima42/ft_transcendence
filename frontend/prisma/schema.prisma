@@ -59,14 +59,14 @@ model Dm {
 }
 
 model DmRoom {
-  id         String       @id @db.Uuid
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime
-  Dm         Dm[]
-  DmRoomUser DmRoomUser[]
+  id           String         @id @db.Uuid
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  Dm           Dm[]
+  DmRoomMember DmRoomMember[]
 }
 
-model DmRoomUser {
+model DmRoomMember {
   dmRoomId String @db.Uuid
   userId   String @db.Uuid
   DmRoom   DmRoom @relation(fields: [dmRoomId], references: [id], onDelete: Cascade)
@@ -111,7 +111,7 @@ model User {
   ChatMessage                                  ChatMessage[]
   ChatRoomUser                                 ChatRoomUser[]
   Dm                                           Dm[]
-  DmRoomUser                                   DmRoomUser[]
+  DmRoomMember                                 DmRoomMember[]
   FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[]      @relation("FriendRequest_creatorIdToUser")
   FriendRequest_FriendRequest_receiverIdToUser FriendRequest[]      @relation("FriendRequest_receiverIdToUser")
   MatchResult_MatchResult_playerOneIdToUser    MatchResult[]        @relation("MatchResult_playerOneIdToUser")

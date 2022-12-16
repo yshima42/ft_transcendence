@@ -48,7 +48,7 @@ model User {
   chatMessages ChatMessage[]  @relation("messageSender") // ユーザーが送信したチャットメッセージ
   dms          Dm[]           @relation("dmSender") // ユーザーが送信したDMメッセージ
   ChatRoomUser ChatRoomUser[] // ユーザーが参加しているチャットルーム
-  DmRoomUser   DmRoomUser[] // ユーザーが参加しているDMルーム
+  DmRoomMember DmRoomMember[] // ユーザーが参加しているDMルーム
 }
 
 enum OnlineStatus {
@@ -146,14 +146,14 @@ model Dm {
 }
 
 model DmRoom {
-  id          String       @id @default(uuid()) @db.Uuid
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  dms         Dm[] // DMルームに属するメッセージ
-  dmRoomUsers DmRoomUser[] // チャットルームに属するユーザー
+  id            String         @id @default(uuid()) @db.Uuid
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  dms           Dm[] // DMルームに属するメッセージ
+  dmRoomMembers DmRoomMember[] // チャットルームに属するユーザー
 }
 
-model DmRoomUser {
+model DmRoomMember {
   dmRoom   DmRoom @relation(fields: [dmRoomId], references: [id], onDelete: Cascade) // 参加しているDMルーム
   dmRoomId String @db.Uuid
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade) // DMルームの参加者
