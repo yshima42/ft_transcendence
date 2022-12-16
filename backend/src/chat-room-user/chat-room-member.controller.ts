@@ -60,7 +60,7 @@ export class ChatRoomMemberController {
     @Body() updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     @GetUser() user: User
   ): Promise<void> {
-    return await this.chatRoomMemberService.update(
+    await this.chatRoomMemberService.update(
       chatRoomId,
       userId,
       updateChatRoomMemberDto,

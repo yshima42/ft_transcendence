@@ -1,5 +1,5 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
-import * as NestJS from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import {
   ChatRoomMemberStatus,
   ChatRoomStatus,
@@ -36,9 +36,9 @@ export class ChatRoomMemberService {
     const chatRoom = await this.chatRoomService.findOne(chatRoomId);
     if (chatRoom.roomStatus === ChatRoomStatus.PROTECTED) {
       if (chatRoomPassword === undefined || chatRoomPassword === '') {
-        throw new NestJS.HttpException(
+        throw new NestJs.HttpException(
           'Password is required',
-          NestJS.HttpStatus.BAD_REQUEST
+          NestJs.HttpStatus.BAD_REQUEST
         );
       }
       if (
@@ -46,9 +46,9 @@ export class ChatRoomMemberService {
         chatRoom.password === '' ||
         chatRoom.password === null
       ) {
-        throw new NestJS.HttpException(
+        throw new NestJs.HttpException(
           'Password is not set',
-          NestJS.HttpStatus.BAD_REQUEST
+          NestJs.HttpStatus.BAD_REQUEST
         );
       }
       // パスワードが一致しない場合はエラー
@@ -57,9 +57,9 @@ export class ChatRoomMemberService {
         chatRoom.password
       );
       if (!isPasswordMatch) {
-        throw new NestJS.HttpException(
+        throw new NestJs.HttpException(
           'Password is incorrect',
-          NestJS.HttpStatus.UNAUTHORIZED
+          NestJs.HttpStatus.UNAUTHORIZED
         );
       }
     }
@@ -77,9 +77,9 @@ export class ChatRoomMemberService {
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
-          throw new NestJS.HttpException(
+          throw new NestJs.HttpException(
             'ChatRoomMember already exists',
-            NestJS.HttpStatus.CONFLICT
+            NestJs.HttpStatus.CONFLICT
           );
         }
       }
@@ -131,9 +131,9 @@ export class ChatRoomMemberService {
       },
     });
     if (chatRoomMember === null) {
-      throw new NestJS.HttpException(
+      throw new NestJs.HttpException(
         'ChatRoomMember not found',
-        NestJS.HttpStatus.NOT_FOUND
+        NestJs.HttpStatus.NOT_FOUND
       );
     }
 
@@ -145,7 +145,7 @@ export class ChatRoomMemberService {
     userId: string,
     updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     loginUserId: string
-  ): Promise<void> {
+  ): Promise<ChatRoomMember> {
     const { memberStatus, limit } = updateChatRoomMemberDto;
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomMember = await this.findOne(chatRoomId, loginUserId);
@@ -160,21 +160,20 @@ export class ChatRoomMemberService {
         (memberStatus === ChatRoomMemberStatus.ADMIN ||
           memberStatus === ChatRoomMemberStatus.MODERATOR))
     ) {
-      throw new NestJS.HttpException(
+      throw new NestJs.HttpException(
         'Permission denied',
-        NestJS.HttpStatus.FORBIDDEN
+        NestJs.HttpStatus.FORBIDDEN
       );
     }
 
     switch (memberStatus) {
       // KICKEDの場合は、テーブルから消去する
       case ChatRoomMemberStatus.KICKED:
-        await this.remove(chatRoomId, userId);
-        break;
+        return await this.remove(chatRoomId, userId);
 
       // ADMIN -> ADMINの場合は変更に加えて、自分のステータスをMODERATORに変更する
-      case ChatRoomMemberStatus.ADMIN:
-        await this.prisma.$transaction([
+      case ChatRoomMemberStatus.ADMIN: {
+        const res = await this.prisma.$transaction([
           this.prisma.chatRoomMember.update({
             where: {
               chatRoomId_userId: {
@@ -198,7 +197,9 @@ export class ChatRoomMemberService {
             },
           }),
         ]);
-        break;
+
+        return res[1];
+      }
 
       default: {
         let limitDate: Date | undefined;
@@ -217,7 +218,8 @@ export class ChatRoomMemberService {
             limitDate.getMilliseconds() + durationInMilliseconds[limit]
           );
         }
-        await this.prisma.chatRoomMember.update({
+
+        return await this.prisma.chatRoomMember.update({
           where: {
             chatRoomId_userId: {
               chatRoomId,
@@ -238,9 +240,9 @@ export class ChatRoomMemberService {
     const chatRoomMember = await this.findOne(chatRoomId, userId);
     // ADMINは退出できない
     if (chatRoomMember.memberStatus === ChatRoomMemberStatus.ADMIN) {
-      throw new NestJS.HttpException(
+      throw new NestJs.HttpException(
         'Permission denied',
-        NestJS.HttpStatus.FORBIDDEN
+        NestJs.HttpStatus.FORBIDDEN
       );
     }
 
@@ -255,9 +257,9 @@ export class ChatRoomMemberService {
       });
     } catch (e) {
       Logger.error(e);
-      throw new NestJS.HttpException(
+      throw new NestJs.HttpException(
         'ChatRoomMember not found',
-        NestJS.HttpStatus.NOT_FOUND
+        NestJs.HttpStatus.NOT_FOUND
       );
     }
   }
