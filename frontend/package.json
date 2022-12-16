@@ -16,7 +16,6 @@
     "lint:style:fix": "stylelint --fix 'src/**/*.{css,less,sass,scss}'",
     "lint": "npm run --silent lint:style; npm run --silent lint:es",
     "lint:fix": "npm run --silent lint:style:fix; npm run --silent lint:es:fix",
-    "preinstall": "npx typesync || :",
     "format": "prettier --write --loglevel=warn '{src,cypress}/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
     "test": "jest --config ./jest.config.json",
