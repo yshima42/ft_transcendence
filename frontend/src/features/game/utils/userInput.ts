@@ -1,46 +1,35 @@
 import { Socket } from 'socket.io-client';
-import { Paddle } from './gameObjs';
-
-const emitUserCommands = (
-  socket: Socket,
-  roomId: string,
-  obj: Paddle,
-  isLeftSide: boolean
-) => {
-  const userCommands = {
-    up: obj.up,
-    down: obj.down,
-    isLeftSide,
-  };
-  socket.emit('user_commands', { roomId, userCommands });
-};
 
 // emitの回数を減らすため
 let justPressed = false;
 export const userInput = (
   socket: Socket | undefined,
-  roomName: string,
-  obj: Paddle,
+  roomId: string,
   isLeftSide: boolean
 ): void => {
+  const userCommand = {
+    up: false,
+    down: false,
+    isLeftSide,
+  };
   if (socket == null) return;
   document.addEventListener(
     'keydown',
     (e: KeyboardEvent) => {
       if (e.key === 'Down' || e.key === 'ArrowDown') {
-        if (!obj.down) {
+        if (!userCommand.down) {
           justPressed = true;
         }
-        obj.down = true;
+        userCommand.down = true;
       } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-        if (!obj.up) {
+        if (!userCommand.up) {
           justPressed = true;
         }
-        obj.up = true;
+        userCommand.up = true;
       }
       if (justPressed) {
         if (socket != null) {
-          void emitUserCommands(socket, roomName, obj, isLeftSide);
+          socket.emit('user_command', { roomId, userCommand });
           justPressed = false;
         }
       }
@@ -52,13 +41,13 @@ export const userInput = (
     'keyup',
     (e: KeyboardEvent) => {
       if (e.key === 'Down' || e.key === 'ArrowDown') {
-        obj.down = false;
+        userCommand.down = false;
       } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-        obj.up = false;
+        userCommand.up = false;
       }
       if (justPressed) {
         if (socket != null) {
-          void emitUserCommands(socket, roomName, obj, isLeftSide);
+          socket.emit('user_command', { roomId, userCommand });
         }
       }
     },

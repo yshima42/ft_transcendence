@@ -123,16 +123,16 @@ export class GameGateway {
     delete this.gameRooms[roomId];
   }
 
-  @SubscribeMessage('user_commands')
+  @SubscribeMessage('user_command')
   handleUserCommands(
     @MessageBody()
     data: {
       roomId: string;
-      userCommands: { up: boolean; down: boolean; isLeftSide: boolean };
+      userCommand: { up: boolean; down: boolean; isLeftSide: boolean };
     }
   ): void {
     const gameRoom = this.gameRooms[data.roomId];
 
-    gameRoom.handleInput(data.roomId, data.userCommands);
+    gameRoom.handleInput(data.roomId, data.userCommand);
   }
 }
