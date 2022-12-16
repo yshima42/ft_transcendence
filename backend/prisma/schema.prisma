@@ -45,10 +45,10 @@ model User {
   playerOne           MatchResult[]        @relation("playerOne")
   playerTwo           MatchResult[]        @relation("playerTwo")
 
-  chatMessages ChatMessage[]  @relation("messageSender") // ユーザーが送信したチャットメッセージ
-  dms          Dm[]           @relation("dmSender") // ユーザーが送信したDMメッセージ
-  ChatRoomUser ChatRoomUser[] // ユーザーが参加しているチャットルーム
-  DmRoomMember DmRoomMember[] // ユーザーが参加しているDMルーム
+  chatMessages   ChatMessage[]    @relation("messageSender") // ユーザーが送信したチャットメッセージ
+  dms            Dm[]             @relation("dmSender") // ユーザーが送信したDMメッセージ
+  ChatRoomMember ChatRoomMember[] // ユーザーが参加しているチャットルーム
+  DmRoomMember   DmRoomMember[] // ユーザーが参加しているDMルーム
 }
 
 enum OnlineStatus {
@@ -114,23 +114,23 @@ model ChatMessage {
 }
 
 model ChatRoom {
-  id            String         @id @default(uuid()) @db.Uuid
-  name          String         @unique
-  status        ChatRoomStatus @default(PUBLIC)
-  password      String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  chatMessages  ChatMessage[]
-  chatRoomUsers ChatRoomUser[] // チャットルームに属するユーザー
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @unique
+  roomStatus      ChatRoomStatus   @default(PUBLIC)
+  password        String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  chatMessages    ChatMessage[]
+  chatRoomMembers ChatRoomMember[] // チャットルームに属するユーザー
 }
 
-model ChatRoomUser {
-  chatRoom    ChatRoom       @relation(fields: [chatRoomId], references: [id], onDelete: Cascade) // 参加しているチャットルーム
-  chatRoomId  String         @db.Uuid
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade) // 参加しているユーザー
-  userId      String         @db.Uuid
-  status      ChatUserStatus @default(NORMAL)
-  statusUntil DateTime?
+model ChatRoomMember {
+  chatRoom     ChatRoom             @relation(fields: [chatRoomId], references: [id], onDelete: Cascade) // 参加しているチャットルーム
+  chatRoomId   String               @db.Uuid
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade) // 参加しているユーザー
+  userId       String               @db.Uuid
+  memberStatus ChatRoomMemberStatus @default(NORMAL)
+  statusUntil  DateTime?
 
   @@id([chatRoomId, userId])
 }
@@ -162,13 +162,13 @@ model DmRoomMember {
   @@id([dmRoomId, userId])
 }
 
-enum ChatUserStatus {
+enum ChatRoomMemberStatus {
   ADMIN // チャットルームのオーナー
   MODERATOR // チャットルームのサブオーナー
   NORMAL // チャットルームのメンバー
   KICKED // チャットルームからキックされた
   BANNED // チャットルームからBANされた
-  MUTE // チャットルームからミュートされた
+  MUTED // チャットルームからミュートされた
 }
 
 enum ChatRoomStatus {

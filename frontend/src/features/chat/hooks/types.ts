@@ -1,12 +1,12 @@
-import { ChatUserStatus, ChatRoomStatus } from '@prisma/client';
+import { ChatRoomMemberStatus, ChatRoomStatus } from '@prisma/client';
 
-export type ResponseChatRoomUser = {
+export type ResponseChatRoomMember = {
   user: {
     id: string;
     nickname: string;
     avatarImageUrl: string;
   };
-  status: ChatUserStatus;
+  memberStatus: ChatRoomMemberStatus;
 };
 
 export type ResponseChatMessage = {
@@ -22,7 +22,7 @@ export type ResponseChatMessage = {
 export type ResponseChatRoom = {
   id: string;
   name: string;
-  status: ChatRoomStatus;
+  roomStatus: ChatRoomStatus;
   chatMessages: Array<{
     content: string;
     createdAt: Date;

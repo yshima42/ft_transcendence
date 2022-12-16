@@ -1,5 +1,3 @@
-import { OnlineStatus } from '@prisma/client';
-
 export type ResponseChatMessage = {
   id: string;
   createdAt: Date;
@@ -7,6 +5,5 @@ export type ResponseChatMessage = {
   sender: {
     name: string;
     avatarImageUrl: string;
-    onlineStatus: OnlineStatus;
   };
 };

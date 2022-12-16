@@ -12,5 +12,5 @@ export class CreateChatRoomDto {
 
   @CV.IsOptional()
   @CV.IsEnum(ChatRoomStatus)
-  status?: ChatRoomStatus;
+  roomStatus?: ChatRoomStatus;
 }
