@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ResponseChatRoom } from 'hooks/api/chat/types';
+import { ResponseChatRoom } from 'features/chat/hooks/types';
 import { axios } from 'lib/axios';
 
 export const useAllChatRoom = (): {
