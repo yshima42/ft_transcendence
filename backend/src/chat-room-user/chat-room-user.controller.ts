@@ -30,7 +30,7 @@ export class ChatRoomUserController {
     @Body() createChatRoomUserDto: CreateChatRoomUserDto,
     @GetUser() user: User
   ): Promise<void> {
-    return await this.chatRoomUserService.create(
+    await this.chatRoomUserService.create(
       chatRoomId,
       createChatRoomUserDto,
       user.id

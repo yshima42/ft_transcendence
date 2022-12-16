@@ -1,7 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import * as NestJS from '@nestjs/common';
-import { ChatUserStatus } from '@prisma/client';
+import { ChatUserStatus, ChatRoomStatus, ChatRoomUser } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
+import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoomUser } from './chat-room-user.interface';
 import { CreateChatRoomUserDto } from './dto/create-chat-room-user.dto';
@@ -9,28 +11,40 @@ import { UpdateChatRoomUserDto } from './dto/update-chat-room-user.dto';
 
 @Injectable()
 export class ChatRoomUserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => ChatRoomService))
+    private readonly chatRoomService: ChatRoomService
+  ) {}
 
   async create(
     chatRoomId: string,
     createChatRoomUserDto: CreateChatRoomUserDto,
     userId: string
-  ): Promise<void> {
+  ): Promise<ChatRoomUser> {
+    Logger.debug(
+      `create chatRoomId=${chatRoomId} createChatRoomUserDto=${JSON.stringify(
+        createChatRoomUserDto
+      )} userId=${userId}`
+    );
     const chatRoomPassword = createChatRoomUserDto.chatRoomPassword;
-    if (chatRoomPassword !== undefined) {
-      // ChatRoomのパスワードを取得
-      const chatRoom = await this.prisma.chatRoom.findUnique({
-        where: {
-          id: chatRoomId,
-        },
-        select: {
-          password: true,
-        },
-      });
-      if (chatRoom === null || chatRoom.password === null) {
+    // chatRoomのステータスを取得
+    const chatRoom = await this.chatRoomService.findOne(chatRoomId);
+    if (chatRoom.status === ChatRoomStatus.PROTECTED) {
+      if (chatRoomPassword === undefined || chatRoomPassword === '') {
         throw new NestJS.HttpException(
-          'ChatRoom not found',
-          NestJS.HttpStatus.NOT_FOUND
+          'Password is required',
+          NestJS.HttpStatus.BAD_REQUEST
+        );
+      }
+      if (
+        chatRoom.password === undefined ||
+        chatRoom.password === '' ||
+        chatRoom.password === null
+      ) {
+        throw new NestJS.HttpException(
+          'Password is not set',
+          NestJS.HttpStatus.BAD_REQUEST
         );
       }
       // パスワードが一致しない場合はエラー
@@ -40,18 +54,33 @@ export class ChatRoomUserService {
       );
       if (!isPasswordMatch) {
         throw new NestJS.HttpException(
-          'Password not match',
-          NestJS.HttpStatus.BAD_REQUEST
+          'Password is incorrect',
+          NestJS.HttpStatus.UNAUTHORIZED
         );
       }
     }
-    await this.prisma.chatRoomUser.create({
-      data: {
-        chatRoomId,
-        userId,
-        status: ChatUserStatus.NORMAL,
-      },
-    });
+
+    try {
+      const res = await this.prisma.chatRoomUser.create({
+        data: {
+          chatRoomId,
+          userId,
+          status: ChatUserStatus.NORMAL,
+        },
+      });
+
+      return res;
+    } catch (e) {
+      if (e instanceof PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw new NestJS.HttpException(
+            'ChatRoomUser already exists',
+            NestJS.HttpStatus.CONFLICT
+          );
+        }
+      }
+      throw e;
+    }
   }
 
   async findAll(chatRoomId: string): Promise<ResponseChatRoomUser[]> {

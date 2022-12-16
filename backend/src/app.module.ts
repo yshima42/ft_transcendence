@@ -4,7 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { ChatMessageModule } from './chat-message/chat-message.module';
 import { ChatRoomUserModule } from './chat-room-user/chat-room-user.module';
-import { ChatroomModule } from './chat-room/chat-room.module';
+import { ChatRoomModule } from './chat-room/chat-room.module';
 import { DmRoomModule } from './dm-room/dm-room.module';
 import { DmModule } from './dm/dm.module';
 import { FileModule } from './file/file.module';
@@ -28,7 +28,7 @@ import { UsersModule } from './users/users.module';
     BlocksModule,
     ChatMessageModule,
     DmModule,
-    ChatroomModule,
+    ChatRoomModule,
     DmRoomModule,
     ChatRoomUserModule,
   ],
