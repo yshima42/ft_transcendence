@@ -23,16 +23,12 @@ export class Vector {
 }
 
 export class Ball {
-  up: boolean;
-  down: boolean;
   pos: { x: number; y: number };
   dx: number;
   dy: number;
 
   constructor(x: number, y: number) {
     this.pos = new Vector(x, y);
-    this.up = false;
-    this.down = false;
     this.dx = BALL_SPEED;
     this.dy = -BALL_SPEED;
   }
@@ -52,15 +48,11 @@ export class Ball {
 }
 
 export class Paddle {
-  up: boolean;
-  down: boolean;
   pos: { x: number; y: number };
   score: number;
 
   constructor(x: number, y: number) {
     this.pos = new Vector(x, y);
-    this.up = false;
-    this.down = false;
     this.score = 0;
   }
 
