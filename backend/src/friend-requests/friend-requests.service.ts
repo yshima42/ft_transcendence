@@ -239,7 +239,7 @@ export class FriendRequestsService {
   async getFriendRelation(
     meId: string,
     otherId: string
-  ): Promise<{ friendRelation: FriendRelation }> {
+  ): Promise<FriendRelation> {
     const ret = await this.prisma.friendRequest.findMany({
       where: {
         OR: [
@@ -269,6 +269,6 @@ export class FriendRequestsService {
       }
     }
 
-    return { friendRelation };
+    return friendRelation;
   }
 }
