@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import {
   useCreateChatRoom,
   ChatRoomCreateFormValues,
-} from 'hooks/api/chat/useCreateChatRoom';
+} from 'features/chat/hooks/useCreateChatRoom';
 import * as RHF from 'react-hook-form';
 import * as yup from 'yup';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatUserStatus } from '@prisma/client';
-import { ResponseChatRoomUser } from 'hooks/api/chat/types';
+import { ResponseChatRoomUser } from 'features/chat/hooks/types';
 import {
   UserActionButtons,
   actionButtonTexts,

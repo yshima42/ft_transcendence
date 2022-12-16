@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { useAllChatRoom } from 'hooks/api/chat/useAllChatRoom';
+import { useAllChatRoom } from 'features/chat/hooks/useAllChatRoom';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 

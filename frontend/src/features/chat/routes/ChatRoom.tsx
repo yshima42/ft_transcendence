@@ -4,10 +4,10 @@ import { ChatRoomStatus, ChatUserStatus } from '@prisma/client';
 import {
   ResponseChatRoomUser,
   ResponseChatMessage,
-} from 'hooks/api/chat/types';
+} from 'features/chat/hooks/types';
+import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';
 import { useLocation, Link } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -23,9 +23,9 @@ export const ChatRoom: React.FC = React.memo(() => {
   const { chatRoomId, name, chatRoomStatus } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
   const [loginUser, setLoginUser] = React.useState<ResponseChatRoomUser>();
-
-  // TODO: ソケットの生成、破棄をちゃんとやる
-  const [socket] = React.useState<Socket>(io('http://localhost:3000/chat'));
+  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
+    autoConnect: false,
+  });
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {

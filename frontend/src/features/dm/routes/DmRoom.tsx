@@ -2,8 +2,8 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
 import { useSavedDms } from 'hooks/api/dm/useSavedDms';
+import { useSocket } from 'hooks/socket/useSocket';
 import { useLocation } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
 import { DmMessages } from '../components/DmMessages';
@@ -19,8 +19,9 @@ export const DmRoom: React.FC = React.memo(() => {
   const { dmRoomId } = location.state as State;
   const { savedDms } = useSavedDms(dmRoomId);
   const [messages, setMessages] = React.useState<ResponseDm[]>(savedDms);
-  // TODO: ソケットの生成、破棄をちゃんとやる
-  const [socket] = React.useState<Socket>(io('http://localhost:3000/dm'));
+  const socket = useSocket(import.meta.env.VITE_WS_DM_URL, {
+    autoConnect: false,
+  });
 
   React.useEffect(() => {
     socket.emit('join_room', dmRoomId);
