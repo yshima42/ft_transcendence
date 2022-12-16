@@ -7,7 +7,6 @@ export * from './game/useMatchHistory';
 export * from './profile/useAvatarUpload';
 export * from './profile/useProfile';
 
-export * from './relations/useAllUsers';
 export * from './block/useBlockUsers';
 export * from './relations/useFriendRequest';
 export * from './relations/useFriendRequestAccept';
