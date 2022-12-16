@@ -229,7 +229,7 @@ export class ChatRoomUserService {
     }
   }
 
-  async remove(chatRoomId: string, userId: string): Promise<void> {
+  async remove(chatRoomId: string, userId: string): Promise<ChatRoomUser> {
     Logger.debug(`remove chatRoomId: ${chatRoomId}, userId: ${userId}`);
     const chatRoomUser = await this.findOne(chatRoomId, userId);
     // ADMINは退出できない
@@ -241,7 +241,7 @@ export class ChatRoomUserService {
     }
 
     try {
-      await this.prisma.chatRoomUser.delete({
+      return await this.prisma.chatRoomUser.delete({
         where: {
           chatRoomId_userId: {
             chatRoomId,

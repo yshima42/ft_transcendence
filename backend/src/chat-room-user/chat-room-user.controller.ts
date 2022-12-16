@@ -74,7 +74,7 @@ export class ChatRoomUserController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<void> {
-    return await this.chatRoomUserService.remove(chatRoomId, user.id);
+    await this.chatRoomUserService.remove(chatRoomId, user.id);
   }
 
   @Delete(':userId')
@@ -82,6 +82,6 @@ export class ChatRoomUserController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Param('userId', new ParseUUIDPipe()) userId: string
   ): Promise<void> {
-    return await this.chatRoomUserService.remove(chatRoomId, userId);
+    await this.chatRoomUserService.remove(chatRoomId, userId);
   }
 }
