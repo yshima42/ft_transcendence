@@ -117,6 +117,12 @@ export class GameGateway {
     // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
   }
 
+  // deleteGameRoom(roomId: string): void {
+  //   this.gameRooms[roomId].disconnectAll();
+  //   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  //   delete this.gameRooms[roomId];
+  // }
+
   @SubscribeMessage('user_commands')
   handleUserCommands(
     @MessageBody()
