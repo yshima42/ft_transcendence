@@ -147,7 +147,7 @@ export const useGame = (): {
       }
       case GamePhase.InGame: {
         socket.emit('connect_pong', { roomId });
-        userInput(socket, roomId, player1, isLeftSide);
+        userInput(socket, roomId, isLeftSide);
         break;
       }
     }
