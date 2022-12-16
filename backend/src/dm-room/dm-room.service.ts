@@ -9,7 +9,7 @@ export class DmRoomService {
   async findAll(userId: string): Promise<ResponseDmRoom[]> {
     const dmRooms = await this.prisma.dmRoom.findMany({
       where: {
-        dmRoomUsers: {
+        dmRoomMembers: {
           some: {
             userId,
           },
@@ -17,7 +17,7 @@ export class DmRoomService {
       },
       select: {
         id: true,
-        dmRoomUsers: {
+        dmRoomMembers: {
           where: {
             userId: {
               not: userId,

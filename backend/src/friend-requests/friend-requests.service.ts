@@ -145,7 +145,7 @@ export class FriendRequestsService {
         }),
         this.prisma.dmRoom.create({
           data: {
-            dmRoomUsers: {
+            dmRoomMembers: {
               create: [
                 {
                   userId: updateFriendRequestDto.creatorId,
