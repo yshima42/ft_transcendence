@@ -1,6 +1,5 @@
 import { Block } from '@prisma/client';
 import {
-  QueryKey,
   UseMutateAsyncFunction,
   useMutation,
   useQueryClient,
@@ -19,7 +18,7 @@ export type CancelUserBlock = UseMutateAsyncFunction<
 >;
 
 export const useUserBlockCancel = (
-  queryKeys: QueryKey[] = []
+  targetId: string
 ): {
   cancelUserBlock: CancelUserBlock;
   isLoading: boolean;
@@ -36,11 +35,10 @@ export const useUserBlockCancel = (
 
   const { mutateAsync: cancelUserBlock, isLoading } = useMutation(axiosDelete, {
     onSuccess: () => {
-      if (queryKeys !== undefined) {
-        queryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries({ queryKey });
-        });
-      }
+      void queryClient.invalidateQueries({ queryKey: ['/users/me/blocks'] });
+      void queryClient.invalidateQueries({
+        queryKey: [`/users/me/block-relation/${targetId}`],
+      });
     },
   });
 
