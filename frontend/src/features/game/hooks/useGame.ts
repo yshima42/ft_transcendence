@@ -109,12 +109,12 @@ export const useGame = (): {
         ballX: number;
         ballY: number;
       }) => {
-        player1.pos.x = data.paddle1X;
-        player1.pos.y = data.paddle1Y;
-        player2.pos.x = data.paddle2X;
-        player2.pos.y = data.paddle2Y;
-        ball.pos.x = data.ballX;
-        ball.pos.y = data.ballY;
+        player1.x = data.paddle1X;
+        player1.y = data.paddle1Y;
+        player2.x = data.paddle2X;
+        player2.y = data.paddle2Y;
+        ball.x = data.ballX;
+        ball.y = data.ballY;
       }
     );
 
