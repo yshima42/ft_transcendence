@@ -30,7 +30,7 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
                 state={{
                   chatRoomId: chatRoom.id,
                   name: chatRoom.name,
-                  chatRoomStatus: chatRoom.status,
+                  roomStatus: chatRoom.roomStatus,
                 }}
               >
                 <C.Box p={5} shadow="md" borderWidth="1px">
@@ -49,7 +49,7 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
                       <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
                       {/* PROTECTED */}
                       <C.Text fontSize="sm">
-                        {chatRoom.status === 'PROTECTED' ? (
+                        {chatRoom.roomStatus === 'PROTECTED' ? (
                           <C.Badge colorScheme="red">PROTECTED</C.Badge>
                         ) : (
                           <></>

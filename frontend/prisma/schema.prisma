@@ -27,23 +27,23 @@ model ChatMessage {
 }
 
 model ChatRoom {
-  id           String         @id @db.Uuid
-  name         String         @unique
-  status       ChatRoomStatus @default(PUBLIC)
-  password     String?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime
-  ChatMessage  ChatMessage[]
-  ChatRoomUser ChatRoomUser[]
+  id             String           @id @db.Uuid
+  name           String           @unique
+  roomStatus     ChatRoomStatus   @default(PUBLIC)
+  password       String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  ChatMessage    ChatMessage[]
+  ChatRoomMember ChatRoomMember[]
 }
 
-model ChatRoomUser {
-  chatRoomId  String         @db.Uuid
-  userId      String         @db.Uuid
-  status      ChatUserStatus @default(NORMAL)
-  statusUntil DateTime?
-  ChatRoom    ChatRoom       @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
-  User        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+model ChatRoomMember {
+  chatRoomId   String               @db.Uuid
+  userId       String               @db.Uuid
+  memberStatus ChatRoomMemberStatus @default(NORMAL)
+  statusUntil  DateTime?
+  ChatRoom     ChatRoom             @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  User         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([chatRoomId, userId])
 }
@@ -109,7 +109,7 @@ model User {
   Block_Block_sourceIdToUser                   Block[]              @relation("Block_sourceIdToUser")
   Block_Block_targetIdToUser                   Block[]              @relation("Block_targetIdToUser")
   ChatMessage                                  ChatMessage[]
-  ChatRoomUser                                 ChatRoomUser[]
+  ChatRoomMember                               ChatRoomMember[]
   Dm                                           Dm[]
   DmRoomMember                                 DmRoomMember[]
   FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[]      @relation("FriendRequest_creatorIdToUser")
@@ -127,13 +127,13 @@ model OneTimePasswordAuth {
   User       User     @relation(fields: [authUserId], references: [id])
 }
 
-enum ChatUserStatus {
+enum ChatRoomMemberStatus {
   ADMIN
   MODERATOR
   NORMAL
   KICKED
   BANNED
-  MUTE
+  MUTED
 }
 
 enum FriendRequestStatus {

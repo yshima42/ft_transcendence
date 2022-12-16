@@ -10,19 +10,19 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 type State = {
   chatRoomId: string;
   name: string;
-  chatRoomStatus: ChatRoomStatus;
+  roomStatus: ChatRoomStatus;
 };
 
 export const ChatRoomConfirmation: React.FC = React.memo(() => {
   const location = useLocation();
-  const { chatRoomId, name, chatRoomStatus } = location.state as State;
+  const { chatRoomId, name, roomStatus } = location.state as State;
   const navigate = useNavigate();
   const { handleSubmit, register } = RHF.useForm();
   // axiosを使って、チャットルームに参加する処理を行う。
   // その後、チャットルームのページに遷移する。
   async function joinChatRoom({ password }: { password: string }) {
-    console.log(chatRoomStatus);
-    if (chatRoomStatus === ChatRoomStatus.PROTECTED) {
+    console.log(roomStatus);
+    if (roomStatus === ChatRoomStatus.PROTECTED) {
       console.log('password', password);
       try {
         await axios.post(`/chat/rooms/${chatRoomId}/users`, {
@@ -41,7 +41,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
       await axios.post(`/chat/rooms/${chatRoomId}/users`);
     }
     navigate(`/app/chat/rooms/${chatRoomId}`, {
-      state: { chatRoomId, name, chatRoomStatus },
+      state: { chatRoomId, name, roomStatus },
     });
   }
 
@@ -63,7 +63,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
             <C.FormLabel>チャットルーム名</C.FormLabel>
             <C.Text>{name}</C.Text>
           </C.FormControl>
-          {chatRoomStatus === ChatRoomStatus.PROTECTED && (
+          {roomStatus === ChatRoomStatus.PROTECTED && (
             <C.FormControl>
               <C.FormLabel>パスワード</C.FormLabel>
               <C.Input

@@ -26,7 +26,6 @@ export class ChatMessageService {
           select: {
             name: true,
             avatarImageUrl: true,
-            onlineStatus: true,
           },
         },
       },
@@ -50,7 +49,6 @@ export class ChatMessageService {
           select: {
             name: true,
             avatarImageUrl: true,
-            onlineStatus: true,
           },
         },
       },

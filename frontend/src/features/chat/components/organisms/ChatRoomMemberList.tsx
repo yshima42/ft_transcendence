@@ -1,19 +1,22 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatUserStatus } from '@prisma/client';
-import { ResponseChatRoomUser } from 'features/chat/hooks/types';
+import { ChatRoomMemberStatus } from '@prisma/client';
+import { ResponseChatRoomMember } from 'features/chat/hooks/types';
 import {
-  UserActionButtons,
+  MemberActionButtons,
   actionButtonTexts,
-} from 'features/chat/components/atoms/UserActionButtons';
+} from 'features/chat/components/atoms/MemberActionButtons';
 
 type Props = {
-  loginUser: ResponseChatRoomUser;
-  users: ResponseChatRoomUser[];
-  onClickAction: (userId: string, status: ChatUserStatus) => Promise<void>;
+  loginUser: ResponseChatRoomMember;
+  users: ResponseChatRoomMember[];
+  onClickAction: (
+    userId: string,
+    memberStatus: ChatRoomMemberStatus
+  ) => Promise<void>;
 };
 
-export const ChatRoomUserList: React.FC<Props> = React.memo(
+export const ChatRoomMemberList: React.FC<Props> = React.memo(
   ({ loginUser, users, onClickAction }) => {
     return (
       <C.List spacing={3}>
@@ -28,7 +31,7 @@ export const ChatRoomUserList: React.FC<Props> = React.memo(
               <C.Text ml={10}>{user.user.nickname}</C.Text>
               <C.Spacer />
               <C.Flex>
-                <C.Text mr={5}>{user.status}</C.Text>
+                <C.Text mr={5}>{user.memberStatus}</C.Text>
                 {loginUser?.user.id === user.user.id && (
                   <C.Flex>
                     <C.Text mr={5}>me</C.Text>
@@ -37,13 +40,13 @@ export const ChatRoomUserList: React.FC<Props> = React.memo(
                 {/* userがLoginUserでない、かつ、(LoginUserがADMIN または MODERATOR) かつ、userがNORMALのとき */}
                 {loginUser !== undefined &&
                   loginUser.user.id !== user.user.id &&
-                  user.status === ChatUserStatus.NORMAL &&
-                  (loginUser.status === ChatUserStatus.MODERATOR ||
-                    loginUser.status === ChatUserStatus.ADMIN) && (
+                  user.memberStatus === ChatRoomMemberStatus.NORMAL &&
+                  (loginUser.memberStatus === ChatRoomMemberStatus.MODERATOR ||
+                    loginUser.memberStatus === ChatRoomMemberStatus.ADMIN) && (
                     <C.Flex>
-                      <UserActionButtons
+                      <MemberActionButtons
                         userId={user.user.id}
-                        status={loginUser.status}
+                        memberStatus={loginUser.memberStatus}
                         onClickAction={onClickAction}
                       />
                     </C.Flex>
@@ -51,38 +54,46 @@ export const ChatRoomUserList: React.FC<Props> = React.memo(
                 {/* userがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
                 {loginUser !== undefined &&
                   loginUser.user.id !== user.user.id &&
-                  loginUser.status === ChatUserStatus.ADMIN &&
-                  user.status !== ChatUserStatus.ADMIN &&
-                  user.status !== ChatUserStatus.NORMAL && (
+                  loginUser.memberStatus === ChatRoomMemberStatus.ADMIN &&
+                  user.memberStatus !== ChatRoomMemberStatus.ADMIN &&
+                  user.memberStatus !== ChatRoomMemberStatus.NORMAL && (
                     <C.Flex>
                       <C.Button
                         onClick={async () =>
                           await onClickAction(
                             user.user.id,
-                            ChatUserStatus.NORMAL
+                            ChatRoomMemberStatus.NORMAL
                           )
                         }
                       >
-                        {actionButtonTexts[user.status as ChatUserStatus]}
+                        {
+                          actionButtonTexts[
+                            user.memberStatus as ChatRoomMemberStatus
+                          ]
+                        }
                       </C.Button>
                     </C.Flex>
                   )}
                 {loginUser !== undefined &&
                   loginUser.user.id !== user.user.id &&
-                  loginUser.status === ChatUserStatus.MODERATOR &&
-                  user.status !== ChatUserStatus.MODERATOR &&
-                  user.status !== ChatUserStatus.ADMIN &&
-                  user.status !== ChatUserStatus.NORMAL && (
+                  loginUser.memberStatus === ChatRoomMemberStatus.MODERATOR &&
+                  user.memberStatus !== ChatRoomMemberStatus.MODERATOR &&
+                  user.memberStatus !== ChatRoomMemberStatus.ADMIN &&
+                  user.memberStatus !== ChatRoomMemberStatus.NORMAL && (
                     <C.Flex>
                       <C.Button
                         onClick={async () =>
                           await onClickAction(
                             user.user.id,
-                            ChatUserStatus.NORMAL
+                            ChatRoomMemberStatus.NORMAL
                           )
                         }
                       >
-                        {actionButtonTexts[user.status as ChatUserStatus]}
+                        {
+                          actionButtonTexts[
+                            user.memberStatus as ChatRoomMemberStatus
+                          ]
+                        }
                       </C.Button>
                     </C.Flex>
                   )}

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomStatus, ChatUserStatus } from '@prisma/client';
+import { ChatRoomStatus, ChatRoomMemberStatus } from '@prisma/client';
 import {
-  ResponseChatRoomUser,
+  ResponseChatRoomMember,
   ResponseChatMessage,
 } from 'features/chat/hooks/types';
 import { useSocket } from 'hooks/socket/useSocket';
@@ -15,14 +15,14 @@ import { MessageSendForm } from 'components/molecules/MessageSendForm';
 type State = {
   chatRoomId: string;
   name: string;
-  chatRoomStatus: ChatRoomStatus;
+  roomStatus: ChatRoomStatus;
 };
 
 export const ChatRoom: React.FC = React.memo(() => {
   const location = useLocation();
-  const { chatRoomId, name, chatRoomStatus } = location.state as State;
+  const { chatRoomId, name, roomStatus } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
-  const [loginUser, setLoginUser] = React.useState<ResponseChatRoomUser>();
+  const [loginUser, setLoginUser] = React.useState<ResponseChatRoomMember>();
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
     autoConnect: false,
   });
@@ -59,7 +59,7 @@ export const ChatRoom: React.FC = React.memo(() => {
   }
 
   async function getLoginUser() {
-    const res: { data: ResponseChatRoomUser } = await axios.get(
+    const res: { data: ResponseChatRoomMember } = await axios.get(
       `/chat/rooms/${chatRoomId}/users/me`
     );
     setLoginUser(res.data);
@@ -83,7 +83,7 @@ export const ChatRoom: React.FC = React.memo(() => {
           <C.Link
             as={Link}
             to={`/app/chat/rooms/${chatRoomId}/settings`}
-            state={{ chatRoomId, name, chatRoomStatus }}
+            state={{ chatRoomId, name, roomStatus }}
           >
             <C.Button colorScheme="blue">Settings</C.Button>
           </C.Link>
@@ -110,16 +110,18 @@ export const ChatRoom: React.FC = React.memo(() => {
           <div ref={scrollBottomRef} />
         </C.Flex>
         <C.Divider />
-        {/* メッセージ送信フォーム  loginUserがMUTEのときは送信できないようにする */}
-        {loginUser?.status === ChatUserStatus.MUTE && (
-          <C.Alert status="warning" mb={4}>
-            <C.AlertIcon />
-            You are muted.
-          </C.Alert>
-        )}
-        {loginUser?.status !== ChatUserStatus.MUTE && (
-          <MessageSendForm onSubmit={sendMessage} />
-        )}
+        {/* メッセージ送信フォーム  loginUserがMUTEDのときは送信できないようにする */}
+        {loginUser != null &&
+          loginUser.memberStatus === ChatRoomMemberStatus.MUTED && (
+            <C.Alert status="warning" mb={4}>
+              <C.AlertIcon />
+              You are muted.
+            </C.Alert>
+          )}
+        {loginUser != null &&
+          loginUser.memberStatus !== ChatRoomMemberStatus.MUTED && (
+            <MessageSendForm onSubmit={sendMessage} />
+          )}
       </ContentLayout>
     </>
   );

@@ -25,7 +25,7 @@ export const useCreateChatRoom: () => {
         state: {
           chatRoomId: chatRoom.id,
           name: chatRoom.name,
-          chatRoomStatus: chatRoom.status,
+          roomStatus: chatRoom.roomStatus,
         },
       });
     } catch (e) {

@@ -3,21 +3,21 @@ import * as C from '@chakra-ui/react';
 import { ChatRoomStatus } from '@prisma/client';
 
 type Props = {
-  chatRoomStatus: ChatRoomStatus;
+  roomStatus: ChatRoomStatus;
   unLockFunc: () => void;
   lockFunc: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const SecurityAccordionItem: React.FC<Props> = React.memo(
-  ({ chatRoomStatus, unLockFunc, lockFunc, onChange }) => {
+  ({ roomStatus, unLockFunc, lockFunc, onChange }) => {
     return (
       <>
         {/*
         PROTECTEDのとき パスワードの解除
         PUBLICのとき パスワード
         */}
-        {chatRoomStatus === ChatRoomStatus.PROTECTED && (
+        {roomStatus === ChatRoomStatus.PROTECTED && (
           <C.Flex>
             <C.Text mr={5}>Password</C.Text>
             <C.Spacer />
@@ -29,7 +29,7 @@ export const SecurityAccordionItem: React.FC<Props> = React.memo(
             </C.Flex>
           </C.Flex>
         )}
-        {chatRoomStatus === ChatRoomStatus.PUBLIC && (
+        {roomStatus === ChatRoomStatus.PUBLIC && (
           <C.Flex>
             <C.Text mr={5}>Password</C.Text>
             <C.Spacer />

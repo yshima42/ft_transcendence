@@ -1,9 +1,9 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import * as NestJS from '@nestjs/common';
-import { ChatRoom, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
+import { ChatRoom, ChatRoomMemberStatus, ChatRoomStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
-import { ChatRoomUserService } from 'src/chat-room-user/chat-room-user.service';
+import { ChatRoomMemberService } from 'src/chat-room-user/chat-room-member.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
@@ -13,8 +13,8 @@ import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 export class ChatRoomService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => ChatRoomUserService))
-    private readonly chatRoomUserService: ChatRoomUserService
+    @Inject(forwardRef(() => ChatRoomMemberService))
+    private readonly chatRoomMemberService: ChatRoomMemberService
   ) {}
 
   async create(
@@ -32,15 +32,15 @@ export class ChatRoomService {
       const chatRoom = await this.prisma.chatRoom.create({
         data: {
           name,
-          status:
+          roomStatus:
             password === undefined
               ? ChatRoomStatus.PUBLIC
               : ChatRoomStatus.PROTECTED,
           password: hashedPassword,
-          chatRoomUsers: {
+          chatRoomMembers: {
             create: {
               userId,
-              status: ChatUserStatus.ADMIN,
+              memberStatus: ChatRoomMemberStatus.ADMIN,
             },
           },
         },
@@ -66,7 +66,7 @@ export class ChatRoomService {
   async findAllWithOutMe(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
-        chatRoomUsers: {
+        chatRoomMembers: {
           every: {
             userId: {
               not: userId,
@@ -77,7 +77,7 @@ export class ChatRoomService {
       select: {
         id: true,
         name: true,
-        status: true,
+        roomStatus: true,
         chatMessages: {
           select: {
             content: true,
@@ -99,11 +99,11 @@ export class ChatRoomService {
   async findAllByMe(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
-        chatRoomUsers: {
+        chatRoomMembers: {
           some: {
             userId,
-            status: {
-              not: ChatUserStatus.BANNED,
+            memberStatus: {
+              not: ChatRoomMemberStatus.BANNED,
             },
           },
         },
@@ -111,7 +111,7 @@ export class ChatRoomService {
       select: {
         id: true,
         name: true,
-        status: true,
+        roomStatus: true,
         chatMessages: {
           select: {
             content: true,
@@ -162,7 +162,7 @@ export class ChatRoomService {
       hashedPassword = await bcrypt.hash(password, 10);
     }
     // userのチャットでの権限を取得
-    const chatRoomUser = await this.prisma.chatRoomUser.findUnique({
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
       where: {
         chatRoomId_userId: {
           chatRoomId,
@@ -171,7 +171,7 @@ export class ChatRoomService {
       },
     });
     // もしADMINじゃなかったらエラー
-    if (chatRoomUser?.status !== ChatUserStatus.ADMIN) {
+    if (chatRoomMember?.memberStatus !== ChatRoomMemberStatus.ADMIN) {
       Logger.warn(`updateChatRoom: user is not admin`);
 
       throw new Error('User is not admin');
@@ -183,7 +183,7 @@ export class ChatRoomService {
       },
       data: {
         password: hashedPassword,
-        status:
+        roomStatus:
           password === undefined
             ? ChatRoomStatus.PUBLIC
             : ChatRoomStatus.PROTECTED,
@@ -197,11 +197,11 @@ export class ChatRoomService {
   // remove
   async remove(chatRoomId: string, userId: string): Promise<ChatRoom> {
     // userのチャットでの権限を取得
-    const loginChatRoomUser = await this.chatRoomUserService.findOne(
+    const loginChatRoomMember = await this.chatRoomMemberService.findOne(
       chatRoomId,
       userId
     );
-    if (loginChatRoomUser === undefined) {
+    if (loginChatRoomMember === undefined) {
       Logger.warn(`removeChatRoom: user is not in chatRoom`);
 
       throw new NestJS.HttpException(
@@ -210,7 +210,7 @@ export class ChatRoomService {
       );
     }
     // もしADMINじゃなかったらエラー
-    if (loginChatRoomUser.status !== ChatUserStatus.ADMIN) {
+    if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.ADMIN) {
       Logger.warn(`removeChatRoom: user is not admin`);
 
       throw new NestJS.HttpException(
