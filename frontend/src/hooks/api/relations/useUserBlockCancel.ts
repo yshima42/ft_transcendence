@@ -38,7 +38,7 @@ export const useUserBlockCancel = (
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries(queryKey);
+          void queryClient.invalidateQueries({ queryKey });
         });
       }
     },
