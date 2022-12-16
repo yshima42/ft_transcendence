@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { API_URL } from 'config';
 import { useProfile } from 'hooks/api';
 import { io } from 'socket.io-client';
 import {
@@ -47,7 +48,7 @@ export const useGame = (): {
   const [isLeftSide, setIsLeftSide] = useState(true);
   const [gameResult, setGameResult] = useState(defaultGameResult);
   // TODO: socket はとりあえずの仮実装
-  const [socket] = useState(io('http://localhost:3000/game'));
+  const [socket] = useState(io(API_URL + '/game'));
   const { user } = useProfile();
 
   const player1 = new Paddle(0, PADDLE_START_POS);
@@ -91,9 +92,9 @@ export const useGame = (): {
     // ゲーム中のスコア受け取り
     socket.on(
       'update_score',
-      (data: { paddle1Score: number; paddle2Score: number }) => {
-        player1.score = data.paddle1Score;
-        player2.score = data.paddle2Score;
+      (data: { player1Score: number; player2Score: number }) => {
+        player1.score = data.player1Score;
+        player2.score = data.player2Score;
       }
     );
 

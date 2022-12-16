@@ -10,6 +10,7 @@ export const PADDLE_WIDTH = 20;
 export const PADDLE_HEIGHT = 75;
 export const PADDLE_START_POS = (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2;
 export const PADDLE_SPEED = 32;
+export const SCORE_TO_WIN = 5;
 export const BALL_COLOR = '#4FD1C5';
 export const PADDLE_COLOR = '#4FD1C5';
 export const BG_COLOR = '#1A202C';
