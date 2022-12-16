@@ -244,9 +244,9 @@ export class UsersController {
     return await this.blocksService.findBlockedUsers(user.id);
   }
 
-  @Get('me/blocks/:id')
+  @Get('me/block-relation/:id')
   @ApiOperation({ summary: '特定のユーザーをブロックしているかどうか判定' })
-  @ApiOkResponse({ type: UserEntity, isArray: true })
+  @ApiOkResponse({ type: Boolean })
   async isBlockedUser(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) targetId: string
@@ -397,7 +397,7 @@ export class UsersController {
   async getFriendRelation(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) otherId: string
-  ): Promise<{ friendRelation: FriendRelation }> {
+  ): Promise<FriendRelation> {
     return await this.friendRequestService.getFriendRelation(user.id, otherId);
   }
 }
