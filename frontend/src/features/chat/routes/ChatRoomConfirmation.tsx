@@ -21,24 +21,24 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
   // axiosを使って、チャットルームに参加する処理を行う。
   // その後、チャットルームのページに遷移する。
   async function joinChatRoom({ password }: { password: string }) {
-    console.log(roomStatus);
-    if (roomStatus === ChatRoomStatus.PROTECTED) {
-      console.log('password', password);
-      try {
-        await axios.post(`/chat/rooms/${chatRoomId}/users`, {
-          password,
-        });
-      } catch (e) {
-        const err = e as AxiosError;
-        console.log(err.response?.status);
-        if (err.response?.status !== 201) {
-          alert('認証に失敗しました。');
-        }
-
-        return;
+    try {
+      console.log(password);
+      await axios.post(
+        `/chat/rooms/${chatRoomId}/users`,
+        roomStatus === ChatRoomStatus.PROTECTED
+          ? {
+              chatRoomPassword: password,
+            }
+          : undefined
+      );
+    } catch (e) {
+      const err = e as AxiosError;
+      console.log(err.response?.status);
+      if (err.response?.status !== 201) {
+        alert('認証に失敗しました。');
       }
-    } else {
-      await axios.post(`/chat/rooms/${chatRoomId}/users`);
+
+      return;
     }
     navigate(`/app/chat/rooms/${chatRoomId}`, {
       state: { chatRoomId, name, roomStatus },
