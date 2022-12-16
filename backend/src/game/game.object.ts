@@ -29,8 +29,6 @@ const defaultBall = {
 };
 
 export type Paddle = {
-  up: boolean;
-  down: boolean;
   x: number;
   y: number;
   score: number;
@@ -40,8 +38,6 @@ export type Paddle = {
 
 // xの値はpaddleごとに設定する
 const defaultPaddle = {
-  up: false,
-  down: false,
   y: PADDLE_START_POS,
   score: 0,
   dx: PADDLE_SPEED,
@@ -229,4 +225,13 @@ export class GameRoom {
       }
     }
   }
+
+  // disconnectAll(): void {
+  //   if (this.player1.socket.connected) {
+  //     void this.player1.socket.leave(this.id);
+  //   }
+  //   if (this.player2.socket.connected) {
+  //     void this.player2.socket.leave(this.id);
+  //   }
+  // }
 }
