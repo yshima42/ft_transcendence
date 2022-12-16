@@ -8,7 +8,6 @@ import {
 import { User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-// eslint-disable-next-line import/extensions
 import { UserData, GameRoom, GameRoomDict } from './game.object';
 import { GameService } from './game.service';
 
@@ -42,6 +41,7 @@ export class GameGateway {
       id: socket.data.userId as string,
       nickname: socket.data.userNickname as string,
       inGame: true,
+      score: 0,
     };
     // 1人目の場合2人目ユーザーを待つ
     if (this.matchWaitingUsers.length === 0) {
