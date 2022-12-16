@@ -12,10 +12,9 @@ import { CreateChatRooms } from 'features/chat/routes/CreateChatRooms';
 import { DmRoom } from 'features/dm/routes/DmRoom';
 import { DmRooms } from 'features/dm/routes/DmRooms';
 import { Users } from 'features/friends/routes/Users';
-import { Game } from 'features/game/routes/Game';
-import { GameTop } from 'features/game/routes/GameTop';
+import { Matching } from 'features/game/components/Matching';
 import { Games } from 'features/game/routes/Games';
-import { Matching } from 'features/game/routes/Matching';
+import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
 import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
 import OnlineUsersProvider from 'providers/OnlineUsersProvider';
@@ -46,7 +45,6 @@ export const publicRoutes = [
     element: <Login />,
   },
   { path: '/otp', element: <OtpAuth /> },
-  { path: '/app/game', element: <Game /> },
   { path: '*', element: <Page404 /> },
   {
     path: '/app',
@@ -57,7 +55,7 @@ export const publicRoutes = [
       { path: 'chat/create', element: <CreateChatRooms /> },
       { path: 'chat/:id', element: <ChatRoom /> },
       { path: 'games', element: <Games /> },
-      { path: '', element: <GameTop /> },
+      { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
       { path: 'dm', element: <DmRooms /> },
       { path: 'dm/:id', element: <DmRoom /> },
