@@ -238,12 +238,12 @@ export class GameRoom {
     }
   }
 
-  // disconnectAll(): void {
-  //   if (this.player1.socket.connected) {
-  //     void this.player1.socket.leave(this.id);
-  //   }
-  //   if (this.player2.socket.connected) {
-  //     void this.player2.socket.leave(this.id);
-  //   }
-  // }
+  disconnectAll(): void {
+    if (this.player1.socket.connected) {
+      void this.player1.socket.leave(this.id);
+    }
+    if (this.player2.socket.connected) {
+      void this.player2.socket.leave(this.id);
+    }
+  }
 }
