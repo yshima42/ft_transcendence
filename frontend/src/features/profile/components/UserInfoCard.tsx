@@ -39,8 +39,9 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
         <Text fontSize="xs" color="gray">
           {user.name}
         </Text>
-        {isLoginUser && <ProfileSetting />}
-        {isLoginUser || (
+        {isLoginUser ? (
+          <ProfileSetting />
+        ) : (
           <>
             <GameButton isGamePlaying={false} />
             <HStack justify="center" align="center">
