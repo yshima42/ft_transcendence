@@ -63,6 +63,6 @@ export class ChatRoomController {
     @Param('chatRoomId') chatRoomId: string,
     @GetUser() user: User
   ): Promise<void> {
-    return await this.chatRoomService.remove(chatRoomId, user.id);
+    await this.chatRoomService.remove(chatRoomId, user.id);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import * as NestJS from '@nestjs/common';
 import { ChatRoom, ChatUserStatus, ChatRoomStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -13,6 +13,7 @@ import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 export class ChatRoomService {
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => ChatRoomUserService))
     private readonly chatRoomUserService: ChatRoomUserService
   ) {}
 
@@ -128,6 +129,25 @@ export class ChatRoomService {
     return chatRooms;
   }
 
+  // findOne
+  async findOne(chatRoomId: string): Promise<ChatRoom> {
+    const chatRoom = await this.prisma.chatRoom.findUnique({
+      where: {
+        id: chatRoomId,
+      },
+    });
+    if (chatRoom === null) {
+      Logger.warn(`findOneChatRoom: chatRoom is not found`);
+      throw new NestJS.HttpException(
+        'ChatRoom is not found',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
+    Logger.debug(`findOneChatRoom: ${JSON.stringify(chatRoom)}`);
+
+    return chatRoom;
+  }
+
   // update
   async update(
     chatRoomId: string,
@@ -175,7 +195,7 @@ export class ChatRoomService {
   }
 
   // remove
-  async remove(chatRoomId: string, userId: string): Promise<void> {
+  async remove(chatRoomId: string, userId: string): Promise<ChatRoom> {
     // userのチャットでの権限を取得
     const loginChatRoomUser = await this.chatRoomUserService.findOne(
       chatRoomId,
@@ -204,5 +224,7 @@ export class ChatRoomService {
       },
     });
     Logger.debug(`removeChatRoom: ${JSON.stringify(chatRoom)}`);
+
+    return chatRoom;
   }
 }
