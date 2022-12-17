@@ -19,8 +19,8 @@ export class GameGateway {
   private readonly server!: Server;
 
   // このクラスで使う配列・変数
-  // private readonly gameRooms: GameRoomDict = {};
-  public gameRooms: Map<string, GameRoom>;
+  private readonly gameRooms: Map<string, GameRoom>;
+
   private readonly matchWaitingUsers: UserData[] = [];
 
   constructor(private readonly gameService: GameService) {

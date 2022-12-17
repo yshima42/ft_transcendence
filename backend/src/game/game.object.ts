@@ -52,10 +52,6 @@ class Paddle {
   }
 }
 
-// export type GameRoomDict = {
-//   [id: string]: GameRoom;
-// };
-
 export type UserData = {
   isLeftSide?: boolean;
   socket: Socket;
