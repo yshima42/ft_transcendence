@@ -8,20 +8,24 @@ import {
 import { User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-import { UserData, GameRoom, GameRoomDict } from './game.object';
+import { UserData, GameRoom } from './game.object';
 import { GameService } from './game.service';
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: '/game' })
 export class GameGateway {
   // gameServiceを使うのに必要
-  constructor(private readonly gameService: GameService) {}
 
   @WebSocketServer()
   private readonly server!: Server;
 
   // このクラスで使う配列・変数
-  private readonly gameRooms: GameRoomDict = {};
+  // private readonly gameRooms: GameRoomDict = {};
+  public gameRooms: Map<string, GameRoom>;
   private readonly matchWaitingUsers: UserData[] = [];
+
+  constructor(private readonly gameService: GameService) {
+    this.gameRooms = new Map<string, GameRoom>();
+  }
 
   // 本来はhandleConnectionでやりたいが、authGuardで対応できないため、こちらでUser情報セット
   @SubscribeMessage('set_user')
@@ -72,7 +76,7 @@ export class GameGateway {
       player1,
       player2
     );
-    this.gameRooms[id] = gameRoom;
+    this.gameRooms.set(id, gameRoom);
 
     return id;
   }
@@ -94,9 +98,12 @@ export class GameGateway {
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: { roomId: string }
   ): void {
-    this.gameRooms[message.roomId].ready
-      ? this.server.in(message.roomId).emit('start_game')
-      : (this.gameRooms[message.roomId].ready = true);
+    const gameRoom = this.gameRooms.get(message.roomId);
+    if (gameRoom !== undefined) {
+      gameRoom.ready
+        ? this.server.in(message.roomId).emit('start_game')
+        : (gameRoom.ready = true);
+    }
   }
 
   @SubscribeMessage('connect_pong')
@@ -105,23 +112,23 @@ export class GameGateway {
     @ConnectedSocket() socket: Socket
   ): void {
     // player1のsocketでゲームオブジェクトを作る
-    if (socket.id === this.gameRooms[message.roomId].player2.socket.id) {
-      return;
+    const gameRoom = this.gameRooms.get(message.roomId);
+    if (gameRoom !== undefined) {
+      if (socket.id === gameRoom.player2.socket.id) {
+        return;
+      }
+      // ゲーム開始
+      gameRoom.gameStart(socket, message.roomId);
     }
-
-    const gameRoom = this.gameRooms[message.roomId];
-
-    // ゲーム開始
-    gameRoom.gameStart(socket, message.roomId);
 
     // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
   }
 
-  deleteGameRoom(roomId: string): void {
-    this.gameRooms[roomId].disconnectAll();
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete this.gameRooms[roomId];
-  }
+  // deleteGameRoom(roomId: string): void {
+  //   this.gameRooms[roomId].disconnectAll();
+  //   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  //   delete this.gameRooms[roomId];
+  // }
 
   @SubscribeMessage('user_command')
   handleUserCommands(
@@ -131,8 +138,9 @@ export class GameGateway {
       userCommand: { up: boolean; down: boolean; isLeftSide: boolean };
     }
   ): void {
-    const gameRoom = this.gameRooms[data.roomId];
-
-    gameRoom.handleInput(data.roomId, data.userCommand);
+    const gameRoom = this.gameRooms.get(data.roomId);
+    if (gameRoom !== undefined) {
+      gameRoom.handleInput(data.roomId, data.userCommand);
+    }
   }
 }
