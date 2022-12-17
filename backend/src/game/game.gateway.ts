@@ -20,7 +20,6 @@ export class GameGateway {
 
   // このクラスで使う配列・変数
   private readonly gameRooms: Map<string, GameRoom>;
-
   private readonly matchWaitingUsers: UserData[] = [];
 
   constructor(private readonly gameService: GameService) {
@@ -44,7 +43,6 @@ export class GameGateway {
       socket,
       id: socket.data.userId as string,
       nickname: socket.data.userNickname as string,
-      inGame: true,
       score: 0,
     };
     // 1人目の場合2人目ユーザーを待つ
@@ -63,7 +61,9 @@ export class GameGateway {
         .to(this.matchWaitingUsers[0].socket.id)
         .emit('go_game_room', roomId, this.matchWaitingUsers[0].isLeftSide);
 
-      this.matchWaitingUsers.splice(0, 1);
+      // どちらでもやること同じだけどpop()を採用した
+      // this.matchWaitingUsers.splice(0, 1);
+      this.matchWaitingUsers.pop();
     }
   }
 

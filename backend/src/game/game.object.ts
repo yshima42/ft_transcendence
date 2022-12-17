@@ -57,12 +57,7 @@ export type UserData = {
   socket: Socket;
   id: string;
   nickname: string;
-  inGame: boolean;
   score: number;
-};
-
-export type UserDict = {
-  [id: string]: UserData;
 };
 
 // このクラスでゲーム操作を行う
