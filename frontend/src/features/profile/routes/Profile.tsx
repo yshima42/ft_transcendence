@@ -1,9 +1,9 @@
-import { memo, FC } from 'react';
+import { memo, FC, Suspense } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import { useIsBlockedUser, useIsLoginUser, useProfile } from 'hooks/api';
 import { useParams } from 'react-router-dom';
+import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
 import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
@@ -43,23 +43,23 @@ export const Profile: FC = memo(() => {
           gap={5}
         >
           <GridItem bg="gray" area="profile">
-            <ProfileCardWrapper>
+            <Suspense fallback={<CenterSpinner />}>
               <UserInfoCard
                 user={user}
                 isLoginUser={isLoginUser}
                 isBlockedUser={isBlockedUser}
               />
-            </ProfileCardWrapper>
+            </Suspense>
           </GridItem>
           <GridItem bg="gray" area="stats">
-            <ProfileCardWrapper>
+            <Suspense fallback={<CenterSpinner />}>
               <StatsCard id={user.id} />
-            </ProfileCardWrapper>
+            </Suspense>
           </GridItem>
           <GridItem bg="gray" area="history">
-            <ProfileCardWrapper>
+            <Suspense fallback={<CenterSpinner />}>
               <MatchHistoryCard id={user.id} />
-            </ProfileCardWrapper>
+            </Suspense>
           </GridItem>
         </Grid>
       </Flex>
