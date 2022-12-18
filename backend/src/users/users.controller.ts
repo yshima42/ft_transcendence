@@ -245,7 +245,7 @@ export class UsersController {
     return await this.blocksService.findBlockedUsers(user.id);
   }
 
-  @Get('me/block-relation/:id')
+  @Get('me/block-relations/:id')
   @ApiOperation({ summary: '特定のユーザーをブロックしているかどうか判定' })
   @ApiOkResponse({ type: Boolean })
   async isBlockedUser(
