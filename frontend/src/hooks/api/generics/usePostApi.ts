@@ -13,6 +13,8 @@ export function usePostApi<ReqBody, ResBody>(
 ): {
   postFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
   isLoading: boolean;
+  isError: boolean;
+  failureReason: unknown;
 } {
   const axiosPost = async (reqBody: ReqBody) => {
     const result = await axios.post<ResBody>(endpoint, reqBody);
@@ -22,7 +24,12 @@ export function usePostApi<ReqBody, ResBody>(
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: postFunc, isLoading } = useMutation(axiosPost, {
+  const {
+    mutateAsync: postFunc,
+    isLoading,
+    isError,
+    failureReason,
+  } = useMutation(axiosPost, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
@@ -32,5 +39,5 @@ export function usePostApi<ReqBody, ResBody>(
     },
   });
 
-  return { postFunc, isLoading };
+  return { postFunc, isLoading, isError, failureReason };
 }
