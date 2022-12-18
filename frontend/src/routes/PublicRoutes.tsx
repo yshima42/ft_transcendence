@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { useToast } from '@chakra-ui/react';
 import { isAxiosError } from 'axios';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -23,9 +24,18 @@ import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const onError = (error: Error) => {
     if (isAxiosError(error) && error.response?.status === 401) {
+      toast({
+        title: 'Error',
+        description: 'Authentication failed.',
+        status: 'error',
+        position: 'top',
+        duration: 3000,
+        isClosable: true,
+      });
       navigate('/');
     } else {
       navigate('/error');
