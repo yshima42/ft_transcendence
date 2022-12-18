@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { WS_BASE_URL } from 'config';
 import { useProfile } from 'hooks/api';
 import { useSocket } from 'hooks/socket/useSocket';
 
@@ -13,9 +14,7 @@ export const OnlineUsersContext = createContext<string[]>([]);
 
 const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useProfile();
-  const socket = useSocket(import.meta.env.VITE_WS_BASE_URL, {
-    autoConnect: false,
-  });
+  const socket = useSocket(WS_BASE_URL, { autoConnect: false });
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const didLogRef = useRef(false);
 
