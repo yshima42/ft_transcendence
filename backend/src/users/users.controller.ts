@@ -27,6 +27,7 @@ import { Block, FriendRequest, MatchResult, User } from '@prisma/client';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
+import { FriendRelationEntity } from 'src/friend-requests/entities/friend-relation.entity';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
 import { FriendRelation } from 'src/friend-requests/interfaces/friend-relation.interface';
 import { GameStatsEntity } from 'src/game/entities/game-stats.entity';
@@ -393,11 +394,11 @@ export class UsersController {
   @ApiOperation({
     summary: '自分から見た特定ユーザーとの関係取得',
   })
-  @ApiOkResponse({ type: UserEntity, isArray: true })
+  @ApiOkResponse({ type: FriendRelationEntity })
   async getFriendRelation(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) otherId: string
-  ): Promise<FriendRelation> {
+  ): Promise<{ friendRelation: FriendRelation }> {
     return await this.friendRequestService.getFriendRelation(user.id, otherId);
   }
 }
