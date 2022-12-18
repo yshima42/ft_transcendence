@@ -16,6 +16,8 @@ export function usePostFileApi<ResBody>(
 ): {
   postFunc: UseMutateAsyncFunction<ResBody, unknown, FileReqBody, unknown>;
   isLoading: boolean;
+  isError: boolean;
+  failureReason: unknown;
 } {
   const axiosPost = async (reqBody: FileReqBody) => {
     const formData = new FormData();
@@ -28,7 +30,12 @@ export function usePostFileApi<ResBody>(
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: postFunc, isLoading } = useMutation(axiosPost, {
+  const {
+    mutateAsync: postFunc,
+    isLoading,
+    isError,
+    failureReason,
+  } = useMutation(axiosPost, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
@@ -38,5 +45,5 @@ export function usePostFileApi<ResBody>(
     },
   });
 
-  return { postFunc, isLoading };
+  return { postFunc, isLoading, isError, failureReason };
 }
