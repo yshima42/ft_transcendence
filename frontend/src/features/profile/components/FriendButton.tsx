@@ -18,7 +18,7 @@ export const FriendButton: FC<Props> = memo((props) => {
   const { friendRelation } = useFriendRelation(otherId);
 
   const queryKeys = [
-    [`friend-relation`, { otherId }],
+    ['friend-relations', { otherId }],
     ['/users/me/friend-requests/outgoing'],
   ];
   const { requestFriend } = useFriendRequest(queryKeys);

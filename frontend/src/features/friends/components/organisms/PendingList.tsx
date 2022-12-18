@@ -13,7 +13,7 @@ export const PendingList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
   const { cancelFriendRequest } = useFriendRequestCancel([
-    ['friend-relation'],
+    ['friend-relations'],
     ['/users/me/friend-requests/outgoing'],
   ]);
   useEffect(() => {

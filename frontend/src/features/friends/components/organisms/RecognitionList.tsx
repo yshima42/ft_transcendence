@@ -15,7 +15,7 @@ export const RecognitionList: FC<Props> = (props) => {
   const [userList, setUserList] = useState<User[]>(users);
 
   const queryKeys = [
-    ['friend-relation'],
+    ['friend-relations'],
     ['/users/me/friend-requests/incoming'],
   ];
   const { acceptFriendRequest } = useFriendRequestAccept(queryKeys);

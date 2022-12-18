@@ -17,7 +17,7 @@ export const RequestableUsersList: FC<Props> = (props) => {
   }, [users]);
 
   const { requestFriend } = useFriendRequest([
-    ['friend-relation'],
+    ['friend-relations'],
     ['/users/me/friend-requests/outgoing'],
   ]);
   if (users === undefined) return <></>;

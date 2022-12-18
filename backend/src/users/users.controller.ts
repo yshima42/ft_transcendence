@@ -389,7 +389,7 @@ export class UsersController {
     return await this.friendRequestService.findRequestableUsers(user.id);
   }
 
-  @Get('me/friend-relation/:id')
+  @Get('me/friend-relations/:id')
   @ApiOperation({
     summary: '自分から見た特定ユーザーとの関係取得',
   })
