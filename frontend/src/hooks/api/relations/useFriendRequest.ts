@@ -18,7 +18,7 @@ export type RequestFriend = UseMutateAsyncFunction<
 >;
 
 export const useFriendRequest = (
-  queryKeys: QueryKey[] = []
+  queryKeys: QueryKey[]
 ): {
   requestFriend: RequestFriend;
   isLoading: boolean;

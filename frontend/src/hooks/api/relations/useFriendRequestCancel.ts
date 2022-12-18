@@ -19,7 +19,7 @@ export type CancelFriendRequest = UseMutateAsyncFunction<
 >;
 
 export const useFriendRequestCancel = (
-  queryKeys: QueryKey[] = []
+  queryKeys: QueryKey[]
 ): {
   cancelFriendRequest: CancelFriendRequest;
   isLoading: boolean;

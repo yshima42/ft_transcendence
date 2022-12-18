@@ -16,7 +16,7 @@ export type AcceptFriendRequest = UseMutateAsyncFunction<
 >;
 
 export const useFriendRequestAccept = (
-  queryKeys: QueryKey[] = []
+  queryKeys: QueryKey[]
 ): {
   acceptFriendRequest: AcceptFriendRequest;
   isLoading: boolean;
