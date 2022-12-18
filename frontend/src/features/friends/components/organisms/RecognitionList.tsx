@@ -13,8 +13,13 @@ type Props = {
 export const RecognitionList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { acceptFriendRequest } = useFriendRequestAccept();
-  const { rejectFriendRequest } = useFriendRequestReject();
+
+  const queryKeys = [
+    ['friend-relation'],
+    ['/users/me/friend-requests/incoming'],
+  ];
+  const { acceptFriendRequest } = useFriendRequestAccept(queryKeys);
+  const { rejectFriendRequest } = useFriendRequestReject(queryKeys);
   useEffect(() => {
     setUserList(users);
   }, [users]);

@@ -10,7 +10,10 @@ type Props = {
 export const BlockButton: FC<Props> = memo((props) => {
   const { userId, isBlockedUser } = props;
 
-  const queryKeys = [[`/users/me/blocks/${userId}`]];
+  const queryKeys = [
+    ['block-relation', { targetId: userId }],
+    ['/users/me/blocks'],
+  ];
   const { blockUser } = useUserBlock(queryKeys);
   const { cancelUserBlock } = useUserBlockCancel(queryKeys);
 
