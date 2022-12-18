@@ -15,7 +15,7 @@ export const BlockedList: FC<Props> = (props) => {
 
   const { cancelUserBlock } = useUserBlockCancel([
     ['/users/me/blocks'],
-    ['block-relation'],
+    ['block-relations'],
   ]);
   useEffect(() => {
     setUserList(users);
