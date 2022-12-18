@@ -1,4 +1,6 @@
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -6,15 +8,20 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
-import { JwtSocketAuthGuard } from 'src/auth/guards/jwt-socket-auth.guard';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
   public socketIdToUserId: Map<string, string>;
   public userIds: Set<string>;
 
-  constructor() {
+  constructor(
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
+    private readonly prisma: PrismaService
+  ) {
     this.socketIdToUserId = new Map<string, string>();
     this.userIds = new Set<string>();
   }
@@ -22,8 +29,23 @@ export class UsersGateway {
   @WebSocketServer()
   private readonly server!: Server;
 
-  @UseGuards(JwtSocketAuthGuard)
-  handleConnection(@ConnectedSocket() socket: Socket): void {
+  async handleConnection(@ConnectedSocket() socket: Socket): Promise<void> {
+    const cookie: string | undefined = socket.handshake.headers.cookie;
+    if (cookie === undefined) {
+      throw new UnauthorizedException();
+    }
+    const { accessToken } = parse(cookie);
+    const payload = this.jwt.verify<{ id: string }>(accessToken, {
+      secret: this.config.get('JWT_SECRET'),
+    });
+    const { id } = payload;
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (user === null) {
+      throw new UnauthorizedException();
+    }
+    socket.data.userId = user.id;
+    socket.data.userNickName = user.nickname;
+
     Logger.debug('connected: ' + socket.id);
   }
 
