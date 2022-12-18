@@ -46,7 +46,7 @@ export class UsersGateway {
     socket.data.userId = user.id;
     socket.data.userNickName = user.nickname;
 
-    socket.emit('connect_success');
+    socket.emit('success_connect');
     Logger.debug('connected: ' + socket.id);
   }
 
