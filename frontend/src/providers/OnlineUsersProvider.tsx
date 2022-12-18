@@ -22,14 +22,16 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     socket.connect();
 
-    // Strictモードによって2回発火するのを防ぐ
-    // https://www.sunapro.com/react18-strict-mode/#index_id5
-    if (!didLogRef.current) {
-      didLogRef.current = true;
-      socket.emit('handshake', user.id, (users: string[]) => {
-        setOnlineUsers(users);
-      });
-    }
+    socket.on('connect_success', () => {
+      // Strictモードによって2回発火するのを防ぐ
+      // https://www.sunapro.com/react18-strict-mode/#index_id5
+      if (!didLogRef.current) {
+        didLogRef.current = true;
+        socket.emit('handshake', user.id, (users: string[]) => {
+          setOnlineUsers(users);
+        });
+      }
+    });
 
     socket.on('user_connected', (user: string) => {
       console.log('User connected message received');
@@ -44,6 +46,7 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
     });
 
     return () => {
+      socket.off('coonnect_success');
       socket.off('user_connected');
       socket.off('user_disconnected');
       socket.disconnect();
