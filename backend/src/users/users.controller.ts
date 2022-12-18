@@ -135,22 +135,6 @@ export class UsersController {
     return this.fileService.streamFile(path);
   }
 
-  @Get('avatar/:filename')
-  @ApiOperation({
-    summary: 'アバターの取得',
-  })
-  @ApiOkResponse({
-    description: 'picture in binary',
-  })
-  streamMyAvatar(
-    @GetUser() user: User,
-    @Param('filename') filename: string
-  ): StreamableFile {
-    const path = `./upload/${user.id}/${filename}`;
-
-    return this.fileService.streamFile(path);
-  }
-
   @Post('me/avatar')
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'アバターの更新' })
