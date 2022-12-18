@@ -6,8 +6,8 @@ export const useFriendRelation = (
   otherId: string
 ): { friendRelation: FriendRelation } => {
   const { data: friendRelation } = useGetApi<FriendRelation>(
-    `/users/me/friend-relation/${otherId}`,
-    ['friend-relation', { otherId }]
+    `/users/me/friend-relations/${otherId}`,
+    ['friend-relations', { otherId }]
   );
 
   return { friendRelation };
