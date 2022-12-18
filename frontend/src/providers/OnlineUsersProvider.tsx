@@ -22,7 +22,7 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     socket.connect();
 
-    socket.on('connect_success', () => {
+    socket.on('success_connect', () => {
       // Strictモードによって2回発火するのを防ぐ
       // https://www.sunapro.com/react18-strict-mode/#index_id5
       if (!didLogRef.current) {
