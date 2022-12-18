@@ -17,9 +17,8 @@ export const useSocket = (
     socket.connect();
 
     return () => {
-      if (socket != null) {
-        socket.disconnect();
-      }
+      socket.disconnect();
+      socket.close();
     };
   }, [socket]);
 
