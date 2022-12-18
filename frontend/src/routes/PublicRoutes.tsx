@@ -1,11 +1,13 @@
 import { Suspense } from 'react';
-import { Spinner } from '@chakra-ui/react';
+import { isAxiosError } from 'axios';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { OtpAuth } from 'features/auth/routes/OtpAuth';
 import { Page404 } from 'features/auth/routes/Page404';
+import { UnexpectedError } from 'features/auth/routes/UnexpectedError';
 import { ChatRoom } from 'features/chat/routes/ChatRoom';
 import { ChatRooms } from 'features/chat/routes/ChatRooms';
 import { CreateChatRooms } from 'features/chat/routes/CreateChatRooms';
@@ -20,20 +22,31 @@ import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
 import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
+  const navigate = useNavigate();
+
+  const onError = (error: Error) => {
+    if (isAxiosError(error) && error.response?.status === 401) {
+      navigate('/');
+    } else {
+      navigate('/error');
+    }
+  };
+
   return (
     // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
     <OnlineUsersProvider>
-      <MainLayout>
-        <ErrorBoundary fallback={<Navigate to="." replace={true} />}>
-          <Suspense
-            fallback={
-              <Spinner emptyColor="gray.200" color="blue.500" size="xl" />
-            }
-          >
-            <Outlet />
-          </Suspense>
-        </ErrorBoundary>
-      </MainLayout>
+      <ErrorBoundary
+        fallback={<CenterSpinner isFullScreen={true} color="red.500" />}
+        onError={onError}
+      >
+        <Suspense fallback={<CenterSpinner isFullScreen={true} />}>
+          <MainLayout>
+            <Suspense fallback={<CenterSpinner isFullScreen={true} />}>
+              <Outlet />
+            </Suspense>
+          </MainLayout>
+        </Suspense>
+      </ErrorBoundary>
     </OnlineUsersProvider>
   );
 };
@@ -46,6 +59,7 @@ export const publicRoutes = [
   },
   { path: '/otp', element: <OtpAuth /> },
   { path: '*', element: <Page404 /> },
+  { path: 'error', element: <UnexpectedError /> },
   {
     path: '/app',
     element: <App />,
