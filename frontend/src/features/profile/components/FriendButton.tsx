@@ -9,16 +9,16 @@ import { useFriendRelation } from 'hooks/api/profile/useFriendRelation';
 import { useFriendRequestReject } from 'hooks/api/relations/useFriendRequestReject';
 
 type Props = {
-  otherId: string;
+  userId: string;
 };
 
 export const FriendButton: FC<Props> = memo((props) => {
-  const { otherId } = props;
+  const { userId } = props;
 
-  const { friendRelation } = useFriendRelation(otherId);
+  const { friendRelation } = useFriendRelation(userId);
 
   const queryKeys = [
-    ['friend-relations', { otherId }],
+    ['friend-relations', { userId }],
     ['/users/me/friend-requests/outgoing'],
   ];
   const { requestFriend } = useFriendRequest(queryKeys);
@@ -27,21 +27,21 @@ export const FriendButton: FC<Props> = memo((props) => {
   const { rejectFriendRequest } = useFriendRequestReject(queryKeys);
 
   const onClickRequestButton = async () => {
-    await requestFriend({ receiverId: otherId });
+    await requestFriend({ receiverId: userId });
   };
 
   const onClickCancelButton = async () => {
-    await cancelFriendRequest(otherId);
+    await cancelFriendRequest(userId);
   };
 
   const onClickAcceptButton = async () => {
     await acceptFriendRequest({
-      creatorId: otherId,
+      creatorId: userId,
     });
   };
 
   const onClickRejectButton = async () => {
-    await rejectFriendRequest(otherId);
+    await rejectFriendRequest(userId);
   };
 
   return (
