@@ -5,10 +5,9 @@ import { useSocket } from 'hooks/socket/useSocket';
 import { useNavigate } from 'react-router-dom';
 
 export enum MatchState {
-  None = 0,
-  Matching = 1,
-  MatchingCancel = 2,
-  Matched = 3,
+  Matching = 0,
+  MatchingCancel = 1,
+  Matched = 2,
 }
 
 // ここでuseRefを使ってsocketのconnect処理ができたら理想
@@ -16,7 +15,7 @@ export const useGameMatching = (): {
   matchState: MatchState;
   setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
 } => {
-  const [matchState, setMatchState] = useState(MatchState.None);
+  const [matchState, setMatchState] = useState(MatchState.Matching);
   const socket = useSocket(`${WS_BASE_URL}/game`);
 
   const { user } = useProfile();
@@ -45,12 +44,12 @@ export const useGameMatching = (): {
         break;
       }
       case MatchState.MatchingCancel: {
-        setMatchState(MatchState.None);
         socket.emit('matching_cancel');
+        navigate('/app');
         break;
       }
     }
-  }, [matchState, socket, user]);
+  }, [matchState, socket, user, navigate]);
 
   return { matchState, setMatchState };
 };
