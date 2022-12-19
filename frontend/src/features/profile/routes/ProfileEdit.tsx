@@ -29,10 +29,10 @@ export const ProfileEdit: FC = memo(() => {
   };
 
   const onProfileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, checked } = event.target;
+    const { name, value } = event.target;
     setProfileFormData((state) => ({
       ...state,
-      [name]: name === 'nickname' ? value : checked,
+      [name]: value,
     }));
   };
 

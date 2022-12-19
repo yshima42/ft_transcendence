@@ -1,7 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import { Grid } from '@chakra-ui/react';
-import { FriendRequestStatus, User } from '@prisma/client';
-import { useFriendRequestRespond } from 'hooks/api';
+import { User } from '@prisma/client';
+import { useFriendRequestAccept } from 'hooks/api';
+import { useFriendRequestReject } from 'hooks/api/relations/useFriendRequestReject';
 import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
@@ -12,16 +13,26 @@ type Props = {
 export const RecognitionList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { respondFriendRequest } = useFriendRequestRespond();
+
+  const queryKeys = [
+    ['friend-relations'],
+    ['/users/me/friend-requests/incoming'],
+  ];
+  const { acceptFriendRequest } = useFriendRequestAccept(queryKeys);
+  const { rejectFriendRequest } = useFriendRequestReject(queryKeys);
   useEffect(() => {
     setUserList(users);
   }, [users]);
 
-  const onClickRespond = async (id: string, status: FriendRequestStatus) => {
-    await respondFriendRequest({
+  const onClickAccept = async (id: string) => {
+    await acceptFriendRequest({
       creatorId: id,
-      status,
     });
+    setUserList(userList.filter((user) => user.id !== id));
+  };
+
+  const onClickReject = async (id: string) => {
+    await rejectFriendRequest(id);
     setUserList(userList.filter((user) => user.id !== id));
   };
 
@@ -48,14 +59,14 @@ export const RecognitionList: FC<Props> = (props) => {
                 text="Accept"
                 id={user.id}
                 onClick={async (id) => {
-                  await onClickRespond(id, 'ACCEPTED');
+                  await onClickAccept(id);
                 }}
               />
               <UserCardButton
                 text="Reject"
                 id={user.id}
                 onClick={async (id) => {
-                  await onClickRespond(id, 'DECLINED');
+                  await onClickReject(id);
                 }}
               />
             </>
