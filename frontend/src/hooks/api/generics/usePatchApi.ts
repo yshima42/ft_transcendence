@@ -12,6 +12,8 @@ export function usePatchApi<ReqBody, ResBody>(
 ): {
   patchFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
   isLoading: boolean;
+  isError: boolean;
+  failureReason: unknown;
 } {
   const axiosPatch = async (reqBody: ReqBody) => {
     const result = await axios.patch<ResBody>(endpoint, reqBody);
@@ -21,7 +23,12 @@ export function usePatchApi<ReqBody, ResBody>(
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: patchFunc, isLoading } = useMutation(axiosPatch, {
+  const {
+    mutateAsync: patchFunc,
+    isLoading,
+    isError,
+    failureReason,
+  } = useMutation(axiosPatch, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
@@ -31,5 +38,5 @@ export function usePatchApi<ReqBody, ResBody>(
     },
   });
 
-  return { patchFunc, isLoading };
+  return { patchFunc, isLoading, isError, failureReason };
 }
