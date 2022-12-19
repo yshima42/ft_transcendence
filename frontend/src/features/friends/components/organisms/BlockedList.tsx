@@ -12,7 +12,11 @@ type Props = {
 export const BlockedList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { cancelUserBlock } = useUserBlockCancel();
+
+  const { cancelUserBlock } = useUserBlockCancel([
+    ['/users/me/blocks'],
+    ['block-relations'],
+  ]);
   useEffect(() => {
     setUserList(users);
   }, [users]);

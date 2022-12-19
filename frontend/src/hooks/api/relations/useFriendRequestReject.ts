@@ -7,26 +7,26 @@ import {
 } from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
-export interface FriendRequestCancelResBody {
+export interface FriendRequestRejectResBody {
   friendRequest: FriendRequest;
 }
 
-export type CancelFriendRequest = UseMutateAsyncFunction<
-  FriendRequestCancelResBody,
+export type RejectFriendRequest = UseMutateAsyncFunction<
+  FriendRequestRejectResBody,
   unknown,
   string,
   unknown
 >;
 
-export const useFriendRequestCancel = (
+export const useFriendRequestReject = (
   queryKeys: QueryKey[]
 ): {
-  cancelFriendRequest: CancelFriendRequest;
+  rejectFriendRequest: RejectFriendRequest;
   isLoading: boolean;
 } => {
   const axiosDelete = async (userId: string) => {
-    const result = await axios.delete<FriendRequestCancelResBody>(
-      `/users/me/friend-requests/${userId}`
+    const result = await axios.delete<FriendRequestRejectResBody>(
+      `/users/me/friend-requests/incoming/${userId}`
     );
 
     return result.data;
@@ -34,7 +34,7 @@ export const useFriendRequestCancel = (
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: cancelFriendRequest, isLoading } = useMutation(
+  const { mutateAsync: rejectFriendRequest, isLoading } = useMutation(
     axiosDelete,
     {
       onSuccess: () => {
@@ -47,5 +47,5 @@ export const useFriendRequestCancel = (
     }
   );
 
-  return { cancelFriendRequest, isLoading };
+  return { rejectFriendRequest, isLoading };
 };
