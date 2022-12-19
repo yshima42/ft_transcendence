@@ -39,13 +39,13 @@ export class GameGateway {
 
   @SubscribeMessage('random_match')
   randomMatch(@ConnectedSocket() socket: Socket): void {
-    const { userId, userNickName } = socket.data as {
+    const { userId, userNickname } = socket.data as {
       userId: string;
-      userNickName: string;
+      userNickname: string;
     };
     // 1人目の場合2人目ユーザーを待つ
     if (this.matchWaitingPlayers.length === 0) {
-      const newPlayer = new Player(socket, userId, userNickName, true);
+      const newPlayer = new Player(socket, userId, userNickname, true);
       this.matchWaitingPlayers.push(newPlayer);
     } else {
       const player1 = this.matchWaitingPlayers[0];
@@ -53,7 +53,7 @@ export class GameGateway {
       // this.matchWaitingPlayers.splice(0, 1);
       this.matchWaitingPlayers.pop();
 
-      const player2 = new Player(socket, userId, userNickName, false);
+      const player2 = new Player(socket, userId, userNickname, false);
       // 2人揃ったらマッチルーム作る
       const roomId = this.createGameRoom(player1, player2);
 
@@ -97,10 +97,13 @@ export class GameGateway {
     @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
-    await socket.join(message.roomId);
-    console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
-
-    socket.emit('check_confirmation');
+    if (this.gameRooms.get(message.roomId) === undefined) {
+      socket.emit('invalid_room');
+    } else {
+      await socket.join(message.roomId);
+      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+      socket.emit('check_confirmation');
+    }
   }
 
   @SubscribeMessage('confirm')
