@@ -1,3 +1,6 @@
+import { Logger, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -5,10 +8,11 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { User } from '@prisma/client';
+import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
-import { UserData, GameRoom } from './game.object';
+import { GameRoom, Player } from './game.object';
 import { GameService } from './game.service';
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: '/game' })
@@ -20,54 +24,73 @@ export class GameGateway {
 
   // このクラスで使う配列・変数
   private readonly gameRooms: Map<string, GameRoom>;
-  private readonly matchWaitingUsers: UserData[] = [];
+  private readonly matchWaitingPlayers: Player[] = [];
 
-  constructor(private readonly gameService: GameService) {
+  constructor(
+    private readonly gameService: GameService,
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
+    private readonly prisma: PrismaService
+  ) {
     this.gameRooms = new Map<string, GameRoom>();
   }
 
-  // 本来はhandleConnectionでやりたいが、authGuardで対応できないため、こちらでUser情報セット
-  @SubscribeMessage('set_user')
-  setUserToSocket(
-    @MessageBody() user: User,
-    @ConnectedSocket() socket: Socket
-  ): void {
-    // socket.dataに情報を登録
+  async handleConnection(@ConnectedSocket() socket: Socket): Promise<void> {
+    const cookie: string | undefined = socket.handshake.headers.cookie;
+    if (cookie === undefined) {
+      throw new UnauthorizedException();
+    }
+    const { accessToken } = parse(cookie);
+    const payload = this.jwt.verify<{ id: string }>(accessToken, {
+      secret: this.config.get('JWT_SECRET'),
+    });
+    const { id } = payload;
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (user === null) {
+      throw new UnauthorizedException();
+    }
     socket.data.userId = user.id;
     socket.data.userNickname = user.nickname;
+
+    socket.emit('connect_established');
+    Logger.debug(`${socket.data.userNickname as string} handleConnection`);
   }
 
   @SubscribeMessage('random_match')
   randomMatch(@ConnectedSocket() socket: Socket): void {
-    const userData: UserData = {
-      socket,
-      id: socket.data.userId as string,
-      nickname: socket.data.userNickname as string,
-      score: 0,
+    Logger.debug(`${socket.data.userNickname as string} random_match`);
+
+    const { userId, userNickname } = socket.data as {
+      userId: string;
+      userNickname: string;
     };
     // 1人目の場合2人目ユーザーを待つ
-    if (this.matchWaitingUsers.length === 0) {
-      userData.isLeftSide = true;
-      this.matchWaitingUsers.push(userData);
+    if (this.matchWaitingPlayers.length === 0) {
+      const newPlayer = new Player(socket, userId, userNickname, true);
+      this.matchWaitingPlayers.push(newPlayer);
     } else {
-      // 2人揃ったらマッチルーム作る
-      userData.isLeftSide = false;
-      const roomId = this.createGameRoom(this.matchWaitingUsers[0], userData);
-
-      this.server
-        .to(socket.id)
-        .emit('go_game_room', roomId, userData.isLeftSide);
-      this.server
-        .to(this.matchWaitingUsers[0].socket.id)
-        .emit('go_game_room', roomId, this.matchWaitingUsers[0].isLeftSide);
-
+      if (this.matchWaitingPlayers[0].id === userId) {
+        return;
+      }
+      const player1 = this.matchWaitingPlayers[0];
       // どちらでもやること同じだけどpop()を採用した
-      // this.matchWaitingUsers.splice(0, 1);
-      this.matchWaitingUsers.pop();
+      // this.matchWaitingPlayers.splice(0, 1);
+      this.matchWaitingPlayers.pop();
+
+      const player2 = new Player(socket, userId, userNickname, false);
+      // 2人揃ったらマッチルーム作る
+      const roomId = this.createGameRoom(player1, player2);
+
+      this.server
+        .to(player1.socket.id)
+        .emit('go_game_room', roomId, player1.isLeftSide);
+      this.server
+        .to(player2.socket.id)
+        .emit('go_game_room', roomId, player2.isLeftSide);
     }
   }
 
-  createGameRoom(player1: UserData, player2: UserData): string {
+  createGameRoom(player1: Player, player2: Player): string {
     const id = uuidv4();
     const gameRoom = new GameRoom(
       this.gameService,
@@ -81,16 +104,40 @@ export class GameGateway {
     return id;
   }
 
+  @SubscribeMessage('matching_cancel')
+  cancelMatching(@ConnectedSocket() socket: Socket): void {
+    Logger.debug(`${socket.data.userNickname as string} matching_cancel`);
+
+    const { userId } = socket.data as { userId: string };
+    const foundIndex = this.matchWaitingPlayers.findIndex(
+      (player) => player.id === userId
+    );
+    if (foundIndex !== undefined) {
+      this.matchWaitingPlayers.splice(foundIndex, 1);
+    }
+  }
+
   // room関連;
   @SubscribeMessage('join_room')
   async joinRoom(
-    @MessageBody() message: { roomId: string },
+    @MessageBody() message: { roomId: string; isLeftSide: boolean },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
-    await socket.join(message.roomId);
-    console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+    Logger.debug(`${socket.data.userNickname as string} join_room`);
 
-    socket.emit('check_confirmation');
+    const gameRoom = this.gameRooms.get(message.roomId);
+    if (gameRoom === undefined) {
+      socket.emit('invalid_room');
+    } else {
+      if (message.isLeftSide) {
+        gameRoom.player1.socket = socket;
+      } else {
+        gameRoom.player2.socket = socket;
+      }
+      await socket.join(message.roomId);
+      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+      socket.emit('check_confirmation');
+    }
   }
 
   @SubscribeMessage('confirm')
@@ -98,6 +145,8 @@ export class GameGateway {
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: { roomId: string }
   ): void {
+    Logger.debug(`${socket.data.userNickname as string} confirm`);
+
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom !== undefined) {
       gameRoom.ready
@@ -111,6 +160,8 @@ export class GameGateway {
     @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): void {
+    Logger.debug(`${socket.data.userNickname as string} connect_pong`);
+
     // player1のsocketでゲームオブジェクトを作る
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom !== undefined) {

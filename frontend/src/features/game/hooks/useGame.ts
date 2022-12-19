@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { API_URL } from 'config';
-import { useProfile } from 'hooks/api';
-import { io } from 'socket.io-client';
+import { WS_BASE_URL } from 'config';
+import { useSocket } from 'hooks/socket/useSocket';
+import { useNavigate } from 'react-router-dom';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -14,9 +14,9 @@ import { Ball, Paddle } from '../utils/gameObjs';
 import { userInput } from '../utils/userInput';
 
 export enum GamePhase {
-  Top = 0,
-  Matching = 1,
-  Confirmation = 2,
+  SocketConnecting = 0,
+  Joining = 1,
+  Confirming = 2,
   Waiting = 3,
   InGame = 4,
   Result = 5,
@@ -37,19 +37,19 @@ const defaultGameResult: GameResult = {
 };
 
 // ここでuseRefを使ってsocketのconnect処理ができたら理想
-export const useGame = (): {
+export const useGame = (
+  roomId: string,
+  isLeftSide: boolean
+): {
   gamePhase: GamePhase;
   setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
   draw: (ctx: CanvasRenderingContext2D) => void;
   gameResult: GameResult;
 } => {
-  const [gamePhase, setGamePhase] = useState(GamePhase.Top);
-  const [roomId, setRoomId] = useState('');
-  const [isLeftSide, setIsLeftSide] = useState(true);
+  const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [gameResult, setGameResult] = useState(defaultGameResult);
-  // TODO: socket はとりあえずの仮実装
-  const [socket] = useState(io(API_URL + '/game'));
-  const { user } = useProfile();
+  const socket = useSocket(`${WS_BASE_URL}/game`);
+  const navigate = useNavigate();
 
   const player1 = new Paddle(0, PADDLE_START_POS);
   const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
@@ -74,18 +74,23 @@ export const useGame = (): {
 
   // socket イベント
   useEffect(() => {
-    socket.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
-      setRoomId(roomId);
-      setIsLeftSide(isLeftSide);
+    socket.on('connect_established', () => {
+      console.log('[Socket Event] connect_established');
+      setGamePhase(GamePhase.Joining);
+    });
 
-      socket.emit('join_room', { roomId });
+    socket.on('invalid_room', () => {
+      console.log('[Socket Event] invalid_room');
+      navigate('/app');
     });
 
     socket.on('check_confirmation', () => {
-      setGamePhase(GamePhase.Confirmation);
+      console.log('[Socket Event] check_confirmation');
+      setGamePhase(GamePhase.Confirming);
     });
 
     socket.on('start_game', () => {
+      console.log('[Socket Event] start_game');
       setGamePhase(GamePhase.InGame);
     });
 
@@ -124,34 +129,45 @@ export const useGame = (): {
     });
 
     return () => {
-      socket.off('go_game_room');
-      socket.off('start_game');
+      socket.off('connect_established');
+      socket.off('invalid_room');
       socket.off('check_confirmation');
+      socket.off('start_game');
       socket.off('done_game');
       socket.off('update_score');
       socket.off('position_update');
     };
-  }, [socket]);
+  }, [socket, navigate]);
 
   // 各ページのLogic
   useEffect(() => {
     switch (gamePhase) {
-      case GamePhase.Matching: {
-        socket.emit('set_user', user);
-        socket.emit('random_match');
+      case GamePhase.Joining: {
+        console.log('[GamePhase] Joining');
+        socket.emit('join_room', { roomId, isLeftSide });
+        break;
+      }
+      case GamePhase.Confirming: {
+        console.log('[GamePhase] Confirming');
         break;
       }
       case GamePhase.Waiting: {
+        console.log('[GamePhase] Waiting');
         socket.emit('confirm', { roomId });
         break;
       }
       case GamePhase.InGame: {
+        console.log('[GamePhase] InGame');
         socket.emit('connect_pong', { roomId });
         userInput(socket, roomId, isLeftSide);
         break;
       }
+      case GamePhase.Result: {
+        console.log('[GamePhase] Result');
+        break;
+      }
     }
-  }, [gamePhase, user, socket]);
+  }, [gamePhase, socket, isLeftSide, roomId]);
 
   return { gamePhase, setGamePhase, draw, gameResult };
 };

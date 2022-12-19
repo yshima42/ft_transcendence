@@ -19,7 +19,7 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
   const didLogRef = useRef(false);
 
   useEffect(() => {
-    socket.on('success_connect', () => {
+    socket.on('connect_established', () => {
       // Strictモードによって2回発火するのを防ぐ
       // https://www.sunapro.com/react18-strict-mode/#index_id5
       if (!didLogRef.current) {
@@ -43,7 +43,7 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
     });
 
     return () => {
-      socket.off('success_connect');
+      socket.off('connect_established');
       socket.off('user_connected');
       socket.off('user_disconnected');
     };

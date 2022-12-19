@@ -52,21 +52,34 @@ class Paddle {
   }
 }
 
-export type UserData = {
-  isLeftSide?: boolean;
+export class Player {
   socket: Socket;
   id: string;
   nickname: string;
+  isLeftSide: boolean;
   score: number;
-};
+
+  constructor(
+    socket: Socket,
+    id: string,
+    nickname: string,
+    isLeftSide: boolean
+  ) {
+    this.socket = socket;
+    this.id = id;
+    this.nickname = nickname;
+    this.isLeftSide = isLeftSide;
+    this.score = 0;
+  }
+}
 
 // このクラスでゲーム操作を行う
 export class GameRoom {
   gameService: GameService;
   id: string;
   server: Server;
-  player1: UserData;
-  player2: UserData;
+  player1: Player;
+  player2: Player;
   ball: Ball;
   paddle1: Paddle;
   paddle2: Paddle;
@@ -77,8 +90,8 @@ export class GameRoom {
     gameService: GameService,
     id: string,
     server: Server,
-    player1: UserData,
-    player2: UserData
+    player1: Player,
+    player2: Player
   ) {
     this.gameService = gameService;
     this.id = id;
