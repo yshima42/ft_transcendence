@@ -8,7 +8,7 @@ import {
 import { User } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-import { UserData, GameRoom } from './game.object';
+import { GameRoom, Player } from './game.object';
 import { GameService } from './game.service';
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: '/game' })
@@ -20,7 +20,7 @@ export class GameGateway {
 
   // このクラスで使う配列・変数
   private readonly gameRooms: Map<string, GameRoom>;
-  private readonly matchWaitingUsers: UserData[] = [];
+  private readonly matchWaitingUsers: Player[] = [];
 
   constructor(private readonly gameService: GameService) {
     this.gameRooms = new Map<string, GameRoom>();
@@ -39,35 +39,34 @@ export class GameGateway {
 
   @SubscribeMessage('random_match')
   randomMatch(@ConnectedSocket() socket: Socket): void {
-    const userData: UserData = {
-      socket,
-      id: socket.data.userId as string,
-      nickname: socket.data.userNickname as string,
-      score: 0,
+    const { userId, userNickName } = socket.data as {
+      userId: string;
+      userNickName: string;
     };
     // 1人目の場合2人目ユーザーを待つ
     if (this.matchWaitingUsers.length === 0) {
-      userData.isLeftSide = true;
-      this.matchWaitingUsers.push(userData);
+      const newPlayer = new Player(socket, userId, userNickName, true);
+      this.matchWaitingUsers.push(newPlayer);
     } else {
-      // 2人揃ったらマッチルーム作る
-      userData.isLeftSide = false;
-      const roomId = this.createGameRoom(this.matchWaitingUsers[0], userData);
-
-      this.server
-        .to(socket.id)
-        .emit('go_game_room', roomId, userData.isLeftSide);
-      this.server
-        .to(this.matchWaitingUsers[0].socket.id)
-        .emit('go_game_room', roomId, this.matchWaitingUsers[0].isLeftSide);
-
+      const player1 = this.matchWaitingUsers[0];
       // どちらでもやること同じだけどpop()を採用した
       // this.matchWaitingUsers.splice(0, 1);
       this.matchWaitingUsers.pop();
+
+      const player2 = new Player(socket, userId, userNickName, false);
+      // 2人揃ったらマッチルーム作る
+      const roomId = this.createGameRoom(player1, player2);
+
+      this.server
+        .to(player1.socket.id)
+        .emit('go_game_room', roomId, player1.isLeftSide);
+      this.server
+        .to(player2.socket.id)
+        .emit('go_game_room', roomId, player2.isLeftSide);
     }
   }
 
-  createGameRoom(player1: UserData, player2: UserData): string {
+  createGameRoom(player1: Player, player2: Player): string {
     const id = uuidv4();
     const gameRoom = new GameRoom(
       this.gameService,
