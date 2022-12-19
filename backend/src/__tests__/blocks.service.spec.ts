@@ -143,13 +143,13 @@ describe('BlocksService', () => {
     it('should be blocked', async () => {
       await expect(
         blocksService.isUserBlocked(userArray[0].id, userArray[1].id)
-      ).resolves.toBe(true);
+      ).resolves.toStrictEqual({ isUserBlocked: true });
     });
 
     it('should not be blocked', async () => {
       await expect(
         blocksService.isUserBlocked(userArray[1].id, userArray[0].id)
-      ).resolves.toBe(false);
+      ).resolves.toStrictEqual({ isUserBlocked: false });
     });
   });
 });
