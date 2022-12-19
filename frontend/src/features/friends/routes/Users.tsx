@@ -1,4 +1,4 @@
-import { memo, FC, useState, useMemo, useEffect } from 'react';
+import { memo, FC, useState, useEffect } from 'react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { axios } from 'lib/axios';
@@ -18,12 +18,6 @@ export const Users: FC = memo(() => {
   const [recognition, setRecognition] = useState<User[]>([]);
   const [blocked, setBlocked] = useState<User[]>([]);
   const [tabIndex, setTabIndex] = useState(0);
-
-  const initialTab = useMemo(() => {
-    if (typeof location === 'undefined') return 0;
-
-    return Math.max(tabs.indexOf(location.hash.slice(1)), 0);
-  }, []);
 
   // TODO ここはSearchに置き換わる
   async function getRequestableUsers(): Promise<void> {
@@ -81,9 +75,8 @@ export const Users: FC = memo(() => {
         variant="soft-rounded"
         onChange={(index) => {
           setTabIndex(index);
-          location.hash = `#${tabs[index]}`;
         }}
-        defaultIndex={initialTab}
+        defaultIndex={0}
       >
         <TabList>
           {tabs.map((tab) => (
