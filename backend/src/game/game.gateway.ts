@@ -58,7 +58,6 @@ export class GameGateway {
 
   @SubscribeMessage('random_match')
   randomMatch(@ConnectedSocket() socket: Socket): void {
-    console.log(socket.data.userNickName);
     Logger.debug(`${socket.data.userNickname as string} random_match`);
 
     const { userId, userNickname } = socket.data as {
