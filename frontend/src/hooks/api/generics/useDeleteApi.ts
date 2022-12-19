@@ -12,6 +12,8 @@ export function useDeleteApi<ResBody>(
 ): {
   deleteFunc: UseMutateAsyncFunction<ResBody, unknown, void, unknown>;
   isLoading: boolean;
+  isError: boolean;
+  failureReason: unknown;
 } {
   const axiosDelete = async () => {
     const result = await axios.delete<ResBody>(endpoint);
@@ -21,7 +23,12 @@ export function useDeleteApi<ResBody>(
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: deleteFunc, isLoading } = useMutation(axiosDelete, {
+  const {
+    mutateAsync: deleteFunc,
+    isLoading,
+    isError,
+    failureReason,
+  } = useMutation(axiosDelete, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
@@ -31,5 +38,5 @@ export function useDeleteApi<ResBody>(
     },
   });
 
-  return { deleteFunc, isLoading };
+  return { deleteFunc, isLoading, isError, failureReason };
 }
