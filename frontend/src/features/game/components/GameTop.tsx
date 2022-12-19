@@ -1,15 +1,15 @@
 import React, { FC, memo } from 'react';
 import { Button } from '@chakra-ui/react';
-import { GamePhase } from '../hooks/useGame';
+import { MatchState } from '../hooks/useGameMatching';
 
 type Props = {
-  setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
+  setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
 };
 
 export const GameTop: FC<Props> = memo((props) => {
-  const { setGamePhase } = props;
+  const { setMatchState } = props;
 
   return (
-    <Button onClick={() => setGamePhase(GamePhase.Matching)}>Match</Button>
+    <Button onClick={() => setMatchState(MatchState.Matching)}>Match</Button>
   );
 });

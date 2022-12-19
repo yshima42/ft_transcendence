@@ -1,13 +1,17 @@
 import { memo, FC } from 'react';
 import { Box, Divider, Flex, Heading, Spinner, Stack } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
+import { MatchState } from '../hooks/useGameMatching';
 
-export const Matching: FC = memo(() => {
-  const navigate = useNavigate();
+type Props = {
+  setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
+};
+
+export const Matching: FC<Props> = memo((props) => {
+  const { setMatchState } = props;
 
   const onClickCancel = () => {
-    navigate(-1);
+    setMatchState(MatchState.MatchingCancel);
   };
 
   // TODO: match cancelボタンの処理

@@ -80,6 +80,17 @@ export class GameGateway {
     return id;
   }
 
+  @SubscribeMessage('matching_cancel')
+  cancelMatching(@ConnectedSocket() socket: Socket): void {
+    const { userId } = socket.data as { userId: string };
+    const foundIndex = this.matchWaitingPlayers.findIndex(
+      (player) => player.id === userId
+    );
+    if (foundIndex !== undefined) {
+      this.matchWaitingPlayers.splice(foundIndex, 1);
+    }
+  }
+
   // room関連;
   @SubscribeMessage('join_room')
   async joinRoom(
