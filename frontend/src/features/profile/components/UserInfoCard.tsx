@@ -1,8 +1,11 @@
 import { memo, FC } from 'react';
 import { Flex, HStack, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
+import { useIsBlockedUser } from 'hooks/api';
+import { useFriendRelation } from 'hooks/api/profile/useFriendRelation';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { BlockButton } from './BlockButton';
+import { DmButton } from './DmButton';
 import { FriendButton } from './FriendButton';
 import { GameButton } from './GameButton';
 import { ProfileSetting } from './ProfileSetting';
@@ -14,6 +17,9 @@ type UserInfoCardProps = {
 
 export const UserInfoCard: FC<UserInfoCardProps> = memo(
   ({ user, isLoginUser }: UserInfoCardProps) => {
+    const { isBlockedUser } = useIsBlockedUser(user.id);
+    const { friendRelation } = useFriendRelation(user.id);
+
     return (
       <Flex
         w="100%"
@@ -42,10 +48,13 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
           <ProfileSetting />
         ) : (
           <>
-            <GameButton isGamePlaying={false} />
             <HStack justify="center" align="center">
-              <FriendButton userId={user.id} />
-              <BlockButton userId={user.id} />
+              <GameButton isGamePlaying={false} />
+              {!isBlockedUser && <DmButton />}
+            </HStack>
+            <HStack justify="center" align="center">
+              <FriendButton userId={user.id} friendRelation={friendRelation} />
+              <BlockButton userId={user.id} isBlockedUser={isBlockedUser} />
             </HStack>
           </>
         )}
