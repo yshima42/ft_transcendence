@@ -9,15 +9,15 @@ import { FriendRelation } from 'hooks/api/profile/useFriendRelation';
 import { useFriendRequestReject } from 'hooks/api/relations/useFriendRequestReject';
 
 type Props = {
-  userId: string;
+  targetId: string;
   friendRelation: FriendRelation;
 };
 
 export const FriendButton: FC<Props> = memo((props) => {
-  const { userId, friendRelation } = props;
+  const { targetId, friendRelation } = props;
 
   const queryKeys = [
-    ['friend-relations', { userId }],
+    ['friend-relations', { targetId }],
     ['/users/me/friend-requests/outgoing'],
   ];
   const { requestFriend } = useFriendRequest(queryKeys);
@@ -26,21 +26,21 @@ export const FriendButton: FC<Props> = memo((props) => {
   const { rejectFriendRequest } = useFriendRequestReject(queryKeys);
 
   const onClickRequestButton = async () => {
-    await requestFriend({ receiverId: userId });
+    await requestFriend({ receiverId: targetId });
   };
 
   const onClickCancelButton = async () => {
-    await cancelFriendRequest(userId);
+    await cancelFriendRequest(targetId);
   };
 
   const onClickAcceptButton = async () => {
     await acceptFriendRequest({
-      creatorId: userId,
+      creatorId: targetId,
     });
   };
 
   const onClickRejectButton = async () => {
-    await rejectFriendRequest(userId);
+    await rejectFriendRequest(targetId);
   };
 
   return (

@@ -53,8 +53,11 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
               {!isBlockedUser && <DmButton />}
             </HStack>
             <HStack justify="center" align="center">
-              <FriendButton userId={user.id} friendRelation={friendRelation} />
-              <BlockButton userId={user.id} isBlockedUser={isBlockedUser} />
+              <FriendButton
+                targetId={user.id}
+                friendRelation={friendRelation}
+              />
+              <BlockButton targetId={user.id} isBlockedUser={isBlockedUser} />
             </HStack>
           </>
         )}
