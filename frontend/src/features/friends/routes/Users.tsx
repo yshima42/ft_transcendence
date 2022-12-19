@@ -76,7 +76,6 @@ export const Users: FC = memo(() => {
         onChange={(index) => {
           setTabIndex(index);
         }}
-        defaultIndex={0}
       >
         <TabList>
           {tabs.map((tab) => (
