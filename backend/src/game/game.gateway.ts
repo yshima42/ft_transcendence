@@ -20,7 +20,7 @@ export class GameGateway {
 
   // このクラスで使う配列・変数
   private readonly gameRooms: Map<string, GameRoom>;
-  private readonly matchWaitingUsers: Player[] = [];
+  private readonly matchWaitingPlayers: Player[] = [];
 
   constructor(private readonly gameService: GameService) {
     this.gameRooms = new Map<string, GameRoom>();
@@ -44,14 +44,14 @@ export class GameGateway {
       userNickName: string;
     };
     // 1人目の場合2人目ユーザーを待つ
-    if (this.matchWaitingUsers.length === 0) {
+    if (this.matchWaitingPlayers.length === 0) {
       const newPlayer = new Player(socket, userId, userNickName, true);
-      this.matchWaitingUsers.push(newPlayer);
+      this.matchWaitingPlayers.push(newPlayer);
     } else {
-      const player1 = this.matchWaitingUsers[0];
+      const player1 = this.matchWaitingPlayers[0];
       // どちらでもやること同じだけどpop()を採用した
-      // this.matchWaitingUsers.splice(0, 1);
-      this.matchWaitingUsers.pop();
+      // this.matchWaitingPlayers.splice(0, 1);
+      this.matchWaitingPlayers.pop();
 
       const player2 = new Player(socket, userId, userNickName, false);
       // 2人揃ったらマッチルーム作る
