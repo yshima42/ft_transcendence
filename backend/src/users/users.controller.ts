@@ -232,11 +232,11 @@ export class UsersController {
   @Get('me/block-relations/:id')
   @ApiOperation({ summary: '特定のユーザーをブロックしているかどうか判定' })
   @ApiOkResponse({ type: Boolean })
-  async isBlockedUser(
+  async isUserBlocked(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) targetId: string
-  ): Promise<boolean> {
-    return await this.blocksService.isBlockedUser(user.id, targetId);
+  ): Promise<{ isUserBlocked: boolean }> {
+    return await this.blocksService.isUserBlocked(user.id, targetId);
   }
 
   /******************************
