@@ -10,11 +10,10 @@ import { ProfileSetting } from './ProfileSetting';
 type UserInfoCardProps = {
   user: User;
   isLoginUser: boolean;
-  isBlockedUser: boolean;
 };
 
 export const UserInfoCard: FC<UserInfoCardProps> = memo(
-  ({ user, isLoginUser, isBlockedUser }: UserInfoCardProps) => {
+  ({ user, isLoginUser }: UserInfoCardProps) => {
     return (
       <Flex
         w="100%"
@@ -46,7 +45,7 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
             <GameButton isGamePlaying={false} />
             <HStack justify="center" align="center">
               <FriendButton userId={user.id} />
-              <BlockButton userId={user.id} isBlockedUser={isBlockedUser} />
+              <BlockButton userId={user.id} />
             </HStack>
           </>
         )}
