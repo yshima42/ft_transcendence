@@ -43,7 +43,7 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
     });
 
     return () => {
-      socket.off('coonnect_success');
+      socket.off('success_connect');
       socket.off('user_connected');
       socket.off('user_disconnected');
     };
