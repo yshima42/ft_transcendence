@@ -72,7 +72,7 @@ export class UsersService {
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
-          throw new BadRequestException('The nickName is already exists');
+          throw new BadRequestException('The nickname is already exists');
         }
       }
       throw e;
