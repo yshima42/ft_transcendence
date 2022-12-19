@@ -3,26 +3,23 @@ import { Box, Button, Flex } from '@chakra-ui/react';
 import { useUserBlock, useUserBlockCancel } from 'hooks/api';
 
 type Props = {
-  userId: string;
+  targetId: string;
   isBlockedUser: boolean;
 };
 
 export const BlockButton: FC<Props> = memo((props) => {
-  const { userId, isBlockedUser } = props;
+  const { targetId, isBlockedUser } = props;
 
-  const queryKeys = [
-    ['block-relations', { targetId: userId }],
-    ['/users/me/blocks'],
-  ];
+  const queryKeys = [['block-relations', { targetId }], ['/users/me/blocks']];
   const { blockUser } = useUserBlock(queryKeys);
   const { cancelUserBlock } = useUserBlockCancel(queryKeys);
 
   const onClickBlock = async () => {
-    await blockUser({ targetId: userId });
+    await blockUser({ targetId });
   };
 
   const onClickCancelBlock = async () => {
-    await cancelUserBlock(userId);
+    await cancelUserBlock(targetId);
   };
 
   return (

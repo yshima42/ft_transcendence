@@ -3,13 +3,13 @@ import { useGetApi } from '../generics/useGetApi';
 export type FriendRelation = 'NONE' | 'ACCEPTED' | 'PENDING' | 'RECOGNITION';
 
 export const useFriendRelation = (
-  userId: string
+  targetId: string
 ): { friendRelation: FriendRelation } => {
   const {
     data: { friendRelation },
   } = useGetApi<{ friendRelation: FriendRelation }>(
-    `/users/me/friend-relations/${userId}`,
-    ['friend-relations', { userId }]
+    `/users/me/friend-relations/${targetId}`,
+    ['friend-relations', { targetId }]
   );
 
   return { friendRelation };
