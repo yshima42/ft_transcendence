@@ -12,7 +12,10 @@ type Props = {
 export const PendingList: FC<Props> = (props) => {
   const { users } = props;
   const [userList, setUserList] = useState<User[]>(users);
-  const { cancelFriendRequest } = useFriendRequestCancel();
+  const { cancelFriendRequest } = useFriendRequestCancel([
+    ['friend-relations'],
+    ['/users/me/friend-requests/outgoing'],
+  ]);
   useEffect(() => {
     setUserList(users);
   }, [users]);

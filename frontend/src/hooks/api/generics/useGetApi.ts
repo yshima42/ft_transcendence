@@ -1,9 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { QueryKey, useQuery } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
 // 使う際は、このhooks自体を<Suspense> で囲むこと。
 // エラーをキャッチしたい場合は、<ErrorBoundary> で囲むこと。
-export function useGetApi<ResBody>(endpoint: string): {
+export function useGetApi<ResBody>(
+  endpoint: string,
+  queryKey?: QueryKey
+): {
   data: ResBody;
 } {
   const axiosGet = async (): Promise<ResBody> => {
@@ -11,7 +14,10 @@ export function useGetApi<ResBody>(endpoint: string): {
 
     return result.data;
   };
-  const { data } = useQuery<ResBody>([endpoint], axiosGet);
+
+  const tmp = queryKey === undefined ? [endpoint] : [...queryKey];
+
+  const { data } = useQuery<ResBody>(tmp, axiosGet);
 
   // TODO: エラーの場合、useQuery内で例外が投げられるので、いつ入るかわかってない。
   if (data === undefined) {
