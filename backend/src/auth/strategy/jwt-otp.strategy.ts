@@ -15,8 +15,8 @@ export class JwtOtpStrategy extends PassportStrategy(Strategy, 'jwt-otp') {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: { cookies?: { access_token?: string } }) => {
-          const jwt = req?.cookies?.access_token ?? '';
+        (req: { cookies?: { accessToken?: string } }) => {
+          const jwt = req?.cookies?.accessToken ?? '';
 
           return jwt;
         },
