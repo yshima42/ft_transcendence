@@ -138,4 +138,18 @@ describe('BlocksService', () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('isUserBlocked', () => {
+    it('should be blocked', async () => {
+      await expect(
+        blocksService.isUserBlocked(userArray[0].id, userArray[1].id)
+      ).resolves.toStrictEqual({ isUserBlocked: true });
+    });
+
+    it('should not be blocked', async () => {
+      await expect(
+        blocksService.isUserBlocked(userArray[1].id, userArray[0].id)
+      ).resolves.toStrictEqual({ isUserBlocked: false });
+    });
+  });
 });
