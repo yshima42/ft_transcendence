@@ -14,7 +14,7 @@ export * from './relations/useFriendRequestCancel';
 export * from './relations/useFriendUnregister';
 export * from './relations/useFriends';
 export * from './relations/useIncomigUsers';
-export * from './block/useIsBlockedUser';
+export * from './block/useBlockRelation';
 export * from './relations/useOutGoingUsers';
 export * from './block/useUserBlock';
 export * from './block/useUserBlockCancel';

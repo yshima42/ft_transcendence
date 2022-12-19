@@ -56,7 +56,10 @@ export class BlocksService {
     }
   }
 
-  async isBlockedUser(sourceId: string, targetId: string): Promise<boolean> {
+  async isUserBlocked(
+    sourceId: string,
+    targetId: string
+  ): Promise<{ isUserBlocked: boolean }> {
     const ret = await this.prisma.block.findUnique({
       where: {
         sourceId_targetId: {
@@ -66,6 +69,6 @@ export class BlocksService {
       },
     });
 
-    return ret !== null;
+    return { isUserBlocked: ret !== null };
   }
 }
