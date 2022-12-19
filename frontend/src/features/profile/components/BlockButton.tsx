@@ -1,14 +1,14 @@
 import { memo, FC } from 'react';
 import { Box, Button, Flex } from '@chakra-ui/react';
-import { useUserBlock, useUserBlockCancel } from 'hooks/api';
+import { useIsBlockedUser, useUserBlock, useUserBlockCancel } from 'hooks/api';
 
 type Props = {
   userId: string;
-  isBlockedUser: boolean;
 };
 
 export const BlockButton: FC<Props> = memo((props) => {
-  const { userId, isBlockedUser } = props;
+  const { userId } = props;
+  const { isBlockedUser } = useIsBlockedUser(userId);
 
   const queryKeys = [
     ['block-relations', { targetId: userId }],
