@@ -5,17 +5,16 @@ import {
   useFriendRequestAccept,
   useFriendRequestCancel,
 } from 'hooks/api';
-import { useFriendRelation } from 'hooks/api/profile/useFriendRelation';
+import { FriendRelation } from 'hooks/api/profile/useFriendRelation';
 import { useFriendRequestReject } from 'hooks/api/relations/useFriendRequestReject';
 
 type Props = {
   userId: string;
+  friendRelation: FriendRelation;
 };
 
 export const FriendButton: FC<Props> = memo((props) => {
-  const { userId } = props;
-
-  const { friendRelation } = useFriendRelation(userId);
+  const { userId, friendRelation } = props;
 
   const queryKeys = [
     ['friend-relations', { userId }],
