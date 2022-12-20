@@ -10,19 +10,15 @@ import {
 } from '@nestjs/websockets';
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
+import { GameRoom, Player } from 'src/game/game.object';
+import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
-import { GameRoom, Player } from './game.object';
-import { GameService } from './game.service';
 
-@WebSocketGateway({ cors: { origin: '*' }, namespace: '/game' })
-export class GameGateway {
-  // gameServiceを使うのに必要
-
-  @WebSocketServer()
-  private readonly server!: Server;
-
-  // このクラスで使う配列・変数
+@WebSocketGateway({ cors: { origin: '*' } })
+export class UsersGateway {
+  public socketIdToUserId: Map<string, string>;
+  public userIds: Set<string>;
   private readonly gameRooms: Map<string, GameRoom>;
   private readonly matchWaitingPlayers: Player[] = [];
 
@@ -32,9 +28,15 @@ export class GameGateway {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService
   ) {
+    this.socketIdToUserId = new Map<string, string>();
+    this.userIds = new Set<string>();
     this.gameRooms = new Map<string, GameRoom>();
   }
 
+  @WebSocketServer()
+  private readonly server!: Server;
+
+  // オンラインステータス関連
   async handleConnection(@ConnectedSocket() socket: Socket): Promise<void> {
     const cookie: string | undefined = socket.handshake.headers.cookie;
     if (cookie === undefined) {
@@ -53,11 +55,58 @@ export class GameGateway {
     socket.data.userNickname = user.nickname;
 
     socket.emit('connect_established');
-    Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} handleConnection`
-    );
+    Logger.debug('connected: ' + socket.id);
   }
 
+  handleDisconnect(@ConnectedSocket() socket: Socket): void {
+    const targetUserId = this.socketIdToUserId.get(socket.id);
+    if (targetUserId !== undefined) {
+      this.socketIdToUserId.delete(socket.id);
+      if (this.countConnectionByUserId(targetUserId) === 0) {
+        this.userIds.delete(targetUserId);
+        socket.broadcast.emit('user_disconnected', targetUserId);
+      }
+    }
+
+    // debug用
+    Logger.debug('disconnected: ' + socket.id);
+    console.table(this.socketIdToUserId);
+    console.table(this.userIds);
+  }
+
+  @SubscribeMessage('handshake')
+  handshake(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() newUserId: string
+  ): string[] {
+    const reconnected = this.userIds.has(newUserId);
+    if (!reconnected) {
+      socket.broadcast.emit('user_connected', newUserId);
+    }
+    this.socketIdToUserId.set(socket.id, newUserId);
+    this.userIds.add(newUserId);
+
+    // debug用
+    Logger.debug('handshake: ' + socket.id);
+    console.table(this.socketIdToUserId);
+    console.table(this.userIds);
+
+    return [...this.userIds];
+  }
+
+  private readonly countConnectionByUserId = (targetUserId: string): number => {
+    const userIds = this.socketIdToUserId.values();
+    let count = 0;
+    for (const userId of userIds) {
+      if (userId === targetUserId) {
+        count += 1;
+      }
+    }
+
+    return count;
+  };
+
+  // Game関連
   @SubscribeMessage('random_match')
   randomMatch(@ConnectedSocket() socket: Socket): void {
     Logger.debug(
@@ -140,12 +189,6 @@ export class GameGateway {
 
       return;
     }
-
-    // if (gameRoom.player1.id !== userId && gameRoom.player2.id !== userId) {
-    //   socket.emit('watch_game');
-
-    //   return;
-    // }
 
     const isLeftSide = gameRoom.player1.id === userId;
     if (isLeftSide) {

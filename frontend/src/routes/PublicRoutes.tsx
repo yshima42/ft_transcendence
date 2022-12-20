@@ -21,8 +21,7 @@ import { Matching } from 'features/game/routes/Matching';
 import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
 import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
-import GameSocketProvider from 'providers/GameSocketProvider';
-import OnlineUsersProvider from 'providers/OnlineUsersProvider';
+import SocketProvider from 'providers/SocketProvider';
 
 const App = () => {
   const navigate = useNavigate();
@@ -51,15 +50,13 @@ const App = () => {
       onError={onError}
     >
       <Suspense fallback={<CenterSpinner h="100vh" />}>
-        <OnlineUsersProvider>
-          <GameSocketProvider>
-            <MainLayout>
-              <Suspense fallback={<CenterSpinner h="100vh" />}>
-                <Outlet />
-              </Suspense>
-            </MainLayout>
-          </GameSocketProvider>
-        </OnlineUsersProvider>
+        <SocketProvider>
+          <MainLayout>
+            <Suspense fallback={<CenterSpinner h="100vh" />}>
+              <Outlet />
+            </Suspense>
+          </MainLayout>
+        </SocketProvider>
       </Suspense>
     </ErrorBoundary>
   );

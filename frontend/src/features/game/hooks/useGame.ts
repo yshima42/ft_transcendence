@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GameSocketContext } from 'providers/GameSocketProvider';
+import { SocketContext } from 'providers/SocketProvider';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -48,7 +48,7 @@ export const useGame = (
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [gameResult, setGameResult] = useState(defaultGameResult);
   const [isLeftSide, setIsLeftSide] = useState(true);
-  const data = useContext(GameSocketContext);
+  const data = useContext(SocketContext);
   if (data === undefined) {
     throw new Error('GameSocket undefined');
   }
