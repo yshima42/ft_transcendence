@@ -53,12 +53,16 @@ export class GameGateway {
     socket.data.userNickname = user.nickname;
 
     socket.emit('connect_established');
-    Logger.debug(`${socket.data.userNickname as string} handleConnection`);
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} handleConnection`
+    );
   }
 
   @SubscribeMessage('random_match')
   randomMatch(@ConnectedSocket() socket: Socket): void {
-    Logger.debug(`${socket.data.userNickname as string} random_match`);
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} random_match`
+    );
 
     const { userId, userNickname } = socket.data as {
       userId: string;
@@ -106,7 +110,9 @@ export class GameGateway {
 
   @SubscribeMessage('matching_cancel')
   cancelMatching(@ConnectedSocket() socket: Socket): void {
-    Logger.debug(`${socket.data.userNickname as string} matching_cancel`);
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} matching_cancel`
+    );
 
     const { userId } = socket.data as { userId: string };
     const foundIndex = this.matchWaitingPlayers.findIndex(
@@ -123,7 +129,9 @@ export class GameGateway {
     @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
-    Logger.debug(`${socket.data.userNickname as string} join_room`);
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} join_room`
+    );
 
     const { userId } = socket.data as { userId: string };
     const gameRoom = this.gameRooms.get(message.roomId);
@@ -156,7 +164,7 @@ export class GameGateway {
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: { roomId: string; isLeftSide: boolean }
   ): void {
-    Logger.debug(`${socket.data.userNickname as string} confirm`);
+    Logger.debug(`${socket.id} ${socket.data.userNickname as string} confirm`);
 
     const { roomId, isLeftSide } = message;
     const gameRoom = this.gameRooms.get(roomId);
@@ -182,7 +190,9 @@ export class GameGateway {
     @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): void {
-    Logger.debug(`${socket.data.userNickname as string} connect_pong`);
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} connect_pong`
+    );
 
     // player1のsocketでゲームオブジェクトを作る
     const gameRoom = this.gameRooms.get(message.roomId);
