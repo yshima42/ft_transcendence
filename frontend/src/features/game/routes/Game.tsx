@@ -15,6 +15,7 @@ export const Game: FC = memo(() => {
 
   const gamePage = useMemo(() => {
     switch (gamePhase) {
+      case GamePhase.SocketConnecting:
       case GamePhase.Joining:
         return <CenterSpinner h="40vh" />;
       case GamePhase.ConfirmWaiting:

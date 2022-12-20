@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GameSocketContext } from 'providers/GameSocketProvider';
 
 export enum MatchState {
+  SocketConnecting = 0,
   Matching = 1,
   MatchingCancel = 2,
   Matched = 3,
@@ -13,11 +14,12 @@ export const useGameMatching = (): {
   matchState: MatchState;
   setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
 } => {
-  const [matchState, setMatchState] = useState(MatchState.Matching);
-  const socket = useContext(GameSocketContext);
-  if (socket === undefined) {
+  const [matchState, setMatchState] = useState(MatchState.SocketConnecting);
+  const data = useContext(GameSocketContext);
+  if (data === undefined) {
     throw new Error('GameSocket undefined');
   }
+  const { socket, connected } = data;
   const navigate = useNavigate();
 
   // socket イベント
@@ -38,6 +40,12 @@ export const useGameMatching = (): {
 
   useEffect(() => {
     switch (matchState) {
+      case MatchState.SocketConnecting: {
+        if (connected) {
+          setMatchState(MatchState.Matching);
+        }
+        break;
+      }
       case MatchState.Matching: {
         console.log('[MatchState] Matching');
         socket.emit('random_match');
@@ -50,7 +58,7 @@ export const useGameMatching = (): {
         break;
       }
     }
-  }, [matchState, socket, navigate]);
+  }, [matchState, socket, navigate, connected]);
 
   return { matchState, setMatchState };
 };
