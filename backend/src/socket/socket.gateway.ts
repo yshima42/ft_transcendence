@@ -59,13 +59,11 @@ export class UsersGateway {
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket): void {
-    const targetUserId = this.socketIdToUserId.get(socket.id);
-    if (targetUserId !== undefined) {
-      this.socketIdToUserId.delete(socket.id);
-      if (this.countConnectionByUserId(targetUserId) === 0) {
-        this.userIds.delete(targetUserId);
-        socket.broadcast.emit('user_disconnected', targetUserId);
-      }
+    const { userId } = socket.data as { userId: string };
+    this.socketIdToUserId.delete(socket.id);
+    if (this.countConnectionByUserId(userId) === 0) {
+      this.userIds.delete(userId);
+      socket.broadcast.emit('user_disconnected', userId);
     }
 
     // debug用
@@ -75,16 +73,14 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('handshake')
-  handshake(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() newUserId: string
-  ): string[] {
-    const reconnected = this.userIds.has(newUserId);
+  handshake(@ConnectedSocket() socket: Socket): string[] {
+    const { userId } = socket.data as { userId: string };
+    const reconnected = this.userIds.has(userId);
     if (!reconnected) {
-      socket.broadcast.emit('user_connected', newUserId);
+      socket.broadcast.emit('user_connected', userId);
     }
-    this.socketIdToUserId.set(socket.id, newUserId);
-    this.userIds.add(newUserId);
+    this.socketIdToUserId.set(socket.id, userId);
+    this.userIds.add(userId);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
@@ -190,16 +186,26 @@ export class UsersGateway {
       return;
     }
 
-    const isLeftSide = gameRoom.player1.id === userId;
-    if (isLeftSide) {
-      gameRoom.player1.socket = socket;
-    } else {
-      gameRoom.player2.socket = socket;
-    }
+    // if (gameRoom.player1.id !== userId && gameRoom.player2.id !== userId) {
+    //   socket.emit('watch_game');
+
+    //   return;
+    // }
+
+    const [player, opponent] =
+      gameRoom.player1.id === userId
+        ? [gameRoom.player1, gameRoom.player2]
+        : [gameRoom.player2, gameRoom.player1];
+    socket.emit('set_side', player.isLeftSide);
+    player.socket = socket;
     await socket.join(message.roomId);
-    console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
-    socket.emit('set_side', isLeftSide);
-    socket.emit('check_confirmation');
+    if (!player.isReady) {
+      socket.emit('check_confirmation');
+    } else if (!opponent.isReady) {
+      socket.emit('wait_opponent');
+    } else {
+      socket.emit('start_game');
+    }
   }
 
   @SubscribeMessage('confirm')
@@ -223,7 +229,6 @@ export class UsersGateway {
     if (!opponent.isReady) {
       socket.emit('wait_opponent');
     } else {
-      gameRoom.isInGame = true;
       this.server.in(roomId).emit('start_game');
     }
   }
@@ -237,12 +242,16 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userNickname as string} connect_pong`
     );
 
-    // player1のsocketでゲームオブジェクトを作る
     const gameRoom = this.gameRooms.get(message.roomId);
-    if (gameRoom !== undefined) {
-      if (socket.id === gameRoom.player2.socket.id) {
-        return;
-      }
+    if (gameRoom === undefined) {
+      socket.emit('invalid_room');
+
+      return;
+    }
+
+    // １回のみ動かす
+    if (!gameRoom.isInGame) {
+      gameRoom.isInGame = true;
       // ゲーム開始
       gameRoom.gameStart(socket, message.roomId);
     }
@@ -250,23 +259,38 @@ export class UsersGateway {
     // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
   }
 
-  // deleteGameRoom(roomId: string): void {
-  //   this.gameRooms[roomId].disconnectAll();
-  //   // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  //   delete this.gameRooms[roomId];
-  // }
-
   @SubscribeMessage('user_command')
   handleUserCommands(
     @MessageBody()
-    data: {
+    message: {
       roomId: string;
       userCommand: { up: boolean; down: boolean; isLeftSide: boolean };
-    }
+    },
+    @ConnectedSocket() socket: Socket
   ): void {
-    const gameRoom = this.gameRooms.get(data.roomId);
-    if (gameRoom !== undefined) {
-      gameRoom.handleInput(data.roomId, data.userCommand);
+    const gameRoom = this.gameRooms.get(message.roomId);
+    if (gameRoom === undefined) {
+      socket.emit('invalid_room');
+
+      return;
     }
+    gameRoom.handleInput(message.roomId, message.userCommand);
+  }
+
+  @SubscribeMessage('delete_room')
+  async deleteGameRoom(
+    @MessageBody() message: { roomId: string },
+    @ConnectedSocket() socket: Socket
+  ): Promise<void> {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} delete_room`
+    );
+
+    const gameRoom = this.gameRooms.get(message.roomId);
+    if (gameRoom === undefined) {
+      return;
+    }
+    await gameRoom.disconnectAll();
+    this.gameRooms.delete(message.roomId);
   }
 }

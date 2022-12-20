@@ -244,12 +244,10 @@ export class GameRoom {
     }
   }
 
-  disconnectAll(): void {
-    if (this.player1.socket.connected) {
-      void this.player1.socket.leave(this.id);
-    }
-    if (this.player2.socket.connected) {
-      void this.player2.socket.leave(this.id);
-    }
+  async disconnectAll(): Promise<void> {
+    await Promise.all([
+      this.player2.socket.leave(this.id),
+      this.player1.socket.leave(this.id),
+    ]);
   }
 }

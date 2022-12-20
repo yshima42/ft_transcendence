@@ -48,11 +48,11 @@ export const useGame = (
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [gameResult, setGameResult] = useState(defaultGameResult);
   const [isLeftSide, setIsLeftSide] = useState(true);
-  const data = useContext(SocketContext);
-  if (data === undefined) {
-    throw new Error('GameSocket undefined');
+  const socketContext = useContext(SocketContext);
+  if (socketContext === undefined) {
+    throw new Error('SocketContext undefined');
   }
-  const { socket, connected } = data;
+  const { socket, connected } = socketContext;
   const navigate = useNavigate();
 
   const player1 = new Paddle(0, PADDLE_START_POS);
@@ -80,8 +80,12 @@ export const useGame = (
   useEffect(() => {
     socket.on('invalid_room', () => {
       console.log('[Socket Event] invalid_room');
-      // TODO: toast
-      navigate('/app');
+      // state は、useToastCheck に合わせる。
+      navigate('/app', {
+        state: {
+          toastProps: { description: 'Invalid game room.', status: 'error' },
+        },
+      });
     });
 
     socket.on('set_side', (isLeftSide: boolean) => {
@@ -185,6 +189,7 @@ export const useGame = (
       }
       case GamePhase.Result: {
         console.log('[GamePhase] Result');
+        socket.emit('delete_room', { roomId });
         break;
       }
     }

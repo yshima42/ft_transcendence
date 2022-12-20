@@ -7,7 +7,6 @@ import {
   useState,
 } from 'react';
 import { WS_BASE_URL } from 'config';
-import { useProfile } from 'hooks/api';
 import { useSocket } from 'hooks/socket/useSocket';
 import { Socket } from 'socket.io-client';
 
@@ -16,7 +15,6 @@ export const SocketContext = createContext<
 >(undefined);
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { user } = useProfile();
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [connected, setConnected] = useState(false);
@@ -29,7 +27,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!didLogRef.current) {
         didLogRef.current = true;
         setConnected(true);
-        socket.emit('handshake', user.id, (users: string[]) => {
+        socket.emit('handshake', (users: string[]) => {
           setOnlineUsers(users);
         });
       }
@@ -52,7 +50,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       socket.off('user_connected');
       socket.off('user_disconnected');
     };
-  }, [socket, user]);
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={{ onlineUsers, socket, connected }}>
