@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { useBlockUsers } from 'hooks/api';
+import { UnblockButton } from 'components/atoms/button/UnblockButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
-import { BlockButton } from '../atoms/UnblockButton';
 
 export const BlockedList: FC = () => {
   const { users } = useBlockUsers();
@@ -26,11 +26,7 @@ export const BlockedList: FC = () => {
           avatarImageUrl={user.avatarImageUrl}
           winRate={50}
           totalNumOfGames={100}
-          buttons={
-            <>
-              <BlockButton targetId={user.id} />
-            </>
-          }
+          buttons={<UnblockButton targetId={user.id} size={'sm'} />}
         />
       ))}
     </Grid>
