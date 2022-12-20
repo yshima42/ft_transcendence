@@ -1,31 +1,13 @@
-import { FC, useState, useEffect } from 'react';
+import { FC } from 'react';
 import { Grid } from '@chakra-ui/react';
-import { User } from '@prisma/client';
-import { useFriendRequestCancel } from 'hooks/api';
-import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
+import { useOutGoingUsers } from 'hooks/api';
+import { CancelButton } from 'components/atoms/button/CancelButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
-type Props = {
-  users: User[];
-};
-
-export const PendingList: FC<Props> = (props) => {
-  const { users } = props;
-  const [userList, setUserList] = useState<User[]>(users);
-  const { cancelFriendRequest } = useFriendRequestCancel([
-    ['friend-relations'],
-    ['/users/me/friend-requests/outgoing'],
-  ]);
-  useEffect(() => {
-    setUserList(users);
-  }, [users]);
+export const PendingList: FC = () => {
+  const { users } = useOutGoingUsers();
 
   if (users === undefined) return <></>;
-
-  const onClickCancel = async (id: string) => {
-    await cancelFriendRequest(id);
-    setUserList(userList.filter((user) => user.id !== id));
-  };
 
   return (
     <Grid
@@ -35,7 +17,7 @@ export const PendingList: FC<Props> = (props) => {
       }}
       gap={6}
     >
-      {userList.map((user) => (
+      {users.map((user) => (
         <UserCard
           key={user.id}
           id={user.id}
@@ -44,17 +26,7 @@ export const PendingList: FC<Props> = (props) => {
           avatarImageUrl={user.avatarImageUrl}
           winRate={50}
           totalNumOfGames={100}
-          buttons={
-            <>
-              <UserCardButton
-                text="Cancel"
-                id={user.id}
-                onClick={async (id) => {
-                  await onClickCancel(id);
-                }}
-              />
-            </>
-          }
+          buttons={<CancelButton targetId={user.id} />}
         />
       ))}
     </Grid>

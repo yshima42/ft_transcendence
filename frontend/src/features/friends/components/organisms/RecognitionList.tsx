@@ -1,40 +1,14 @@
-import { FC, useState, useEffect } from 'react';
-import { Grid } from '@chakra-ui/react';
-import { User } from '@prisma/client';
-import { useFriendRequestAccept } from 'hooks/api';
-import { useFriendRequestReject } from 'hooks/api/relations/useFriendRequestReject';
-import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
+import { FC } from 'react';
+import { Grid, VStack } from '@chakra-ui/react';
+import { useIncomingUsers } from 'hooks/api';
+import { AcceptButton } from 'components/atoms/button/AcceptButton';
+import { RejectButton } from 'components/atoms/button/RejectButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
-type Props = {
-  users: User[];
-};
+export const RecognitionList: FC = () => {
+  const { users } = useIncomingUsers();
 
-export const RecognitionList: FC<Props> = (props) => {
-  const { users } = props;
-  const [userList, setUserList] = useState<User[]>(users);
-
-  const queryKeys = [
-    ['friend-relations'],
-    ['/users/me/friend-requests/incoming'],
-  ];
-  const { acceptFriendRequest } = useFriendRequestAccept(queryKeys);
-  const { rejectFriendRequest } = useFriendRequestReject(queryKeys);
-  useEffect(() => {
-    setUserList(users);
-  }, [users]);
-
-  const onClickAccept = async (id: string) => {
-    await acceptFriendRequest({
-      creatorId: id,
-    });
-    setUserList(userList.filter((user) => user.id !== id));
-  };
-
-  const onClickReject = async (id: string) => {
-    await rejectFriendRequest(id);
-    setUserList(userList.filter((user) => user.id !== id));
-  };
+  if (users === undefined) return <></>;
 
   return (
     <Grid
@@ -44,7 +18,7 @@ export const RecognitionList: FC<Props> = (props) => {
       }}
       gap={6}
     >
-      {userList.map((user) => (
+      {users.map((user) => (
         <UserCard
           key={user.id}
           id={user.id}
@@ -54,22 +28,10 @@ export const RecognitionList: FC<Props> = (props) => {
           winRate={50}
           totalNumOfGames={100}
           buttons={
-            <>
-              <UserCardButton
-                text="Accept"
-                id={user.id}
-                onClick={async (id) => {
-                  await onClickAccept(id);
-                }}
-              />
-              <UserCardButton
-                text="Reject"
-                id={user.id}
-                onClick={async (id) => {
-                  await onClickReject(id);
-                }}
-              />
-            </>
+            <VStack justify="center" align="center">
+              <AcceptButton targetId={user.id} />
+              <RejectButton targetId={user.id} />
+            </VStack>
           }
         />
       ))}
