@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { WS_BASE_URL } from 'config';
-import { useSocket } from 'hooks/socket/useSocket';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GameSocketContext } from 'providers/GameSocketProvider';
 import {
   BALL_START_X,
   BALL_START_Y,
@@ -46,10 +45,14 @@ export const useGame = (
   draw: (ctx: CanvasRenderingContext2D) => void;
   gameResult: GameResult;
 } => {
-  const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
+  const [gamePhase, setGamePhase] = useState(GamePhase.Joining);
   const [gameResult, setGameResult] = useState(defaultGameResult);
   const [isLeftSide, setIsLeftSide] = useState(true);
-  const socket = useSocket(`${WS_BASE_URL}/game`);
+  const data = useContext(GameSocketContext);
+  if (data === undefined) {
+    throw new Error('GameSocket undefined');
+  }
+  const { socket, connected } = data;
   const navigate = useNavigate();
 
   const player1 = new Paddle(0, PADDLE_START_POS);
@@ -75,11 +78,6 @@ export const useGame = (
 
   // socket イベント
   useEffect(() => {
-    socket.on('connect_established', () => {
-      console.log('[Socket Event] connect_established');
-      setGamePhase(GamePhase.Joining);
-    });
-
     socket.on('invalid_room', () => {
       console.log('[Socket Event] invalid_room');
       // TODO: toast
@@ -141,7 +139,6 @@ export const useGame = (
     });
 
     return () => {
-      socket.off('connect_established');
       socket.off('invalid_room');
       socket.off('set_side');
       socket.off('check_confirmation');
@@ -156,6 +153,12 @@ export const useGame = (
   // 各ページのLogic
   useEffect(() => {
     switch (gamePhase) {
+      case GamePhase.SocketConnecting: {
+        if (connected) {
+          setGamePhase(GamePhase.Joining);
+        }
+        break;
+      }
       case GamePhase.Joining: {
         console.log('[GamePhase] Joining');
         socket.emit('join_room', { roomId });
@@ -185,7 +188,7 @@ export const useGame = (
         break;
       }
     }
-  }, [gamePhase, socket, isLeftSide, roomId]);
+  }, [gamePhase, socket, isLeftSide, roomId, connected]);
 
   return { gamePhase, setGamePhase, draw, gameResult };
 };
