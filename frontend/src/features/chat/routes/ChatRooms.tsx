@@ -36,25 +36,26 @@ export const ChatRooms: React.FC = React.memo(() => {
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
                     <C.Box>
-                      <C.Text fontSize="sm">
-                        {/* 投稿がない場合は何も表示しない */}
-                        {chatRoom.chatMessages.length !== 0 ? (
-                          new Date(
-                            chatRoom.chatMessages[0].createdAt
+                      {/* 投稿がない場合は何も表示しない */}
+                      {chatRoom.chatMessages.length !== 0 && (
+                        <C.Text
+                          fontSize="sm"
+                          data-testid="chat-room-created-at"
+                        >
+                          new Date( chatRoom.chatMessages[0].createdAt
                           ).toLocaleString()
-                        ) : (
-                          <></>
-                        )}
-                      </C.Text>
+                        </C.Text>
+                      )}
                       <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
                       {/* PROTECTED の場合 */}
-                      <C.Text fontSize="sm">
-                        {chatRoom.roomStatus === 'PROTECTED' ? (
-                          <C.Badge colorScheme="red">PROTECTED</C.Badge>
-                        ) : (
-                          <></>
-                        )}
-                      </C.Text>
+                      {chatRoom.roomStatus === 'PROTECTED' && (
+                        <C.Badge
+                          colorScheme="red"
+                          data-testid="chat-room-room-status"
+                        >
+                          PROTECTED
+                        </C.Badge>
+                      )}
                     </C.Box>
                   </C.Flex>
                 </C.Box>
