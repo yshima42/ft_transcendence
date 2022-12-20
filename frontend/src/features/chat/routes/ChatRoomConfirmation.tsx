@@ -53,8 +53,6 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
 
         チャットルームへの参加は、axiosを使って行う。
         チャットルームのページに遷移する。
-
-        formは、react-hook-formを使って実装する。
       */}
       <C.Box>
         <C.Heading>チャットルームに参加</C.Heading>
