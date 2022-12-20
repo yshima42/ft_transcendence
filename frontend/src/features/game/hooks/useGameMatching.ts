@@ -15,11 +15,11 @@ export const useGameMatching = (): {
   setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
 } => {
   const [matchState, setMatchState] = useState(MatchState.SocketConnecting);
-  const data = useContext(GameSocketContext);
-  if (data === undefined) {
+  const gameSocketContext = useContext(GameSocketContext);
+  if (gameSocketContext === undefined) {
     throw new Error('GameSocket undefined');
   }
-  const { socket, connected } = data;
+  const { socket, connected } = gameSocketContext;
   const navigate = useNavigate();
 
   // socket イベント
