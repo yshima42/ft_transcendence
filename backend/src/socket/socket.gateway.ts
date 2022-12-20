@@ -59,13 +59,11 @@ export class UsersGateway {
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket): void {
-    const targetUserId = this.socketIdToUserId.get(socket.id);
-    if (targetUserId !== undefined) {
-      this.socketIdToUserId.delete(socket.id);
-      if (this.countConnectionByUserId(targetUserId) === 0) {
-        this.userIds.delete(targetUserId);
-        socket.broadcast.emit('user_disconnected', targetUserId);
-      }
+    const { userId } = socket.data as { userId: string };
+    this.socketIdToUserId.delete(socket.id);
+    if (this.countConnectionByUserId(userId) === 0) {
+      this.userIds.delete(userId);
+      socket.broadcast.emit('user_disconnected', userId);
     }
 
     // debug用
@@ -75,16 +73,14 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('handshake')
-  handshake(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() newUserId: string
-  ): string[] {
-    const reconnected = this.userIds.has(newUserId);
+  handshake(@ConnectedSocket() socket: Socket): string[] {
+    const { userId } = socket.data as { userId: string };
+    const reconnected = this.userIds.has(userId);
     if (!reconnected) {
-      socket.broadcast.emit('user_connected', newUserId);
+      socket.broadcast.emit('user_connected', userId);
     }
-    this.socketIdToUserId.set(socket.id, newUserId);
-    this.userIds.add(newUserId);
+    this.socketIdToUserId.set(socket.id, userId);
+    this.userIds.add(userId);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
