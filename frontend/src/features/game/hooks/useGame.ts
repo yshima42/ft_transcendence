@@ -16,10 +16,11 @@ import { userInput } from '../utils/userInput';
 export enum GamePhase {
   SocketConnecting = 0,
   Joining = 1,
-  Confirming = 2,
-  Waiting = 3,
-  InGame = 4,
-  Result = 5,
+  ConfirmWaiting = 2,
+  Confirming = 3,
+  OpponentWaiting = 4,
+  InGame = 5,
+  Result = 6,
 }
 
 export type GameResult = {
@@ -38,8 +39,7 @@ const defaultGameResult: GameResult = {
 
 // ここでuseRefを使ってsocketのconnect処理ができたら理想
 export const useGame = (
-  roomId: string,
-  isLeftSide: boolean
+  roomId: string
 ): {
   gamePhase: GamePhase;
   setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
@@ -48,6 +48,7 @@ export const useGame = (
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [gameResult, setGameResult] = useState(defaultGameResult);
+  const [isLeftSide, setIsLeftSide] = useState(true);
   const socket = useSocket(`${WS_BASE_URL}/game`);
   const navigate = useNavigate();
 
@@ -81,12 +82,19 @@ export const useGame = (
 
     socket.on('invalid_room', () => {
       console.log('[Socket Event] invalid_room');
+      // TODO: toast
       navigate('/app');
     });
 
-    socket.on('check_confirmation', () => {
+    socket.on('check_confirmation', (isLeftSide: boolean) => {
       console.log('[Socket Event] check_confirmation');
-      setGamePhase(GamePhase.Confirming);
+      setIsLeftSide(isLeftSide);
+      setGamePhase(GamePhase.ConfirmWaiting);
+    });
+
+    socket.on('wait_opponent', () => {
+      console.log('[Socket Event] wait_opponent');
+      setGamePhase(GamePhase.OpponentWaiting);
     });
 
     socket.on('start_game', () => {
@@ -144,16 +152,20 @@ export const useGame = (
     switch (gamePhase) {
       case GamePhase.Joining: {
         console.log('[GamePhase] Joining');
-        socket.emit('join_room', { roomId, isLeftSide });
+        socket.emit('join_room', { roomId });
+        break;
+      }
+      case GamePhase.ConfirmWaiting: {
+        console.log('[GamePhase] ConfirmWaiting');
         break;
       }
       case GamePhase.Confirming: {
         console.log('[GamePhase] Confirming');
+        socket.emit('confirm', { roomId });
         break;
       }
-      case GamePhase.Waiting: {
-        console.log('[GamePhase] Waiting');
-        socket.emit('confirm', { roomId });
+      case GamePhase.OpponentWaiting: {
+        console.log('[GamePhase] OpponentWaiting');
         break;
       }
       case GamePhase.InGame: {
