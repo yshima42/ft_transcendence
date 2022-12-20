@@ -42,8 +42,9 @@ export const ChatRooms: React.FC = React.memo(() => {
                           fontSize="sm"
                           data-testid="chat-room-created-at"
                         >
-                          new Date( chatRoom.chatMessages[0].createdAt
-                          ).toLocaleString()
+                          {new Date(
+                            chatRoom.chatMessages[0].createdAt
+                          ).toLocaleString()}
                         </C.Text>
                       )}
                       <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
