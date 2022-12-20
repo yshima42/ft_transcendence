@@ -16,7 +16,8 @@ export const GameSocketContext = createContext<
 >(undefined);
 
 const GameSocketProvider: FC<PropsWithChildren> = ({ children }) => {
-  const socket = useSocket(`${WS_BASE_URL}/game`);
+  // TODO: autoConnect: falseをuseSocketに入れて、usersの方も修正
+  const socket = useSocket(`${WS_BASE_URL}/game`, { autoConnect: false });
   const [connected, setConnected] = useState(false);
 
   const didLogRef = useRef(false);
@@ -48,7 +49,7 @@ const GameSocketProvider: FC<PropsWithChildren> = ({ children }) => {
       // socket.off('user_connected');
       // socket.off('user_disconnected');
     };
-  }, [socket]);
+  }, [socket, connected]);
 
   return (
     <GameSocketContext.Provider value={{ socket, connected }}>
