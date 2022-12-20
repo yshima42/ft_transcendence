@@ -41,9 +41,10 @@ export class ChatMessageController {
   }
 
   @Get()
-  async findAll(
-    @Param('chatRoomId') chatRoomId: string
+  async findAllNotBlocked(
+    @Param('chatRoomId') chatRoomId: string,
+    @GetUser() user: User
   ): Promise<ResponseChatMessage[]> {
-    return await this.chatMessageService.findAll(chatRoomId);
+    return await this.chatMessageService.findAllNotBlocked(chatRoomId, user.id);
   }
 }

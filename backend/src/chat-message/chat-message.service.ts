@@ -35,11 +35,26 @@ export class ChatMessageService {
     return chatMessage;
   }
 
-  async findAll(chatRoomId: string): Promise<ResponseChatMessage[]> {
+  async findAllNotBlocked(
+    chatRoomId: string,
+    userId: string
+  ): Promise<ResponseChatMessage[]> {
     Logger.debug(`findChatMessages: ${JSON.stringify(chatRoomId)}`);
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
         chatRoomId,
+        // ブロックしているユーザーのメッセージは取得しない
+        sender: {
+          blocking: {
+            every: {
+              targetId: {
+                not: {
+                  equals: userId,
+                },
+              },
+            },
+          },
+        },
       },
       select: {
         id: true,
