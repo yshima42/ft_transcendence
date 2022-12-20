@@ -5,8 +5,7 @@ import { FileModule } from 'src/file/file.module';
 import { FriendRequestsModule } from 'src/friend-requests/friend-requests.module';
 import { GameModule } from 'src/game/game.module';
 import { PrismaModule } from '../prisma/prisma.module';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
+import { UsersGateway } from './socket.gateway';
 
 @Module({
   imports: [
@@ -17,8 +16,8 @@ import { UsersService } from './users.service';
     FriendRequestsModule,
     JwtModule.register({}),
   ],
-  controllers: [UsersController],
-  providers: [UsersService],
-  exports: [UsersService],
+  controllers: [],
+  providers: [UsersGateway],
+  exports: [],
 })
-export class UsersModule {}
+export class SocketModule {}
