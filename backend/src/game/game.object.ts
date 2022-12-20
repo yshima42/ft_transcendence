@@ -57,6 +57,7 @@ export class Player {
   id: string;
   nickname: string;
   isLeftSide: boolean;
+  isReady: boolean;
   score: number;
 
   constructor(
@@ -69,6 +70,7 @@ export class Player {
     this.id = id;
     this.nickname = nickname;
     this.isLeftSide = isLeftSide;
+    this.isReady = false;
     this.score = 0;
   }
 }
@@ -84,7 +86,7 @@ export class GameRoom {
   paddle1: Paddle;
   paddle2: Paddle;
   interval: NodeJS.Timer;
-  ready: boolean;
+  isInGame: boolean;
 
   constructor(
     gameService: GameService,
@@ -104,7 +106,7 @@ export class GameRoom {
     this.interval = setInterval(() => {
       // イニシャライズのための空変数
     });
-    this.ready = false;
+    this.isInGame = false;
   }
 
   setBallCenter(): void {
