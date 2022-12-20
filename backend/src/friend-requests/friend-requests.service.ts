@@ -6,6 +6,7 @@ import {
 import { FriendRequest, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateFriendRequestDto } from './dto/update-friend-request.dto';
+import { FriendRelation } from './interfaces/friend-relation.interface';
 
 @Injectable()
 export class FriendRequestsService {
@@ -212,6 +213,32 @@ export class FriendRequestsService {
     });
   }
 
+  /**
+   * 特定のユーザーからのフレンドリクエストを拒否する際に使用。
+   * PENDINGになっているレコードを削除する。
+   * @param userId - 自分のID
+   * @param requestUserId - フレンドリクエストを送ったユーザー
+   * @returns count
+   */
+  async removePendingRequest(
+    userId: string,
+    requestUserId: string
+  ): Promise<{ count: number }> {
+    const pendingRequests = await this.prisma.friendRequest.findMany({
+      where: {
+        creatorId: requestUserId,
+        receiverId: userId,
+        status: 'PENDING',
+      },
+    });
+
+    if (pendingRequests.length === 0) {
+      throw new NotFoundException('This user do not request.');
+    }
+
+    return await this.removeTwo(userId, requestUserId);
+  }
+
   // 命名に違和感あり
   async removeBetweenFriends(
     userId: string,
@@ -239,5 +266,41 @@ export class FriendRequestsService {
     }
 
     return await this.removeTwo(userId, friendId);
+  }
+
+  async getFriendRelation(
+    meId: string,
+    otherId: string
+  ): Promise<{ friendRelation: FriendRelation }> {
+    const ret = await this.prisma.friendRequest.findMany({
+      where: {
+        OR: [
+          {
+            AND: [{ creatorId: meId }, { receiverId: otherId }],
+          },
+          {
+            AND: [{ creatorId: otherId }, { receiverId: meId }],
+          },
+        ],
+      },
+    });
+
+    let friendRelation: FriendRelation;
+
+    if (ret.length === 0) {
+      friendRelation = 'NONE';
+    } else {
+      if (ret[0].status === 'ACCEPTED') {
+        friendRelation = 'ACCEPTED';
+      } else {
+        if (ret[0].creatorId === meId) {
+          friendRelation = 'PENDING';
+        } else {
+          friendRelation = 'RECOGNITION';
+        }
+      }
+    }
+
+    return { friendRelation };
   }
 }

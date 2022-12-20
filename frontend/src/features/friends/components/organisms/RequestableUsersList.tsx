@@ -16,7 +16,10 @@ export const RequestableUsersList: FC<Props> = (props) => {
     setUserList(users);
   }, [users]);
 
-  const { requestFriend } = useFriendRequest();
+  const { requestFriend } = useFriendRequest([
+    ['friend-relations'],
+    ['/users/me/friend-requests/outgoing'],
+  ]);
   if (users === undefined) return <></>;
   const onClickRequest = async (id: string) => {
     await requestFriend({
