@@ -1,9 +1,9 @@
-import { memo, FC } from 'react';
+import { memo, FC, Suspense } from 'react';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
-import { useIsBlockedUser, useIsLoginUser, useProfile } from 'hooks/api';
+import { useIsLoginUser, useProfile } from 'hooks/api';
 import { useParams } from 'react-router-dom';
+import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { ProfileCardWrapper } from '../components/ProfileCardWrapper';
 import { StatsCard } from '../components/StatsCard';
 import { UserInfoCard } from '../components/UserInfoCard';
 import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
@@ -14,7 +14,6 @@ export const Profile: FC = memo(() => {
   const { id } = useParams();
   const { user } = useProfile(id);
   const { isLoginUser } = useIsLoginUser(user.id);
-  const { isBlockedUser } = useIsBlockedUser(user.id);
 
   return (
     <ContentLayout title="Profile">
@@ -24,13 +23,13 @@ export const Profile: FC = memo(() => {
           h={{ base: '900px', md: '600px' }}
           templateAreas={{
             base: `"profile stats"
-                   "profile stats"
-                   "history history"
-                   "history history"
-                   "history history"
-                   "history history"`,
+                  "profile stats"
+                  "history history"
+                  "history history"
+                  "history history"
+                  "history history"`,
             md: `"profile profile history history history"
-                 "stats   stats   history history history"`,
+                "stats   stats   history history history"`,
           }}
           gridTemplateRows={{
             base: `1fr 1fr 1fr 1fr 1fr 1fr`,
@@ -43,23 +42,19 @@ export const Profile: FC = memo(() => {
           gap={5}
         >
           <GridItem bg="gray" area="profile">
-            <ProfileCardWrapper>
-              <UserInfoCard
-                user={user}
-                isLoginUser={isLoginUser}
-                isBlockedUser={isBlockedUser}
-              />
-            </ProfileCardWrapper>
+            <Suspense fallback={<CenterSpinner />}>
+              <UserInfoCard user={user} isLoginUser={isLoginUser} />
+            </Suspense>
           </GridItem>
           <GridItem bg="gray" area="stats">
-            <ProfileCardWrapper>
+            <Suspense fallback={<CenterSpinner />}>
               <StatsCard id={user.id} />
-            </ProfileCardWrapper>
+            </Suspense>
           </GridItem>
           <GridItem bg="gray" area="history">
-            <ProfileCardWrapper>
+            <Suspense fallback={<CenterSpinner />}>
               <MatchHistoryCard id={user.id} />
-            </ProfileCardWrapper>
+            </Suspense>
           </GridItem>
         </Grid>
       </Flex>

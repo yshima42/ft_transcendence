@@ -1,5 +1,10 @@
 import { FriendRequest } from '@prisma/client';
-import { UseMutateAsyncFunction, useMutation } from '@tanstack/react-query';
+import {
+  QueryKey,
+  UseMutateAsyncFunction,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
 export interface FriendRequestCancelResBody {
@@ -13,20 +18,34 @@ export type CancelFriendRequest = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useFriendRequestCancel = (): {
+export const useFriendRequestCancel = (
+  queryKeys: QueryKey[]
+): {
   cancelFriendRequest: CancelFriendRequest;
   isLoading: boolean;
 } => {
   const axiosDelete = async (userId: string) => {
     const result = await axios.delete<FriendRequestCancelResBody>(
-      '/users/me/friend-requests/' + userId
+      `/users/me/friend-requests/${userId}`
     );
 
     return result.data;
   };
 
-  const { mutateAsync: cancelFriendRequest, isLoading } =
-    useMutation(axiosDelete);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: cancelFriendRequest, isLoading } = useMutation(
+    axiosDelete,
+    {
+      onSuccess: () => {
+        if (queryKeys !== undefined) {
+          queryKeys.forEach((queryKey) => {
+            void queryClient.invalidateQueries({ queryKey });
+          });
+        }
+      },
+    }
+  );
 
   return { cancelFriendRequest, isLoading };
 };

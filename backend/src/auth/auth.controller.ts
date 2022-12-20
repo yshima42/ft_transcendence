@@ -56,7 +56,7 @@ export class AuthController {
     const { accessToken, isOtpAuthEnabled, isSignUp } =
       await this.authService.login(name, signUpUser);
 
-    res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('accessToken', accessToken, this.cookieOptions);
 
     console.log(ftProfile.intraName, ' login !');
     console.log(accessToken);
@@ -74,7 +74,7 @@ export class AuthController {
   @Get('login/dummy')
   @Redirect('http://localhost:5173/app')
   @ApiOperation({
-    summary: 'seedで作ったdummy1~5のaccess_tokenを取得(ログイン)',
+    summary: 'seedで作ったdummy1~5のaccessTokenを取得(ログイン)',
   })
   @ApiBody({
     description: 'seedで作ったdummyのnameを設定',
@@ -95,7 +95,7 @@ export class AuthController {
     const { accessToken, isOtpAuthEnabled } = await this.authService.login(
       name
     );
-    res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('accessToken', accessToken, this.cookieOptions);
 
     if (isOtpAuthEnabled) {
       return { url: 'http://localhost:5173/otp' };
@@ -106,9 +106,9 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/logout')
-  @ApiOperation({ summary: 'access_tokenのcookieを削除(ログアウト)' })
+  @ApiOperation({ summary: 'accessTokenのcookieを削除(ログアウト)' })
   logout(@Res({ passthrough: true }) res: Response): { message: string } {
-    res.cookie('access_token', '', this.cookieOptions);
+    res.cookie('accessToken', '', this.cookieOptions);
 
     return { message: 'ok' };
   }
@@ -133,7 +133,7 @@ export class AuthController {
       true
     );
 
-    res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('accessToken', accessToken, this.cookieOptions);
 
     return { message: 'ok' };
   }
@@ -158,7 +158,7 @@ export class AuthController {
       false
     );
 
-    res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('accessToken', accessToken, this.cookieOptions);
 
     return { message: 'ok' };
   }
@@ -218,7 +218,7 @@ export class AuthController {
       true
     );
 
-    res.cookie('access_token', accessToken, this.cookieOptions);
+    res.cookie('accessToken', accessToken, this.cookieOptions);
 
     return { url: 'http://localhost:5173/app' };
   }

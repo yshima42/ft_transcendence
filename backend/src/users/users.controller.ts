@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseEnumPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -24,17 +23,13 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  Block,
-  FriendRequest,
-  FriendRequestStatus,
-  MatchResult,
-  User,
-} from '@prisma/client';
+import { Block, FriendRequest, MatchResult, User } from '@prisma/client';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { FileService } from 'src/file/file.service';
+import { FriendRelationEntity } from 'src/friend-requests/entities/friend-relation.entity';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
+import { FriendRelation } from 'src/friend-requests/interfaces/friend-relation.interface';
 import { GameStatsEntity } from 'src/game/entities/game-stats.entity';
 import { MatchResultEntity } from 'src/game/entities/match-result.entity';
 import { GameService } from 'src/game/game.service';
@@ -131,22 +126,6 @@ export class UsersController {
     @Param('filename') filename: string
   ): StreamableFile {
     const path = `./upload/${id}/${filename}`;
-
-    return this.fileService.streamFile(path);
-  }
-
-  @Get('avatar/:filename')
-  @ApiOperation({
-    summary: 'アバターの取得',
-  })
-  @ApiOkResponse({
-    description: 'picture in binary',
-  })
-  streamMyAvatar(
-    @GetUser() user: User,
-    @Param('filename') filename: string
-  ): StreamableFile {
-    const path = `./upload/${user.id}/${filename}`;
 
     return this.fileService.streamFile(path);
   }
@@ -250,6 +229,16 @@ export class UsersController {
     return await this.blocksService.findBlockedUsers(user.id);
   }
 
+  @Get('me/block-relations/:id')
+  @ApiOperation({ summary: '特定のユーザーをブロックしているかどうか判定' })
+  @ApiOkResponse({ type: Boolean })
+  async isUserBlocked(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) targetId: string
+  ): Promise<{ isUserBlocked: boolean }> {
+    return await this.blocksService.isUserBlocked(user.id, targetId);
+  }
+
   /******************************
    * フレンド関係
    ******************************/
@@ -277,12 +266,11 @@ export class UsersController {
 
   @Patch('me/friend-requests/incoming')
   @ApiOperation({
-    summary: 'フレンドリクエストの承認・拒否',
-    description:
-      'フレンドリクエストが自分に来ている相手に対してのみ使用可</br>承認する時はACCEPTED、拒否する時はDECLINEをstatusに設定する',
+    summary: 'フレンドリクエストの承認',
+    description: 'フレンドリクエストが自分に来ている相手に対してのみ使用可',
   })
   @ApiBody({
-    description: 'statusは承認(ACCEPTED)または拒否(DECLINE)',
+    description: '',
     schema: {
       type: 'object',
       properties: {
@@ -290,23 +278,34 @@ export class UsersController {
           type: 'UUID',
           example: '21514d8b-e6af-490c-bc51-d0c7a359a267',
         },
-        status: { type: 'FriendRequestStatus', example: 'ACCEPTED' },
       },
     },
   })
   @ApiOkResponse({ type: FriendRequestEntity })
-  async respondFriendRequest(
+  async acceptFriendRequest(
     @GetUser() user: User,
-    // TODO: ここDTO使ってないのなんで？
-    @Body('creatorId', ParseUUIDPipe) creatorId: string,
-    @Body('status', new ParseEnumPipe(FriendRequestStatus))
-    status: FriendRequestStatus
+    @Body('creatorId', ParseUUIDPipe) creatorId: string
   ): Promise<FriendRequest> {
     return await this.friendRequestService.update({
       creatorId,
       receiverId: user.id,
-      status,
+      status: 'ACCEPTED',
     });
+  }
+
+  @Delete('me/friend-requests/incoming/:id')
+  @ApiOperation({
+    summary: 'フレンド申請拒否',
+    description: 'フレンドリクエストが自分に来ている相手にのみ使用可</br>',
+  })
+  async reject(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) requestUserId: string
+  ): Promise<{ count: number }> {
+    return await this.friendRequestService.removePendingRequest(
+      user.id,
+      requestUserId
+    );
   }
 
   // numberがレスポンスとして返ってくるのは修正するべきでは
@@ -373,5 +372,17 @@ export class UsersController {
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findRequetableUsers(@GetUser() user: User): Promise<User[]> {
     return await this.friendRequestService.findRequestableUsers(user.id);
+  }
+
+  @Get('me/friend-relations/:id')
+  @ApiOperation({
+    summary: '自分から見た特定ユーザーとの関係取得',
+  })
+  @ApiOkResponse({ type: FriendRelationEntity })
+  async getFriendRelation(
+    @GetUser() user: User,
+    @Param('id', ParseUUIDPipe) otherId: string
+  ): Promise<{ friendRelation: FriendRelation }> {
+    return await this.friendRequestService.getFriendRelation(user.id, otherId);
   }
 }
