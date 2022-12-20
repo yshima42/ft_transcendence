@@ -48,11 +48,11 @@ export const useGame = (
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [gameResult, setGameResult] = useState(defaultGameResult);
   const [isLeftSide, setIsLeftSide] = useState(true);
-  const data = useContext(GameSocketContext);
-  if (data === undefined) {
+  const gameSocketContext = useContext(GameSocketContext);
+  if (gameSocketContext === undefined) {
     throw new Error('GameSocket undefined');
   }
-  const { socket, connected } = data;
+  const { socket, connected } = gameSocketContext;
   const navigate = useNavigate();
 
   const player1 = new Paddle(0, PADDLE_START_POS);
