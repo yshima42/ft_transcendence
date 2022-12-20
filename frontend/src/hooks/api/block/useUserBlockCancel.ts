@@ -1,11 +1,6 @@
 import { Block } from '@prisma/client';
-import {
-  QueryKey,
-  UseMutateAsyncFunction,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { axios } from 'lib/axios';
+import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { useDeleteApi } from '../generics/useDeleteApi';
 
 export interface UserBlockCancelResBody {
   block: Block;
@@ -14,35 +9,21 @@ export interface UserBlockCancelResBody {
 export type CancelUserBlock = UseMutateAsyncFunction<
   UserBlockCancelResBody,
   unknown,
-  string,
+  void,
   unknown
 >;
 
 export const useUserBlockCancel = (
-  queryKeys: QueryKey[]
+  targetId: string
 ): {
   cancelUserBlock: CancelUserBlock;
   isLoading: boolean;
 } => {
-  const queryClient = useQueryClient();
-
-  const axiosDelete = async (userId: string) => {
-    const result = await axios.delete<UserBlockCancelResBody>(
-      `/users/me/blocks/${userId}`
-    );
-
-    return result.data;
-  };
-
-  const { mutateAsync: cancelUserBlock, isLoading } = useMutation(axiosDelete, {
-    onSuccess: () => {
-      if (queryKeys !== undefined) {
-        queryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries({ queryKey });
-        });
-      }
-    },
-  });
+  const { deleteFunc: cancelUserBlock, isLoading } =
+    useDeleteApi<UserBlockCancelResBody>(`/users/me/blocks/${targetId}`, [
+      ['/users/me/blocks'],
+      [`/users/me/block-relations/${targetId}`],
+    ]);
 
   return { cancelUserBlock, isLoading };
 };
