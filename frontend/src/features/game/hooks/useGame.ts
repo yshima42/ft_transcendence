@@ -83,7 +83,7 @@ export const useGame = (
       // state は、useToastCheck に合わせる。
       navigate('/app', {
         state: {
-          toastProps: { description: 'Invalid Room.', status: 'error' },
+          toastProps: { description: 'Invalid game room.', status: 'error' },
         },
       });
     });
