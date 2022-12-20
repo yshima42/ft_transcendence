@@ -147,28 +147,33 @@ export class GameGateway {
     }
     await socket.join(message.roomId);
     console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
-    socket.emit('check_confirmation', isLeftSide);
+    socket.emit('set_side', isLeftSide);
+    socket.emit('check_confirmation');
   }
 
   @SubscribeMessage('confirm')
   confirm(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { roomId: string }
+    @MessageBody() message: { roomId: string; isLeftSide: boolean }
   ): void {
     Logger.debug(`${socket.data.userNickname as string} confirm`);
 
-    const gameRoom = this.gameRooms.get(message.roomId);
+    const { roomId, isLeftSide } = message;
+    const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
 
       return;
     }
 
-    if (!gameRoom.ready) {
+    const player = isLeftSide ? gameRoom.player1 : gameRoom.player2;
+    const opponent = isLeftSide ? gameRoom.player2 : gameRoom.player1;
+    player.isReady = true;
+    if (!opponent.isReady) {
       socket.emit('wait_opponent');
-      gameRoom.ready = true;
     } else {
-      this.server.in(message.roomId).emit('start_game');
+      gameRoom.isInGame = true;
+      this.server.in(roomId).emit('start_game');
     }
   }
 

@@ -86,9 +86,13 @@ export const useGame = (
       navigate('/app');
     });
 
-    socket.on('check_confirmation', (isLeftSide: boolean) => {
-      console.log('[Socket Event] check_confirmation');
+    socket.on('set_side', (isLeftSide: boolean) => {
+      console.log('[Socket Event] set_side');
       setIsLeftSide(isLeftSide);
+    });
+
+    socket.on('check_confirmation', () => {
+      console.log('[Socket Event] check_confirmation');
       setGamePhase(GamePhase.ConfirmWaiting);
     });
 
@@ -139,6 +143,7 @@ export const useGame = (
     return () => {
       socket.off('connect_established');
       socket.off('invalid_room');
+      socket.off('set_side');
       socket.off('check_confirmation');
       socket.off('wait_opponent');
       socket.off('start_game');
@@ -162,7 +167,7 @@ export const useGame = (
       }
       case GamePhase.Confirming: {
         console.log('[GamePhase] Confirming');
-        socket.emit('confirm', { roomId });
+        socket.emit('confirm', { roomId, isLeftSide });
         break;
       }
       case GamePhase.OpponentWaiting: {
