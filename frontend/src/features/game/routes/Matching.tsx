@@ -9,20 +9,17 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
-import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { MatchState, useGameMatching } from '../hooks/useGameMatching';
 
 export const Matching: FC = memo(() => {
-  const { matchState, setMatchState } = useGameMatching();
+  const { setMatchState } = useGameMatching();
 
   const onClickCancel = () => {
     setMatchState(MatchState.MatchingCancel);
   };
 
-  return matchState === MatchState.SocketConnecting ? (
-    <CenterSpinner h="40vh" />
-  ) : (
+  return (
     <ContentLayout title="">
       <Center>
         <Flex align="center" justify="center" height="40vh">

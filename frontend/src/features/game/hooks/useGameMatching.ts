@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
-import { WS_BASE_URL } from 'config';
-import { useSocket } from 'hooks/socket/useSocket';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GameSocketContext } from 'providers/GameSocketProvider';
 
 export enum MatchState {
-  SocketConnecting = 0,
   Matching = 1,
   MatchingCancel = 2,
   Matched = 3,
@@ -15,17 +13,15 @@ export const useGameMatching = (): {
   matchState: MatchState;
   setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
 } => {
-  const [matchState, setMatchState] = useState(MatchState.SocketConnecting);
-  const socket = useSocket(`${WS_BASE_URL}/game`);
+  const [matchState, setMatchState] = useState(MatchState.Matching);
+  const socket = useContext(GameSocketContext);
+  if (socket === undefined) {
+    throw new Error('GameSocket undefined');
+  }
   const navigate = useNavigate();
 
   // socket イベント
   useEffect(() => {
-    socket.on('connect_established', () => {
-      console.log('[Socket Event] connect_established');
-      setMatchState(MatchState.Matching);
-    });
-
     socket.on('go_game_room', (roomId: string) => {
       console.log('[Socket Event] go_game_room');
       setMatchState(MatchState.Matched);
@@ -36,7 +32,6 @@ export const useGameMatching = (): {
       if (matchState === MatchState.Matching) {
         socket.emit('matching_cancel');
       }
-      socket.off('connect_established');
       socket.off('go_game_room');
     };
   }, [socket, matchState, navigate]);
