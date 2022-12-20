@@ -45,7 +45,7 @@ export const useGame = (
   draw: (ctx: CanvasRenderingContext2D) => void;
   gameResult: GameResult;
 } => {
-  const [gamePhase, setGamePhase] = useState(GamePhase.Joining);
+  const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [gameResult, setGameResult] = useState(defaultGameResult);
   const [isLeftSide, setIsLeftSide] = useState(true);
   const data = useContext(GameSocketContext);
