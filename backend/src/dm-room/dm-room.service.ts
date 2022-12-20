@@ -8,10 +8,21 @@ export class DmRoomService {
 
   async findAll(userId: string): Promise<ResponseDmRoom[]> {
     const dmRooms = await this.prisma.dmRoom.findMany({
+      // ブロックしているユーザーは取得しない
       where: {
         dmRoomMembers: {
-          some: {
-            userId,
+          every: {
+            user: {
+              blocking: {
+                every: {
+                  targetId: {
+                    not: {
+                      equals: userId,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
