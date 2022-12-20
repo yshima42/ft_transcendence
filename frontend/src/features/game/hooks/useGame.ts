@@ -80,8 +80,12 @@ export const useGame = (
   useEffect(() => {
     socket.on('invalid_room', () => {
       console.log('[Socket Event] invalid_room');
-      // TODO: toast
-      navigate('/app');
+      // state は、useToastCheck に合わせる。
+      navigate('/app', {
+        state: {
+          toastProps: { description: 'Invalid Room.', status: 'error' },
+        },
+      });
     });
 
     socket.on('set_side', (isLeftSide: boolean) => {
@@ -185,6 +189,7 @@ export const useGame = (
       }
       case GamePhase.Result: {
         console.log('[GamePhase] Result');
+        socket.emit('delete_room', { roomId });
         break;
       }
     }
