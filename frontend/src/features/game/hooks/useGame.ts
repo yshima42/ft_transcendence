@@ -140,6 +140,7 @@ export const useGame = (
       socket.off('connect_established');
       socket.off('invalid_room');
       socket.off('check_confirmation');
+      socket.off('wait_opponent');
       socket.off('start_game');
       socket.off('done_game');
       socket.off('update_score');
