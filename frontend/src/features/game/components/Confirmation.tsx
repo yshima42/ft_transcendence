@@ -18,7 +18,7 @@ export const Confirmation: FC<Props> = memo((props) => {
         </Heading>
         <Divider />
         <Stack spacing={4} py={4} px={10} align="center">
-          <PrimaryButton onClick={() => setGamePhase(GamePhase.Waiting)}>
+          <PrimaryButton onClick={() => setGamePhase(GamePhase.Confirming)}>
             Yes
           </PrimaryButton>
         </Stack>

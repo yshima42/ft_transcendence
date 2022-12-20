@@ -26,10 +26,10 @@ export const useGameMatching = (): {
       setMatchState(MatchState.Matching);
     });
 
-    socket.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
+    socket.on('go_game_room', (roomId: string) => {
       console.log('[Socket Event] go_game_room');
       setMatchState(MatchState.Matched);
-      navigate(`/app/games/${roomId}`, { state: { isLeftSide } });
+      navigate(`/app/games/${roomId}`);
     });
 
     return () => {
