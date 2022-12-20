@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Box, Divider, Flex, Heading, Spinner, Stack } from '@chakra-ui/react';
 
-export const Waiting: FC = memo(() => {
+export const OpponentWaiting: FC = memo(() => {
   return (
     <Flex align="center" justify="center" height="40vh">
       <Box bg="white" w="sm" p={4} borderRadius="md" shadow="md">

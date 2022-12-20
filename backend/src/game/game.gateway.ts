@@ -120,24 +120,34 @@ export class GameGateway {
   // room関連;
   @SubscribeMessage('join_room')
   async joinRoom(
-    @MessageBody() message: { roomId: string; isLeftSide: boolean },
+    @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
     Logger.debug(`${socket.data.userNickname as string} join_room`);
 
+    const { userId } = socket.data as { userId: string };
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
-    } else {
-      if (message.isLeftSide) {
-        gameRoom.player1.socket = socket;
-      } else {
-        gameRoom.player2.socket = socket;
-      }
-      await socket.join(message.roomId);
-      console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
-      socket.emit('check_confirmation');
+
+      return;
     }
+
+    // if (gameRoom.player1.id !== userId && gameRoom.player2.id !== userId) {
+    //   socket.emit('watch_game');
+
+    //   return;
+    // }
+
+    const isLeftSide = gameRoom.player1.id === userId;
+    if (isLeftSide) {
+      gameRoom.player1.socket = socket;
+    } else {
+      gameRoom.player2.socket = socket;
+    }
+    await socket.join(message.roomId);
+    console.log(`joinRoom: ${socket.id} joined ${message.roomId}`);
+    socket.emit('check_confirmation', isLeftSide);
   }
 
   @SubscribeMessage('confirm')
@@ -148,10 +158,17 @@ export class GameGateway {
     Logger.debug(`${socket.data.userNickname as string} confirm`);
 
     const gameRoom = this.gameRooms.get(message.roomId);
-    if (gameRoom !== undefined) {
-      gameRoom.ready
-        ? this.server.in(message.roomId).emit('start_game')
-        : (gameRoom.ready = true);
+    if (gameRoom === undefined) {
+      socket.emit('invalid_room');
+
+      return;
+    }
+
+    if (!gameRoom.ready) {
+      socket.emit('wait_opponent');
+      gameRoom.ready = true;
+    } else {
+      this.server.in(message.roomId).emit('start_game');
     }
   }
 

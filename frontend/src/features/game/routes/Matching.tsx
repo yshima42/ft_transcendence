@@ -21,7 +21,7 @@ export const Matching: FC = memo(() => {
   };
 
   return matchState === MatchState.SocketConnecting ? (
-    <CenterSpinner isFullScreen />
+    <CenterSpinner h="40vh" />
   ) : (
     <ContentLayout title="">
       <Center>
