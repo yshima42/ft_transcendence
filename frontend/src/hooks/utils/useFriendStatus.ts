@@ -1,8 +1,12 @@
 import { useContext } from 'react';
-import { OnlineUsersContext } from 'providers/OnlineUsersProvider';
+import { SocketContext } from 'providers/SocketProvider';
 
 export const useFriendStatus = (friendId: string): { isOnline: boolean } => {
-  const onlineUsers = useContext(OnlineUsersContext);
+  const data = useContext(SocketContext);
+  if (data === undefined) {
+    throw new Error('GameSocket undefined');
+  }
+  const { onlineUsers } = data;
   const isOnline =
     onlineUsers.find((onlineUserId) => onlineUserId === friendId) !== undefined;
 

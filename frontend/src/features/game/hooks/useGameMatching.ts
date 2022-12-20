@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GameSocketContext } from 'providers/GameSocketProvider';
+import { SocketContext } from 'providers/SocketProvider';
 
 export enum MatchState {
   SocketConnecting = 0,
@@ -15,7 +15,7 @@ export const useGameMatching = (): {
   setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
 } => {
   const [matchState, setMatchState] = useState(MatchState.SocketConnecting);
-  const data = useContext(GameSocketContext);
+  const data = useContext(SocketContext);
   if (data === undefined) {
     throw new Error('GameSocket undefined');
   }
