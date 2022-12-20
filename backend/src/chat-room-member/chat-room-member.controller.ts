@@ -15,8 +15,8 @@ import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseChatRoomMember } from './chat-room-member.interface';
 import { ChatRoomMemberService } from './chat-room-member.service';
-import { CreateChatRoomMemberDto } from './dto/create-chat-room-user.dto';
-import { UpdateChatRoomMemberDto } from './dto/update-chat-room-user.dto';
+import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
+import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
 @Controller('chat/rooms/:chatRoomId/users')
 @Sw.ApiTags('chat-room-user')

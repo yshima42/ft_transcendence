@@ -10,8 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoomMember } from './chat-room-member.interface';
-import { CreateChatRoomMemberDto } from './dto/create-chat-room-user.dto';
-import { UpdateChatRoomMemberDto } from './dto/update-chat-room-user.dto';
+import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
+import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
 @Injectable()
 export class ChatRoomMemberService {
