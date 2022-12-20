@@ -9,13 +9,17 @@ import {
 import { WS_BASE_URL } from 'config';
 import { useProfile } from 'hooks/api';
 import { useSocket } from 'hooks/socket/useSocket';
+import { Socket } from 'socket.io-client';
 
-export const OnlineUsersContext = createContext<string[]>([]);
+export const SocketContext = createContext<
+  { onlineUsers: string[]; socket: Socket; connected: boolean } | undefined
+>(undefined);
 
-const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
+const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useProfile();
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
 
   useEffect(() => {
@@ -24,6 +28,7 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
       // https://www.sunapro.com/react18-strict-mode/#index_id5
       if (!didLogRef.current) {
         didLogRef.current = true;
+        setConnected(true);
         socket.emit('handshake', user.id, (users: string[]) => {
           setOnlineUsers(users);
         });
@@ -50,10 +55,10 @@ const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [socket, user]);
 
   return (
-    <OnlineUsersContext.Provider value={onlineUsers}>
+    <SocketContext.Provider value={{ onlineUsers, socket, connected }}>
       {children}
-    </OnlineUsersContext.Provider>
+    </SocketContext.Provider>
   );
 };
 
-export default OnlineUsersProvider;
+export default SocketProvider;
