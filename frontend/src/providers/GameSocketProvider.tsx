@@ -1,13 +1,23 @@
-import { createContext, FC, PropsWithChildren, useEffect, useRef } from 'react';
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
 import { Socket } from 'socket.io-client';
 
 // TODO: undefinedを定義しない方法を探す
-export const GameSocketContext = createContext<Socket | undefined>(undefined);
+export const GameSocketContext = createContext<
+  { socket: Socket; connected: boolean } | undefined
+>(undefined);
 
 const GameSocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(`${WS_BASE_URL}/game`);
+  const [connected, setConnected] = useState(false);
 
   const didLogRef = useRef(false);
 
@@ -17,6 +27,7 @@ const GameSocketProvider: FC<PropsWithChildren> = ({ children }) => {
       // https://www.sunapro.com/react18-strict-mode/#index_id5
       if (!didLogRef.current) {
         didLogRef.current = true;
+        setConnected(true);
       }
     });
 
@@ -40,7 +51,7 @@ const GameSocketProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [socket]);
 
   return (
-    <GameSocketContext.Provider value={socket}>
+    <GameSocketContext.Provider value={{ socket, connected }}>
       {children}
     </GameSocketContext.Provider>
   );

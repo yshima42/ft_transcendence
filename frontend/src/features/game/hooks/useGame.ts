@@ -13,6 +13,7 @@ import { Ball, Paddle } from '../utils/gameObjs';
 import { userInput } from '../utils/userInput';
 
 export enum GamePhase {
+  SocketConnecting = 0,
   Joining = 1,
   ConfirmWaiting = 2,
   Confirming = 3,
@@ -47,10 +48,11 @@ export const useGame = (
   const [gamePhase, setGamePhase] = useState(GamePhase.Joining);
   const [gameResult, setGameResult] = useState(defaultGameResult);
   const [isLeftSide, setIsLeftSide] = useState(true);
-  const socket = useContext(GameSocketContext);
-  if (socket === undefined) {
+  const data = useContext(GameSocketContext);
+  if (data === undefined) {
     throw new Error('GameSocket undefined');
   }
+  const { socket, connected } = data;
   const navigate = useNavigate();
 
   const player1 = new Paddle(0, PADDLE_START_POS);
@@ -151,6 +153,12 @@ export const useGame = (
   // 各ページのLogic
   useEffect(() => {
     switch (gamePhase) {
+      case GamePhase.SocketConnecting: {
+        if (connected) {
+          setGamePhase(GamePhase.Joining);
+        }
+        break;
+      }
       case GamePhase.Joining: {
         console.log('[GamePhase] Joining');
         socket.emit('join_room', { roomId });
@@ -180,7 +188,7 @@ export const useGame = (
         break;
       }
     }
-  }, [gamePhase, socket, isLeftSide, roomId]);
+  }, [gamePhase, socket, isLeftSide, roomId, connected]);
 
   return { gamePhase, setGamePhase, draw, gameResult };
 };
