@@ -3,7 +3,7 @@ import * as NestJS from '@nestjs/common';
 import { ChatRoom, ChatRoomMemberStatus, ChatRoomStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
-import { ChatRoomMemberService } from 'src/chat-room-user/chat-room-member.service';
+import { ChatRoomMemberService } from 'src/chat-room-member/chat-room-member.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
