@@ -29,7 +29,7 @@ export const userInput = (
       }
       if (justPressed) {
         if (socket != null) {
-          socket.emit('user_command', { roomId, userCommand });
+          socket.emit('user_command', { userCommand });
           justPressed = false;
         }
       }
@@ -47,7 +47,7 @@ export const userInput = (
       }
       if (justPressed) {
         if (socket != null) {
-          socket.emit('user_command', { roomId, userCommand });
+          socket.emit('user_command', { userCommand });
         }
       }
     },
