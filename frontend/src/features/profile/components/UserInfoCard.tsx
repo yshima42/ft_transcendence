@@ -8,8 +8,7 @@ import { GameButton } from 'components/atoms/button/GameButton';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
-import { ProfileModal } from './ProfileModal';
-// import { ProfileSetting } from './ProfileSetting';
+import { ModalProfileEdit } from './ModalProfileEdit';
 
 type UserInfoCardProps = {
   user: User;
@@ -46,9 +45,8 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
           {user.name}
         </Text>
         {isLoginUser ? (
-          <ProfileModal />
+          <ModalProfileEdit />
         ) : (
-          // <ProfileSetting />
           <>
             <HStack justify="center" align="center">
               <GameButton targetId={user.id} />
