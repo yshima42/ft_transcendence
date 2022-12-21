@@ -1,13 +1,13 @@
 import { memo, FC } from 'react';
-import { Flex, HStack, Text } from '@chakra-ui/react';
+import { Box, Flex, HStack, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { useBlockRelation } from 'hooks/api';
-import { useFriendRelation } from 'hooks/api/profile/useFriendRelation';
+import { useFriendRelation } from 'hooks/api/friend/useFriendRelation';
+import { DmButton } from 'components/atoms/button/DmButton';
+import { GameButton } from 'components/atoms/button/GameButton';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
-import { BlockButton } from './BlockButton';
-import { DmButton } from './DmButton';
+import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
-import { GameButton } from './GameButton';
 import { ProfileSetting } from './ProfileSetting';
 
 type UserInfoCardProps = {
@@ -49,16 +49,21 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
         ) : (
           <>
             <HStack justify="center" align="center">
-              <GameButton isGamePlaying={false} />
-              {!isUserBlocked && <DmButton />}
+              <GameButton targetId={user.id} />
+              {!isUserBlocked && <DmButton targetId={user.id} />}
             </HStack>
-            <HStack justify="center" align="center">
-              <FriendButton
-                targetId={user.id}
-                friendRelation={friendRelation}
-              />
-              <BlockButton targetId={user.id} isBlockedUser={isUserBlocked} />
-            </HStack>
+            <Box m={2}>
+              <HStack justify="center" align="center">
+                <FriendButton
+                  targetId={user.id}
+                  friendRelation={friendRelation}
+                />
+                <BlockRelationButton
+                  targetId={user.id}
+                  isBlockedUser={isUserBlocked}
+                />
+              </HStack>
+            </Box>
           </>
         )}
       </Flex>
