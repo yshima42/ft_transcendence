@@ -174,7 +174,7 @@ export const useGame = (
       }
       case GamePhase.Confirming: {
         console.log('[GamePhase] Confirming');
-        socket.emit('confirm', { roomId, isLeftSide });
+        socket.emit('confirm', { roomId });
         break;
       }
       case GamePhase.OpponentWaiting: {

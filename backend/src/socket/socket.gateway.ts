@@ -207,25 +207,27 @@ export class UsersGateway {
   @SubscribeMessage('confirm')
   confirm(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { roomId: string; isLeftSide: boolean }
+    @MessageBody() message: { roomId: string }
   ): void {
     Logger.debug(`${socket.id} ${socket.data.userNickname as string} confirm`);
 
-    const { roomId, isLeftSide } = message;
-    const gameRoom = this.gameRooms.get(roomId);
+    const { userId } = socket.data as { userId: string };
+    const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
 
       return;
     }
 
-    const player = isLeftSide ? gameRoom.player1 : gameRoom.player2;
-    const opponent = isLeftSide ? gameRoom.player2 : gameRoom.player1;
+    const [player, opponent] =
+      gameRoom.player1.id === userId
+        ? [gameRoom.player1, gameRoom.player2]
+        : [gameRoom.player2, gameRoom.player1];
     player.isReady = true;
     if (!opponent.isReady) {
-      socket.emit('wait_opponent');
+      this.server.to(player.id).emit('wait_opponent');
     } else {
-      this.server.in(roomId).emit('start_game');
+      this.server.in(message.roomId).emit('start_game');
     }
   }
 
