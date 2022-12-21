@@ -19,7 +19,7 @@ export const Users: FC = memo(() => {
             <Tab key={tab}>{tab}</Tab>
           ))}
         </TabList>
-        <Suspense fallback={<CenterSpinner />}>
+        <Suspense fallback={<CenterSpinner h="80vh" />}>
           <TabPanels>
             <TabPanel>
               <FriendsList />
