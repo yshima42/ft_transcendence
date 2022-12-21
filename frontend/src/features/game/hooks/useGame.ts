@@ -143,6 +143,7 @@ export const useGame = (
     });
 
     return () => {
+      socket.emit('leave_room');
       socket.off('invalid_room');
       socket.off('set_side');
       socket.off('check_confirmation');
@@ -174,7 +175,7 @@ export const useGame = (
       }
       case GamePhase.Confirming: {
         console.log('[GamePhase] Confirming');
-        socket.emit('confirm', { roomId });
+        socket.emit('confirm');
         break;
       }
       case GamePhase.OpponentWaiting: {
@@ -183,13 +184,12 @@ export const useGame = (
       }
       case GamePhase.InGame: {
         console.log('[GamePhase] InGame');
-        socket.emit('connect_pong', { roomId });
+        socket.emit('connect_pong');
         userInput(socket, roomId, isLeftSide);
         break;
       }
       case GamePhase.Result: {
         console.log('[GamePhase] Result');
-        socket.emit('delete_room', { roomId });
         break;
       }
     }

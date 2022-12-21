@@ -80,6 +80,7 @@ export class GameRoom {
   paddle2: Paddle;
   interval: NodeJS.Timer;
   isInGame: boolean;
+  isFinished: boolean;
 
   constructor(
     gameService: GameService,
@@ -100,6 +101,7 @@ export class GameRoom {
       // イニシャライズのための空変数
     });
     this.isInGame = false;
+    this.isFinished = false;
   }
 
   setBallCenter(): void {
@@ -167,6 +169,7 @@ export class GameRoom {
   }
 
   async doneGame(roomId: string): Promise<void> {
+    this.isFinished = true;
     // setIntervalを止める処理
     clearInterval(this.interval);
 
@@ -235,9 +238,5 @@ export class GameRoom {
         this.paddle2.y = 0;
       }
     }
-  }
-
-  disconnectAll(): void {
-    this.server.socketsLeave(this.id);
   }
 }
