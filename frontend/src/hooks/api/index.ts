@@ -10,7 +10,7 @@ export * from './auth/useOtpQrcodeUrl';
 export * from './block/useBlockRelation';
 export * from './block/useBlockUsers';
 export * from './block/useUserBlock';
-export * from './block/useUserBlockCancel';
+export * from './block/useUserUnblock';
 
 // friend
 export * from './friend/useFriendRelation';

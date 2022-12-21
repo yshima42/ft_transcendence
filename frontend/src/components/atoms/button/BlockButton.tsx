@@ -22,7 +22,7 @@ export const BlockButton: FC<Props> = memo((props) => {
       isDisabled={isLoading}
       onClick={onClickUnblock}
     >
-      Unblock
+      Block
     </Button>
   );
 });
