@@ -53,20 +53,13 @@ class Paddle {
 }
 
 export class Player {
-  socket: Socket;
   id: string;
   nickname: string;
   isLeftSide: boolean;
   isReady: boolean;
   score: number;
 
-  constructor(
-    socket: Socket,
-    id: string,
-    nickname: string,
-    isLeftSide: boolean
-  ) {
-    this.socket = socket;
+  constructor(id: string, nickname: string, isLeftSide: boolean) {
     this.id = id;
     this.nickname = nickname;
     this.isLeftSide = isLeftSide;
@@ -87,6 +80,7 @@ export class GameRoom {
   paddle2: Paddle;
   interval: NodeJS.Timer;
   isInGame: boolean;
+  isFinished: boolean;
 
   constructor(
     gameService: GameService,
@@ -107,6 +101,7 @@ export class GameRoom {
       // イニシャライズのための空変数
     });
     this.isInGame = false;
+    this.isFinished = false;
   }
 
   setBallCenter(): void {
@@ -174,6 +169,7 @@ export class GameRoom {
   }
 
   async doneGame(roomId: string): Promise<void> {
+    this.isFinished = true;
     // setIntervalを止める処理
     clearInterval(this.interval);
 
@@ -242,12 +238,5 @@ export class GameRoom {
         this.paddle2.y = 0;
       }
     }
-  }
-
-  async disconnectAll(): Promise<void> {
-    await Promise.all([
-      this.player2.socket.leave(this.id),
-      this.player1.socket.leave(this.id),
-    ]);
   }
 }
