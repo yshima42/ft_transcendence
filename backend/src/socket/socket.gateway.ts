@@ -261,12 +261,12 @@ export class UsersGateway {
     message: {
       roomId: string;
       userCommand: { up: boolean; down: boolean; isLeftSide: boolean };
-    }
-    // @ConnectedSocket() socket: Socket
+    },
+    @ConnectedSocket() socket: Socket
   ): void {
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
-      // socket.emit('invalid_room');
+      socket.emit('invalid_room');
 
       return;
     }
