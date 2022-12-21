@@ -1,5 +1,4 @@
 import { useGetApi } from '../generics/useGetApi';
-import { useFriends } from './useFriends';
 
 export type FriendRelation = 'NONE' | 'ACCEPTED' | 'PENDING' | 'RECOGNITION';
 
@@ -16,8 +15,7 @@ export const useFriendRelation = (
 };
 
 export const useIsFriend = (userId: string): { isFriend: boolean } => {
-  const { users: friends } = useFriends();
-  const isFriend = friends.find((friend) => friend.id === userId) !== undefined;
+  const { friendRelation } = useFriendRelation(userId);
 
-  return { isFriend };
+  return { isFriend: friendRelation === 'ACCEPTED' };
 };
