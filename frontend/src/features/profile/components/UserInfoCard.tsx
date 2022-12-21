@@ -2,7 +2,7 @@ import { memo, FC } from 'react';
 import { Box, Flex, HStack, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { useBlockRelation } from 'hooks/api';
-import { useFriendRelation } from 'hooks/api/profile/useFriendRelation';
+import { useFriendRelation } from 'hooks/api/friend/useFriendRelation';
 import { DmButton } from 'components/atoms/button/DmButton';
 import { GameButton } from 'components/atoms/button/GameButton';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';

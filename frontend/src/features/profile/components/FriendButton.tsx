@@ -1,6 +1,6 @@
 import { memo, FC } from 'react';
 import { Box, Flex, HStack } from '@chakra-ui/react';
-import { FriendRelation } from 'hooks/api/profile/useFriendRelation';
+import { FriendRelation } from 'hooks/api/friend/useFriendRelation';
 import { AcceptButton } from 'components/atoms/button/AcceptButton';
 import { CancelButton } from 'components/atoms/button/CancelButton';
 import { RejectButton } from 'components/atoms/button/RejectButton';

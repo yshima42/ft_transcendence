@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Grid } from '@chakra-ui/react';
-import { useRequestableUsers } from 'hooks/api/relations/useRequestableUsers';
+import { useRequestableUsers } from 'hooks/api/friend/useRequestableUsers';
 import { RequestButton } from 'components/atoms/button/RequestButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
