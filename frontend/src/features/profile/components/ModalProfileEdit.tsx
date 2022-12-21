@@ -25,13 +25,11 @@ import {
   useProfile,
   useProfileEdit,
 } from 'hooks/api';
-import { useNavigate } from 'react-router-dom';
 
 export const ModalProfileEdit: FC = memo(() => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { user } = useProfile();
-  const navigate = useNavigate();
   const { editProfile, isLoading: isLoading1 } = useProfileEdit();
   const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
   const [profileFormData, setProfileFormData] = useState<ProfileFormData>();
@@ -45,7 +43,6 @@ export const ModalProfileEdit: FC = memo(() => {
     if (avatarFormData !== undefined) {
       await uploadAvatar(avatarFormData);
     }
-    navigate('/app/profile');
   };
 
   const onProfileChange = (event: ChangeEvent<HTMLInputElement>) => {
