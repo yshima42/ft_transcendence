@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Spinner } from '@chakra-ui/react';
 import { useFriendRequestAccept } from 'hooks/api';
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 
 export const AcceptButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
-  const { acceptFriendRequest } = useFriendRequestAccept(targetId);
+  const { acceptFriendRequest, isLoading } = useFriendRequestAccept(targetId);
 
   const onClickAccept = async () => {
     await acceptFriendRequest({ creatorId: targetId });
@@ -17,7 +17,7 @@ export const AcceptButton: FC<Props> = memo((props) => {
 
   return (
     <Button size={size} onClick={onClickAccept}>
-      Accept
+      {isLoading ? <Spinner /> : 'Accept'}
     </Button>
   );
 });

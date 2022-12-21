@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, Spinner } from '@chakra-ui/react';
 import { useFriendRequest } from 'hooks/api';
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 
 export const RequestButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
-  const { requestFriend } = useFriendRequest(targetId);
+  const { requestFriend, isLoading } = useFriendRequest(targetId);
 
   const onClickRequest = async () => {
     await requestFriend({ receiverId: targetId });
@@ -17,7 +17,7 @@ export const RequestButton: FC<Props> = memo((props) => {
 
   return (
     <Button size={size} onClick={onClickRequest}>
-      Request
+      {isLoading ? <Spinner /> : 'Request'}
     </Button>
   );
 });
