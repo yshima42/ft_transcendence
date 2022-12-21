@@ -1,5 +1,6 @@
-import { memo, FC } from 'react';
+import { memo, FC, Suspense } from 'react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { BlockedList } from 'features/friends/components/organisms/BlockedList';
 import { FriendsList } from 'features/friends/components/organisms/FriendsList';
@@ -18,23 +19,25 @@ export const Users: FC = memo(() => {
             <Tab key={tab}>{tab}</Tab>
           ))}
         </TabList>
-        <TabPanels>
-          <TabPanel>
-            <FriendsList />
-          </TabPanel>
-          <TabPanel>
-            <PendingList />
-          </TabPanel>
-          <TabPanel>
-            <RecognitionList />
-          </TabPanel>
-          <TabPanel>
-            <BlockedList />
-          </TabPanel>
-          <TabPanel>
-            <RequestableUsersList />
-          </TabPanel>
-        </TabPanels>
+        <Suspense fallback={<CenterSpinner />}>
+          <TabPanels>
+            <TabPanel>
+              <FriendsList />
+            </TabPanel>
+            <TabPanel>
+              <PendingList />
+            </TabPanel>
+            <TabPanel>
+              <RecognitionList />
+            </TabPanel>
+            <TabPanel>
+              <BlockedList />
+            </TabPanel>
+            <TabPanel>
+              <RequestableUsersList />
+            </TabPanel>
+          </TabPanels>
+        </Suspense>
       </Tabs>
     </ContentLayout>
   );
