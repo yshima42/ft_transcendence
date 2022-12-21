@@ -16,12 +16,7 @@ export const CancelButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button
-      size={size}
-      isLoading={isLoading}
-      isDisabled={isLoading}
-      onClick={onClickCancel}
-    >
+    <Button size={size} isDisabled={isLoading} onClick={onClickCancel}>
       Cancel
     </Button>
   );

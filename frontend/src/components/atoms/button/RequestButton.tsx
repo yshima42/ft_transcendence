@@ -16,12 +16,7 @@ export const RequestButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button
-      size={size}
-      isLoading={isLoading}
-      isDisabled={isLoading}
-      onClick={onClickRequest}
-    >
+    <Button size={size} isDisabled={isLoading} onClick={onClickRequest}>
       Request
     </Button>
   );

@@ -16,12 +16,7 @@ export const UnblockButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button
-      size={size}
-      isLoading={isLoading}
-      isDisabled={isLoading}
-      onClick={onClickUnblock}
-    >
+    <Button size={size} isDisabled={isLoading} onClick={onClickUnblock}>
       Unblock
     </Button>
   );
