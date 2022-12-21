@@ -14,7 +14,7 @@ export const GameButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button size={size} onClick={onClickGame}>
+    <Button mr={2} size={size} onClick={onClickGame}>
       Game
     </Button>
   );
