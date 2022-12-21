@@ -69,7 +69,7 @@ export class UsersGateway {
 
     // disconnect されたら、room からも自動で消えるため、一旦コメントアウト
     // await socket.leave(userId);
-    // await socket.leave(`matching`);
+    // await socket.leave('matching');
     await this.leaveGameRoom(socket);
 
     // debug用
@@ -129,12 +129,12 @@ export class UsersGateway {
     const { userId: waitUserId, userNickname: waitUserNickname } =
       matchingSockets[0].data as { userId: string; userNickname: string };
     if (waitUserId === userId) {
-      await socket.join(`matching`);
+      await socket.join('matching');
 
       return;
     }
 
-    this.server.socketsLeave(`matching`);
+    this.server.socketsLeave('matching');
     const player1 = new Player(waitUserId, waitUserNickname, true);
     const player2 = new Player(userId, userNickname, false);
     // 2人揃ったらマッチルーム作る
@@ -163,7 +163,7 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userNickname as string} matching_cancel`
     );
 
-    await socket.leave(`matching`);
+    await socket.leave('matching');
   }
 
   // room関連;
