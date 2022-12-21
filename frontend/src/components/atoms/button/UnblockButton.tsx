@@ -1,6 +1,6 @@
 import { memo, FC } from 'react';
 import { Button } from '@chakra-ui/react';
-import { useUserBlockCancel } from 'hooks/api';
+import { useUserUnblock } from 'hooks/api';
 
 type Props = {
   targetId: string;
@@ -9,10 +9,10 @@ type Props = {
 
 export const UnblockButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
-  const { cancelUserBlock, isLoading } = useUserBlockCancel(targetId);
+  const { unblockUser, isLoading } = useUserUnblock(targetId);
 
   const onClickUnblock = async () => {
-    await cancelUserBlock();
+    await unblockUser();
   };
 
   return (
