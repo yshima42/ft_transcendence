@@ -1,6 +1,6 @@
 import { memo, FC } from 'react';
 import { Button } from '@chakra-ui/react';
-import { useFriendRequestReject } from 'hooks/api/relations/useFriendRequestReject';
+import { useFriendRequestReject } from 'hooks/api/friend/useFriendRequestReject';
 
 type Props = {
   targetId: string;
