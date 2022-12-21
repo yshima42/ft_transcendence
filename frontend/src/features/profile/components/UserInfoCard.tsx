@@ -8,7 +8,8 @@ import { BlockButton } from './BlockButton';
 import { DmButton } from './DmButton';
 import { FriendButton } from './FriendButton';
 import { GameButton } from './GameButton';
-import { ProfileSetting } from './ProfileSetting';
+import { ProfileModal } from './ProfileModal';
+// import { ProfileSetting } from './ProfileSetting';
 
 type UserInfoCardProps = {
   user: User;
@@ -45,8 +46,9 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
           {user.name}
         </Text>
         {isLoginUser ? (
-          <ProfileSetting />
+          <ProfileModal />
         ) : (
+          // <ProfileSetting />
           <>
             <HStack justify="center" align="center">
               <GameButton isGamePlaying={false} />
