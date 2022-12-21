@@ -46,7 +46,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
     socket.on('user_disconnected', (user: [string, boolean]) => {
       console.info('User disconnected message received');
       setOnlineUsers((prev) =>
-        prev.filter((onlineUserId) => onlineUserId !== user)
+        prev.filter((onlineUser) => onlineUser !== user)
       );
     });
 
