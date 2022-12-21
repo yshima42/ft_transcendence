@@ -6,7 +6,7 @@ import { useFriendRelation } from 'hooks/api/profile/useFriendRelation';
 import { DmButton } from 'components/atoms/button/DmButton';
 import { GameButton } from 'components/atoms/button/GameButton';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
-import { BlockButton } from './BlockButton';
+import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
 import { ProfileSetting } from './ProfileSetting';
 
@@ -58,7 +58,10 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
                   targetId={user.id}
                   friendRelation={friendRelation}
                 />
-                <BlockButton targetId={user.id} isBlockedUser={isUserBlocked} />
+                <BlockRelationButton
+                  targetId={user.id}
+                  isBlockedUser={isUserBlocked}
+                />
               </HStack>
             </Box>
           </>
