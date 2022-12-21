@@ -45,13 +45,13 @@ const App = () => {
   return (
     // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
     <ErrorBoundary
-      fallback={<CenterSpinner isFullScreen={true} color="red.500" />}
+      fallback={<CenterSpinner h={'100vh'} color="red.500" />}
       onError={onError}
     >
-      <Suspense fallback={<CenterSpinner isFullScreen={true} />}>
+      <Suspense fallback={<CenterSpinner h={'100vh'} />}>
         <OnlineUsersProvider>
           <MainLayout>
-            <Suspense fallback={<CenterSpinner isFullScreen={true} />}>
+            <Suspense fallback={<CenterSpinner h={'100vh'} />}>
               <Outlet />
             </Suspense>
           </MainLayout>
