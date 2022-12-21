@@ -18,7 +18,8 @@ import { v4 as uuidv4 } from 'uuid';
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
   public socketIdToUserId: Map<string, string>;
-  public userIds: Set<string>;
+  // public userIds: Set<string>;
+  public onlineUsers: Map<string, boolean>;
   private readonly gameRooms: Map<string, GameRoom>;
 
   constructor(
@@ -28,7 +29,8 @@ export class UsersGateway {
     private readonly prisma: PrismaService
   ) {
     this.socketIdToUserId = new Map<string, string>();
-    this.userIds = new Set<string>();
+    // this.userIds = new Set<string>();
+    this.onlineUsers = new Map<string, boolean>();
     this.gameRooms = new Map<string, GameRoom>();
   }
 
@@ -63,8 +65,12 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
     this.socketIdToUserId.delete(socket.id);
     if (this.countConnectionByUserId(userId) === 0) {
-      this.userIds.delete(userId);
-      socket.broadcast.emit('user_disconnected', userId);
+      // this.userIds.delete(userId);
+      this.onlineUsers.delete(userId);
+      socket.broadcast.emit('user_disconnected', [
+        userId,
+        this.onlineUsers.get(userId),
+      ]);
     }
 
     // disconnect されたら、room からも自動で消えるため、一旦コメントアウト
@@ -75,25 +81,31 @@ export class UsersGateway {
     // debug用
     Logger.debug('disconnected: ' + socket.id);
     console.table(this.socketIdToUserId);
-    console.table(this.userIds);
+    // console.table(this.userIds);
   }
 
   @SubscribeMessage('handshake')
-  handshake(@ConnectedSocket() socket: Socket): string[] {
+  handshake(@ConnectedSocket() socket: Socket): Array<[string, boolean]> {
     const { userId } = socket.data as { userId: string };
-    const reconnected = this.userIds.has(userId);
+    // const reconnected = this.userIds.has(userId);
+    const reconnected = this.onlineUsers.has(userId);
     if (!reconnected) {
-      socket.broadcast.emit('user_connected', userId);
+      socket.broadcast.emit('user_connected', [
+        userId,
+        this.onlineUsers.get(userId),
+      ]);
     }
     this.socketIdToUserId.set(socket.id, userId);
-    this.userIds.add(userId);
+    // this.userIds.add(userId);
+    this.onlineUsers.set(userId, false);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
     console.table(this.socketIdToUserId);
-    console.table(this.userIds);
+    // console.table(this.userIds);
 
-    return [...this.userIds];
+    // return [...this.userIds];
+    return [...this.onlineUsers];
   }
 
   private readonly countConnectionByUserId = (targetUserId: string): number => {
