@@ -53,20 +53,13 @@ class Paddle {
 }
 
 export class Player {
-  socket: Socket;
   id: string;
   nickname: string;
   isLeftSide: boolean;
   isReady: boolean;
   score: number;
 
-  constructor(
-    socket: Socket,
-    id: string,
-    nickname: string,
-    isLeftSide: boolean
-  ) {
-    this.socket = socket;
+  constructor(id: string, nickname: string, isLeftSide: boolean) {
     this.id = id;
     this.nickname = nickname;
     this.isLeftSide = isLeftSide;
@@ -244,10 +237,7 @@ export class GameRoom {
     }
   }
 
-  async disconnectAll(): Promise<void> {
-    await Promise.all([
-      this.player2.socket.leave(this.id),
-      this.player1.socket.leave(this.id),
-    ]);
+  disconnectAll(): void {
+    this.server.socketsLeave(this.id);
   }
 }
