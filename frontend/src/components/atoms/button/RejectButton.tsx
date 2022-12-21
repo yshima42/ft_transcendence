@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { Button, Spinner } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
 import { useFriendRequestReject } from 'hooks/api/relations/useFriendRequestReject';
 
 type Props = {
@@ -16,8 +16,13 @@ export const RejectButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button size={size} onClick={onClickReject}>
-      {isLoading ? <Spinner /> : 'Reject'}
+    <Button
+      size={size}
+      isLoading={isLoading}
+      isDisabled={isLoading}
+      onClick={onClickReject}
+    >
+      Reject
     </Button>
   );
 });
