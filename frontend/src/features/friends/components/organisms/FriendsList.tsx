@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Grid, VStack } from '@chakra-ui/react';
+import { Grid } from '@chakra-ui/react';
 import { useFriends } from 'hooks/api';
 import { DmButton } from 'components/atoms/button/DmButton';
 import { GameButton } from 'components/atoms/button/GameButton';
@@ -28,10 +28,10 @@ export const FriendsList: FC = () => {
           winRate={50}
           totalNumOfGames={100}
           buttons={
-            <VStack justify="center" align="center">
+            <>
               <GameButton targetId={user.id} />
               <DmButton targetId={user.id} />
-            </VStack>
+            </>
           }
         />
       ))}

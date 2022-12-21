@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Grid, VStack } from '@chakra-ui/react';
+import { Grid } from '@chakra-ui/react';
 import { useIncomingUsers } from 'hooks/api';
 import { AcceptButton } from 'components/atoms/button/AcceptButton';
 import { RejectButton } from 'components/atoms/button/RejectButton';
@@ -28,10 +28,10 @@ export const RecognitionList: FC = () => {
           winRate={50}
           totalNumOfGames={100}
           buttons={
-            <VStack justify="center" align="center">
+            <>
               <AcceptButton targetId={user.id} />
               <RejectButton targetId={user.id} />
-            </VStack>
+            </>
           }
         />
       ))}
