@@ -20,7 +20,6 @@ export class UsersGateway {
   public socketIdToUserId: Map<string, string>;
   public userIds: Set<string>;
   private readonly gameRooms: Map<string, GameRoom>;
-  private readonly matchWaitingPlayers: Player[] = [];
 
   constructor(
     private readonly gameService: GameService,
@@ -54,17 +53,24 @@ export class UsersGateway {
     socket.data.userId = user.id;
     socket.data.userNickname = user.nickname;
 
+    await socket.join(user.id);
+
     socket.emit('connect_established');
     Logger.debug('connected: ' + socket.id);
   }
 
-  handleDisconnect(@ConnectedSocket() socket: Socket): void {
+  async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
     const { userId } = socket.data as { userId: string };
     this.socketIdToUserId.delete(socket.id);
     if (this.countConnectionByUserId(userId) === 0) {
       this.userIds.delete(userId);
       socket.broadcast.emit('user_disconnected', userId);
     }
+
+    // disconnect されたら、room からも自動で消えるため、一旦コメントアウト
+    // await socket.leave(userId);
+    // await socket.leave('matching');
+    await this.leaveGameRoom(socket);
 
     // debug用
     Logger.debug('disconnected: ' + socket.id);
@@ -104,39 +110,37 @@ export class UsersGateway {
 
   // Game関連
   @SubscribeMessage('random_match')
-  randomMatch(@ConnectedSocket() socket: Socket): void {
+  async randomMatch(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
       `${socket.id} ${socket.data.userNickname as string} random_match`
     );
 
+    // 1人目の場合2人目ユーザーを待つ
     const { userId, userNickname } = socket.data as {
       userId: string;
       userNickname: string;
     };
-    // 1人目の場合2人目ユーザーを待つ
-    if (this.matchWaitingPlayers.length === 0) {
-      const newPlayer = new Player(socket, userId, userNickname, true);
-      this.matchWaitingPlayers.push(newPlayer);
-    } else {
-      if (this.matchWaitingPlayers[0].id === userId) {
-        return;
-      }
-      const player1 = this.matchWaitingPlayers[0];
-      // どちらでもやること同じだけどpop()を採用した
-      // this.matchWaitingPlayers.splice(0, 1);
-      this.matchWaitingPlayers.pop();
+    const matchingSockets = await this.server.in('matching').fetchSockets();
+    if (matchingSockets.length === 0) {
+      await socket.join('matching');
 
-      const player2 = new Player(socket, userId, userNickname, false);
-      // 2人揃ったらマッチルーム作る
-      const roomId = this.createGameRoom(player1, player2);
-
-      this.server
-        .to(player1.socket.id)
-        .emit('go_game_room', roomId, player1.isLeftSide);
-      this.server
-        .to(player2.socket.id)
-        .emit('go_game_room', roomId, player2.isLeftSide);
+      return;
     }
+    const { userId: waitUserId, userNickname: waitUserNickname } =
+      matchingSockets[0].data as { userId: string; userNickname: string };
+    if (waitUserId === userId) {
+      await socket.join('matching');
+
+      return;
+    }
+
+    this.server.socketsLeave('matching');
+    const player1 = new Player(waitUserId, waitUserNickname, true);
+    const player2 = new Player(userId, userNickname, false);
+    // 2人揃ったらマッチルーム作る
+    const newRoomId = this.createGameRoom(player1, player2);
+    this.server.to(player1.id).emit('go_game_room', newRoomId);
+    this.server.to(player2.id).emit('go_game_room', newRoomId);
   }
 
   createGameRoom(player1: Player, player2: Player): string {
@@ -154,18 +158,12 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('matching_cancel')
-  cancelMatching(@ConnectedSocket() socket: Socket): void {
+  async cancelMatching(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
       `${socket.id} ${socket.data.userNickname as string} matching_cancel`
     );
 
-    const { userId } = socket.data as { userId: string };
-    const foundIndex = this.matchWaitingPlayers.findIndex(
-      (player) => player.id === userId
-    );
-    if (foundIndex !== undefined) {
-      this.matchWaitingPlayers.splice(foundIndex, 1);
-    }
+    await socket.leave('matching');
   }
 
   // room関連;
@@ -185,6 +183,7 @@ export class UsersGateway {
 
       return;
     }
+    socket.data.roomId = message.roomId;
 
     // if (gameRoom.player1.id !== userId && gameRoom.player2.id !== userId) {
     //   socket.emit('watch_game');
@@ -197,25 +196,31 @@ export class UsersGateway {
         ? [gameRoom.player1, gameRoom.player2]
         : [gameRoom.player2, gameRoom.player1];
     socket.emit('set_side', player.isLeftSide);
-    player.socket = socket;
     await socket.join(message.roomId);
     if (!player.isReady) {
       socket.emit('check_confirmation');
     } else if (!opponent.isReady) {
       socket.emit('wait_opponent');
-    } else {
+    } else if (!gameRoom.isFinished) {
       socket.emit('start_game');
+    } else {
+      socket.emit('done_game', {
+        player1Nickname: gameRoom.player1.nickname,
+        player2Nickname: gameRoom.player2.nickname,
+        player1Score: gameRoom.player1.score,
+        player2Score: gameRoom.player2.score,
+      });
     }
   }
 
   @SubscribeMessage('confirm')
-  confirm(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { roomId: string; isLeftSide: boolean }
-  ): void {
+  confirm(@ConnectedSocket() socket: Socket): void {
     Logger.debug(`${socket.id} ${socket.data.userNickname as string} confirm`);
 
-    const { roomId, isLeftSide } = message;
+    const { userId, roomId } = socket.data as {
+      userId: string;
+      roomId: string;
+    };
     const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
@@ -223,26 +228,26 @@ export class UsersGateway {
       return;
     }
 
-    const player = isLeftSide ? gameRoom.player1 : gameRoom.player2;
-    const opponent = isLeftSide ? gameRoom.player2 : gameRoom.player1;
+    const [player, opponent] =
+      gameRoom.player1.id === userId
+        ? [gameRoom.player1, gameRoom.player2]
+        : [gameRoom.player2, gameRoom.player1];
     player.isReady = true;
     if (!opponent.isReady) {
-      socket.emit('wait_opponent');
+      this.server.to(player.id).emit('wait_opponent');
     } else {
       this.server.in(roomId).emit('start_game');
     }
   }
 
   @SubscribeMessage('connect_pong')
-  connectPong(
-    @MessageBody() message: { roomId: string },
-    @ConnectedSocket() socket: Socket
-  ): void {
+  connectPong(@ConnectedSocket() socket: Socket): void {
     Logger.debug(
       `${socket.id} ${socket.data.userNickname as string} connect_pong`
     );
 
-    const gameRoom = this.gameRooms.get(message.roomId);
+    const { roomId } = socket.data as { roomId: string };
+    const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
 
@@ -253,7 +258,7 @@ export class UsersGateway {
     if (!gameRoom.isInGame) {
       gameRoom.isInGame = true;
       // ゲーム開始
-      gameRoom.gameStart(socket, message.roomId);
+      gameRoom.gameStart(socket, roomId);
     }
 
     // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
@@ -263,34 +268,47 @@ export class UsersGateway {
   handleUserCommands(
     @MessageBody()
     message: {
-      roomId: string;
       userCommand: { up: boolean; down: boolean; isLeftSide: boolean };
     },
     @ConnectedSocket() socket: Socket
   ): void {
-    const gameRoom = this.gameRooms.get(message.roomId);
+    const { roomId } = socket.data as { roomId: string };
+    const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
 
       return;
     }
-    gameRoom.handleInput(message.roomId, message.userCommand);
+    gameRoom.handleInput(roomId, message.userCommand);
   }
 
-  @SubscribeMessage('delete_room')
-  async deleteGameRoom(
-    @MessageBody() message: { roomId: string },
-    @ConnectedSocket() socket: Socket
-  ): Promise<void> {
+  @SubscribeMessage('leave_room')
+  async handleLeaveGameRoom(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} delete_room`
+      `${socket.id} ${socket.data.userNickname as string} leave_room`
     );
 
-    const gameRoom = this.gameRooms.get(message.roomId);
+    await this.leaveGameRoom(socket);
+  }
+
+  async leaveGameRoom(socket: Socket): Promise<void> {
+    const { roomId } = socket.data as { roomId: string | undefined };
+    if (roomId === undefined) {
+      return;
+    }
+    socket.data.roomId = undefined;
+    const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
       return;
     }
-    await gameRoom.disconnectAll();
-    this.gameRooms.delete(message.roomId);
+    await socket.leave(roomId);
+    const gameRoomSockets = await this.server.in(roomId).fetchSockets();
+    if (gameRoomSockets.length === 0) {
+      // 観戦用
+      // if (!gameRoom.isFinished) {
+      //   this.server.in(roomId).emit('both_players_disconnected');
+      // }
+      this.gameRooms.delete(roomId);
+    }
   }
 }
