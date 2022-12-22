@@ -32,7 +32,9 @@ export const useProfileEdit = (): {
     isLoading,
     isError,
     failureReason,
-  } = usePostApi<ProfileFormData, ProfileEditResBody>(`/users/me/profile`);
+  } = usePostApi<ProfileFormData, ProfileEditResBody>(`/users/me/profile`, [
+    [`/users/me/profile`],
+  ]);
 
   const toast = useToast();
   useEffect(() => {
