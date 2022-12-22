@@ -33,7 +33,8 @@ export const useProfileEdit = (): {
     isError,
     failureReason,
   } = usePostApi<ProfileFormData, ProfileEditResBody>(`/users/me/profile`, [
-    [`/users/me/profile`],
+    ['/users/me/profile'],
+    ['/game/matches'],
   ]);
 
   const toast = useToast();
