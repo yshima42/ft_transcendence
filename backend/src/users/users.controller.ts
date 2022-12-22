@@ -26,6 +26,7 @@ import {
 import { Block, FriendRequest, MatchResult, User } from '@prisma/client';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { BlocksService } from 'src/blocks/blocks.service';
+import { BlockRelationEntity } from 'src/blocks/entities/block-relation.entity';
 import { FileService } from 'src/file/file.service';
 import { FriendRelationEntity } from 'src/friend-requests/entities/friend-relation.entity';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
@@ -231,7 +232,7 @@ export class UsersController {
 
   @Get('me/block-relations/:id')
   @ApiOperation({ summary: '特定のユーザーをブロックしているかどうか判定' })
-  @ApiOkResponse({ type: Boolean })
+  @ApiOkResponse({ type: BlockRelationEntity })
   async isUserBlocked(
     @GetUser() user: User,
     @Param('id', ParseUUIDPipe) targetId: string
