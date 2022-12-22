@@ -10,13 +10,26 @@ import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
 import { Socket } from 'socket.io-client';
 
+export enum Presence {
+  OFFLINE = 0,
+  ONLINE = 1,
+  INGAME = 2,
+}
+
 export const SocketContext = createContext<
-  { onlineUsers: string[]; socket: Socket; connected: boolean } | undefined
+  | {
+      userIdToPresence: Array<[string, Presence]>;
+      socket: Socket;
+      connected: boolean;
+    }
+  | undefined
 >(undefined);
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [userIdToPresence, setUserIdToPresence] = useState<
+    Array<[string, Presence]>
+  >([]);
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
 
@@ -27,33 +40,39 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!didLogRef.current) {
         didLogRef.current = true;
         setConnected(true);
-        socket.emit('handshake', (users: string[]) => {
-          setOnlineUsers(users);
-        });
+        socket.emit(
+          'handshake',
+          (userIdToPresence: Array<[string, Presence]>) => {
+            setUserIdToPresence(userIdToPresence);
+          }
+        );
       }
     });
 
-    socket.on('user_connected', (user: string) => {
-      console.log('User connected message received');
-      setOnlineUsers((prev) => [...prev, user]);
+    socket.on('update_presence', (userIdToPresence: [string, Presence]) => {
+      console.log('User update presence message received');
+      setUserIdToPresence((prev) => [...prev, userIdToPresence]);
     });
 
-    socket.on('user_disconnected', (uid: string) => {
+    // TODO: ログアウト時にレンダリングがうまく行ってないので後ほど修正
+    socket.on('user_disconnected', (userId: string) => {
       console.info('User disconnected message received');
-      setOnlineUsers((prev) =>
-        prev.filter((onlineUserId) => onlineUserId !== uid)
+      setUserIdToPresence((prev) =>
+        prev.filter(
+          (userIdToPresencePair) => userIdToPresencePair[0] !== userId
+        )
       );
     });
 
     return () => {
       socket.off('connect_established');
-      socket.off('user_connected');
+      socket.off('update_presence');
       socket.off('user_disconnected');
     };
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ onlineUsers, socket, connected }}>
+    <SocketContext.Provider value={{ userIdToPresence, socket, connected }}>
       {children}
     </SocketContext.Provider>
   );
