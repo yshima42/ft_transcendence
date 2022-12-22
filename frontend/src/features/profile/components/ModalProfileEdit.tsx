@@ -28,7 +28,6 @@ import {
 
 export const ModalProfileEdit: FC = memo(() => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   const { user } = useProfile();
   const { editProfile, isLoading: isLoading1 } = useProfileEdit();
   const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
@@ -70,7 +69,7 @@ export const ModalProfileEdit: FC = memo(() => {
 
   return (
     <>
-      <Button size="sm" onClick={onOpen}>
+      <Button size="xs" fontSize="xs" onClick={onOpen} m={2}>
         Edit
       </Button>
 
