@@ -12,7 +12,7 @@ import { Socket } from 'socket.io-client';
 
 export const SocketContext = createContext<
   | {
-      onlineUsers: Array<[string, boolean]>;
+      onlineUsers: Array<[string, 'ONLINE' | 'INGAME']>;
       socket: Socket;
       connected: boolean;
     }
@@ -21,7 +21,9 @@ export const SocketContext = createContext<
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
-  const [onlineUsers, setOnlineUsers] = useState<Array<[string, boolean]>>([]);
+  const [onlineUsers, setOnlineUsers] = useState<
+    Array<[string, 'ONLINE' | 'INGAME']>
+  >([]);
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
 
@@ -32,23 +34,32 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!didLogRef.current) {
         didLogRef.current = true;
         setConnected(true);
-        socket.emit('handshake', (users: Array<[string, boolean]>) => {
-          setOnlineUsers(users);
-        });
+        socket.emit(
+          'handshake',
+          (userIdToStatus: Array<[string, 'ONLINE' | 'INGAME']>) => {
+            setOnlineUsers(userIdToStatus);
+          }
+        );
       }
     });
 
-    socket.on('user_connected', (user: [string, boolean]) => {
-      console.log('User connected message received');
-      setOnlineUsers((prev) => [...prev, user]);
-    });
+    socket.on(
+      'user_connected',
+      (userIdToStatus: [string, 'ONLINE' | 'INGAME']) => {
+        console.log('User connected message received');
+        setOnlineUsers((prev) => [...prev, userIdToStatus]);
+      }
+    );
 
-    socket.on('user_disconnected', (user: [string, boolean]) => {
-      console.info('User disconnected message received');
-      setOnlineUsers((prev) =>
-        prev.filter((onlineUser) => onlineUser !== user)
-      );
-    });
+    socket.on(
+      'user_disconnected',
+      (userIdToStatus: [string, 'ONLINE' | 'INGAME']) => {
+        console.info('User disconnected message received');
+        setOnlineUsers((prev) =>
+          prev.filter((onlineUser) => onlineUser !== userIdToStatus)
+        );
+      }
+    );
 
     return () => {
       socket.off('connect_established');
