@@ -128,11 +128,7 @@ export class UsersGateway {
     };
 
     // PresenceをINGAMEに変更
-    this.userIdToStatus.set(userId, Presence.INGAME);
-    socket.broadcast.emit('update_presence', [
-      userId,
-      this.userIdToStatus.get(userId),
-    ]);
+    this.changePresence(userId, Presence.INGAME, socket);
 
     const matchingSockets = await this.server.in('matching').fetchSockets();
 
@@ -173,6 +169,14 @@ export class UsersGateway {
     return id;
   }
 
+  changePresence(userId: string, presence: Presence, socket: Socket): void {
+    this.userIdToStatus.set(userId, presence);
+    socket.broadcast.emit('update_presence', [
+      userId,
+      this.userIdToStatus.get(userId),
+    ]);
+  }
+
   @SubscribeMessage('matching_cancel')
   async cancelMatching(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
@@ -181,11 +185,7 @@ export class UsersGateway {
 
     // PresenceをINGAMEからONLINEに戻す
     const { userId } = socket.data as { userId: string };
-    this.userIdToStatus.set(userId, Presence.ONLINE);
-    socket.broadcast.emit('update_presence', [
-      userId,
-      this.userIdToStatus.get(userId),
-    ]);
+    this.changePresence(userId, Presence.ONLINE, socket);
 
     await socket.leave('matching');
   }
@@ -203,11 +203,7 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
 
     // PresenceをINGAMEに変更
-    this.userIdToStatus.set(userId, Presence.INGAME);
-    socket.broadcast.emit('update_presence', [
-      userId,
-      this.userIdToStatus.get(userId),
-    ]);
+    this.changePresence(userId, Presence.INGAME, socket);
 
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
@@ -322,11 +318,7 @@ export class UsersGateway {
 
     // PresenceをINGAMEからONLINEに戻す;
     const { userId } = socket.data as { userId: string };
-    this.userIdToStatus.set(userId, Presence.ONLINE);
-    socket.broadcast.emit('update_presence', [
-      userId,
-      this.userIdToStatus.get(userId),
-    ]);
+    this.changePresence(userId, Presence.ONLINE, socket);
 
     await this.leaveGameRoom(socket);
   }
