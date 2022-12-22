@@ -12,12 +12,12 @@ type Props = AvatarProps & {
 export const UserAvatar: FC<Props> = memo(({ id, ...avatarProps }: Props) => {
   const { isFriend } = useIsFriend(id);
   const { isLoginUser } = useIsLoginUser(id);
-  const { status } = useFriendStatus(id);
+  const { presence } = useFriendStatus(id);
   const link = isLoginUser ? `/app/profile` : `/app/users/${id}`;
   const badgeColor =
-    status === Presence.ONLINE
+    presence === Presence.ONLINE
       ? 'green.500'
-      : status === Presence.INGAME
+      : presence === Presence.INGAME
       ? 'red'
       : 'gray';
 
