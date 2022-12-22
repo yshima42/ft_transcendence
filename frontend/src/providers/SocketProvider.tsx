@@ -52,15 +52,12 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
     );
 
     // TODO: ログアウト時にレンダリングがうまく行ってないので後ほど修正
-    socket.on(
-      'user_disconnected',
-      (userIdToStatus: [string, 'ONLINE' | 'INGAME']) => {
-        console.info('User disconnected message received');
-        setUserIdToStatus((prev) =>
-          prev.filter((onlineUser) => onlineUser !== userIdToStatus)
-        );
-      }
-    );
+    socket.on('user_disconnected', (userId: string) => {
+      console.info('User disconnected message received');
+      setUserIdToStatus((prev) =>
+        prev.filter((userIdToStatusPair) => userIdToStatusPair[0] !== userId)
+      );
+    });
 
     return () => {
       socket.off('connect_established');

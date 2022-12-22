@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
+  // TODO: userIdToSocketIdsにする(全てuserIdに紐づく構造にするため)
   public socketIdToUserId: Map<string, string>;
   // public userIds: Set<string>;
   public userIdToStatus: Map<string, 'ONLINE' | 'INGAME'>;
@@ -66,11 +67,8 @@ export class UsersGateway {
     this.socketIdToUserId.delete(socket.id);
     if (this.countConnectionByUserId(userId) === 0) {
       // this.userIds.delete(userId);
+      socket.broadcast.emit('user_disconnected', userId);
       this.userIdToStatus.delete(userId);
-      socket.broadcast.emit('user_disconnected', [
-        userId,
-        this.userIdToStatus.get(userId),
-      ]);
     }
 
     // disconnect されたら、room からも自動で消えるため、一旦コメントアウト
