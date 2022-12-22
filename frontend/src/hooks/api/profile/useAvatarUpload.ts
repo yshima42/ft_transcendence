@@ -24,6 +24,7 @@ export const useAvatarUpload = (): {
   const { postFunc: uploadAvatar, isLoading } =
     usePostFileApi<AvatarUploadResBody>('/users/me/avatar', [
       ['/users/me/profile'],
+      ['/game/matches'],
     ]);
 
   return { uploadAvatar, isLoading };
