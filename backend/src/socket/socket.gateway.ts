@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class UsersGateway {
   public socketIdToUserId: Map<string, string>;
   // public userIds: Set<string>;
-  public onlineUsers: Map<string, boolean>;
+  public userIdToStatus: Map<string, 'ONLINE' | 'INGAME'>;
   private readonly gameRooms: Map<string, GameRoom>;
 
   constructor(
@@ -30,7 +30,7 @@ export class UsersGateway {
   ) {
     this.socketIdToUserId = new Map<string, string>();
     // this.userIds = new Set<string>();
-    this.onlineUsers = new Map<string, boolean>();
+    this.userIdToStatus = new Map<string, 'ONLINE' | 'INGAME'>();
     this.gameRooms = new Map<string, GameRoom>();
   }
 
@@ -66,10 +66,10 @@ export class UsersGateway {
     this.socketIdToUserId.delete(socket.id);
     if (this.countConnectionByUserId(userId) === 0) {
       // this.userIds.delete(userId);
-      this.onlineUsers.delete(userId);
+      this.userIdToStatus.delete(userId);
       socket.broadcast.emit('user_disconnected', [
         userId,
-        this.onlineUsers.get(userId),
+        this.userIdToStatus.get(userId),
       ]);
     }
 
@@ -85,19 +85,21 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('handshake')
-  handshake(@ConnectedSocket() socket: Socket): Array<[string, boolean]> {
+  handshake(
+    @ConnectedSocket() socket: Socket
+  ): Array<[string, 'ONLINE' | 'INGAME']> {
     const { userId } = socket.data as { userId: string };
     // const reconnected = this.userIds.has(userId);
-    const reconnected = this.onlineUsers.has(userId);
+    const reconnected = this.userIdToStatus.has(userId);
     if (!reconnected) {
       socket.broadcast.emit('user_connected', [
         userId,
-        this.onlineUsers.get(userId),
+        this.userIdToStatus.get(userId),
       ]);
     }
     this.socketIdToUserId.set(socket.id, userId);
     // this.userIds.add(userId);
-    this.onlineUsers.set(userId, false);
+    this.userIdToStatus.set(userId, 'ONLINE');
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
@@ -105,7 +107,7 @@ export class UsersGateway {
     // console.table(this.userIds);
 
     // return [...this.userIds];
-    return [...this.onlineUsers];
+    return [...this.userIdToStatus];
   }
 
   private readonly countConnectionByUserId = (targetUserId: string): number => {
