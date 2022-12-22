@@ -1,5 +1,9 @@
 import { memo, FC } from 'react';
 import { Button } from '@chakra-ui/react';
+import {
+  InvitationState,
+  useInvitationGame,
+} from 'features/profile/hooks/useInvitationGame';
 
 type Props = {
   targetId: string;
@@ -8,9 +12,11 @@ type Props = {
 
 export const GameButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
+  const { setInvitationState, setOpponentId } = useInvitationGame();
 
   const onClickGame = () => {
-    alert(`Game with ${targetId}`);
+    setOpponentId(targetId);
+    setInvitationState(InvitationState.Inviting);
   };
 
   return (

@@ -22,8 +22,6 @@ enum Presence {
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
-  // TODO: userIdToSocketIdsにする(全てuserIdに紐づく構造にするため)
-  public socketIdToUserId: Map<string, string>;
   public userIdToPresence: Map<string, Presence>;
   private readonly gameRooms: Map<string, GameRoom>;
 
@@ -33,7 +31,6 @@ export class UsersGateway {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService
   ) {
-    this.socketIdToUserId = new Map<string, string>();
     this.userIdToPresence = new Map<string, Presence>();
     this.gameRooms = new Map<string, GameRoom>();
   }
@@ -67,20 +64,22 @@ export class UsersGateway {
 
   async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
     const { userId } = socket.data as { userId: string };
-    this.socketIdToUserId.delete(socket.id);
-    if (this.countConnectionByUserId(userId) === 0) {
+    await socket.leave(userId);
+
+    // TODO: これ必要か検討
+    await socket.leave('matching');
+
+    const userIdSockets = await this.server.in(userId).fetchSockets();
+
+    if (userIdSockets.length === 0) {
       socket.broadcast.emit('user_disconnected', userId);
       this.userIdToPresence.delete(userId);
     }
 
-    // disconnect されたら、room からも自動で消えるため、一旦コメントアウト
-    // await socket.leave(userId);
-    // await socket.leave('matching');
     await this.leaveGameRoom(socket);
 
     // debug用
     Logger.debug('disconnected: ' + socket.id);
-    console.table(this.socketIdToUserId);
   }
 
   @SubscribeMessage('handshake')
@@ -93,27 +92,13 @@ export class UsersGateway {
         this.userIdToPresence.get(userId),
       ]);
     }
-    this.socketIdToUserId.set(socket.id, userId);
     this.userIdToPresence.set(userId, Presence.ONLINE);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
-    console.table(this.socketIdToUserId);
 
     return [...this.userIdToPresence];
   }
-
-  private readonly countConnectionByUserId = (targetUserId: string): number => {
-    const userIds = this.socketIdToUserId.values();
-    let count = 0;
-    for (const userId of userIds) {
-      if (userId === targetUserId) {
-        count += 1;
-      }
-    }
-
-    return count;
-  };
 
   // Game関連
   @SubscribeMessage('random_match')
@@ -182,6 +167,29 @@ export class UsersGateway {
 
     await socket.leave('matching');
   }
+
+  // @SubscribeMessage('invitation_match')
+  // invitationMatch(
+  //   @ConnectedSocket() socket: Socket,
+  //   @MessageBody() message: { opponentId: string }
+  // ): void {
+  //   Logger.debug(
+  //     `${socket.id} ${socket.data.userNickname as string} invitation_match`
+  //   );
+  //   console.log('invitation_match ' + socket.id + ' vs ' + message.opponentId);
+
+  //   const { userId, userNickname } = socket.data as {
+  //     userId: string;
+  //     userNickname: string;
+  //   };
+
+  //   const player1 = new Player(userId, userNickname, true);
+  //   const player2 = new Player(userId, userNickname, false);
+  //   // 2人揃ったらマッチルーム作る
+  //   const newRoomId = this.createGameRoom(player1, player2);
+  //   this.server.to(player1.id).emit('go_game_room', newRoomId);
+  //   // this.server.to(player2.id).emit('go_game_room', newRoomId);
+  // }
 
   // room関連;
   @SubscribeMessage('join_room')
@@ -281,8 +289,6 @@ export class UsersGateway {
       // ゲーム開始
       gameRoom.gameStart(socket, roomId);
     }
-
-    // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
   }
 
   @SubscribeMessage('user_command')

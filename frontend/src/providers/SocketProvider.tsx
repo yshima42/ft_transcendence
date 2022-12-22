@@ -54,7 +54,6 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       setUserIdToPresence((prev) => [...prev, userIdToPresence]);
     });
 
-    // TODO: ログアウト時にレンダリングがうまく行ってないので後ほど修正
     socket.on('user_disconnected', (userId: string) => {
       console.info('User disconnected message received');
       setUserIdToPresence((prev) =>
