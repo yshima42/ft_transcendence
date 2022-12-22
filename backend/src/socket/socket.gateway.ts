@@ -24,7 +24,6 @@ enum Presence {
 export class UsersGateway {
   // TODO: userIdToSocketIdsにする(全てuserIdに紐づく構造にするため)
   public socketIdToUserId: Map<string, string>;
-  // public userIds: Set<string>;
   public userIdToStatus: Map<string, Presence>;
   private readonly gameRooms: Map<string, GameRoom>;
 
@@ -35,7 +34,6 @@ export class UsersGateway {
     private readonly prisma: PrismaService
   ) {
     this.socketIdToUserId = new Map<string, string>();
-    // this.userIds = new Set<string>();
     this.userIdToStatus = new Map<string, Presence>();
     this.gameRooms = new Map<string, GameRoom>();
   }
@@ -71,7 +69,6 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
     this.socketIdToUserId.delete(socket.id);
     if (this.countConnectionByUserId(userId) === 0) {
-      // this.userIds.delete(userId);
       socket.broadcast.emit('user_disconnected', userId);
       this.userIdToStatus.delete(userId);
     }
@@ -84,13 +81,11 @@ export class UsersGateway {
     // debug用
     Logger.debug('disconnected: ' + socket.id);
     console.table(this.socketIdToUserId);
-    // console.table(this.userIds);
   }
 
   @SubscribeMessage('handshake')
   handshake(@ConnectedSocket() socket: Socket): Array<[string, Presence]> {
     const { userId } = socket.data as { userId: string };
-    // const reconnected = this.userIds.has(userId);
     const reconnected = this.userIdToStatus.has(userId);
     if (!reconnected) {
       socket.broadcast.emit('user_connected', [
@@ -99,15 +94,12 @@ export class UsersGateway {
       ]);
     }
     this.socketIdToUserId.set(socket.id, userId);
-    // this.userIds.add(userId);
     this.userIdToStatus.set(userId, Presence.ONLINE);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
     console.table(this.socketIdToUserId);
-    // console.table(this.userIds);
 
-    // return [...this.userIds];
     return [...this.userIdToStatus];
   }
 
@@ -130,12 +122,21 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userNickname as string} random_match`
     );
 
-    // 1人目の場合2人目ユーザーを待つ
     const { userId, userNickname } = socket.data as {
       userId: string;
       userNickname: string;
     };
+
+    // PresenceをINGAMEに変更
+    this.userIdToStatus.set(userId, Presence.INGAME);
+    socket.broadcast.emit('user_connected', [
+      userId,
+      this.userIdToStatus.get(userId),
+    ]);
+
     const matchingSockets = await this.server.in('matching').fetchSockets();
+
+    // 1人目の場合2人目ユーザーを待つ
     if (matchingSockets.length === 0) {
       await socket.join('matching');
 

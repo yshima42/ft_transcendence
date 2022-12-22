@@ -9,6 +9,8 @@ export const useFriendStatus = (friendId: string): { presence: Presence } => {
   const { userIdToStatus } = data;
 
   const onlineUsersMap = new Map(userIdToStatus);
+
+  // 冗長だけど他のやり方うまく行かなかったので一旦こちらで
   const presence = onlineUsersMap.has(friendId)
     ? onlineUsersMap.get(friendId) === Presence.INGAME
       ? Presence.INGAME
