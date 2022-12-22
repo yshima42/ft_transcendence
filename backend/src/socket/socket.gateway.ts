@@ -88,7 +88,7 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
     const reconnected = this.userIdToStatus.has(userId);
     if (!reconnected) {
-      socket.broadcast.emit('user_connected', [
+      socket.broadcast.emit('update_presence', [
         userId,
         this.userIdToStatus.get(userId),
       ]);
@@ -129,7 +129,7 @@ export class UsersGateway {
 
     // PresenceをINGAMEに変更
     this.userIdToStatus.set(userId, Presence.INGAME);
-    socket.broadcast.emit('user_connected', [
+    socket.broadcast.emit('update_presence', [
       userId,
       this.userIdToStatus.get(userId),
     ]);
@@ -179,6 +179,14 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userNickname as string} matching_cancel`
     );
 
+    // PresenceをINGAMEからONLINEに戻す
+    const { userId } = socket.data as { userId: string };
+    this.userIdToStatus.set(userId, Presence.ONLINE);
+    socket.broadcast.emit('update_presence', [
+      userId,
+      this.userIdToStatus.get(userId),
+    ]);
+
     await socket.leave('matching');
   }
 
@@ -193,6 +201,14 @@ export class UsersGateway {
     );
 
     const { userId } = socket.data as { userId: string };
+
+    // PresenceをINGAMEに変更
+    this.userIdToStatus.set(userId, Presence.INGAME);
+    socket.broadcast.emit('update_presence', [
+      userId,
+      this.userIdToStatus.get(userId),
+    ]);
+
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
@@ -303,6 +319,14 @@ export class UsersGateway {
     Logger.debug(
       `${socket.id} ${socket.data.userNickname as string} leave_room`
     );
+
+    // PresenceをINGAMEからONLINEに戻す;
+    const { userId } = socket.data as { userId: string };
+    this.userIdToStatus.set(userId, Presence.ONLINE);
+    socket.broadcast.emit('update_presence', [
+      userId,
+      this.userIdToStatus.get(userId),
+    ]);
 
     await this.leaveGameRoom(socket);
   }
