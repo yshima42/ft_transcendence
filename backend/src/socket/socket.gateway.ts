@@ -127,9 +127,6 @@ export class UsersGateway {
       userNickname: string;
     };
 
-    // PresenceをINGAMEに変更
-    this.changePresence(userId, Presence.INGAME, socket);
-
     const matchingSockets = await this.server.in('matching').fetchSockets();
 
     // 1人目の場合2人目ユーザーを待つ
@@ -169,9 +166,9 @@ export class UsersGateway {
     return id;
   }
 
-  changePresence(userId: string, presence: Presence, socket: Socket): void {
+  changePresence(userId: string, presence: Presence): void {
     this.userIdToPresence.set(userId, presence);
-    socket.broadcast.emit('update_presence', [
+    this.server.emit('update_presence', [
       userId,
       this.userIdToPresence.get(userId),
     ]);
@@ -182,10 +179,6 @@ export class UsersGateway {
     Logger.debug(
       `${socket.id} ${socket.data.userNickname as string} matching_cancel`
     );
-
-    // PresenceをINGAMEからONLINEに戻す
-    const { userId } = socket.data as { userId: string };
-    this.changePresence(userId, Presence.ONLINE, socket);
 
     await socket.leave('matching');
   }
@@ -203,7 +196,7 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
 
     // PresenceをINGAMEに変更
-    this.changePresence(userId, Presence.INGAME, socket);
+    this.changePresence(userId, Presence.INGAME);
 
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
@@ -318,7 +311,7 @@ export class UsersGateway {
 
     // PresenceをINGAMEからONLINEに戻す;
     const { userId } = socket.data as { userId: string };
-    this.changePresence(userId, Presence.ONLINE, socket);
+    this.changePresence(userId, Presence.ONLINE);
 
     await this.leaveGameRoom(socket);
   }
