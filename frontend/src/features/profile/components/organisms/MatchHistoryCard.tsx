@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Box, Stack, Text, VStack } from '@chakra-ui/react';
 import { useMatchHistory } from 'hooks/api/game/useMatchHistory';
-import { GameResultCard } from './GameResultCard';
+import { GameResultCard } from '../molecules/GameResultCard';
 
 type MatchHistoryCardProps = {
   id: string;

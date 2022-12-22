@@ -20,7 +20,7 @@ type Props = {
   onCloseModal: () => void;
 };
 
-export const ModalOtpQrcode: FC<Props> = memo((props) => {
+export const OtpQrcodeModal: FC<Props> = memo((props) => {
   const { isOpen, onCloseModal } = props;
   const { Canvas } = useQRCode();
   const { qrcodeUrl } = useOtpQrcodeUrl();

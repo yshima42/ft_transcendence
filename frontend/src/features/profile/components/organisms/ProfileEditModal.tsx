@@ -8,7 +8,6 @@ import {
   ModalBody,
   ModalCloseButton,
   Button,
-  useDisclosure,
   Box,
   HStack,
   Avatar,
@@ -26,8 +25,13 @@ import {
   useProfileEdit,
 } from 'hooks/api';
 
-export const ModalProfileEdit: FC = memo(() => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+type Props = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export const ProfileEditModal: FC<Props> = memo((props) => {
+  const { isOpen, onClose } = props;
   const { user } = useProfile();
   const { editProfile, isLoading: isLoading1 } = useProfileEdit();
   const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
@@ -69,10 +73,6 @@ export const ModalProfileEdit: FC = memo(() => {
 
   return (
     <>
-      <Button size="xs" fontSize="xs" onClick={onOpen} m={2}>
-        Edit
-      </Button>
-
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

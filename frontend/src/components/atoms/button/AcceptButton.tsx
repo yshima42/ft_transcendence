@@ -16,7 +16,7 @@ export const AcceptButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button mr={2} size={size} isDisabled={isLoading} onClick={onClickAccept}>
+    <Button size={size} isDisabled={isLoading} onClick={onClickAccept}>
       Accept
     </Button>
   );

@@ -4,9 +4,9 @@ import { useIsLoginUser, useProfile } from 'hooks/api';
 import { useParams } from 'react-router-dom';
 import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { StatsCard } from '../components/StatsCard';
-import { UserInfoCard } from '../components/UserInfoCard';
-import { MatchHistoryCard } from '../components/matchhistory/MatchHistoryCard';
+import { MatchHistoryCard } from '../components/organisms/MatchHistoryCard';
+import { StatsCard } from '../components/organisms/StatsCard';
+import { UserInfoCard } from '../components/organisms/UserInfoCard';
 
 // /app/profile経由で表示するときはid=undefinedとなり、useProfileでログインユーザーの情報が取れる
 // 少し可読性が低いので、余力あれば書き換えてもいいかもれない。
