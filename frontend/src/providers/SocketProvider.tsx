@@ -12,7 +12,7 @@ import { Socket } from 'socket.io-client';
 
 export const SocketContext = createContext<
   | {
-      onlineUsers: Array<[string, 'ONLINE' | 'INGAME']>;
+      userIdToStatus: Array<[string, 'ONLINE' | 'INGAME']>;
       socket: Socket;
       connected: boolean;
     }
@@ -21,7 +21,7 @@ export const SocketContext = createContext<
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
-  const [onlineUsers, setOnlineUsers] = useState<
+  const [userIdToStatus, setUserIdToStatus] = useState<
     Array<[string, 'ONLINE' | 'INGAME']>
   >([]);
   const [connected, setConnected] = useState(false);
@@ -37,7 +37,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
         socket.emit(
           'handshake',
           (userIdToStatus: Array<[string, 'ONLINE' | 'INGAME']>) => {
-            setOnlineUsers(userIdToStatus);
+            setUserIdToStatus(userIdToStatus);
           }
         );
       }
@@ -47,15 +47,16 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       'user_connected',
       (userIdToStatus: [string, 'ONLINE' | 'INGAME']) => {
         console.log('User connected message received');
-        setOnlineUsers((prev) => [...prev, userIdToStatus]);
+        setUserIdToStatus((prev) => [...prev, userIdToStatus]);
       }
     );
 
+    // TODO: ログアウト時にレンダリングがうまく行ってないので後ほど修正
     socket.on(
       'user_disconnected',
       (userIdToStatus: [string, 'ONLINE' | 'INGAME']) => {
         console.info('User disconnected message received');
-        setOnlineUsers((prev) =>
+        setUserIdToStatus((prev) =>
           prev.filter((onlineUser) => onlineUser !== userIdToStatus)
         );
       }
@@ -69,7 +70,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ onlineUsers, socket, connected }}>
+    <SocketContext.Provider value={{ userIdToStatus, socket, connected }}>
       {children}
     </SocketContext.Provider>
   );

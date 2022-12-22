@@ -1,16 +1,25 @@
 import { useContext } from 'react';
 import { SocketContext } from 'providers/SocketProvider';
 
-export const useFriendStatus = (friendId: string): { isOnline: boolean } => {
+export enum Status {
+  Offline = 0,
+  Online = 1,
+  InGame = 2,
+}
+
+export const useFriendStatus = (friendId: string): { status: Status } => {
   const data = useContext(SocketContext);
   if (data === undefined) {
     throw new Error('GameSocket undefined');
   }
-  const { onlineUsers } = data;
-  // const isOnline =
-  //   onlineUsers.find((onlineUserId) => onlineUserId === friendId) !== undefined;
-  const onlineUsersMap = new Map(onlineUsers);
-  const isOnline = onlineUsersMap.has(friendId);
+  const { userIdToStatus } = data;
 
-  return { isOnline };
+  const onlineUsersMap = new Map(userIdToStatus);
+  const status = onlineUsersMap.has(friendId)
+    ? onlineUsersMap.get(friendId) === 'INGAME'
+      ? Status.InGame
+      : Status.Online
+    : Status.Offline;
+
+  return { status };
 };

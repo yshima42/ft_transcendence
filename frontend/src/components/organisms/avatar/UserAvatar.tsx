@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { AvatarBadge, AvatarProps } from '@chakra-ui/react';
 import { useIsFriend, useIsLoginUser } from 'hooks/api';
-import { useFriendStatus } from 'hooks/utils/useFriendStatus';
+import { Status, useFriendStatus } from 'hooks/utils/useFriendStatus';
 import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 
 type Props = AvatarProps & {
@@ -11,9 +11,14 @@ type Props = AvatarProps & {
 export const UserAvatar: FC<Props> = memo(({ id, ...avatarProps }: Props) => {
   const { isFriend } = useIsFriend(id);
   const { isLoginUser } = useIsLoginUser(id);
-  const { isOnline } = useFriendStatus(id);
+  const { status } = useFriendStatus(id);
   const link = isLoginUser ? `/app/profile` : `/app/users/${id}`;
-  const badgeColor = isOnline ? 'green.500' : 'gray';
+  const badgeColor =
+    status === Status.Online
+      ? 'green.500'
+      : status === Status.InGame
+      ? 'red'
+      : 'gray';
 
   return (
     <>
