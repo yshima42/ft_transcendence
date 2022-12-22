@@ -18,7 +18,7 @@ export enum Presence {
 
 export const SocketContext = createContext<
   | {
-      userIdToStatus: Array<[string, Presence]>;
+      userIdToPresence: Array<[string, Presence]>;
       socket: Socket;
       connected: boolean;
     }
@@ -27,7 +27,7 @@ export const SocketContext = createContext<
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
-  const [userIdToStatus, setUserIdToStatus] = useState<
+  const [userIdToPresence, setUserIdToPresence] = useState<
     Array<[string, Presence]>
   >([]);
   const [connected, setConnected] = useState(false);
@@ -42,23 +42,25 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
         setConnected(true);
         socket.emit(
           'handshake',
-          (userIdToStatus: Array<[string, Presence]>) => {
-            setUserIdToStatus(userIdToStatus);
+          (userIdToPresence: Array<[string, Presence]>) => {
+            setUserIdToPresence(userIdToPresence);
           }
         );
       }
     });
 
-    socket.on('update_presence', (userIdToStatus: [string, Presence]) => {
+    socket.on('update_presence', (userIdToPresence: [string, Presence]) => {
       console.log('User update presence message received');
-      setUserIdToStatus((prev) => [...prev, userIdToStatus]);
+      setUserIdToPresence((prev) => [...prev, userIdToPresence]);
     });
 
     // TODO: ログアウト時にレンダリングがうまく行ってないので後ほど修正
     socket.on('user_disconnected', (userId: string) => {
       console.info('User disconnected message received');
-      setUserIdToStatus((prev) =>
-        prev.filter((userIdToStatusPair) => userIdToStatusPair[0] !== userId)
+      setUserIdToPresence((prev) =>
+        prev.filter(
+          (userIdToPresencePair) => userIdToPresencePair[0] !== userId
+        )
       );
     });
 
@@ -70,7 +72,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ userIdToStatus, socket, connected }}>
+    <SocketContext.Provider value={{ userIdToPresence, socket, connected }}>
       {children}
     </SocketContext.Provider>
   );

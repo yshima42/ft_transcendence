@@ -1,14 +1,14 @@
 import { useContext } from 'react';
 import { Presence, SocketContext } from 'providers/SocketProvider';
 
-export const useFriendStatus = (friendId: string): { presence: Presence } => {
+export const useUserPresence = (friendId: string): { presence: Presence } => {
   const data = useContext(SocketContext);
   if (data === undefined) {
     throw new Error('GameSocket undefined');
   }
-  const { userIdToStatus } = data;
+  const { userIdToPresence } = data;
 
-  const onlineUsersMap = new Map(userIdToStatus);
+  const onlineUsersMap = new Map(userIdToPresence);
 
   // 冗長だけど他のやり方うまく行かなかったので一旦こちらで
   const presence = onlineUsersMap.has(friendId)
