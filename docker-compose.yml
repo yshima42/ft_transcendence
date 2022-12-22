@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  dev-frontend:
+    # image: dev-frontend-slim
+    build: ./frontend
+    ports:
+      - 5173:5173
+    # restart: always
+    volumes:
+    - type: bind
+      source: "./frontend"
+      target: "/usr/src/app"
+    depends_on:
+      - dev-backend
+    networks:
+      - lesson
+
+  dev-backend:
+    # image: dev-backend-slim
+    build: ./backend
+    ports:
+      - 3000:3000
+    # restart: always
+    volumes:
+    - type: bind
+      source: "./backend"
+      target: "/usr/src/app"
+    depends_on:
+      - dev-postgres
+    networks:
+      - lesson
+
+  dev-postgres:
+    image: postgres:14.4-alpine
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: udemy
+      POSTGRES_PASSWORD: udemy
+      POSTGRES_DB: udemy
+    restart: always
+    networks:
+      - lesson
+networks:
+  lesson:
