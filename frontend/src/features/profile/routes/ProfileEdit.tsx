@@ -7,7 +7,7 @@ import {
   useProfileEdit,
 } from 'hooks/api/profile/useProfileEdit';
 import { useNavigate } from 'react-router-dom';
-import { OtpAuthSetting } from 'features/profile/components/OtpAuthSetting';
+import { OtpAuthButton } from 'features/profile/components/OtpAuthButton';
 
 export const ProfileEdit: FC = memo(() => {
   const { user } = useProfile();
@@ -84,7 +84,7 @@ export const ProfileEdit: FC = memo(() => {
         </Button>
         <br />
         <br />
-        <OtpAuthSetting />
+        <OtpAuthButton />
       </form>
     </Flex>
   );
