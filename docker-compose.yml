@@ -42,9 +42,14 @@ services:
     restart: always
     networks:
       - back-tier
+    volumes:
+      - database-volume:/var/lib/postgresql/data
 
 networks:
   front-tier:
     driver: bridge
   back-tier:
     driver: bridge
+
+volumes:
+  database-volume:

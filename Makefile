@@ -7,4 +7,4 @@ ps:
 build: 
 	docker-compose build
 log: 
-	docker-compose logs -f dev-backend
+	docker-compose logs -f backend
