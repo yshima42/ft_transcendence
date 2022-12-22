@@ -141,6 +141,9 @@ export class UsersGateway {
     const newRoomId = this.createGameRoom(player1, player2);
     this.server.to(player1.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('go_game_room', newRoomId);
+    this.server
+      .to('monitor')
+      .emit('room_created', newRoomId, player1.id, player2.id);
   }
 
   createGameRoom(player1: Player, player2: Player): string {
@@ -309,6 +312,37 @@ export class UsersGateway {
       //   this.server.in(roomId).emit('both_players_disconnected');
       // }
       this.gameRooms.delete(roomId);
+      this.server.to('monitor').emit('room_deleted', roomId);
     }
+  }
+
+  @SubscribeMessage('join_monitoring_room')
+  async sendAllGameRoomIds(
+    @ConnectedSocket() socket: Socket
+  ): Promise<string[][]> {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} join_monitoring_room`
+    );
+
+    await socket.join('monitor');
+    const inGameOutlines: string[][] = [];
+    this.gameRooms.forEach((gameRoom) => {
+      inGameOutlines.push([
+        gameRoom.id,
+        gameRoom.player1.id,
+        gameRoom.player2.id,
+      ]);
+    });
+
+    return inGameOutlines;
+  }
+
+  @SubscribeMessage('leave_monitoring_room')
+  async leaveRoomList(@ConnectedSocket() socket: Socket): Promise<void> {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} leave_monitoring_room`
+    );
+
+    await socket.leave('monitor');
   }
 }
