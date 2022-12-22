@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Box, Center, HStack, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { AvatarWithName } from './AvatarWithName';
+import { AvatarWithNickname } from './AvatarWithNickname';
 import { ScoreAndDate } from './ScoreAndDate';
 
 type Props = {
@@ -20,14 +20,14 @@ export const GameResultCard: FC<Props> = memo((props) => {
     <>
       <Box h="100px" bg="gray.200" borderRadius={20} px={4}>
         <HStack>
-          <AvatarWithName
-            name={playerOne.nickname}
+          <AvatarWithNickname
+            nickname={playerOne.nickname}
             avatarImageUrl={playerOne.avatarImageUrl}
             id={playerOne.id}
           />
           <ScoreAndDate score={score} createdAt={createdAt} />
-          <AvatarWithName
-            name={playerTwo.nickname}
+          <AvatarWithNickname
+            nickname={playerTwo.nickname}
             avatarImageUrl={playerTwo.avatarImageUrl}
             id={playerTwo.id}
           />
