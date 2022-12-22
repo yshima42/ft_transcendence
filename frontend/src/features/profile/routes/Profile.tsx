@@ -53,7 +53,7 @@ export const Profile: FC = memo(() => {
           </GridItem>
           <GridItem bg="gray" area="history">
             <Suspense fallback={<CenterSpinner />}>
-              <MatchHistoryCard id={user.id} />
+              <MatchHistoryCard id={user.id} isLoginUser={isLoginUser} />
             </Suspense>
           </GridItem>
         </Grid>
