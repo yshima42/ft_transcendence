@@ -49,8 +49,8 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     });
 
-    socket.on('user_connected', (userIdToStatus: [string, Presence]) => {
-      console.log('User connected message received');
+    socket.on('update_presence', (userIdToStatus: [string, Presence]) => {
+      console.log('User update presence message received');
       setUserIdToStatus((prev) => [...prev, userIdToStatus]);
     });
 
@@ -64,7 +64,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
     return () => {
       socket.off('connect_established');
-      socket.off('user_connected');
+      socket.off('update_presence');
       socket.off('user_disconnected');
     };
   }, [socket]);
