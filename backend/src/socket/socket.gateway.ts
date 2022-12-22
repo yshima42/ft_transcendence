@@ -15,12 +15,17 @@ import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 
+enum Presence {
+  ONLINE = 1,
+  INGAME = 2,
+}
+
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
   // TODO: userIdToSocketIdsにする(全てuserIdに紐づく構造にするため)
   public socketIdToUserId: Map<string, string>;
   // public userIds: Set<string>;
-  public userIdToStatus: Map<string, 'ONLINE' | 'INGAME'>;
+  public userIdToStatus: Map<string, Presence>;
   private readonly gameRooms: Map<string, GameRoom>;
 
   constructor(
@@ -31,7 +36,7 @@ export class UsersGateway {
   ) {
     this.socketIdToUserId = new Map<string, string>();
     // this.userIds = new Set<string>();
-    this.userIdToStatus = new Map<string, 'ONLINE' | 'INGAME'>();
+    this.userIdToStatus = new Map<string, Presence>();
     this.gameRooms = new Map<string, GameRoom>();
   }
 
@@ -83,9 +88,7 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('handshake')
-  handshake(
-    @ConnectedSocket() socket: Socket
-  ): Array<[string, 'ONLINE' | 'INGAME']> {
+  handshake(@ConnectedSocket() socket: Socket): Array<[string, Presence]> {
     const { userId } = socket.data as { userId: string };
     // const reconnected = this.userIds.has(userId);
     const reconnected = this.userIdToStatus.has(userId);
@@ -97,7 +100,7 @@ export class UsersGateway {
     }
     this.socketIdToUserId.set(socket.id, userId);
     // this.userIds.add(userId);
-    this.userIdToStatus.set(userId, 'ONLINE');
+    this.userIdToStatus.set(userId, Presence.ONLINE);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
