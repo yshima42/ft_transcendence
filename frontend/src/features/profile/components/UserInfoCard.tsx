@@ -9,6 +9,7 @@ import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
 import { ModalProfileEdit } from './ModalProfileEdit';
+import { OtpAuthButton } from './OtpAuthButton';
 
 type UserInfoCardProps = {
   user: User;
@@ -45,7 +46,10 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
           {user.name}
         </Text>
         {isLoginUser ? (
-          <ModalProfileEdit />
+          <>
+            <ModalProfileEdit />
+            <OtpAuthButton />
+          </>
         ) : (
           <>
             <HStack justify="center" align="center">
