@@ -8,12 +8,12 @@ type Props = {
 };
 
 // 100% は親要素に対しての割合。100vh は画面いっぱい。
-export const CenterSpinner: FC<Props> = memo(
-  ({ h = '100%', w = '100%', color = 'blue.500' }: Props) => {
-    return (
-      <Center h={h} w={w}>
-        <Spinner emptyColor="gray.200" color={color} size="xl" />
-      </Center>
-    );
-  }
-);
+export const CenterSpinner: FC<Props> = memo((props) => {
+  const { h = '100%', w = '100%', color = 'blue.500' } = props;
+
+  return (
+    <Center h={h} w={w}>
+      <Spinner emptyColor="gray.200" color={color} size="xl" />
+    </Center>
+  );
+});

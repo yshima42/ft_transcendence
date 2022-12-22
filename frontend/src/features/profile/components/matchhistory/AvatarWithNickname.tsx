@@ -1,15 +1,16 @@
 import { memo, FC } from 'react';
-import { Box, Text, VStack } from '@chakra-ui/react';
+import { Box, VStack } from '@chakra-ui/react';
+import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 type Props = {
-  name: string;
+  nickname: string;
   avatarImageUrl: string;
   id: string;
 };
 
-export const AvatarWithName: FC<Props> = memo((props) => {
-  const { name, avatarImageUrl, id } = props;
+export const AvatarWithNickname: FC<Props> = memo((props) => {
+  const { nickname, avatarImageUrl, id } = props;
 
   return (
     <Box h="90" p={2}>
@@ -17,9 +18,7 @@ export const AvatarWithName: FC<Props> = memo((props) => {
         <UserAvatar id={id} size="md" src={avatarImageUrl} />
 
         {/* TODO:ニックネームが長くなるときどう表示するか考える。暫定で省略している */}
-        <Text maxWidth={20} noOfLines={1}>
-          {name}
-        </Text>
+        <LinkedNickname id={id} nickname={nickname} maxWidth={20} />
       </VStack>
     </Box>
   );
