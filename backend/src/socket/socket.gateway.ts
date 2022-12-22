@@ -24,7 +24,7 @@ enum Presence {
 export class UsersGateway {
   // TODO: userIdToSocketIdsにする(全てuserIdに紐づく構造にするため)
   public socketIdToUserId: Map<string, string>;
-  public userIdToStatus: Map<string, Presence>;
+  public userIdToPresence: Map<string, Presence>;
   private readonly gameRooms: Map<string, GameRoom>;
 
   constructor(
@@ -34,7 +34,7 @@ export class UsersGateway {
     private readonly prisma: PrismaService
   ) {
     this.socketIdToUserId = new Map<string, string>();
-    this.userIdToStatus = new Map<string, Presence>();
+    this.userIdToPresence = new Map<string, Presence>();
     this.gameRooms = new Map<string, GameRoom>();
   }
 
@@ -70,7 +70,7 @@ export class UsersGateway {
     this.socketIdToUserId.delete(socket.id);
     if (this.countConnectionByUserId(userId) === 0) {
       socket.broadcast.emit('user_disconnected', userId);
-      this.userIdToStatus.delete(userId);
+      this.userIdToPresence.delete(userId);
     }
 
     // disconnect されたら、room からも自動で消えるため、一旦コメントアウト
@@ -86,21 +86,21 @@ export class UsersGateway {
   @SubscribeMessage('handshake')
   handshake(@ConnectedSocket() socket: Socket): Array<[string, Presence]> {
     const { userId } = socket.data as { userId: string };
-    const reconnected = this.userIdToStatus.has(userId);
+    const reconnected = this.userIdToPresence.has(userId);
     if (!reconnected) {
       socket.broadcast.emit('update_presence', [
         userId,
-        this.userIdToStatus.get(userId),
+        this.userIdToPresence.get(userId),
       ]);
     }
     this.socketIdToUserId.set(socket.id, userId);
-    this.userIdToStatus.set(userId, Presence.ONLINE);
+    this.userIdToPresence.set(userId, Presence.ONLINE);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
     console.table(this.socketIdToUserId);
 
-    return [...this.userIdToStatus];
+    return [...this.userIdToPresence];
   }
 
   private readonly countConnectionByUserId = (targetUserId: string): number => {
@@ -170,10 +170,10 @@ export class UsersGateway {
   }
 
   changePresence(userId: string, presence: Presence, socket: Socket): void {
-    this.userIdToStatus.set(userId, presence);
+    this.userIdToPresence.set(userId, presence);
     socket.broadcast.emit('update_presence', [
       userId,
-      this.userIdToStatus.get(userId),
+      this.userIdToPresence.get(userId),
     ]);
   }
 
