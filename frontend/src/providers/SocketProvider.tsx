@@ -10,9 +10,15 @@ import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
 import { Socket } from 'socket.io-client';
 
+export enum Presence {
+  OFFLINE = 0,
+  ONLINE = 1,
+  INGAME = 2,
+}
+
 export const SocketContext = createContext<
   | {
-      userIdToStatus: Array<[string, 'ONLINE' | 'INGAME']>;
+      userIdToStatus: Array<[string, Presence]>;
       socket: Socket;
       connected: boolean;
     }
@@ -22,7 +28,7 @@ export const SocketContext = createContext<
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
   const [userIdToStatus, setUserIdToStatus] = useState<
-    Array<[string, 'ONLINE' | 'INGAME']>
+    Array<[string, Presence]>
   >([]);
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
@@ -36,20 +42,17 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
         setConnected(true);
         socket.emit(
           'handshake',
-          (userIdToStatus: Array<[string, 'ONLINE' | 'INGAME']>) => {
+          (userIdToStatus: Array<[string, Presence]>) => {
             setUserIdToStatus(userIdToStatus);
           }
         );
       }
     });
 
-    socket.on(
-      'user_connected',
-      (userIdToStatus: [string, 'ONLINE' | 'INGAME']) => {
-        console.log('User connected message received');
-        setUserIdToStatus((prev) => [...prev, userIdToStatus]);
-      }
-    );
+    socket.on('user_connected', (userIdToStatus: [string, Presence]) => {
+      console.log('User connected message received');
+      setUserIdToStatus((prev) => [...prev, userIdToStatus]);
+    });
 
     // TODO: ログアウト時にレンダリングがうまく行ってないので後ほど修正
     socket.on('user_disconnected', (userId: string) => {

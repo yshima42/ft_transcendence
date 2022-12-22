@@ -1,13 +1,7 @@
 import { useContext } from 'react';
-import { SocketContext } from 'providers/SocketProvider';
+import { Presence, SocketContext } from 'providers/SocketProvider';
 
-export enum Status {
-  Offline = 0,
-  Online = 1,
-  InGame = 2,
-}
-
-export const useFriendStatus = (friendId: string): { status: Status } => {
+export const useFriendStatus = (friendId: string): { status: Presence } => {
   const data = useContext(SocketContext);
   if (data === undefined) {
     throw new Error('GameSocket undefined');
@@ -16,10 +10,10 @@ export const useFriendStatus = (friendId: string): { status: Status } => {
 
   const onlineUsersMap = new Map(userIdToStatus);
   const status = onlineUsersMap.has(friendId)
-    ? onlineUsersMap.get(friendId) === 'INGAME'
-      ? Status.InGame
-      : Status.Online
-    : Status.Offline;
+    ? onlineUsersMap.get(friendId) === Presence.INGAME
+      ? Presence.INGAME
+      : Presence.ONLINE
+    : Presence.OFFLINE;
 
   return { status };
 };
