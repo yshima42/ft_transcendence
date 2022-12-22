@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  dev-frontend:
+  frontend:
     # image: dev-frontend-slim
     build: ./frontend
     ports:
@@ -11,11 +11,11 @@ services:
       source: "./frontend"
       target: "/usr/src/app"
     depends_on:
-      - dev-backend
+      - backend
     networks:
-      - lesson
+      - front-tier
 
-  dev-backend:
+  backend:
     # image: dev-backend-slim
     build: ./backend
     ports:
@@ -26,11 +26,12 @@ services:
       source: "./backend"
       target: "/usr/src/app"
     depends_on:
-      - dev-postgres
+      - database
     networks:
-      - lesson
+      - front-tier
+      - back-tier
 
-  dev-postgres:
+  database:
     image: postgres:14.4-alpine
     ports:
       - 5434:5432
@@ -40,6 +41,10 @@ services:
       POSTGRES_DB: udemy
     restart: always
     networks:
-      - lesson
+      - back-tier
+
 networks:
-  lesson:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
