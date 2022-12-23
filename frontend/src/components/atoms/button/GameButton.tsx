@@ -13,7 +13,7 @@ export const GameButton: FC<Props> = memo((props) => {
   const { targetUser, size = 'sm' } = props;
 
   return (
-    <Link to={`/app/inviting/${targetUser.id}`} state={{ user: targetUser }}>
+    <Link to={'/app/inviting'} state={{ user: targetUser }}>
       <Button mr={2} size={size}>
         Game
       </Button>
