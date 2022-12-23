@@ -25,7 +25,7 @@ export const GamePreference: FC<Props> = memo((props) => {
   const onClickPreferenceOk = () => {
     switch (value) {
       case '1':
-        setBallSpeed(6);
+        setBallSpeed(5);
         break;
       case '2':
         setBallSpeed(8);
@@ -44,6 +44,9 @@ export const GamePreference: FC<Props> = memo((props) => {
           Game Preference
         </Heading>
         <Divider />
+        <Heading as="h2" size="md" textAlign="center">
+          Ball Speed
+        </Heading>
         <Center>
           <RadioGroup onChange={setValue} value={value}>
             <Stack direction="row">

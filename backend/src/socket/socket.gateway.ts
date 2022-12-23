@@ -8,6 +8,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { User } from '@prisma/client';
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
 import { BALL_SPEED } from 'src/game/config/game-config';
@@ -174,7 +175,7 @@ export class UsersGateway {
   @SubscribeMessage('invitation_match')
   invitationMatch(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { opponentId: string; ballSpeed: number }
+    @MessageBody() message: { opponentUser: User; ballSpeed: number }
   ): void {
     Logger.debug(
       `${socket.id} ${socket.data.userNickname as string} invitation_match`
@@ -186,7 +187,11 @@ export class UsersGateway {
     };
 
     const player1 = new Player(userId, userNickname, true);
-    const player2 = new Player(message.opponentId, 'nickname', false);
+    const player2 = new Player(
+      message.opponentUser.id,
+      message.opponentUser.nickname,
+      false
+    );
     const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
     this.server.to(player1.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('go_game_room', newRoomId);

@@ -17,20 +17,20 @@ import { GamePreference } from '../components/GamePreference';
 import { InviteState, useGameInvitation } from '../hooks/useGameInviting';
 
 type State = {
-  user: User;
+  opponentUser: User;
 };
 
 export const Inviting: FC = memo(() => {
   const location = useLocation();
-  const { user } = location.state as State;
-  const { inviteState, setInviteState, setOpponentId, setBallSpeed } =
+  const { opponentUser } = location.state as State;
+  const { inviteState, setInviteState, setOpponentUser, setBallSpeed } =
     useGameInvitation();
   const onClickCancel = () => {
     setInviteState(InviteState.InvitingCancel);
   };
 
   useEffect(() => {
-    setOpponentId(user.id);
+    setOpponentUser(opponentUser);
   }, []);
 
   const invitingPage = useMemo(() => {
