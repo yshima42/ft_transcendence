@@ -65,9 +65,13 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       );
     });
 
-    socket.on('go_game_room', (roomId: string) => {
-      console.log('[Socket Event] go_game_room');
-      navigate(`/app/games/${roomId}`);
+    // socket.on('go_game_room', (roomId: string) => {
+    //   console.log('[Socket Event] go_game_room');
+    //   navigate(`/app/games/${roomId}`);
+    // });
+
+    socket.on('receive_invitation', () => {
+      navigate('/app/invited');
     });
 
     return () => {

@@ -189,7 +189,8 @@ export class UsersGateway {
     const player2 = new Player(message.opponentId, 'dummy', false);
     const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
     this.server.to(player1.id).emit('go_game_room', newRoomId);
-    this.server.to(player2.id).emit('go_game_room', newRoomId);
+    this.server.to(player2.id).emit('receive_invitation');
+    // this.server.to(player2.id).emit('go_game_room', newRoomId);
   }
 
   // room関連;
