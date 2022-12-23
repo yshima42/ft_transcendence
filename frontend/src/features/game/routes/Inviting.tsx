@@ -8,7 +8,6 @@ import {
   Spinner,
   Stack,
 } from '@chakra-ui/react';
-import { User } from '@prisma/client';
 import { useLocation } from 'react-router-dom';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
 import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
@@ -17,20 +16,20 @@ import { GamePreference } from '../components/GamePreference';
 import { InviteState, useGameInvitation } from '../hooks/useGameInviting';
 
 type State = {
-  opponentUser: User;
+  targetId: string;
 };
 
 export const Inviting: FC = memo(() => {
   const location = useLocation();
-  const { opponentUser } = location.state as State;
-  const { inviteState, setInviteState, setOpponentUser, setBallSpeed } =
+  const { targetId } = location.state as State;
+  const { inviteState, setInviteState, setOpponentId, setBallSpeed } =
     useGameInvitation();
   const onClickCancel = () => {
     setInviteState(InviteState.InvitingCancel);
   };
 
   useEffect(() => {
-    setOpponentUser(opponentUser);
+    setOpponentId(targetId);
   }, []);
 
   const invitingPage = useMemo(() => {
