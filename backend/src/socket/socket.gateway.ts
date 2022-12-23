@@ -10,6 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
+import { BALL_SPEED } from 'src/game/config/game-config';
 import { GameRoom, Player } from 'src/game/game.object';
 import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -132,26 +133,27 @@ export class UsersGateway {
     const player1 = new Player(waitUserId, waitUserNickname, true);
     const player2 = new Player(userId, userNickname, false);
     // 2人揃ったらマッチルーム作る
-    const newRoomId = this.createGameRoom(player1, player2);
+    const newRoomId = this.createGameRoom(player1, player2, BALL_SPEED);
     this.server.to(player1.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('go_game_room', newRoomId);
   }
 
-  createGameRoom(player1: Player, player2: Player): string {
+  createGameRoom(player1: Player, player2: Player, ballSpeed: number): string {
     const id = uuidv4();
     const gameRoom = new GameRoom(
       this.gameService,
       id,
       this.server,
       player1,
-      player2
+      player2,
+      ballSpeed
     );
     this.gameRooms.set(id, gameRoom);
 
     return id;
   }
 
-  changePresence(userId: string, presence: Presence): void {
+  updatePresence(userId: string, presence: Presence): void {
     this.userIdToPresence.set(userId, presence);
     this.server.emit('update_presence', [
       userId,
@@ -168,10 +170,11 @@ export class UsersGateway {
     await socket.leave('matching');
   }
 
+  // TODO: nicknameをどう取ってくるか検討
   @SubscribeMessage('invitation_match')
   invitationMatch(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { opponentId: string }
+    @MessageBody() message: { opponentId: string; ballSpeed: number }
   ): void {
     Logger.debug(
       `${socket.id} ${socket.data.userNickname as string} invitation_match`
@@ -184,7 +187,7 @@ export class UsersGateway {
 
     const player1 = new Player(userId, userNickname, true);
     const player2 = new Player(message.opponentId, 'nickname', false);
-    const newRoomId = this.createGameRoom(player1, player2);
+    const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
     this.server.to(player1.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('go_game_room', newRoomId);
   }
@@ -202,7 +205,7 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
 
     // PresenceをINGAMEに変更
-    this.changePresence(userId, Presence.INGAME);
+    this.updatePresence(userId, Presence.INGAME);
 
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
@@ -315,7 +318,7 @@ export class UsersGateway {
 
     // PresenceをINGAMEからONLINEに戻す;
     const { userId } = socket.data as { userId: string };
-    this.changePresence(userId, Presence.ONLINE);
+    this.updatePresence(userId, Presence.ONLINE);
 
     await this.leaveGameRoom(socket);
   }

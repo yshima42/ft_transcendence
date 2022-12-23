@@ -1,7 +1,6 @@
 import {
   BALL_COLOR,
   BALL_SIZE,
-  BALL_SPEED,
   PADDLE_COLOR,
   PADDLE_HEIGHT,
   PADDLE_WIDTH,
@@ -10,14 +9,10 @@ import {
 export class Ball {
   x: number;
   y: number;
-  dx: number;
-  dy: number;
 
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.dx = BALL_SPEED;
-    this.dy = -BALL_SPEED;
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {

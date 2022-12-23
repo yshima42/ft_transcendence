@@ -1,7 +1,6 @@
 import { Socket, Server } from 'socket.io';
 import {
   BALL_SIZE,
-  BALL_SPEED,
   BALL_START_X,
   BALL_START_Y,
   CANVAS_HEIGHT,
@@ -21,11 +20,11 @@ class Ball {
   dx: number;
   dy: number;
 
-  constructor() {
+  constructor(speed: number) {
     this.x = BALL_START_X;
     this.y = BALL_START_Y;
-    this.dx = BALL_SPEED;
-    this.dy = BALL_SPEED;
+    this.dx = speed;
+    this.dy = speed;
   }
 
   boundX(): void {
@@ -87,7 +86,8 @@ export class GameRoom {
     id: string,
     server: Server,
     player1: Player,
-    player2: Player
+    player2: Player,
+    ballSpeed: number
   ) {
     this.gameService = gameService;
     this.id = id;
@@ -96,7 +96,7 @@ export class GameRoom {
     this.player2 = player2;
     this.paddle1 = new Paddle(0);
     this.paddle2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH);
-    this.ball = new Ball();
+    this.ball = new Ball(ballSpeed);
     this.interval = setInterval(() => {
       // イニシャライズのための空変数
     });
