@@ -37,16 +37,16 @@ services:
     ports:
       - 5434:5432
     environment:
-      POSTGRES_USER: udemy
-      POSTGRES_PASSWORD: udemy
-      POSTGRES_DB: udemy
-    restart: always
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
+    # restart: always
     networks:
       - back-tier
     volumes:
       - database-volume:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "udemy"]
+      test: ["CMD", "pg_isready", "-U", "$POSTGRES_USER"]
       interval: 5s
       timeout: 5s
       retries: 5
