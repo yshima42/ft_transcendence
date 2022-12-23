@@ -150,6 +150,9 @@ export class UsersGateway {
     const newRoomId = this.createGameRoom(player1, player2);
     this.server.to(player1.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('go_game_room', newRoomId);
+    this.server
+      .to('monitor')
+      .emit('room_created', newRoomId, player1.id, player2.id);
   }
 
   createGameRoom(player1: Player, player2: Player): string {
@@ -195,9 +198,6 @@ export class UsersGateway {
 
     const { userId } = socket.data as { userId: string };
 
-    // PresenceをINGAMEに変更
-    this.changePresence(userId, Presence.INGAME);
-
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
@@ -206,24 +206,25 @@ export class UsersGateway {
     }
     socket.data.roomId = message.roomId;
 
-    // if (gameRoom.player1.id !== userId && gameRoom.player2.id !== userId) {
-    //   socket.emit('watch_game');
-
-    //   return;
-    // }
-
+    const isPlayer =
+      gameRoom.player1.id === userId || gameRoom.player2.id === userId;
+    // 接続してきたのが観戦者の場合、どっちでもいい
     const [player, opponent] =
       gameRoom.player1.id === userId
         ? [gameRoom.player1, gameRoom.player2]
         : [gameRoom.player2, gameRoom.player1];
+    if (isPlayer) {
+      // PresenceをINGAMEに変更
+      this.changePresence(userId, Presence.INGAME);
+    }
     socket.emit('set_side', player.isLeftSide);
     await socket.join(message.roomId);
     if (!player.isReady) {
-      socket.emit('check_confirmation');
+      socket.emit(isPlayer ? 'check_confirmation' : 'wait_players');
     } else if (!opponent.isReady) {
-      socket.emit('wait_opponent');
+      socket.emit(isPlayer ? 'wait_opponent' : 'wait_players');
     } else if (!gameRoom.isFinished) {
-      socket.emit('start_game');
+      socket.emit(isPlayer ? 'start_game' : 'watch_game');
     } else {
       socket.emit('done_game', {
         player1Nickname: gameRoom.player1.nickname,
@@ -249,6 +250,8 @@ export class UsersGateway {
       return;
     }
 
+    const isPlayer =
+      gameRoom.player1.id === userId || gameRoom.player2.id === userId;
     const [player, opponent] =
       gameRoom.player1.id === userId
         ? [gameRoom.player1, gameRoom.player2]
@@ -257,7 +260,7 @@ export class UsersGateway {
     if (!opponent.isReady) {
       this.server.to(player.id).emit('wait_opponent');
     } else {
-      this.server.in(roomId).emit('start_game');
+      this.server.in(roomId).emit(isPlayer ? 'start_game' : 'watch_game');
     }
   }
 
@@ -278,11 +281,8 @@ export class UsersGateway {
     // １回のみ動かす
     if (!gameRoom.isInGame) {
       gameRoom.isInGame = true;
-      // ゲーム開始
       gameRoom.gameStart(socket, roomId);
     }
-
-    // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
   }
 
   @SubscribeMessage('user_command')
@@ -309,15 +309,14 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userNickname as string} leave_room`
     );
 
-    // PresenceをINGAMEからONLINEに戻す;
-    const { userId } = socket.data as { userId: string };
-    this.changePresence(userId, Presence.ONLINE);
-
     await this.leaveGameRoom(socket);
   }
 
   async leaveGameRoom(socket: Socket): Promise<void> {
-    const { roomId } = socket.data as { roomId: string | undefined };
+    const { userId, roomId } = socket.data as {
+      userId: string;
+      roomId: string | undefined;
+    };
     if (roomId === undefined) {
       return;
     }
@@ -328,12 +327,53 @@ export class UsersGateway {
     }
     await socket.leave(roomId);
     const gameRoomSockets = await this.server.in(roomId).fetchSockets();
-    if (gameRoomSockets.length === 0) {
-      // 観戦用
-      // if (!gameRoom.isFinished) {
-      //   this.server.in(roomId).emit('both_players_disconnected');
-      // }
+    const isPlayerLeft = Boolean(
+      gameRoomSockets.find((socket) => {
+        const { userId } = socket.data as { userId: string };
+
+        return gameRoom.player1.id === userId || gameRoom.player2.id === userId;
+      })
+    );
+    if (!isPlayerLeft) {
+      if (!gameRoom.isFinished) {
+        // 観戦者を追い出す
+        this.server.in(roomId).emit('both_players_disconnected');
+        clearInterval(gameRoom.interval);
+      }
+      this.changePresence(userId, Presence.ONLINE);
+      this.server.socketsLeave(roomId);
       this.gameRooms.delete(roomId);
+      this.server.to('monitor').emit('room_deleted', roomId);
     }
+  }
+
+  @SubscribeMessage('join_monitoring_room')
+  async sendAllGameRoomIds(
+    @ConnectedSocket() socket: Socket
+  ): Promise<string[][]> {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} join_monitoring_room`
+    );
+
+    await socket.join('monitor');
+    const inGameOutlines: string[][] = [];
+    this.gameRooms.forEach((gameRoom) => {
+      inGameOutlines.push([
+        gameRoom.id,
+        gameRoom.player1.id,
+        gameRoom.player2.id,
+      ]);
+    });
+
+    return inGameOutlines;
+  }
+
+  @SubscribeMessage('leave_monitoring_room')
+  async leaveRoomList(@ConnectedSocket() socket: Socket): Promise<void> {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} leave_monitoring_room`
+    );
+
+    await socket.leave('monitor');
   }
 }
