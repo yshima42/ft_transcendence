@@ -35,7 +35,7 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
           <ModalBody>
             <VStack justify="center" align="center">
               <Text fontSize="lg" mb={4}>
-                Scan the QR code with Google authenticator.
+                Scan the QR code with Google Authenticator app.
               </Text>
               {qrcodeUrl === '' ? (
                 <Spinner />
