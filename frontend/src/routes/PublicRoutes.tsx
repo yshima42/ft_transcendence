@@ -17,6 +17,7 @@ import { DmRooms } from 'features/dm/routes/DmRooms';
 import { Users } from 'features/friends/routes/Users';
 import { Game } from 'features/game/routes/Game';
 import { Games } from 'features/game/routes/Games';
+import { Invited } from 'features/game/routes/Invited';
 import { Inviting } from 'features/game/routes/Inviting';
 import { Matching } from 'features/game/routes/Matching';
 import { Top } from 'features/game/routes/Top';
@@ -85,6 +86,7 @@ export const publicRoutes = [
       { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
       { path: 'inviting', element: <Inviting /> },
+      { path: 'invited', element: <Invited /> },
       { path: 'dm', element: <DmRooms /> },
       { path: 'dm/:id', element: <DmRoom /> },
       { path: 'profile', element: <Profile /> },
