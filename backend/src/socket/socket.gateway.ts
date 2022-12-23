@@ -198,9 +198,6 @@ export class UsersGateway {
 
     const { userId } = socket.data as { userId: string };
 
-    // PresenceをINGAMEに変更
-    this.changePresence(userId, Presence.INGAME);
-
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom === undefined) {
       socket.emit('invalid_room');
@@ -211,10 +208,15 @@ export class UsersGateway {
 
     const isPlayer =
       gameRoom.player1.id === userId || gameRoom.player2.id === userId;
+    // 接続してきたのが観戦者の場合、どっちでもいい
     const [player, opponent] =
       gameRoom.player1.id === userId
         ? [gameRoom.player1, gameRoom.player2]
         : [gameRoom.player2, gameRoom.player1];
+    if (isPlayer) {
+      // PresenceをINGAMEに変更
+      this.changePresence(userId, Presence.INGAME);
+    }
     socket.emit('set_side', player.isLeftSide);
     await socket.join(message.roomId);
     if (!player.isReady) {
@@ -307,15 +309,14 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userNickname as string} leave_room`
     );
 
-    // PresenceをINGAMEからONLINEに戻す;
-    const { userId } = socket.data as { userId: string };
-    this.changePresence(userId, Presence.ONLINE);
-
     await this.leaveGameRoom(socket);
   }
 
   async leaveGameRoom(socket: Socket): Promise<void> {
-    const { roomId } = socket.data as { roomId: string | undefined };
+    const { userId, roomId } = socket.data as {
+      userId: string;
+      roomId: string | undefined;
+    };
     if (roomId === undefined) {
       return;
     }
@@ -339,6 +340,7 @@ export class UsersGateway {
         this.server.in(roomId).emit('both_players_disconnected');
         clearInterval(gameRoom.interval);
       }
+      this.changePresence(userId, Presence.ONLINE);
       this.server.socketsLeave(roomId);
       this.gameRooms.delete(roomId);
       this.server.to('monitor').emit('room_deleted', roomId);
