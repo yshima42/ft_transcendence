@@ -49,7 +49,7 @@ export const UserInfoCard: FC<UserInfoCardProps> = memo(
         ) : (
           <>
             <HStack justify="center" align="center">
-              <GameButton targetUser={user} />
+              <GameButton targetId={user.id} />
               {!isUserBlocked && <DmButton targetId={user.id} />}
             </HStack>
             <Box m={2}>

@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-import { User } from '@prisma/client';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 
@@ -14,7 +13,7 @@ export enum InviteState {
 export const useGameInvitation = (): {
   inviteState: InviteState;
   setInviteState: React.Dispatch<React.SetStateAction<InviteState>>;
-  setOpponentUser: React.Dispatch<React.SetStateAction<User | undefined>>;
+  setOpponentId: React.Dispatch<React.SetStateAction<string>>;
   setBallSpeed: React.Dispatch<React.SetStateAction<number>>;
 } => {
   const [inviteState, setInviteState] = useState(InviteState.SocketConnecting);
@@ -24,7 +23,7 @@ export const useGameInvitation = (): {
   }
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
-  const [opponentUser, setOpponentUser] = useState<User>();
+  const [opponentId, setOpponentId] = useState('');
   // TODO: デフォルト値必要？
   const [ballSpeed, setBallSpeed] = useState(0);
 
@@ -55,9 +54,9 @@ export const useGameInvitation = (): {
       }
       case InviteState.Inviting: {
         console.log('[InviteState] Inviting');
-        if (opponentUser !== undefined) {
+        if (opponentId !== undefined) {
           socket.emit('invitation_match', {
-            opponentUser,
+            opponentId,
             ballSpeed,
           });
         }
@@ -74,7 +73,7 @@ export const useGameInvitation = (): {
   return {
     inviteState,
     setInviteState,
-    setOpponentUser,
+    setOpponentId,
     setBallSpeed,
   };
 };
