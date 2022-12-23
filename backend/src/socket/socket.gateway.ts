@@ -67,8 +67,6 @@ export class UsersGateway {
   async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
     const { userId } = socket.data as { userId: string };
     await socket.leave(userId);
-
-    // TODO: これ必要か検討
     await socket.leave('matching');
 
     const userIdSockets = await this.server.in(userId).fetchSockets();
@@ -174,7 +172,6 @@ export class UsersGateway {
     await socket.leave('matching');
   }
 
-  // TODO: nicknameをどう取ってくるか検討
   @SubscribeMessage('invitation_match')
   invitationMatch(
     @ConnectedSocket() socket: Socket,
