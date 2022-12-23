@@ -231,6 +231,10 @@ export class UsersGateway {
       socket.emit(isPlayer ? 'wait_opponent' : 'wait_players');
     } else if (!gameRoom.isFinished) {
       socket.emit(isPlayer ? 'start_game' : 'watch_game');
+      socket.emit('update_score', {
+        player1Score: gameRoom.player1.score,
+        player2Score: gameRoom.player2.score,
+      });
     } else {
       socket.emit('done_game', {
         player1Nickname: gameRoom.player1.nickname,
