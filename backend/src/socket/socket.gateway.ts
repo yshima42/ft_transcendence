@@ -10,6 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
+import { BALL_SPEED } from 'src/game/config/game-config';
 import { GameRoom, Player } from 'src/game/game.object';
 import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -22,8 +23,6 @@ enum Presence {
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
-  // TODO: userIdToSocketIdsにする(全てuserIdに紐づく構造にするため)
-  public socketIdToUserId: Map<string, string>;
   public userIdToPresence: Map<string, Presence>;
   private readonly gameRooms: Map<string, GameRoom>;
 
@@ -33,7 +32,6 @@ export class UsersGateway {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService
   ) {
-    this.socketIdToUserId = new Map<string, string>();
     this.userIdToPresence = new Map<string, Presence>();
     this.gameRooms = new Map<string, GameRoom>();
   }
@@ -67,20 +65,20 @@ export class UsersGateway {
 
   async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
     const { userId } = socket.data as { userId: string };
-    this.socketIdToUserId.delete(socket.id);
-    if (this.countConnectionByUserId(userId) === 0) {
+    await socket.leave(userId);
+    await socket.leave('matching');
+
+    const userIdSockets = await this.server.in(userId).fetchSockets();
+
+    if (userIdSockets.length === 0) {
       socket.broadcast.emit('user_disconnected', userId);
       this.userIdToPresence.delete(userId);
     }
 
-    // disconnect されたら、room からも自動で消えるため、一旦コメントアウト
-    // await socket.leave(userId);
-    // await socket.leave('matching');
     await this.leaveGameRoom(socket);
 
     // debug用
     Logger.debug('disconnected: ' + socket.id);
-    console.table(this.socketIdToUserId);
   }
 
   @SubscribeMessage('handshake')
@@ -93,27 +91,13 @@ export class UsersGateway {
         this.userIdToPresence.get(userId),
       ]);
     }
-    this.socketIdToUserId.set(socket.id, userId);
     this.userIdToPresence.set(userId, Presence.ONLINE);
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
-    console.table(this.socketIdToUserId);
 
     return [...this.userIdToPresence];
   }
-
-  private readonly countConnectionByUserId = (targetUserId: string): number => {
-    const userIds = this.socketIdToUserId.values();
-    let count = 0;
-    for (const userId of userIds) {
-      if (userId === targetUserId) {
-        count += 1;
-      }
-    }
-
-    return count;
-  };
 
   // Game関連
   @SubscribeMessage('random_match')
@@ -147,7 +131,7 @@ export class UsersGateway {
     const player1 = new Player(waitUserId, waitUserNickname, true);
     const player2 = new Player(userId, userNickname, false);
     // 2人揃ったらマッチルーム作る
-    const newRoomId = this.createGameRoom(player1, player2);
+    const newRoomId = this.createGameRoom(player1, player2, BALL_SPEED);
     this.server.to(player1.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('go_game_room', newRoomId);
     this.server
@@ -155,21 +139,22 @@ export class UsersGateway {
       .emit('room_created', newRoomId, player1.id, player2.id);
   }
 
-  createGameRoom(player1: Player, player2: Player): string {
+  createGameRoom(player1: Player, player2: Player, ballSpeed: number): string {
     const id = uuidv4();
     const gameRoom = new GameRoom(
       this.gameService,
       id,
       this.server,
       player1,
-      player2
+      player2,
+      ballSpeed
     );
     this.gameRooms.set(id, gameRoom);
 
     return id;
   }
 
-  changePresence(userId: string, presence: Presence): void {
+  updatePresence(userId: string, presence: Presence): void {
     this.userIdToPresence.set(userId, presence);
     this.server.emit('update_presence', [
       userId,
@@ -184,6 +169,27 @@ export class UsersGateway {
     );
 
     await socket.leave('matching');
+  }
+
+  @SubscribeMessage('invitation_match')
+  invitationMatch(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { opponentId: string; ballSpeed: number }
+  ): void {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} invitation_match`
+    );
+
+    const { userId, userNickname } = socket.data as {
+      userId: string;
+      userNickname: string;
+    };
+
+    const player1 = new Player(userId, userNickname, true);
+    const player2 = new Player(message.opponentId, 'dummy', false);
+    const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
+    this.server.to(player1.id).emit('go_game_room', newRoomId);
+    this.server.to(player2.id).emit('go_game_room', newRoomId);
   }
 
   // room関連;
@@ -215,7 +221,7 @@ export class UsersGateway {
         : [gameRoom.player2, gameRoom.player1];
     if (isPlayer) {
       // PresenceをINGAMEに変更
-      this.changePresence(userId, Presence.INGAME);
+      this.updatePresence(userId, Presence.INGAME);
     }
     socket.emit('set_side', me.isLeftSide);
     await socket.join(message.roomId);
@@ -340,7 +346,7 @@ export class UsersGateway {
         this.server.in(roomId).emit('both_players_disconnected');
         clearInterval(gameRoom.interval);
       }
-      this.changePresence(userId, Presence.ONLINE);
+      this.updatePresence(userId, Presence.ONLINE);
       this.server.socketsLeave(roomId);
       this.gameRooms.delete(roomId);
       this.server.to('monitor').emit('room_deleted', roomId);
