@@ -209,7 +209,7 @@ export class UsersGateway {
     const isPlayer =
       gameRoom.player1.id === userId || gameRoom.player2.id === userId;
     // 接続してきたのが観戦者の場合、どっちでもいい
-    const [player, opponent] =
+    const [me, opponent] =
       gameRoom.player1.id === userId
         ? [gameRoom.player1, gameRoom.player2]
         : [gameRoom.player2, gameRoom.player1];
@@ -217,9 +217,9 @@ export class UsersGateway {
       // PresenceをINGAMEに変更
       this.changePresence(userId, Presence.INGAME);
     }
-    socket.emit('set_side', player.isLeftSide);
+    socket.emit('set_side', me.isLeftSide);
     await socket.join(message.roomId);
-    if (!player.isReady) {
+    if (!me.isReady) {
       socket.emit(isPlayer ? 'check_confirmation' : 'wait_players');
     } else if (!opponent.isReady) {
       socket.emit(isPlayer ? 'wait_opponent' : 'wait_players');
@@ -252,13 +252,13 @@ export class UsersGateway {
 
     const isPlayer =
       gameRoom.player1.id === userId || gameRoom.player2.id === userId;
-    const [player, opponent] =
+    const [me, opponent] =
       gameRoom.player1.id === userId
         ? [gameRoom.player1, gameRoom.player2]
         : [gameRoom.player2, gameRoom.player1];
-    player.isReady = true;
+    me.isReady = true;
     if (!opponent.isReady) {
-      this.server.to(player.id).emit('wait_opponent');
+      this.server.to(me.id).emit('wait_opponent');
     } else {
       this.server.in(roomId).emit(isPlayer ? 'start_game' : 'watch_game');
     }
