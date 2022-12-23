@@ -279,11 +279,8 @@ export class UsersGateway {
     // １回のみ動かす
     if (!gameRoom.isInGame) {
       gameRoom.isInGame = true;
-      // ゲーム開始
       gameRoom.gameStart(socket, roomId);
     }
-
-    // TODO: ゲーム終了後、gameRoomを削除する処理を入れる
   }
 
   @SubscribeMessage('user_command')
