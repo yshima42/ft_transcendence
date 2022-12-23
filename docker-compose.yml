@@ -26,7 +26,8 @@ services:
       source: "./backend"
       target: "/usr/src/app"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     networks:
       - front-tier
       - back-tier
@@ -44,6 +45,12 @@ services:
       - back-tier
     volumes:
       - database-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "udemy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   front-tier:
