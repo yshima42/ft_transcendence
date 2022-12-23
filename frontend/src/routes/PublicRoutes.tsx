@@ -84,7 +84,7 @@ export const publicRoutes = [
       { path: 'games/:id', element: <Game /> },
       { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
-      { path: 'inviting/:id', element: <Inviting /> },
+      { path: 'inviting', element: <Inviting /> },
       // { path: 'select', element: <GameSelect targetId="" /> },
       { path: 'dm', element: <DmRooms /> },
       { path: 'dm/:id', element: <DmRoom /> },

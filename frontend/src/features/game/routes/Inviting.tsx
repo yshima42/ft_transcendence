@@ -9,7 +9,7 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
 import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -21,7 +21,6 @@ type State = {
 };
 
 export const Inviting: FC = memo(() => {
-  const { id } = useParams();
   const location = useLocation();
   const { user } = location.state as State;
   const { inviteState, setInviteState, setOpponentId, setBallSpeed } =
@@ -31,7 +30,7 @@ export const Inviting: FC = memo(() => {
   };
 
   useEffect(() => {
-    if (id !== undefined) setOpponentId(user.id);
+    setOpponentId(user.id);
   }, []);
 
   const invitingPage = useMemo(() => {
