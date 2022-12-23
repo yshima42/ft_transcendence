@@ -136,7 +136,7 @@ export class UsersGateway {
     this.server.to(player2.id).emit('go_game_room', newRoomId);
     this.server
       .to('monitor')
-      .emit('room_created', newRoomId, player1.id, player2.id);
+      .emit('room_created', [newRoomId, player1.id, player2.id]);
   }
 
   createGameRoom(player1: Player, player2: Player, ballSpeed: number): string {
