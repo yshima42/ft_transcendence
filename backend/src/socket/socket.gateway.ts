@@ -209,12 +209,8 @@ export class UsersGateway {
     }
     socket.data.roomId = message.roomId;
 
-    // if (gameRoom.player1.id !== userId && gameRoom.player2.id !== userId) {
-    //   socket.emit('watch_game');
-
-    //   return;
-    // }
-
+    const isPlayer =
+      gameRoom.player1.id === userId || gameRoom.player2.id === userId;
     const [player, opponent] =
       gameRoom.player1.id === userId
         ? [gameRoom.player1, gameRoom.player2]
@@ -222,11 +218,11 @@ export class UsersGateway {
     socket.emit('set_side', player.isLeftSide);
     await socket.join(message.roomId);
     if (!player.isReady) {
-      socket.emit('check_confirmation');
+      socket.emit(isPlayer ? 'check_confirmation' : 'wait_players');
     } else if (!opponent.isReady) {
-      socket.emit('wait_opponent');
+      socket.emit(isPlayer ? 'wait_opponent' : 'wait_players');
     } else if (!gameRoom.isFinished) {
-      socket.emit('start_game');
+      socket.emit(isPlayer ? 'start_game' : 'watch_game');
     } else {
       socket.emit('done_game', {
         player1Nickname: gameRoom.player1.nickname,
@@ -252,6 +248,8 @@ export class UsersGateway {
       return;
     }
 
+    const isPlayer =
+      gameRoom.player1.id === userId || gameRoom.player2.id === userId;
     const [player, opponent] =
       gameRoom.player1.id === userId
         ? [gameRoom.player1, gameRoom.player2]
@@ -260,7 +258,7 @@ export class UsersGateway {
     if (!opponent.isReady) {
       this.server.to(player.id).emit('wait_opponent');
     } else {
-      this.server.in(roomId).emit('start_game');
+      this.server.in(roomId).emit(isPlayer ? 'start_game' : 'watch_game');
     }
   }
 
@@ -331,11 +329,20 @@ export class UsersGateway {
     }
     await socket.leave(roomId);
     const gameRoomSockets = await this.server.in(roomId).fetchSockets();
-    if (gameRoomSockets.length === 0) {
-      // 観戦用
-      // if (!gameRoom.isFinished) {
-      //   this.server.in(roomId).emit('both_players_disconnected');
-      // }
+    const isPlayerLeft = Boolean(
+      gameRoomSockets.find((socket) => {
+        const { userId } = socket.data as { userId: string };
+
+        return gameRoom.player1.id === userId || gameRoom.player2.id === userId;
+      })
+    );
+    if (!isPlayerLeft) {
+      if (!gameRoom.isFinished) {
+        // 観戦者を追い出す
+        this.server.in(roomId).emit('both_players_disconnected');
+        clearInterval(gameRoom.interval);
+      }
+      this.server.socketsLeave(roomId);
       this.gameRooms.delete(roomId);
       this.server.to('monitor').emit('room_deleted', roomId);
     }
