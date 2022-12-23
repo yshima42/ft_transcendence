@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
+import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
 export enum Presence {
@@ -32,6 +33,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   >([]);
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.on('connect_established', () => {
@@ -61,6 +63,11 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
           (userIdToPresencePair) => userIdToPresencePair[0] !== userId
         )
       );
+    });
+
+    socket.on('go_game_room', (roomId: string) => {
+      console.log('[Socket Event] go_game_room');
+      navigate(`/app/games/${roomId}`);
     });
 
     return () => {
