@@ -10,7 +10,6 @@ import {
   PADDLE_WIDTH,
 } from '../utils/gameConfig';
 import { Ball, Paddle } from '../utils/gameObjs';
-import { userInput } from '../utils/userInput';
 
 export enum GamePhase {
   SocketConnecting = 0,
@@ -20,6 +19,8 @@ export enum GamePhase {
   OpponentWaiting = 4,
   InGame = 5,
   Result = 6,
+  PlayerWaiting = 7,
+  Watch = 8,
 }
 
 export type GameResult = {
@@ -47,7 +48,6 @@ export const useGame = (
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [gameResult, setGameResult] = useState(defaultGameResult);
-  const [isLeftSide, setIsLeftSide] = useState(true);
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
@@ -76,6 +76,39 @@ export const useGame = (
     ctx.fillText(player2.score.toString(), 960, 50);
   }, []);
 
+  const userCommand = {
+    up: false,
+    down: false,
+    isLeftSide: true,
+  };
+  let justPressed = false;
+
+  const keyDownEvent = (e: KeyboardEvent) => {
+    if (e.key === 'Down' || e.key === 'ArrowDown') {
+      if (!userCommand.down) {
+        justPressed = true;
+      }
+      userCommand.down = true;
+    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+      if (!userCommand.up) {
+        justPressed = true;
+      }
+      userCommand.up = true;
+    }
+    if (justPressed) {
+      socket.emit('user_command', { userCommand });
+      justPressed = false;
+    }
+  };
+
+  const keyUpEvent = (e: KeyboardEvent) => {
+    if (e.key === 'Down' || e.key === 'ArrowDown') {
+      userCommand.down = false;
+    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+      userCommand.up = false;
+    }
+  };
+
   // socket イベント
   useEffect(() => {
     socket.on('invalid_room', () => {
@@ -88,9 +121,21 @@ export const useGame = (
       });
     });
 
+    socket.on('both_players_disconnected', () => {
+      console.log('[Socket Event] both_players_disconnected');
+      navigate('/app', {
+        state: {
+          toastProps: {
+            description: 'Both players disconnected.',
+            status: 'error',
+          },
+        },
+      });
+    });
+
     socket.on('set_side', (isLeftSide: boolean) => {
       console.log('[Socket Event] set_side');
-      setIsLeftSide(isLeftSide);
+      userCommand.isLeftSide = isLeftSide;
     });
 
     socket.on('check_confirmation', () => {
@@ -105,6 +150,8 @@ export const useGame = (
 
     socket.on('start_game', () => {
       console.log('[Socket Event] start_game');
+      document.addEventListener('keydown', keyDownEvent, false);
+      document.addEventListener('keyup', keyUpEvent, false);
       setGamePhase(GamePhase.InGame);
     });
 
@@ -142,9 +189,18 @@ export const useGame = (
       setGamePhase(GamePhase.Result);
     });
 
+    socket.on('wait_players', () => {
+      setGamePhase(GamePhase.PlayerWaiting);
+    });
+
+    socket.on('watch_game', () => {
+      setGamePhase(GamePhase.Watch);
+    });
+
     return () => {
       socket.emit('leave_room');
       socket.off('invalid_room');
+      socket.off('both_players_disconnected');
       socket.off('set_side');
       socket.off('check_confirmation');
       socket.off('wait_opponent');
@@ -152,6 +208,10 @@ export const useGame = (
       socket.off('done_game');
       socket.off('update_score');
       socket.off('position_update');
+      socket.off('wait_players');
+      socket.off('watch');
+      document.removeEventListener('keydown', keyDownEvent, false);
+      document.removeEventListener('keyup', keyUpEvent, false);
     };
   }, [socket, navigate]);
 
@@ -185,15 +245,22 @@ export const useGame = (
       case GamePhase.InGame: {
         console.log('[GamePhase] InGame');
         socket.emit('connect_pong');
-        userInput(socket, roomId, isLeftSide);
         break;
       }
       case GamePhase.Result: {
         console.log('[GamePhase] Result');
         break;
       }
+      case GamePhase.PlayerWaiting: {
+        console.log('[GamePhase] PlayerWaiting');
+        break;
+      }
+      case GamePhase.Watch: {
+        console.log('[GamePhase] Watch');
+        break;
+      }
     }
-  }, [gamePhase, socket, isLeftSide, roomId, connected]);
+  }, [gamePhase, socket, roomId, connected]);
 
   return { gamePhase, setGamePhase, draw, gameResult };
 };

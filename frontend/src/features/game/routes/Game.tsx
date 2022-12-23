@@ -5,6 +5,7 @@ import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Confirmation } from '../components/Confirmation';
 import { OpponentWaiting } from '../components/OpponentWaiting';
+import { PlayerWaiting } from '../components/PlayerWaiting';
 import { PongGame } from '../components/PongGame';
 import { Result } from '../components/Result';
 import { GamePhase, useGame } from '../hooks/useGame';
@@ -24,7 +25,10 @@ export const Game: FC = memo(() => {
         return <CenterSpinner h="40vh" />;
       case GamePhase.OpponentWaiting:
         return <OpponentWaiting />;
+      case GamePhase.PlayerWaiting:
+        return <PlayerWaiting />;
       case GamePhase.InGame:
+      case GamePhase.Watch:
         return <PongGame draw={draw} />;
       case GamePhase.Result:
         return <Result gameResult={gameResult} />;
