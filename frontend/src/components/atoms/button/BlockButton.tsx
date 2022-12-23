@@ -9,14 +9,18 @@ type Props = {
 
 export const BlockButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
-  const { blockUser, isLoading } = useUserBlock(targetId);
+  const { blockUser, isLoading, isSuccess } = useUserBlock(targetId);
 
   const onClickUnblock = async () => {
     await blockUser({ targetId });
   };
 
   return (
-    <Button size={size} isDisabled={isLoading} onClick={onClickUnblock}>
+    <Button
+      size={size}
+      isDisabled={isLoading || isSuccess}
+      onClick={onClickUnblock}
+    >
       Block
     </Button>
   );

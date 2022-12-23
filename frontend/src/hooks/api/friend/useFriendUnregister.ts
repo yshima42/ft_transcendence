@@ -18,9 +18,13 @@ export const useFriendUnregister = (
 ): {
   unregisterFriend: UnregisterFriend;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { deleteFunc: unregisterFriend, isLoading } =
-    useDeleteApi<FriendUnregisterResBody>(`/users/me/friends/${userId}`);
+  const {
+    deleteFunc: unregisterFriend,
+    isLoading,
+    isSuccess,
+  } = useDeleteApi<FriendUnregisterResBody>(`/users/me/friends/${userId}`);
 
-  return { unregisterFriend, isLoading };
+  return { unregisterFriend, isLoading, isSuccess };
 };
