@@ -12,6 +12,10 @@ type Props = {
 
 export const GameOutlineCard: FC<Props> = memo((props) => {
   const { gameOutline } = props;
+  const { user } = useProfile();
+  const isPlayer =
+    user.id === gameOutline.leftPlayerId ||
+    user.id === gameOutline.rightPlayerId;
   const { user: leftPlayer } = useProfile(gameOutline.leftPlayerId);
   const { user: rightPlayer } = useProfile(gameOutline.rightPlayerId);
   const navigate = useNavigate();
@@ -41,7 +45,7 @@ export const GameOutlineCard: FC<Props> = memo((props) => {
         </VStack>
         <Spacer />
         <Button onClick={() => navigate(`/app/games/${gameOutline.roomId}`)}>
-          Watch
+          {isPlayer ? 'Reconnect' : 'Watch'}
         </Button>
       </Flex>
     </Card>
