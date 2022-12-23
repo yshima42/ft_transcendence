@@ -27,7 +27,7 @@ export const FriendsList: FC = () => {
           avatarImageUrl={user.avatarImageUrl}
           buttons={
             <>
-              <GameButton targetId={user.id} />
+              <GameButton targetUser={user} />
               <DmButton targetId={user.id} />
             </>
           }
