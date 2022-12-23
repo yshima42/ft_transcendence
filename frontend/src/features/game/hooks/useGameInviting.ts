@@ -4,20 +4,19 @@ import { SocketContext } from 'providers/SocketProvider';
 
 export enum InviteState {
   SocketConnecting = 0,
-  GameSelect = 1,
+  GamePreference = 1,
   Inviting = 2,
   InvitingCancel = 3,
   Matched = 4,
 }
 
 export const useGameInvitation = (): {
-  invitingState: InviteState;
-  setInvitationState: React.Dispatch<React.SetStateAction<InviteState>>;
+  inviteState: InviteState;
+  setInviteState: React.Dispatch<React.SetStateAction<InviteState>>;
   setOpponentId: React.Dispatch<React.SetStateAction<string>>;
+  setBallSpeed: React.Dispatch<React.SetStateAction<number>>;
 } => {
-  const [invitationState, setInvitationState] = useState(
-    InviteState.SocketConnecting
-  );
+  const [inviteState, setInviteState] = useState(InviteState.SocketConnecting);
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
@@ -25,46 +24,54 @@ export const useGameInvitation = (): {
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
   const [opponentId, setOpponentId] = useState('');
+  // TODO: デフォルト値必要？
+  const [ballSpeed, setBallSpeed] = useState(0);
 
   // socket イベント
   useEffect(() => {
     socket.on('go_game_room', (roomId: string) => {
       console.log('[Socket Event] go_game_room');
-      setInvitationState(InviteState.Matched);
+      setInviteState(InviteState.Matched);
       navigate(`/app/games/${roomId}`);
     });
 
     return () => {
-      if (invitationState === InviteState.Inviting) {
+      if (inviteState === InviteState.Inviting) {
         socket.emit('inviting_cancel');
       }
       socket.off('go_game_room');
     };
-  }, [socket, invitationState, navigate]);
+  }, [socket, inviteState, navigate]);
 
   useEffect(() => {
-    switch (invitationState) {
+    switch (inviteState) {
       case InviteState.SocketConnecting: {
         if (connected) {
-          setInvitationState(InviteState.Inviting);
+          console.log('[InviteState] connected');
+          setInviteState(InviteState.GamePreference);
         }
         break;
       }
-      case InviteState.GameSelect: {
+      case InviteState.GamePreference: {
         break;
       }
       case InviteState.Inviting: {
-        console.log('[MatchState] Matching');
-        socket.emit('invitation_match', { opponentId });
+        console.log('[InviteState] Inviting');
+        socket.emit('invitation_match', { opponentId, ballSpeed });
         break;
       }
       case InviteState.InvitingCancel: {
-        console.log('[MatchState] MatchingCancel');
+        console.log('[InviteState] InvitationCancel');
         navigate('/app');
         break;
       }
     }
-  }, [invitationState, socket, navigate, connected]);
+  }, [inviteState, socket, navigate, connected]);
 
-  return { invitingState: invitationState, setInvitationState, setOpponentId };
+  return {
+    inviteState,
+    setInviteState,
+    setOpponentId,
+    setBallSpeed,
+  };
 };
