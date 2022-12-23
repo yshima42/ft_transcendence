@@ -1,9 +1,7 @@
 import { memo, FC } from 'react';
 import { Button } from '@chakra-ui/react';
-import {
-  InvitationState,
-  useInvitationGame,
-} from 'features/profile/hooks/useInvitationGame';
+
+import { Link } from 'react-router-dom';
 
 type Props = {
   targetId: string;
@@ -12,16 +10,12 @@ type Props = {
 
 export const GameButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
-  const { setInvitationState, setOpponentId } = useInvitationGame();
-
-  const onClickGame = () => {
-    setOpponentId(targetId);
-    setInvitationState(InvitationState.Inviting);
-  };
 
   return (
-    <Button mr={2} size={size} onClick={onClickGame}>
-      Game
-    </Button>
+    <Link to={`/app/inviting/${targetId}`}>
+      <Button mr={2} size={size}>
+        Game
+      </Button>
+    </Link>
   );
 });

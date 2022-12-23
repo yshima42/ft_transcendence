@@ -2,20 +2,21 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 
-export enum InvitationState {
+export enum InviteState {
   SocketConnecting = 0,
-  Inviting = 1,
-  InvitingCancel = 2,
-  Matched = 3,
+  GameSelect = 1,
+  Inviting = 2,
+  InvitingCancel = 3,
+  Matched = 4,
 }
 
-export const useInvitationGame = (): {
-  invitationState: InvitationState;
-  setInvitationState: React.Dispatch<React.SetStateAction<InvitationState>>;
+export const useGameInvitation = (): {
+  invitingState: InviteState;
+  setInvitationState: React.Dispatch<React.SetStateAction<InviteState>>;
   setOpponentId: React.Dispatch<React.SetStateAction<string>>;
 } => {
   const [invitationState, setInvitationState] = useState(
-    InvitationState.SocketConnecting
+    InviteState.SocketConnecting
   );
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
@@ -29,12 +30,12 @@ export const useInvitationGame = (): {
   useEffect(() => {
     socket.on('go_game_room', (roomId: string) => {
       console.log('[Socket Event] go_game_room');
-      setInvitationState(InvitationState.Matched);
+      setInvitationState(InviteState.Matched);
       navigate(`/app/games/${roomId}`);
     });
 
     return () => {
-      if (invitationState === InvitationState.Inviting) {
+      if (invitationState === InviteState.Inviting) {
         socket.emit('inviting_cancel');
       }
       socket.off('go_game_room');
@@ -43,25 +44,27 @@ export const useInvitationGame = (): {
 
   useEffect(() => {
     switch (invitationState) {
-      // case InvitationState.SocketConnecting: {
-      //   if (connected) {
-      //     setInvitationState(InvitationState.Inviting);
-      //   }
-      //   break;
-      // }
-      case InvitationState.Inviting: {
+      case InviteState.SocketConnecting: {
+        if (connected) {
+          setInvitationState(InviteState.Inviting);
+        }
+        break;
+      }
+      case InviteState.GameSelect: {
+        break;
+      }
+      case InviteState.Inviting: {
         console.log('[MatchState] Matching');
         socket.emit('invitation_match', { opponentId });
         break;
       }
-      case InvitationState.InvitingCancel: {
+      case InviteState.InvitingCancel: {
         console.log('[MatchState] MatchingCancel');
-        socket.emit('inviting_cancel');
         navigate('/app');
         break;
       }
     }
   }, [invitationState, socket, navigate, connected]);
 
-  return { invitationState, setInvitationState, setOpponentId };
+  return { invitingState: invitationState, setInvitationState, setOpponentId };
 };
