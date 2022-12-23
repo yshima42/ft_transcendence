@@ -1,4 +1,7 @@
-run: up log
+run: 
+	docker-compose up --build
+
+test: up log
 
 up: 
 	docker-compose up -d
@@ -20,3 +23,7 @@ dclean:
 
 vclean:
 	docker volume rm ft_transcendence_database-volume
+
+re: down run
+
+rev: down vclean run
