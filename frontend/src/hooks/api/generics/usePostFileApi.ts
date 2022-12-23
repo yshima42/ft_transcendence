@@ -17,6 +17,7 @@ export function usePostFileApi<ResBody>(
   postFunc: UseMutateAsyncFunction<ResBody, unknown, FileReqBody, unknown>;
   isLoading: boolean;
   isError: boolean;
+  isSuccess: boolean;
   failureReason: unknown;
 } {
   const axiosPost = async (reqBody: FileReqBody) => {
@@ -34,6 +35,7 @@ export function usePostFileApi<ResBody>(
     mutateAsync: postFunc,
     isLoading,
     isError,
+    isSuccess,
     failureReason,
   } = useMutation(axiosPost, {
     onSuccess: () => {
@@ -45,5 +47,5 @@ export function usePostFileApi<ResBody>(
     },
   });
 
-  return { postFunc, isLoading, isError, failureReason };
+  return { postFunc, isLoading, isError, isSuccess, failureReason };
 }

@@ -20,12 +20,16 @@ export type UploadAvatar = UseMutateAsyncFunction<
 export const useAvatarUpload = (): {
   uploadAvatar: UploadAvatar;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { postFunc: uploadAvatar, isLoading } =
-    usePostFileApi<AvatarUploadResBody>('/users/me/avatar', [
-      ['/users/me/profile'],
-      ['/game/matches'],
-    ]);
+  const {
+    postFunc: uploadAvatar,
+    isLoading,
+    isSuccess,
+  } = usePostFileApi<AvatarUploadResBody>('/users/me/avatar', [
+    ['/users/me/profile'],
+    ['/game/matches'],
+  ]);
 
-  return { uploadAvatar, isLoading };
+  return { uploadAvatar, isLoading, isSuccess };
 };
