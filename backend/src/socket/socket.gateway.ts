@@ -157,7 +157,7 @@ export class UsersGateway {
     return id;
   }
 
-  changePresence(userId: string, presence: Presence): void {
+  updatePresence(userId: string, presence: Presence): void {
     this.userIdToPresence.set(userId, presence);
     this.server.emit('update_presence', [
       userId,
@@ -229,7 +229,7 @@ export class UsersGateway {
         : [gameRoom.player2, gameRoom.player1];
     if (isPlayer) {
       // PresenceをINGAMEに変更
-      this.changePresence(userId, Presence.INGAME);
+      this.updatePresence(userId, Presence.INGAME);
     }
     socket.emit('set_side', me.isLeftSide);
     await socket.join(message.roomId);
@@ -354,7 +354,7 @@ export class UsersGateway {
         this.server.in(roomId).emit('both_players_disconnected');
         clearInterval(gameRoom.interval);
       }
-      this.changePresence(userId, Presence.ONLINE);
+      this.updatePresence(userId, Presence.ONLINE);
       this.server.socketsLeave(roomId);
       this.gameRooms.delete(roomId);
       this.server.to('monitor').emit('room_deleted', roomId);
