@@ -72,7 +72,7 @@ export const useGameInvitation = (): {
         console.log('[InviteState] InvitationCancel');
         customToast({
           title: 'Declined',
-          description: 'Your Challenge was declined',
+          description: 'Your Invitation was declined',
           status: 'warning',
         });
         navigate('/app');
