@@ -25,7 +25,6 @@ export const useGameInvitation = (): {
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
   const [opponentId, setOpponentId] = useState('');
-  // TODO: デフォルト値必要？
   const [ballSpeed, setBallSpeed] = useState(0);
   const { customToast } = useCustomToast();
 
@@ -74,7 +73,7 @@ export const useGameInvitation = (): {
         customToast({
           title: 'Declined',
           description: 'Your Challenge was declined',
-          status: 'info',
+          status: 'warning',
         });
         navigate('/app');
         break;
