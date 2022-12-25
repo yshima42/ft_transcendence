@@ -8,9 +8,14 @@ export const useFriendRelation = (
   const {
     data: { friendRelation },
   } = useGetApi<{ friendRelation: FriendRelation }>(
-    `/users/me/friend-relations/${targetId}`,
-    ['friend-relations', { targetId }]
+    `/users/me/friend-relations/${targetId}`
   );
 
   return { friendRelation };
+};
+
+export const useIsFriend = (userId: string): { isFriend: boolean } => {
+  const { friendRelation } = useFriendRelation(userId);
+
+  return { isFriend: friendRelation === 'ACCEPTED' };
 };
