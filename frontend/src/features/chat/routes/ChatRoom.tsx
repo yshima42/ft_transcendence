@@ -3,6 +3,7 @@ import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatRoomMemberStatus } from '@prisma/client';
 import { ResponseChatMessage } from 'features/chat/hooks/types';
 import { useChatLoginUser } from 'features/chat/hooks/useChatLoginUser';
+import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
@@ -29,6 +30,9 @@ export const ChatRoom: React.FC = React.memo(() => {
     navigate
   );
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
+
+  // ブロックユーザー
+  const { users: blockUsers } = useBlockUsers();
 
   React.useEffect(() => {
     socket.emit('join_room', chatRoomId);
@@ -101,16 +105,20 @@ export const ChatRoom: React.FC = React.memo(() => {
           overflowX="hidden"
           height="70vh"
         >
-          {messages.map((message) => (
-            <Message
-              key={message.id}
-              id={message.id}
-              content={message.content}
-              createdAt={message.createdAt}
-              name={message.sender.name}
-              avatarImageUrl={message.sender.avatarImageUrl}
-            />
-          ))}
+          {/* ブロックユーザーのメッセージは表示しない */}
+          {messages.map(
+            (message) =>
+              !blockUsers.some((user) => user.id === message.sender.id) && (
+                <Message
+                  key={message.id}
+                  id={message.id}
+                  content={message.content}
+                  createdAt={message.createdAt}
+                  name={message.sender.name}
+                  avatarImageUrl={message.sender.avatarImageUrl}
+                />
+              )
+          )}
           <div ref={scrollBottomRef} />
         </C.Flex>
         <C.Divider />
