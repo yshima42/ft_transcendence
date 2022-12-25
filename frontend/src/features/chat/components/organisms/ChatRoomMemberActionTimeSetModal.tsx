@@ -1,13 +1,12 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { Limit } from 'features/chat/hooks/types';
 
-// 1m, 1h, 1d, 1w, 1M, unlimited
-type limit = '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
-const limitList: limit[] = ['1m', '1h', '1d', '1w', '1M', 'unlimited'];
+const limitList: Limit[] = ['1m', '1h', '1d', '1w', '1M', 'unlimited'];
 
 type Props = {
   isOpen: boolean;
-  onClick: (limit: limit) => void;
+  onClick: (limit: Limit) => void;
   onClose: () => void;
 };
 
