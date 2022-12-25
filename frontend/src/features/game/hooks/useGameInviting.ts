@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 
@@ -24,22 +25,27 @@ export const useGameInvitation = (): {
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
   const [opponentId, setOpponentId] = useState('');
-  // TODO: デフォルト値必要？
   const [ballSpeed, setBallSpeed] = useState(0);
+  const { customToast } = useCustomToast();
 
   // socket イベント
   useEffect(() => {
-    socket.on('go_game_room', (roomId: string) => {
-      console.log('[Socket Event] go_game_room');
+    socket.on('go_game_room_by_invitation', (roomId: string) => {
+      console.log('[Socket Event] go_game_room_by_invitation');
       setInviteState(InviteState.Matched);
       navigate(`/app/games/${roomId}`);
+    });
+
+    socket.on('player2_decline_invitation', () => {
+      console.log('[Socket Event] go_game_room_by_invitation');
+      setInviteState(InviteState.InvitingCancel);
     });
 
     return () => {
       if (inviteState === InviteState.Inviting) {
         socket.emit('inviting_cancel');
       }
-      socket.off('go_game_room');
+      socket.off('go_game_room_by_invitation');
     };
   }, [socket, inviteState, navigate]);
 
@@ -64,6 +70,11 @@ export const useGameInvitation = (): {
       }
       case InviteState.InvitingCancel: {
         console.log('[InviteState] InvitationCancel');
+        customToast({
+          title: 'Declined',
+          description: 'Your Invitation was declined',
+          status: 'warning',
+        });
         navigate('/app');
         break;
       }

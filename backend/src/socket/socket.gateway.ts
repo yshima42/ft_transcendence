@@ -188,8 +188,43 @@ export class UsersGateway {
     const player1 = new Player(userId, userNickname, true);
     const player2 = new Player(message.opponentId, 'dummy', false);
     const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
-    this.server.to(player1.id).emit('go_game_room', newRoomId);
-    this.server.to(player2.id).emit('go_game_room', newRoomId);
+    // this.server.to(player1.id).emit('go_game_room', newRoomId);
+    // this.server.to(player2.id).emit('go_game_room', newRoomId);
+    this.server.to(player2.id).emit('receive_invitation', {
+      roomId: newRoomId,
+      challengerNickname: player1.nickname,
+    });
+  }
+
+  @SubscribeMessage('accept_invitation')
+  accept_invitation(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { roomId: string }
+  ): void {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} accept_invitation`
+    );
+    const gameRoom = this.gameRooms.get(message.roomId);
+    if (gameRoom !== undefined) {
+      this.server
+        .to(gameRoom.player1.id)
+        .emit('go_game_room_by_invitation', message.roomId);
+    }
+  }
+
+  @SubscribeMessage('decline_invitation')
+  async decline_invitation(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { roomId: string }
+  ): Promise<void> {
+    Logger.debug(
+      `${socket.id} ${socket.data.userNickname as string} decline_invitation`
+    );
+    const gameRoom = this.gameRooms.get(message.roomId);
+    if (gameRoom !== undefined) {
+      this.server.to(gameRoom.player1.id).emit('player2_decline_invitation');
+    }
+    await this.leaveGameRoom(socket);
   }
 
   // room関連;
