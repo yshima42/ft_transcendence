@@ -40,21 +40,22 @@ export class ChatMessageService {
     userId: string
   ): Promise<ResponseChatMessage[]> {
     Logger.debug(`findChatMessages: ${JSON.stringify(chatRoomId)}`);
+    Logger.debug(`findChatMessages: ${JSON.stringify(userId)}`);
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
         chatRoomId,
         // ブロックしているユーザーのメッセージは取得しない
-        sender: {
-          blocking: {
-            every: {
-              targetId: {
-                not: {
-                  equals: userId,
-                },
-              },
-            },
-          },
-        },
+        // sender: {
+        //   blocking: {
+        //     every: {
+        //       targetId: {
+        //         not: {
+        //           equals: userId,
+        //         },
+        //       },
+        //     },
+        //   },
+        // },
       },
       select: {
         id: true,
