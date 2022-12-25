@@ -58,12 +58,12 @@ enum OnlineStatus {
 }
 
 model OneTimePasswordAuth {
-  authUser     User     @relation(fields: [authUserId], references: [id])
-  authUserId   String   @id @db.Uuid
-  isOTPEnabled Boolean
-  qrcodeUrl    String
-  secret       String
-  createdAt    DateTime @default(now())
+  authUser         User     @relation(fields: [authUserId], references: [id])
+  authUserId       String   @id @db.Uuid
+  isOtpAuthEnabled Boolean
+  qrcodeUrl        String
+  secret           String
+  createdAt        DateTime @default(now())
 }
 
 model FriendRequest {
