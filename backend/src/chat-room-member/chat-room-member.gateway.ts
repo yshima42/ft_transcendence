@@ -1,7 +1,8 @@
 import * as NestJs from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as WebSocket from '@nestjs/websockets';
+import { parse } from 'cookie';
 import * as SocketIO from 'socket.io';
-import { UsersService } from 'src/users/users.service';
 import { ChatRoomMemberService } from './chat-room-member.service';
 import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
@@ -14,7 +15,7 @@ import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 export class ChatRoomMemberGateway {
   constructor(
     private readonly chatRoomMemberService: ChatRoomMemberService,
-    private readonly usersService: UsersService
+    private readonly jwt: JwtService
   ) {}
 
   @WebSocket.WebSocketServer()
@@ -65,7 +66,7 @@ export class ChatRoomMemberGateway {
 
       return;
     }
-    const chatLoginUserId = this.usersService.getUserIdFromCookie(cookie);
+    const chatLoginUserId = this.getUserIdFromCookie(cookie);
     await this.chatRoomMemberService.update(
       data.chatRoomId,
       data.userId,
@@ -80,5 +81,12 @@ export class ChatRoomMemberGateway {
       .in(data.chatRoomId)
       .emit('changeChatRoomMemberStatusSocket', data); // チャットルーム内の全員に送信(自分含む)
     NestJs.Logger.debug(res);
+  }
+
+  getUserIdFromCookie(cookie: string): string {
+    const { accessToken } = parse(cookie);
+    const { id } = this.jwt.decode(accessToken) as { id: string };
+
+    return id;
   }
 }
