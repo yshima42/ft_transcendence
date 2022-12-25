@@ -28,3 +28,5 @@ export type ResponseChatRoom = {
     createdAt: Date;
   }>;
 };
+
+export type Limit = '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';

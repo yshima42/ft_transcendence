@@ -14,31 +14,35 @@ import { MessageSendForm } from 'components/molecules/MessageSendForm';
 
 type State = {
   chatRoomId: string;
-  name: string;
+  chatName: string;
   roomStatus: ChatRoomStatus;
 };
 
 export const ChatRoom: React.FC = React.memo(() => {
-  const location = useLocation();
-  const { chatRoomId, name, roomStatus } = location.state as State;
-  const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
-  const [loginUser, setLoginUser] = React.useState<ResponseChatRoomMember>();
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
     autoConnect: false,
   });
+  const location = useLocation();
+  const { chatRoomId, chatName, roomStatus } = location.state as State;
+  const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
+  const [loginUser, setLoginUser] = React.useState<ResponseChatRoomMember>();
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     socket.emit('join_room', chatRoomId);
+    socket.emit('join_room_member', chatRoomId);
     socket.on('receive_message', (payload: ResponseChatMessage) => {
+      // メッセージを受け取ったときに実行される関数を登録
       setMessages((prev) => {
         return [...prev, payload];
       });
     });
 
     return () => {
+      // コンポーネントの寿命が切れるときに実行される
       socket.off('receive_message');
       socket.emit('leave_room', chatRoomId);
+      socket.emit('leave_room_member', chatRoomId);
     };
   }, [chatRoomId, socket]);
 
@@ -60,7 +64,7 @@ export const ChatRoom: React.FC = React.memo(() => {
 
   async function getLoginUser() {
     const res: { data: ResponseChatRoomMember } = await axios.get(
-      `/chat/rooms/${chatRoomId}/users/me`
+      `/chat/rooms/${chatRoomId}/members/me`
     );
     setLoginUser(res.data);
   }
@@ -77,13 +81,13 @@ export const ChatRoom: React.FC = React.memo(() => {
 
   return (
     <>
-      <ContentLayout title={name}>
+      <ContentLayout title={chatName}>
         {/* チャットの設定ボタン */}
         <C.Flex justifyContent="flex-end" mb={4}>
           <C.Link
             as={Link}
             to={`/app/chat/rooms/${chatRoomId}/settings`}
-            state={{ chatRoomId, name, roomStatus }}
+            state={{ chatRoomId, name: chatName, roomStatus }}
           >
             <C.Button colorScheme="blue">Settings</C.Button>
           </C.Link>

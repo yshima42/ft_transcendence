@@ -5,8 +5,12 @@ describe('chatroom spec', () => {
   });
 
   it('chat', () => {
-    cy.contains('Chat').click(); // Chatが含まれる要素をクリック
-    // data-testid="create-chat-room"が存在する
+    // Chatと一致する要素をクリック
+    cy.contains(/^Chat$/).click();
     cy.get('[data-testid="create-chat-room"]').should('exist');
+    cy.get('[data-testid="chat-room-list"]').should('exist');
+    cy.get('[data-testid="chat-room-id"]').should('exist');
+    cy.get('[data-testid="chat-room-created-at"]').should('exist');
+    cy.get('[data-testid="chat-room-room-status"]').should('not.exist');
   });
 });

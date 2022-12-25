@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   ParseUUIDPipe,
+  Logger,
 } from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { User } from '@prisma/client';
@@ -18,7 +19,7 @@ import { ChatRoomMemberService } from './chat-room-member.service';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
 import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
-@Controller('chat/rooms/:chatRoomId/users')
+@Controller('chat/rooms/:chatRoomId/members')
 @Sw.ApiTags('chat-room-user')
 @UseGuards(JwtOtpAuthGuard)
 export class ChatRoomMemberController {
@@ -30,6 +31,11 @@ export class ChatRoomMemberController {
     @Body() createChatRoomMemberDto: CreateChatRoomMemberDto,
     @GetUser() user: User
   ): Promise<void> {
+    Logger.debug(
+      `chat-room-member.controller create chatRoomId=${chatRoomId} createChatRoomMemberDto=${JSON.stringify(
+        createChatRoomMemberDto
+      )} user=${JSON.stringify(user)}`
+    );
     await this.chatRoomMemberService.create(
       chatRoomId,
       createChatRoomMemberDto,
@@ -41,6 +47,10 @@ export class ChatRoomMemberController {
   async findAll(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
   ): Promise<ResponseChatRoomMember[]> {
+    Logger.debug(
+      `chat-room-member.controller findAll chatRoomId=${chatRoomId}`
+    );
+
     return await this.chatRoomMemberService.findAll(chatRoomId);
   }
 
@@ -50,19 +60,30 @@ export class ChatRoomMemberController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<ResponseChatRoomMember> {
+    Logger.debug(
+      `chat-room-member.controller findMe chatRoomId=${chatRoomId} user=${JSON.stringify(
+        user
+      )}`
+    );
+
     return await this.chatRoomMemberService.findOne(chatRoomId, user.id);
   }
 
-  @Patch(':userId')
+  @Patch(':memberId')
   async update(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Param('userId', new ParseUUIDPipe()) userId: string,
+    @Param('memberId', new ParseUUIDPipe()) memberId: string,
     @Body() updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     @GetUser() user: User
   ): Promise<void> {
+    Logger.debug(
+      `chat-room-member.controller update chatRoomId=${chatRoomId} memberId=${memberId} updateChatRoomMemberDto=${JSON.stringify(
+        updateChatRoomMemberDto
+      )} user=${JSON.stringify(user)}`
+    );
     await this.chatRoomMemberService.update(
       chatRoomId,
-      userId,
+      memberId,
       updateChatRoomMemberDto,
       user.id
     );
@@ -74,14 +95,22 @@ export class ChatRoomMemberController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<void> {
+    Logger.debug(
+      `chat-room-member.controller removeMe chatRoomId=${chatRoomId} user=${JSON.stringify(
+        user
+      )}`
+    );
     await this.chatRoomMemberService.remove(chatRoomId, user.id);
   }
 
-  @Delete(':userId')
+  @Delete(':memberId')
   async remove(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Param('userId', new ParseUUIDPipe()) userId: string
+    @Param('memberId', new ParseUUIDPipe()) memberId: string
   ): Promise<void> {
-    await this.chatRoomMemberService.remove(chatRoomId, userId);
+    Logger.debug(
+      `chat-room-member.controller remove chatRoomId=${chatRoomId} memberId=${memberId}`
+    );
+    await this.chatRoomMemberService.remove(chatRoomId, memberId);
   }
 }
