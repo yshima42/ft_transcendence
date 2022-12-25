@@ -6,6 +6,7 @@ import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { CreateChatRoomDto } from 'src/chat-room/dto/create-chat-room.dto';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UsersModule } from 'src/users/users.module';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatRoomMemberService } from './chat-room-member.service';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
@@ -18,7 +19,7 @@ describe('ChatRoomMemberService', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [PrismaModule, ChatRoomModule],
+      imports: [PrismaModule, ChatRoomModule, UsersModule],
       providers: [ChatRoomMemberService],
     }).compile();
 
