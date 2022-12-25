@@ -283,15 +283,15 @@ const main = async () => {
   await prisma.chatMessage.createMany({
     data: chatMessages,
   });
-  await prisma.dmRoom.createMany({
-    data: dmRooms,
-  });
-  await prisma.dmRoomMember.createMany({
-    data: dmRoomMembers,
-  });
-  await prisma.dm.createMany({
-    data: dms,
-  });
+  // await prisma.dmRoom.createMany({
+  //   data: dmRooms,
+  // });
+  // await prisma.dmRoomMember.createMany({
+  //   data: dmRoomMembers,
+  // });
+  // await prisma.dm.createMany({
+  //   data: dms,
+  // });
   await prisma.matchResult.createMany({
     data: matchResultData,
   });
