@@ -37,8 +37,10 @@ export const useGame = (
   draw: (ctx: CanvasRenderingContext2D) => void;
   player1: Player;
   player2: Player;
+  countDownNum: number;
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
+  const [countDownNum, setCountDownNum] = useState<number>(0);
 
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
@@ -115,16 +117,24 @@ export const useGame = (
         player1: { id: string; score: number };
         player2: { id: string; score: number };
         isLeftSide: boolean;
+        countDownNum: number;
         nextGamePhase: GamePhase;
       }) => {
+        console.log('[Socket Event] set_game_info');
         player1.id = message.player1.id;
         player2.id = message.player2.id;
         player1.score = message.player1.score;
         player2.score = message.player2.score;
         userCommand.isLeftSide = message.isLeftSide;
+        setCountDownNum(message.countDownNum);
         setGamePhase(message.nextGamePhase);
       }
     );
+
+    socket.on('set_count_down_num', (newCountDownNum: number) => {
+      console.log('[Socket Event] set_count_down_num');
+      setCountDownNum(newCountDownNum);
+    });
 
     socket.on('update_game_phase', (nextGamePhase: GamePhase) => {
       console.log(`[Socket Event] update_game_phase ${nextGamePhase}`);
@@ -161,6 +171,7 @@ export const useGame = (
       socket.emit('leave_game_room');
       socket.off('game_room_error');
       socket.off('set_game_info');
+      socket.off('set_count_down_num');
       socket.off('update_game_phase');
       socket.off('update_score');
       socket.off('update_position');
@@ -212,5 +223,5 @@ export const useGame = (
     };
   }, [gamePhase, socket, roomId, connected, keyDownEvent, keyUpEvent]);
 
-  return { gamePhase, setGamePhase, draw, player1, player2 };
+  return { gamePhase, setGamePhase, draw, player1, player2, countDownNum };
 };
