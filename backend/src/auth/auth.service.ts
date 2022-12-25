@@ -61,12 +61,13 @@ export class AuthService {
   }
 
   /**
-   * 特定のユーザーが２要素認証を有効にしているかどうか確認する。
-   * TwoFactorAuthテーブルにレコードのisOTPEnabledを確認。
+   * 特定のユーザーがOTPによる２要素認証を有効にしているか
+   * どうか確認する。
+   * OneTimePasswordAuthテーブルのisOtpAuthEnabledを確認。
    * trueならOTPが有効。falseなら無効。
-   * レコードがなくても無効。
-   * @param authUserId
-   * @returns bool値
+   * レコードがない場合も無効。
+   * @param authUserId - uuid(string)
+   * @returns bool値またはnull
    */
   async isOtpAuthEnabled(
     authUserId: string
@@ -75,14 +76,14 @@ export class AuthService {
       where: { authUserId },
     });
 
-    return { isOtpAuthEnabled: ret === null ? null : ret.isOTPEnabled };
+    return { isOtpAuthEnabled: ret === null ? null : ret.isOtpAuthEnabled };
   }
 
   /**
    * ワンタイムパスワード生成用のシークレットとurlを生成し。
-   * TwoFactorAuthテーブルに新規レコード作成。
+   * OneTimePasswordAuthテーブルに新規レコード作成。
    * @param user
-   * @returns 登録されたTwoFactorAuthレコード
+   * @returns 登録されたOneTimePasswordAuthレコード
    */
   async createOtpAuth(user: User): Promise<OneTimePasswordAuth> {
     const secret = authenticator.generateSecret();
@@ -97,7 +98,7 @@ export class AuthService {
       const oneTimePasswordAuth = await this.prisma.oneTimePasswordAuth.create({
         data: {
           authUserId: user.id,
-          isOTPEnabled: false,
+          isOtpAuthEnabled: false,
           qrcodeUrl,
           secret,
         },
@@ -118,10 +119,10 @@ export class AuthService {
   }
 
   /**
-   * TwoFactorAuthテーブルからレコードを削除。
+   * OneTimePasswordAuthテーブルからレコードを削除。
    * データベースに該当がなければ例外送出。
    * @param user
-   * @returns 削除されたTwoFactorAuthレコード
+   * @returns 削除されたOneTimePasswordAuthレコード
    */
   async deleteOtpAuth(user: User): Promise<OneTimePasswordAuth> {
     try {
@@ -152,12 +153,12 @@ export class AuthService {
   /**
    * ２要素認証を有効化させる。
    * @param user
-   * @returns
+   * @returns 有効化されたOneTimePasswordAuthレコード
    */
   async activateOtp(user: User): Promise<OneTimePasswordAuth> {
     return await this.prisma.oneTimePasswordAuth.update({
       where: { authUserId: user.id },
-      data: { isOTPEnabled: true },
+      data: { isOtpAuthEnabled: true },
     });
   }
 
