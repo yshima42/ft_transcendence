@@ -9,14 +9,19 @@ type Props = {
 
 export const AcceptButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
-  const { acceptFriendRequest, isLoading } = useFriendRequestAccept(targetId);
+  const { acceptFriendRequest, isLoading, isSuccess } =
+    useFriendRequestAccept(targetId);
 
   const onClickAccept = async () => {
     await acceptFriendRequest({ creatorId: targetId });
   };
 
   return (
-    <Button mr={2} size={size} isDisabled={isLoading} onClick={onClickAccept}>
+    <Button
+      size={size}
+      isDisabled={isLoading || isSuccess}
+      onClick={onClickAccept}
+    >
       Accept
     </Button>
   );
