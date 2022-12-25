@@ -127,7 +127,7 @@ export class UsersGateway {
     socket.emit('go_game_room', newRoomId);
     this.server
       .to('monitor')
-      .emit('room_created', [newRoomId, player1.id, player2.id]);
+      .emit('game_room_created', [newRoomId, player1.id, player2.id]);
   }
 
   createGameRoom(player1: Player, player2: Player, ballSpeed: number): string {
@@ -372,16 +372,16 @@ export class UsersGateway {
       this.server.socketsLeave(roomId);
       this.server.socketsLeave(`watch_${roomId}`);
       this.gameRooms.delete(roomId);
-      this.server.to('monitor').emit('room_deleted', roomId);
+      this.server.to('monitor').emit('game_room_deleted', roomId);
     }
   }
 
-  @SubscribeMessage('join_monitoring_room')
+  @SubscribeMessage('join_game_monitor_room')
   async sendAllGameRoomIds(
     @ConnectedSocket() socket: Socket
   ): Promise<string[][]> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} join_monitoring_room`
+      `${socket.id} ${socket.data.userId as string} join_game_monitor_room`
     );
 
     await socket.join('monitor');
@@ -397,10 +397,10 @@ export class UsersGateway {
     return inGameOutlines;
   }
 
-  @SubscribeMessage('leave_monitoring_room')
+  @SubscribeMessage('leave_game_monitor_room')
   async leaveRoomList(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} leave_monitoring_room`
+      `${socket.id} ${socket.data.userId as string} leave_game_monitor_room`
     );
 
     await socket.leave('monitor');

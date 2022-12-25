@@ -21,20 +21,23 @@ export const useGameMonitoring = (): {
   useEffect(() => {
     if (!connected) return;
 
-    socket.emit('join_monitoring_room', (inGameOutlines: Array<string[3]>) => {
-      console.log('[Socket Event] join_monitoring_inGame');
-      inGameOutlines.forEach((inGameOutline) =>
-        inGameOutlineMap.set(inGameOutline[0], {
-          roomId: inGameOutline[0],
-          leftPlayerId: inGameOutline[1],
-          rightPlayerId: inGameOutline[2],
-        })
-      );
-      setInGameOutlines(Array.from(inGameOutlineMap.values()));
-    });
+    socket.emit(
+      'join_game_monitor_room',
+      (inGameOutlines: Array<string[3]>) => {
+        console.log('[Socket Event] join_game_monitor_room');
+        inGameOutlines.forEach((inGameOutline) =>
+          inGameOutlineMap.set(inGameOutline[0], {
+            roomId: inGameOutline[0],
+            leftPlayerId: inGameOutline[1],
+            rightPlayerId: inGameOutline[2],
+          })
+        );
+        setInGameOutlines(Array.from(inGameOutlineMap.values()));
+      }
+    );
 
-    socket.on('room_created', (createdRoomOutline: string[3]) => {
-      console.log('[Socket Event] room_created');
+    socket.on('game_room_created', (createdRoomOutline: string[3]) => {
+      console.log('[Socket Event] game_room_created');
       inGameOutlineMap.set(createdRoomOutline[0], {
         roomId: createdRoomOutline[0],
         leftPlayerId: createdRoomOutline[1],
@@ -43,8 +46,8 @@ export const useGameMonitoring = (): {
       setInGameOutlines(Array.from(inGameOutlineMap.values()));
     });
 
-    socket.on('room_deleted', (deletedRoomId: string) => {
-      console.log('[Socket Event] room_deleted');
+    socket.on('game_room_deleted', (deletedRoomId: string) => {
+      console.log('[Socket Event] game_room_deleted');
       inGameOutlineMap.delete(deletedRoomId);
       setInGameOutlines(Array.from(inGameOutlineMap.values()));
     });
@@ -52,9 +55,9 @@ export const useGameMonitoring = (): {
     return () => {
       if (!connected) return;
 
-      socket.emit('leave_monitoring_room');
-      socket.off('room_created');
-      socket.off('room_deleted');
+      socket.emit('leave_game_monitor_room');
+      socket.off('game_room_created');
+      socket.off('game_room_deleted');
     };
   }, [socket, connected]);
 
