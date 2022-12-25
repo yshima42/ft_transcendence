@@ -30,7 +30,7 @@ export const Game: FC = memo(() => {
       case GamePhase.Confirming:
         return <CenterSpinner h="40vh" />;
       case GamePhase.OpponentWaiting:
-        return <OpponentWaiting />;
+        return <OpponentWaiting countDownNum={countDownNum} />;
       case GamePhase.PlayerWaiting:
         return <PlayerWaiting />;
       case GamePhase.InGame:
