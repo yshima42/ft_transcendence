@@ -28,6 +28,10 @@ export const useChangeChatRoomMemberStatus = (
       return;
     }
     selectLimitTime(selectedMemberId, selectedMemberStatus, selectedLimitTime);
+    setIsOpen(false);
+    setSelectedMemberId(undefined);
+    setSelectedMemberStatus(undefined);
+    setSelectedLimitTime('unlimited');
   }, [selectedLimitTime]);
 
   function changeChatRoomMemberStatus(
