@@ -131,6 +131,7 @@ export class ChatRoomService {
 
   // findOne
   async findOne(chatRoomId: string): Promise<ChatRoom> {
+    Logger.debug(`chat-room.service: findOne: ${chatRoomId}`);
     const chatRoom = await this.prisma.chatRoom.findUnique({
       where: {
         id: chatRoomId,
@@ -143,7 +144,7 @@ export class ChatRoomService {
         NestJS.HttpStatus.NOT_FOUND
       );
     }
-    Logger.debug(`findOneChatRoom: ${JSON.stringify(chatRoom)}`);
+    Logger.debug(`findOneChatRoom: ${JSON.stringify(chatRoom, null, 2)}`);
 
     return chatRoom;
   }

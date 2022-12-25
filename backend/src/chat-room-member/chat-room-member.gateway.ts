@@ -3,7 +3,6 @@ import * as WebSocket from '@nestjs/websockets';
 import * as SocketIO from 'socket.io';
 import { UsersService } from 'src/users/users.service';
 import { ChatRoomMemberService } from './chat-room-member.service';
-import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
 import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
 @WebSocket.WebSocketGateway({
@@ -30,6 +29,7 @@ export class ChatRoomMemberGateway {
     NestJs.Logger.debug(
       `chat-room-member.gateway joinRoom: ${JSON.stringify(chatRoomId)}`
     );
+    this.server.to(chatRoomId).emit('changeChatRoomMemberStatusSocket');
     void client.join(chatRoomId);
   }
 
@@ -80,42 +80,5 @@ export class ChatRoomMemberGateway {
       .in(data.chatRoomId)
       .emit('changeChatRoomMemberStatusSocket', data); // チャットルーム内の全員に送信(自分含む)
     NestJs.Logger.debug(res);
-  }
-
-  // 新たにチャットに加入したときに呼ばれる
-  @WebSocket.SubscribeMessage('joinChatRoomMemberNew')
-  async joinChatRoomMemberNew(
-    @WebSocket.MessageBody()
-    data: {
-      chatRoomId: string;
-      createChatRoomMemberDto: CreateChatRoomMemberDto;
-    },
-    @WebSocket.ConnectedSocket() client: SocketIO.Socket
-  ): Promise<void> {
-    // cookieからuser.idを取得
-    const cookie = client.handshake.headers.cookie;
-    if (cookie === undefined) {
-      NestJs.Logger.error('cookie is undefined');
-
-      return;
-    }
-    const chatLoginUserId = this.usersService.getUserIdFromCookie(cookie);
-    NestJs.Logger.debug(
-      `chat-room-member.gateway joinChatRoomMemberNew: ${JSON.stringify(
-        data,
-        null,
-        2
-      )}`
-    );
-    const res = await this.chatRoomMemberService.create(
-      data.chatRoomId,
-      data.createChatRoomMemberDto,
-      chatLoginUserId
-    );
-    NestJs.Logger.verbose('to: ' + client.id);
-    void client.join(data.chatRoomId);
-    this.server
-      .in(data.chatRoomId)
-      .emit('changeChatRoomMemberStatusSocket', res); // チャットルーム内の全員に送信(自分含む)
   }
 }
