@@ -11,14 +11,14 @@ export const OtpAuthButton: FC = memo(() => {
   const { deleteOtpAuth } = useOtpAuthDelete();
   const [showFlag, setShowFlag] = useState(false);
 
-  const onClickInactivate = async () => {
+  const onClickInactive = async () => {
     if (isOtpAuthEnabled === null) {
       await createOtpAuth({});
     }
     setShowFlag(true);
   };
 
-  const onClickActivate = async () => {
+  const onClickActive = async () => {
     await deleteOtpAuth();
     setShowFlag(false);
   };
@@ -30,16 +30,11 @@ export const OtpAuthButton: FC = memo(() => {
   return (
     <>
       {isOtpAuthEnabled === null || !isOtpAuthEnabled ? (
-        <Button size="xs" fontSize="xs" bg="red.200" onClick={onClickActivate}>
+        <Button size="xs" fontSize="xs" bg="red.200" onClick={onClickInactive}>
           inactive
         </Button>
       ) : (
-        <Button
-          size="xs"
-          fontSize="xs"
-          bg="green.200"
-          onClick={onClickInactivate}
-        >
+        <Button size="xs" fontSize="xs" bg="green.200" onClick={onClickActive}>
           active
         </Button>
       )}
