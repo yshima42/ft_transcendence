@@ -22,15 +22,20 @@ export const useFriendRequest = (
 ): {
   requestFriend: RequestFriend;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { postFunc: requestFriend, isLoading } = usePostApi<
-    FriendRequestReqBody,
-    FriendRequestResBody
-  >(`/users/me/friend-requests`, [
-    ['/users/me/requestable-users'],
-    ['/users/me/friend-requests/outgoing'],
-    [`/users/me/friend-relations/${targetId}`],
-  ]);
+  const {
+    postFunc: requestFriend,
+    isLoading,
+    isSuccess,
+  } = usePostApi<FriendRequestReqBody, FriendRequestResBody>(
+    `/users/me/friend-requests`,
+    [
+      ['/users/me/requestable-users'],
+      ['/users/me/friend-requests/outgoing'],
+      [`/users/me/friend-relations/${targetId}`],
+    ]
+  );
 
-  return { requestFriend, isLoading };
+  return { requestFriend, isLoading, isSuccess };
 };

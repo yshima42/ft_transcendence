@@ -16,12 +16,16 @@ export type DeleteOtpAuth = UseMutateAsyncFunction<
 export const useOtpAuthDelete = (): {
   deleteOtpAuth: DeleteOtpAuth;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { deleteFunc: deleteOtpAuth, isLoading } =
-    useDeleteApi<DeleteOtpAuthResBody>(`/auth/otp`, [
-      ['/auth/otp/qrcode-url'],
-      ['/auth/otp'],
-    ]);
+  const {
+    deleteFunc: deleteOtpAuth,
+    isLoading,
+    isSuccess,
+  } = useDeleteApi<DeleteOtpAuthResBody>(`/auth/otp`, [
+    ['/auth/otp/qrcode-url'],
+    ['/auth/otp'],
+  ]);
 
-  return { deleteOtpAuth, isLoading };
+  return { deleteOtpAuth, isLoading, isSuccess };
 };
