@@ -24,8 +24,8 @@ export const useOtpAuthCreate = (): {
     isLoading,
     isSuccess,
   } = usePostApi<CreateOtpAuthReqBody, CreateOtpAuthResBody>('/auth/otp', [
-    ['/auth/otp/qrcode-url'],
     ['/auth/otp'],
+    ['/auth/otp/qrcode-url'],
   ]);
 
   return { createOtpAuth, isLoading, isSuccess };

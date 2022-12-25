@@ -23,8 +23,8 @@ export const useOtpAuthDelete = (): {
     isLoading,
     isSuccess,
   } = useDeleteApi<DeleteOtpAuthResBody>(`/auth/otp`, [
-    ['/auth/otp/qrcode-url'],
     ['/auth/otp'],
+    ['/auth/otp/qrcode-url'],
   ]);
 
   return { deleteOtpAuth, isLoading, isSuccess };
