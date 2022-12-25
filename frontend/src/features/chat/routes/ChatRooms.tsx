@@ -29,7 +29,7 @@ export const ChatRooms: React.FC = React.memo(() => {
                 to={`rooms/${chatRoom.id}/confirmation`}
                 state={{
                   chatRoomId: chatRoom.id,
-                  name: chatRoom.name,
+                  chatName: chatRoom.name,
                   roomStatus: chatRoom.roomStatus,
                 }}
               >
