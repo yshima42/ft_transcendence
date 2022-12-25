@@ -22,15 +22,20 @@ export const useFriendRequestAccept = (
 ): {
   acceptFriendRequest: AcceptFriendRequest;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { patchFunc: acceptFriendRequest, isLoading } = usePatchApi<
-    FriendRequestAcceptReqBody,
-    FriendRequestAcceptResBody
-  >(`/users/me/friend-requests/incoming`, [
-    ['/users/me/friend-requests/incoming'],
-    ['/users/me/friends'],
-    [`/users/me/friend-relations/${targetId}`],
-  ]);
+  const {
+    patchFunc: acceptFriendRequest,
+    isLoading,
+    isSuccess,
+  } = usePatchApi<FriendRequestAcceptReqBody, FriendRequestAcceptResBody>(
+    `/users/me/friend-requests/incoming`,
+    [
+      ['/users/me/friend-requests/incoming'],
+      ['/users/me/friends'],
+      [`/users/me/friend-relations/${targetId}`],
+    ]
+  );
 
-  return { acceptFriendRequest, isLoading };
+  return { acceptFriendRequest, isLoading, isSuccess };
 };

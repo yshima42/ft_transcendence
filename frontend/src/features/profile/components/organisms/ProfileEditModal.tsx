@@ -139,7 +139,8 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
             <ModalFooter>
               <Button
                 type="submit"
-                isLoading={isLoading1 && isLoading2}
+                isLoading={isLoading1 || isLoading2}
+                isDisabled={isLoading1 || isLoading2}
                 onClick={onClose}
               >
                 Save
