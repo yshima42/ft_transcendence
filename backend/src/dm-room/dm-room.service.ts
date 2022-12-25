@@ -1,10 +1,30 @@
 import { Injectable } from '@nestjs/common';
+import { DmRoom } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDmRoom } from './dm-room.interface';
 
 @Injectable()
 export class DmRoomService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async create(userId: string, loginUserId: string): Promise<DmRoom> {
+    const dmRoom = await this.prisma.dmRoom.create({
+      data: {
+        dmRoomMembers: {
+          create: [
+            {
+              userId: loginUserId,
+            },
+            {
+              userId,
+            },
+          ],
+        },
+      },
+    });
+
+    return dmRoom;
+  }
 
   async findAll(userId: string): Promise<ResponseDmRoom[]> {
     const dmRooms = await this.prisma.dmRoom.findMany({
