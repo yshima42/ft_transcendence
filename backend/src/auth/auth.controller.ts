@@ -189,12 +189,12 @@ export class AuthController {
   /**
    * 入力されたワンタイムパスワードの検証。
    * 正しければ、valid=trueを付与したaccessTokenを
-   * cookieに割り当てて、アプリトップへリダイレクト。
-   * 間違っていれば、ログインページにリダイレクト。
+   * cookieに割り当てて、true返却。
+   * 間違っていれば、何もしないでfalse返却。
    * @param user
-   * @param oneTimePassword - クエリから取得。
+   * @param oneTimePassword - Bodyから取得。
    * @param res - cookie用
-   * @returns リダイレクト先
+   * @returns bool値
    */
   @Post('otp/validation')
   @HttpCode(200)
@@ -208,46 +208,16 @@ export class AuthController {
       oneTimePassword,
       user
     );
-    if (!isCodeValid) {
-      return { isCodeValid };
+    if (isCodeValid) {
+      const { accessToken } = await this.authService.generateJwt(
+        user.id,
+        user.name,
+        true
+      );
+
+      res.cookie('accessToken', accessToken, this.cookieOptions);
     }
-
-    const { accessToken } = await this.authService.generateJwt(
-      user.id,
-      user.name,
-      true
-    );
-
-    res.cookie('accessToken', accessToken, this.cookieOptions);
 
     return { isCodeValid };
   }
-
-  // @Get('otp/validation')
-  // @HttpCode(200)
-  // @Redirect('http://localhost:5173/app')
-  // @UseGuards(JwtAuthGuard)
-  // async validateOtp(
-  //   @GetUser() user: User,
-  //   @Query('one-time-password') oneTimePassword: string,
-  //   @Res({ passthrough: true }) res: Response
-  // ): Promise<{ url: string }> {
-  //   const isCodeValid = await this.authService.validateOtp(
-  //     oneTimePassword,
-  //     user
-  //   );
-  //   if (!isCodeValid) {
-  //     return { url: 'http://localhost:5173/' };
-  //   }
-
-  //   const { accessToken } = await this.authService.generateJwt(
-  //     user.id,
-  //     user.name,
-  //     true
-  //   );
-
-  //   res.cookie('accessToken', accessToken, this.cookieOptions);
-
-  //   return { url: 'http://localhost:5173/app' };
-  // }
 }
