@@ -31,7 +31,9 @@ export class ChatMessageService {
         },
       },
     });
-    Logger.debug(`createChatMessage: ${JSON.stringify(chatMessage)}`);
+    Logger.debug(
+      `chat-message.service.ts: ${JSON.stringify(chatMessage, null, 2)}`
+    );
 
     return chatMessage;
   }
@@ -40,8 +42,6 @@ export class ChatMessageService {
     chatRoomId: string,
     userId: string
   ): Promise<ResponseChatMessage[]> {
-    Logger.debug(`findChatMessages: ${JSON.stringify(chatRoomId)}`);
-    Logger.debug(`findChatMessages: ${JSON.stringify(userId)}`);
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
         chatRoomId,
@@ -69,7 +69,9 @@ export class ChatMessageService {
         },
       },
     });
-    Logger.debug(`findChatMessages: ${JSON.stringify(chatMessage)}`);
+    Logger.debug(
+      `chat-message.service.ts: ${JSON.stringify(chatMessage, null, 2)}`
+    );
 
     return chatMessage;
   }

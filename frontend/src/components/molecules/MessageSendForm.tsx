@@ -17,12 +17,15 @@ export const MessageSendForm: React.FC<Props> = ({ onSubmit }) => {
       }}
     >
       <C.Input
+        type="text"
         name="content"
         placeholder="メッセージを入力してください"
         size="lg"
         isRequired
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        maxLength={255}
+        minLength={1}
       />
       <C.Button type="submit">送信</C.Button>
     </form>

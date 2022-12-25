@@ -11,7 +11,12 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 const schema = yup.object().shape(
   {
-    name: yup.string().required('チャットルーム名を入力してください').max(50),
+    // nameスペースはだめ
+    name: yup
+      .string()
+      .trim()
+      .required('チャットルーム名を入力してください')
+      .max(50),
     password: yup
       .string()
       .optional()
