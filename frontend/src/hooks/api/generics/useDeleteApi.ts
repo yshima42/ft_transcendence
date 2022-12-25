@@ -13,6 +13,7 @@ export function useDeleteApi<ResBody>(
   deleteFunc: UseMutateAsyncFunction<ResBody, unknown, void, unknown>;
   isLoading: boolean;
   isError: boolean;
+  isSuccess: boolean;
   failureReason: unknown;
 } {
   const axiosDelete = async () => {
@@ -27,6 +28,7 @@ export function useDeleteApi<ResBody>(
     mutateAsync: deleteFunc,
     isLoading,
     isError,
+    isSuccess,
     failureReason,
   } = useMutation(axiosDelete, {
     onSuccess: () => {
@@ -38,5 +40,5 @@ export function useDeleteApi<ResBody>(
     },
   });
 
-  return { deleteFunc, isLoading, isError, failureReason };
+  return { deleteFunc, isLoading, isError, isSuccess, failureReason };
 }

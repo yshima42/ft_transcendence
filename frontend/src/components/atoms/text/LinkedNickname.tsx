@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom';
 type Props = {
   id: string;
   nickname: string;
-  maxWidth: number;
+  maxWidth?: number | string;
 };
 
 export const LinkedNickname: FC<Props> = memo((props) => {
-  const { id, nickname, maxWidth } = props;
+  const { id, nickname, maxWidth = 'none' } = props;
   const { isLoginUser } = useIsLoginUser(id);
   const link = isLoginUser ? `/app/profile` : `/app/users/${id}`;
 

@@ -13,6 +13,7 @@ export function usePatchApi<ReqBody, ResBody>(
   patchFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
   isLoading: boolean;
   isError: boolean;
+  isSuccess: boolean;
   failureReason: unknown;
 } {
   const axiosPatch = async (reqBody: ReqBody) => {
@@ -27,6 +28,7 @@ export function usePatchApi<ReqBody, ResBody>(
     mutateAsync: patchFunc,
     isLoading,
     isError,
+    isSuccess,
     failureReason,
   } = useMutation(axiosPatch, {
     onSuccess: () => {
@@ -38,5 +40,5 @@ export function usePatchApi<ReqBody, ResBody>(
     },
   });
 
-  return { patchFunc, isLoading, isError, failureReason };
+  return { patchFunc, isLoading, isError, isSuccess, failureReason };
 }
