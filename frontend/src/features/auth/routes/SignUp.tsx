@@ -125,7 +125,11 @@ export const SignUp: FC = memo(() => {
           </Box>
 
           <Flex justify="right" align="center">
-            <Button type="submit" isLoading={isLoading1 && isLoading2}>
+            <Button
+              type="submit"
+              isLoading={isLoading1 || isLoading2}
+              isDisabled={isLoading1 || isLoading2}
+            >
               Save
             </Button>
           </Flex>
