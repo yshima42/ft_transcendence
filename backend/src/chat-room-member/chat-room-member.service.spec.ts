@@ -1,4 +1,5 @@
 import * as NestJs from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as T from '@prisma/client';
 import { ChatRoomModule } from 'src/chat-room/chat-room.module';
@@ -6,8 +7,8 @@ import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { CreateChatRoomDto } from 'src/chat-room/dto/create-chat-room.dto';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UsersModule } from 'src/users/users.module';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatRoomMemberModule } from './chat-room-member.module';
 import { ChatRoomMemberService } from './chat-room-member.service';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
 
@@ -19,7 +20,12 @@ describe('ChatRoomMemberService', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [PrismaModule, ChatRoomModule, UsersModule],
+      imports: [
+        PrismaModule,
+        ChatRoomMemberModule,
+        ChatRoomModule,
+        JwtModule.register({}),
+      ],
       providers: [ChatRoomMemberService],
     }).compile();
 
