@@ -32,9 +32,14 @@ export class ChatRoomMemberController {
     @GetUser() user: User
   ): Promise<void> {
     Logger.debug(
-      `chat-room-member.controller create chatRoomId=${chatRoomId} createChatRoomMemberDto=${JSON.stringify(
-        createChatRoomMemberDto
-      )} user=${JSON.stringify(user)}`
+      `chat-room-member.controller create
+      chatRoomId=${chatRoomId}
+      createChatRoomMemberDto=${JSON.stringify(
+        createChatRoomMemberDto,
+        null,
+        2
+      )}
+      user=${JSON.stringify(user)}`
     );
     await this.chatRoomMemberService.create(
       chatRoomId,
