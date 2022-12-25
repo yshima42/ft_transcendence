@@ -31,17 +31,12 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
 
   const joinChatRoom: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
     const { password } = data;
+    console.log(`roomStatus: ${roomStatus}`);
+    console.log(`password : ${password}`);
     try {
-      await axios.post(
-        `/chat/rooms/${chatRoomId}/members`,
-        roomStatus === ChatRoomStatus.PROTECTED
-          ? {
-              createChatRoomMemberDto: {
-                chatRoomPassword: password,
-              },
-            }
-          : undefined
-      );
+      await axios.post(`/chat/rooms/${chatRoomId}/members`, {
+        chatRoomPassword: password,
+      });
     } catch (e) {
       const err = e as AxiosError;
       if (err.response?.status !== 201) {
@@ -51,7 +46,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
       return;
     }
     navigate(`/app/chat/rooms/${chatRoomId}`, {
-      state: { chatRoomId, name, roomStatus },
+      state: { chatRoomId, chatName, roomStatus },
     });
   };
 
