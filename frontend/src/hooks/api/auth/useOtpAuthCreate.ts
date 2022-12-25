@@ -17,11 +17,16 @@ export type CreateOtpAuth = UseMutateAsyncFunction<
 export const useOtpAuthCreate = (): {
   createOtpAuth: CreateOtpAuth;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { postFunc: createOtpAuth, isLoading } = usePostApi<
-    CreateOtpAuthReqBody,
-    CreateOtpAuthResBody
-  >('/auth/otp', [['/auth/otp/qrcode-url'], ['/auth/otp']]);
+  const {
+    postFunc: createOtpAuth,
+    isLoading,
+    isSuccess,
+  } = usePostApi<CreateOtpAuthReqBody, CreateOtpAuthResBody>('/auth/otp', [
+    ['/auth/otp/qrcode-url'],
+    ['/auth/otp'],
+  ]);
 
-  return { createOtpAuth, isLoading };
+  return { createOtpAuth, isLoading, isSuccess };
 };
