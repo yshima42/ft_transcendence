@@ -34,8 +34,8 @@ model User {
   avatarImageUrl String
   nickname       String       @unique
   onlineStatus   OnlineStatus @default(ONLINE)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
 
   oneTimePasswordAuth OneTimePasswordAuth?
   creator             FriendRequest[]      @relation("creator")
@@ -62,7 +62,7 @@ model OneTimePasswordAuth {
   authUserId String   @id @db.Uuid
   qrcodeUrl  String
   secret     String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
 }
 
 model FriendRequest {
@@ -71,8 +71,8 @@ model FriendRequest {
   receiver   User                @relation("receiver", fields: [receiverId], references: [id])
   receiverId String              @db.Uuid
   status     FriendRequestStatus
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
+  createdAt  DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime            @updatedAt @db.Timestamptz(3)
 
   @@id([creatorId, receiverId])
 }
@@ -100,13 +100,13 @@ model MatchResult {
   playerTwoId    String   @db.Uuid
   playerOneScore Int
   playerTwoScore Int
-  finishedAt     DateTime @default(now())
+  finishedAt     DateTime @default(now()) @db.Timestamptz(3)
 }
 
 model ChatMessage {
   id         String   @id @default(uuid()) @db.Uuid
   content    String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
   chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade) // 属するチャットルーム
   chatRoomId String   @db.Uuid
   sender     User     @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade) // 送信者
@@ -118,8 +118,8 @@ model ChatRoom {
   name            String           @unique
   roomStatus      ChatRoomStatus   @default(PUBLIC)
   password        String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime         @updatedAt @db.Timestamptz(3)
   chatMessages    ChatMessage[]
   chatRoomMembers ChatRoomMember[] // チャットルームに属するユーザー
 }
@@ -130,7 +130,7 @@ model ChatRoomMember {
   user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade) // 参加しているユーザー
   userId       String               @db.Uuid
   memberStatus ChatRoomMemberStatus @default(NORMAL)
-  statusUntil  DateTime?
+  statusUntil  DateTime?            @db.Timestamptz(3)
 
   @@id([chatRoomId, userId])
 }
@@ -138,7 +138,7 @@ model ChatRoomMember {
 model Dm {
   id        String   @id @default(uuid()) @db.Uuid
   content   String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
   dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id], onDelete: Cascade) // 属するDMルーム dmRoomIdが削除されたら、このDmも削除される
   dmRoomId  String   @db.Uuid
   sender    User     @relation("dmSender", fields: [senderId], references: [id], onDelete: Cascade) // DMに属するユーザー
@@ -147,8 +147,8 @@ model Dm {
 
 model DmRoom {
   id            String         @id @default(uuid()) @db.Uuid
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @updatedAt @db.Timestamptz(3)
   dms           Dm[] // DMルームに属するメッセージ
   dmRoomMembers DmRoomMember[] // チャットルームに属するユーザー
 }

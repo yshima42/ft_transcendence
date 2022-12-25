@@ -1,5 +1,6 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import * as NestJs from '@nestjs/common';
+import * as Schedule from '@nestjs/schedule';
 import {
   ChatRoomMemberStatus,
   ChatRoomStatus,
@@ -164,7 +165,7 @@ export class ChatRoomMemberService {
     memberId=${memberId}
     updateChatRoomMemberDto=${JSON.stringify(updateChatRoomMemberDto)}
     chatLoginUserId=${chatLoginUserId}`);
-    const { memberStatus, limit } = updateChatRoomMemberDto;
+    const { memberStatus, limitTime } = updateChatRoomMemberDto;
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomMember = await this.findOne(chatRoomId, chatLoginUserId);
     // ADMIN -> すべての変更を許可
@@ -221,7 +222,7 @@ export class ChatRoomMemberService {
 
       default: {
         let limitDate: Date | undefined;
-        if (limit !== undefined) {
+        if (limitTime !== undefined && limitTime !== 'unlimited') {
           // 現在時刻からlimitを足した時間を取得
           limitDate = new Date();
           const durationInMilliseconds = {
@@ -230,10 +231,9 @@ export class ChatRoomMemberService {
             '1d': 24 * 60 * 60 * 1000,
             '1w': 7 * 24 * 60 * 60 * 1000,
             '1M': 30 * 24 * 60 * 60 * 1000,
-            unlimited: 100 * 365 * 24 * 60 * 60 * 1000,
           };
           limitDate.setMilliseconds(
-            limitDate.getMilliseconds() + durationInMilliseconds[limit]
+            limitDate.getMilliseconds() + durationInMilliseconds[limitTime]
           );
         }
 
@@ -280,5 +280,47 @@ export class ChatRoomMemberService {
         NestJs.HttpStatus.NOT_FOUND
       );
     }
+  }
+
+  // 1分ごとに時限性のあるステータスをチェックする
+  @Schedule.Cron('0 * * * * *')
+  handleCron(): void {
+    Logger.debug(`chat-room-member.service.ts handleCron`);
+    this.prisma.chatRoomMember
+      .findMany({
+        where: {
+          statusUntil: {
+            lt: new Date(), // 現在時刻よりも前のもの
+          },
+        },
+      })
+      .then((chatRoomMembers) => {
+        chatRoomMembers.forEach((chatRoomMember) => {
+          this.prisma.chatRoomMember
+            .update({
+              where: {
+                chatRoomId_userId: {
+                  chatRoomId: chatRoomMember.chatRoomId,
+                  userId: chatRoomMember.userId,
+                },
+              },
+              data: {
+                memberStatus: ChatRoomMemberStatus.NORMAL,
+                statusUntil: null,
+              },
+            })
+            .finally(() => {
+              Logger.debug(
+                `handleCron chatRoomId=${chatRoomMember.chatRoomId} userId=${chatRoomMember.userId}`
+              );
+            })
+            .catch((e) => {
+              Logger.error(e);
+            });
+        });
+      })
+      .catch((e) => {
+        Logger.error(e);
+      });
   }
 }
