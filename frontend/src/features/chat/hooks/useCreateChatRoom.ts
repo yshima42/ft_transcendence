@@ -8,11 +8,10 @@ export type ChatRoomCreateFormValues = {
   password?: string;
 };
 
-export const useCreateChatRoom = (
-  navigate: ReturnType<typeof useNavigate>
-): {
+export const useCreateChatRoom = (): {
   CreateChatRoom: (data: ChatRoomCreateFormValues) => Promise<void>;
 } => {
+  const navigate = useNavigate();
   async function CreateChatRoom(data: ChatRoomCreateFormValues) {
     const { name, password } = data;
     try {

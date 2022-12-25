@@ -7,11 +7,6 @@ export const useChangeChatRoomMemberStatus = (
   chatRoomId: string,
   socket: Socket
 ): {
-  selectLimitTime: (
-    memberId: string,
-    memberStatus: ChatRoomMemberStatus,
-    limitTime: Limit
-  ) => void;
   changeChatRoomMemberStatus: (
     memberId: string,
     memberStatus: ChatRoomMemberStatus
@@ -73,9 +68,9 @@ export const useChangeChatRoomMemberStatus = (
   }
 
   return {
+    changeChatRoomMemberStatus,
     isOpen,
     onClose,
-    changeChatRoomMemberStatus,
     setSelectedLimitTime,
   };
 };
