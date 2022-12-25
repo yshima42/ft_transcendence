@@ -12,13 +12,15 @@ export const OtpAuthButton: FC = memo(() => {
   const [showFlag, setShowFlag] = useState(false);
 
   const onClickInactivate = async () => {
-    await deleteOtpAuth();
-    setShowFlag(false);
+    if (isOtpAuthEnabled === null) {
+      await createOtpAuth({});
+    }
+    setShowFlag(true);
   };
 
   const onClickActivate = async () => {
-    await createOtpAuth({});
-    setShowFlag(true);
+    await deleteOtpAuth();
+    setShowFlag(false);
   };
 
   const onCloseModal = () => {
@@ -27,7 +29,11 @@ export const OtpAuthButton: FC = memo(() => {
 
   return (
     <>
-      {isOtpAuthEnabled ? (
+      {isOtpAuthEnabled === null || !isOtpAuthEnabled ? (
+        <Button size="xs" fontSize="xs" bg="red.200" onClick={onClickActivate}>
+          inactive
+        </Button>
+      ) : (
         <Button
           size="xs"
           fontSize="xs"
@@ -36,11 +42,8 @@ export const OtpAuthButton: FC = memo(() => {
         >
           active
         </Button>
-      ) : (
-        <Button size="xs" fontSize="xs" bg="red.200" onClick={onClickActivate}>
-          inactive
-        </Button>
       )}
+
       <OtpQrcodeModal isOpen={showFlag} onCloseModal={onCloseModal} />
     </>
   );
