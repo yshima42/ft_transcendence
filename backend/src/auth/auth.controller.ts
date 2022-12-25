@@ -62,7 +62,7 @@ export class AuthController {
     console.log(accessToken);
 
     if (isSignUp) {
-      return { url: 'http://localhost:5173/app/profile/edit' };
+      return { url: 'http://localhost:5173/sign-up' };
     } else if (isOtpAuthEnabled) {
       return { url: 'http://localhost:5173/otp' };
     } else {

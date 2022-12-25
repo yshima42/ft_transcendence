@@ -9,14 +9,19 @@ type Props = {
 
 export const RejectButton: FC<Props> = memo((props) => {
   const { targetId, size = 'sm' } = props;
-  const { rejectFriendRequest, isLoading } = useFriendRequestReject(targetId);
+  const { rejectFriendRequest, isLoading, isSuccess } =
+    useFriendRequestReject(targetId);
 
   const onClickReject = async () => {
     await rejectFriendRequest();
   };
 
   return (
-    <Button size={size} isDisabled={isLoading} onClick={onClickReject}>
+    <Button
+      size={size}
+      isDisabled={isLoading || isSuccess}
+      onClick={onClickReject}
+    >
       Reject
     </Button>
   );

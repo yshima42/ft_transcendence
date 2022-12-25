@@ -22,14 +22,16 @@ export const useUserBlock = (
 ): {
   blockUser: BlockUser;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { postFunc: blockUser, isLoading } = usePostApi<
-    UserBlockReqBody,
-    UserBlockResBody
-  >(`/users/me/blocks`, [
+  const {
+    postFunc: blockUser,
+    isLoading,
+    isSuccess,
+  } = usePostApi<UserBlockReqBody, UserBlockResBody>(`/users/me/blocks`, [
     ['/users/me/blocks'],
     [`/users/me/block-relations/${targetId}`],
   ]);
 
-  return { blockUser, isLoading };
+  return { blockUser, isLoading, isSuccess };
 };

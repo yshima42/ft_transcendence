@@ -18,12 +18,16 @@ export const useUserUnblock = (
 ): {
   unblockUser: UnblockUser;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { deleteFunc: unblockUser, isLoading } =
-    useDeleteApi<UnblockUserResBody>(`/users/me/blocks/${targetId}`, [
-      ['/users/me/blocks'],
-      [`/users/me/block-relations/${targetId}`],
-    ]);
+  const {
+    deleteFunc: unblockUser,
+    isLoading,
+    isSuccess,
+  } = useDeleteApi<UnblockUserResBody>(`/users/me/blocks/${targetId}`, [
+    ['/users/me/blocks'],
+    [`/users/me/block-relations/${targetId}`],
+  ]);
 
-  return { unblockUser, isLoading };
+  return { unblockUser, isLoading, isSuccess };
 };
