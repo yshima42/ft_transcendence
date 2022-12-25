@@ -17,11 +17,13 @@ export type Logout = UseMutateAsyncFunction<
 export const useLogout = (): {
   logout: Logout;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { postFunc: logout, isLoading } = usePostApi<
-    LogoutReqBody,
-    LogoutResBody
-  >('/auth/logout');
+  const {
+    postFunc: logout,
+    isLoading,
+    isSuccess,
+  } = usePostApi<LogoutReqBody, LogoutResBody>('/auth/logout');
 
-  return { logout, isLoading };
+  return { logout, isLoading, isSuccess };
 };

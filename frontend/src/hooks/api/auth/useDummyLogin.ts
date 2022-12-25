@@ -19,11 +19,13 @@ export type DummyLogin = UseMutateAsyncFunction<
 export const useDummyLogin = (): {
   dummyLogin: DummyLogin;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { postFunc: dummyLogin, isLoading } = usePostApi<
-    DummyLoginReqBody,
-    DummyLoginResBody
-  >('/auth/login/dummy');
+  const {
+    postFunc: dummyLogin,
+    isLoading,
+    isSuccess,
+  } = usePostApi<DummyLoginReqBody, DummyLoginResBody>('/auth/login/dummy');
 
-  return { dummyLogin, isLoading };
+  return { dummyLogin, isLoading, isSuccess };
 };
