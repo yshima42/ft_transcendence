@@ -1,13 +1,11 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatRoomMemberStatus } from '@prisma/client';
-import {
-  ResponseChatRoomMember,
-  ResponseChatMessage,
-} from 'features/chat/hooks/types';
+import { ResponseChatMessage } from 'features/chat/hooks/types';
+import { useChatLoginUser } from 'features/chat/hooks/useChatLoginUser';
 import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -23,9 +21,13 @@ export const ChatRoom: React.FC = React.memo(() => {
     autoConnect: false,
   });
   const location = useLocation();
+  const navigate: ReturnType<typeof useNavigate> = useNavigate();
   const { chatRoomId, chatName, roomStatus } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
-  const [loginUser, setLoginUser] = React.useState<ResponseChatRoomMember>();
+  const { chatLoginUser, getChatLoginUser } = useChatLoginUser(
+    chatRoomId,
+    navigate
+  );
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -37,10 +39,15 @@ export const ChatRoom: React.FC = React.memo(() => {
         return [...prev, payload];
       });
     });
+    // webSocketのイベントを受け取る関数を登録
+    socket.on('changeChatRoomMemberStatusSocket', () => {
+      getChatLoginUser().catch((err) => console.log(err));
+    });
 
     return () => {
       // コンポーネントの寿命が切れるときに実行される
       socket.off('receive_message');
+      socket.off('changeChatRoomMemberStatusSocket');
       socket.emit('leave_room', chatRoomId);
       socket.emit('leave_room_member', chatRoomId);
     };
@@ -54,24 +61,17 @@ export const ChatRoom: React.FC = React.memo(() => {
   }
   // 送信ボタンを押したときの処理
   function sendMessage(content: string): void {
-    if (loginUser == null) return;
+    if (chatLoginUser == null) return;
     socket.emit('send_message', {
       content,
-      senderId: loginUser.user.id,
+      senderId: chatLoginUser.user.id,
       chatRoomId,
     });
   }
 
-  async function getLoginUser() {
-    const res: { data: ResponseChatRoomMember } = await axios.get(
-      `/chat/rooms/${chatRoomId}/members/me`
-    );
-    setLoginUser(res.data);
-  }
-
   React.useEffect(() => {
     getAllChatMessage().catch((err) => console.error(err));
-    getLoginUser().catch((err) => console.error(err));
+    getChatLoginUser().catch((err) => console.error(err));
   }, []);
 
   // 更新時の自動スクロール
@@ -115,15 +115,15 @@ export const ChatRoom: React.FC = React.memo(() => {
         </C.Flex>
         <C.Divider />
         {/* メッセージ送信フォーム  loginUserがMUTEDのときは送信できないようにする */}
-        {loginUser != null &&
-          loginUser.memberStatus === ChatRoomMemberStatus.MUTED && (
+        {chatLoginUser != null &&
+          chatLoginUser.memberStatus === ChatRoomMemberStatus.MUTED && (
             <C.Alert status="warning" mb={4}>
               <C.AlertIcon />
               You are muted.
             </C.Alert>
           )}
-        {loginUser != null &&
-          loginUser.memberStatus !== ChatRoomMemberStatus.MUTED && (
+        {chatLoginUser != null &&
+          chatLoginUser.memberStatus !== ChatRoomMemberStatus.MUTED && (
             <MessageSendForm onSubmit={sendMessage} />
           )}
       </ContentLayout>
