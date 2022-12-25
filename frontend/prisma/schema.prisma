@@ -117,11 +117,12 @@ model User {
 }
 
 model OneTimePasswordAuth {
-  authUserId String   @id @db.Uuid
-  qrcodeUrl  String
-  secret     String
-  createdAt  DateTime @default(now())
-  User       User     @relation(fields: [authUserId], references: [id])
+  authUserId   String   @id @db.Uuid
+  isOTPEnabled Boolean
+  qrcodeUrl    String
+  secret       String
+  createdAt    DateTime @default(now())
+  User         User     @relation(fields: [authUserId], references: [id])
 }
 
 enum ChatUserStatus {

@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { ChangeEvent, FC, memo, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -11,8 +11,11 @@ import {
   Spinner,
   VStack,
   Text,
+  HStack,
+  Input,
 } from '@chakra-ui/react';
 import { useOtpQrcodeUrl } from 'hooks/api';
+import { useOtpAuthActivate } from 'hooks/api/auth/useOtpAuthActivate';
 import { useQRCode } from 'next-qrcode';
 
 type Props = {
@@ -24,6 +27,17 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
   const { isOpen, onCloseModal } = props;
   const { Canvas } = useQRCode();
   const { qrcodeUrl } = useOtpQrcodeUrl();
+  const { activateOtpAuth } = useOtpAuthActivate();
+
+  const [token, setToken] = useState('');
+
+  const onChangeToken = (e: ChangeEvent<HTMLInputElement>) => {
+    setToken(e.target.value);
+  };
+
+  const onClickSubmit = async () => {
+    await activateOtpAuth({ oneTimePassword: token });
+  };
 
   return (
     <>
@@ -54,6 +68,17 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
                   }}
                 />
               )}
+              <HStack>
+                <Input
+                  m={4}
+                  placeholder="Token"
+                  value={token}
+                  onChange={onChangeToken}
+                />
+                <Button bg="teal.300" color="white" onClick={onClickSubmit}>
+                  submit
+                </Button>
+              </HStack>
             </VStack>
           </ModalBody>
 
