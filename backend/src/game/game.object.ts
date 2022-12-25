@@ -14,6 +14,16 @@ import {
 import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import { GameService } from './game.service';
 
+export enum GamePhase {
+  Joining = 1,
+  ConfirmWaiting = 2,
+  OpponentWaiting = 4,
+  InGame = 5,
+  Result = 6,
+  PlayerWaiting = 7,
+  Watch = 8,
+}
+
 class Ball {
   x: number;
   y: number;
@@ -53,14 +63,12 @@ class Paddle {
 
 export class Player {
   id: string;
-  nickname: string;
   isLeftSide: boolean;
   isReady: boolean;
   score: number;
 
-  constructor(id: string, nickname: string, isLeftSide: boolean) {
+  constructor(id: string, isLeftSide: boolean) {
     this.id = id;
-    this.nickname = nickname;
     this.isLeftSide = isLeftSide;
     this.isReady = false;
     this.score = 0;
@@ -182,17 +190,14 @@ export class GameRoom {
     };
     await this.gameService.addMatchResult(muchResult);
 
-    this.server.in(roomId).emit('done_game', {
-      player1Nickname: this.player1.nickname,
-      player2Nickname: this.player2.nickname,
-      player1Score: this.player1.score,
-      player2Score: this.player2.score,
-    });
+    this.server
+      .in([roomId, `watch_${roomId}`])
+      .emit('update_game_phase', GamePhase.Result);
   }
 
   // TODO: disconnect処理を実行
   updatePosition(roomId: string): void {
-    this.server.in(roomId).emit('position_update', {
+    this.server.in([roomId, `watch_${roomId}`]).emit('update_position', {
       paddle1X: this.paddle1.x,
       paddle1Y: this.paddle1.y,
       paddle2X: this.paddle2.x,
@@ -203,7 +208,7 @@ export class GameRoom {
   }
 
   updateScore(roomId: string): void {
-    this.server.in(roomId).emit('update_score', {
+    this.server.in([roomId, `watch_${roomId}`]).emit('update_score', {
       player1Score: this.player1.score,
       player2Score: this.player2.score,
     });
