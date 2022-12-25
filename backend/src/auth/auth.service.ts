@@ -26,7 +26,7 @@ export class AuthService {
     signUpUser?: SignUpUser
   ): Promise<{
     accessToken: string;
-    isOtpAuthEnabled: boolean;
+    isOtpAuthEnabled: boolean | null;
     isSignUp: boolean;
   }> {
     let user = await this.prisma.user.findUnique({ where: { name } });
@@ -41,7 +41,7 @@ export class AuthService {
 
     const { accessToken } = await this.generateJwt(user.id, user.name);
 
-    const isOtpAuthEnabled = await this.isOtpAuthEnabled(user.id);
+    const { isOtpAuthEnabled } = await this.isOtpAuthEnabled(user.id);
 
     return { accessToken, isOtpAuthEnabled, isSignUp };
   }
@@ -62,17 +62,20 @@ export class AuthService {
 
   /**
    * 特定のユーザーが２要素認証を有効にしているかどうか確認する。
-   * TwoFactorAuthテーブルにレコードがあるかどうかで確認。
-   * 存在すれば、OTPが有効。存在しなければ無効。
+   * TwoFactorAuthテーブルにレコードのisOTPEnabledを確認。
+   * trueならOTPが有効。falseなら無効。
+   * レコードがなくても無効。
    * @param authUserId
    * @returns bool値
    */
-  async isOtpAuthEnabled(authUserId: string): Promise<boolean> {
+  async isOtpAuthEnabled(
+    authUserId: string
+  ): Promise<{ isOtpAuthEnabled: boolean | null }> {
     const ret = await this.prisma.oneTimePasswordAuth.findUnique({
       where: { authUserId },
     });
 
-    return ret !== null;
+    return { isOtpAuthEnabled: ret === null ? null : ret.isOTPEnabled };
   }
 
   /**
@@ -94,6 +97,7 @@ export class AuthService {
       const oneTimePasswordAuth = await this.prisma.oneTimePasswordAuth.create({
         data: {
           authUserId: user.id,
+          isOTPEnabled: false,
           qrcodeUrl,
           secret,
         },
@@ -143,6 +147,18 @@ export class AuthService {
     if (ret === null) return { qrcodeUrl: '' };
 
     return { qrcodeUrl: ret.qrcodeUrl };
+  }
+
+  /**
+   * ２要素認証を有効化させる。
+   * @param user
+   * @returns
+   */
+  async activateOtp(user: User): Promise<OneTimePasswordAuth> {
+    return await this.prisma.oneTimePasswordAuth.update({
+      where: { authUserId: user.id },
+      data: { isOTPEnabled: true },
+    });
   }
 
   /**

@@ -9,6 +9,9 @@ import {
   Redirect,
   Query,
   Delete,
+  UnauthorizedException,
+  Body,
+  Patch,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
@@ -63,7 +66,7 @@ export class AuthController {
 
     if (isSignUp) {
       return { url: 'http://localhost:5173/sign-up' };
-    } else if (isOtpAuthEnabled) {
+    } else if (isOtpAuthEnabled !== null && isOtpAuthEnabled) {
       return { url: 'http://localhost:5173/otp' };
     } else {
       return { url: 'http://localhost:5173/app' };
@@ -97,7 +100,7 @@ export class AuthController {
     );
     res.cookie('accessToken', accessToken, this.cookieOptions);
 
-    if (isOtpAuthEnabled) {
+    if (isOtpAuthEnabled !== null && isOtpAuthEnabled) {
       return { url: 'http://localhost:5173/otp' };
     } else {
       return { url: 'http://localhost:5173/app' };
@@ -175,14 +178,46 @@ export class AuthController {
   }
 
   /**
-   * OneTimePasswordAuthテーブル上に、特定のユーザーのレコードが存在するか確認。
+   * OneTimePasswordAuthテーブル上に、特定のユーザーのレコードが存在し、
+   * isOTPEnabledプロパティがtrueかどうかを確認。
    * @param user
-   * @returns trueならOTP有効。falseなら無効。
+   * @returns trueならOTP有効。falseなら無効。レコードが存在しない場合もfalse。
    */
   @Get('otp')
   @UseGuards(JwtOtpAuthGuard)
-  async isOtpAuthEnabled(@GetUser() user: User): Promise<boolean> {
+  async isOtpAuthEnabled(
+    @GetUser() user: User
+  ): Promise<{ isOtpAuthEnabled: boolean | null }> {
     return await this.authService.isOtpAuthEnabled(user.id);
+  }
+
+  @Patch('otp')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  async activateOtp(
+    @GetUser() user: User,
+    @Body('oneTimePassword') oneTimePassword: string,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<{ message: string }> {
+    const isCodeValid = await this.authService.validateOtp(
+      oneTimePassword,
+      user
+    );
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+
+    await this.authService.activateOtp(user);
+
+    const { accessToken } = await this.authService.generateJwt(
+      user.id,
+      user.name,
+      true
+    );
+
+    res.cookie('accessToken', accessToken, this.cookieOptions);
+
+    return { message: 'ok' };
   }
 
   /**
