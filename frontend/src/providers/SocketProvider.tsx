@@ -37,7 +37,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const didLogRef = useRef(false);
   const navigate = useNavigate();
   const [roomId, setRoomId] = useState('');
-  const [challenger, setChallenger] = useState('');
+  const [challengerId, setChallengerId] = useState('');
 
   useEffect(() => {
     socket.on('connect_established', () => {
@@ -71,8 +71,8 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
     socket.on(
       'receive_invitation',
-      (message: { roomId: string; challengerNickname: string }) => {
-        setChallenger(message.challengerNickname);
+      (message: { roomId: string; challengerId: string }) => {
+        setChallengerId(message.challengerId);
         onOpen();
         setRoomId(message.roomId);
       }
@@ -110,7 +110,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
         cancelRef={cancelRef}
         onClickDecline={onClickDecline}
         onClickAccept={onClickAccept}
-        challenger={challenger}
+        challengerId={challengerId}
       />
     </SocketContext.Provider>
   );
