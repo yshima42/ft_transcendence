@@ -6,10 +6,12 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useDisclosure } from '@chakra-ui/hooks';
 import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+import { InvitationAlert } from './InvitationAlert';
 
 export enum Presence {
   OFFLINE = 0,
@@ -34,6 +36,8 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
   const navigate = useNavigate();
+  const [roomId, setRoomId] = useState('');
+  const [challenger, setChallenger] = useState('');
 
   useEffect(() => {
     socket.on('connect_established', () => {
@@ -65,21 +69,49 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       );
     });
 
-    socket.on('go_game_room', (roomId: string) => {
-      console.log('[Socket Event] go_game_room');
-      navigate(`/app/games/${roomId}`);
-    });
+    socket.on(
+      'receive_invitation',
+      (message: { roomId: string; challengerNickname: string }) => {
+        setChallenger(message.challengerNickname);
+        onOpen();
+        setRoomId(message.roomId);
+      }
+    );
 
     return () => {
       socket.off('connect_established');
       socket.off('update_presence');
       socket.off('user_disconnected');
+      socket.off('receive_invitation');
     };
   }, [socket]);
+
+  // AlertDialogのleastDestructiveRefでエラーが出てたので以下を参考にエラー対応
+  // (https://github.com/chakra-ui/chakra-ui/discussions/2936)
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef(null);
+
+  const onClickAccept = () => {
+    onClose();
+    socket.emit('accept_invitation', { roomId });
+    navigate(`/app/games/${roomId}`);
+  };
+
+  const onClickDecline = () => {
+    onClose();
+    socket.emit('decline_invitation', { roomId });
+  };
 
   return (
     <SocketContext.Provider value={{ userIdToPresence, socket, connected }}>
       {children}
+      <InvitationAlert
+        isOpen={isOpen}
+        cancelRef={cancelRef}
+        onClickDecline={onClickDecline}
+        onClickAccept={onClickAccept}
+        challenger={challenger}
+      />
     </SocketContext.Provider>
   );
 };
