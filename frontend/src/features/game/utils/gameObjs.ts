@@ -32,12 +32,10 @@ export class Ball {
 export class Paddle {
   x: number;
   y: number;
-  score: number;
 
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.score = 0;
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {
