@@ -14,6 +14,7 @@ export type ResponseChatMessage = {
   createdAt: Date;
   content: string;
   sender: {
+    id: string;
     name: string;
     avatarImageUrl: string;
   };

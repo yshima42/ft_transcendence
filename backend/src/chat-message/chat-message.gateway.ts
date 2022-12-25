@@ -31,7 +31,6 @@ export class ChatMessageGateway {
     }
   ): Promise<void> {
     const { content, senderId, chatRoomId } = data;
-    // TODO:エラー処理
     const newMessage = await this.chatMessageService.create(
       { content },
       chatRoomId,

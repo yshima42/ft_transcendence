@@ -24,6 +24,7 @@ export class ChatMessageService {
         createdAt: true,
         sender: {
           select: {
+            id: true,
             name: true,
             avatarImageUrl: true,
           },
@@ -44,18 +45,16 @@ export class ChatMessageService {
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
         chatRoomId,
-        // ブロックしているユーザーのメッセージは取得しない
-        // sender: {
-        //   blocking: {
-        //     every: {
-        //       targetId: {
-        //         not: {
-        //           equals: userId,
-        //         },
-        //       },
-        //     },
-        //   },
-        // },
+        // 自分がブロックしているユーザーのメッセージは取得しない
+        sender: {
+          blockedBy: {
+            every: {
+              targetId: {
+                equals: userId,
+              },
+            },
+          },
+        },
       },
       select: {
         id: true,
@@ -63,6 +62,7 @@ export class ChatMessageService {
         createdAt: true,
         sender: {
           select: {
+            id: true,
             name: true,
             avatarImageUrl: true,
           },
