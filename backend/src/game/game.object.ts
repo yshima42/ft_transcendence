@@ -88,6 +88,7 @@ export class GameRoom {
   interval: NodeJS.Timer;
   isInGame: boolean;
   isFinished: boolean;
+  countDownNum: number;
 
   constructor(
     gameService: GameService,
@@ -110,6 +111,26 @@ export class GameRoom {
     });
     this.isInGame = false;
     this.isFinished = false;
+    this.countDownNum = 10;
+    this.countDownUntilPlayerReady();
+  }
+
+  countDownUntilPlayerReady(): void {
+    const timer = setInterval(() => {
+      this.countDownNum--;
+      if (this.countDownNum === 0) {
+        this.server
+          .in([this.id, `watch_${this.id}`])
+          .emit('game_room_error', 'No player response.');
+        clearInterval(timer);
+      } else if (this.isInGame) {
+        clearInterval(timer);
+      } else {
+        this.server
+          .in([this.id, `watch_${this.id}`])
+          .emit('set_count_down_num', this.countDownNum);
+      }
+    }, 1000);
   }
 
   setBallCenter(): void {
