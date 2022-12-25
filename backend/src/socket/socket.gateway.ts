@@ -11,7 +11,7 @@ import {
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
 import { BALL_SPEED } from 'src/game/config/game-config';
-import { GameRoom, Player } from 'src/game/game.object';
+import { GamePhase, GameRoom, Player } from 'src/game/game.object';
 import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -55,7 +55,6 @@ export class UsersGateway {
       throw new UnauthorizedException();
     }
     socket.data.userId = user.id;
-    socket.data.userNickname = user.nickname;
 
     await socket.join(user.id);
 
@@ -67,15 +66,13 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
     await socket.leave(userId);
     await socket.leave('matching');
+    await this.leaveGameRoom(socket);
 
     const userIdSockets = await this.server.in(userId).fetchSockets();
-
     if (userIdSockets.length === 0) {
       socket.broadcast.emit('user_disconnected', userId);
       this.userIdToPresence.delete(userId);
     }
-
-    await this.leaveGameRoom(socket);
 
     // debug用
     Logger.debug('disconnected: ' + socket.id);
@@ -102,41 +99,35 @@ export class UsersGateway {
   // Game関連
   @SubscribeMessage('random_match')
   async randomMatch(@ConnectedSocket() socket: Socket): Promise<void> {
-    Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} random_match`
-    );
-
-    const { userId, userNickname } = socket.data as {
-      userId: string;
-      userNickname: string;
-    };
+    Logger.debug(`${socket.id} ${socket.data.userId as string} random_match`);
 
     const matchingSockets = await this.server.in('matching').fetchSockets();
-
     // 1人目の場合2人目ユーザーを待つ
     if (matchingSockets.length === 0) {
       await socket.join('matching');
 
       return;
     }
-    const { userId: waitUserId, userNickname: waitUserNickname } =
-      matchingSockets[0].data as { userId: string; userNickname: string };
-    if (waitUserId === userId) {
+    const { userId } = socket.data as { userId: string };
+    const { userId: waitUserId } = matchingSockets[0].data as {
+      userId: string;
+    };
+    if (userId === waitUserId) {
       await socket.join('matching');
 
       return;
     }
 
-    this.server.socketsLeave('matching');
-    const player1 = new Player(waitUserId, waitUserNickname, true);
-    const player2 = new Player(userId, userNickname, false);
+    const player1 = new Player(waitUserId, true);
+    const player2 = new Player(userId, false);
     // 2人揃ったらマッチルーム作る
     const newRoomId = this.createGameRoom(player1, player2, BALL_SPEED);
-    this.server.to(player1.id).emit('go_game_room', newRoomId);
-    this.server.to(player2.id).emit('go_game_room', newRoomId);
+    this.server.to('matching').emit('go_game_room', newRoomId);
+    this.server.socketsLeave('matching');
+    socket.emit('go_game_room', newRoomId);
     this.server
       .to('monitor')
-      .emit('room_created', newRoomId, player1.id, player2.id);
+      .emit('game_room_created', [newRoomId, player1.id, player2.id]);
   }
 
   createGameRoom(player1: Player, player2: Player, ballSpeed: number): string {
@@ -165,7 +156,7 @@ export class UsersGateway {
   @SubscribeMessage('matching_cancel')
   async cancelMatching(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} matching_cancel`
+      `${socket.id} ${socket.data.userId as string} matching_cancel`
     );
 
     await socket.leave('matching');
@@ -177,22 +168,18 @@ export class UsersGateway {
     @MessageBody() message: { opponentId: string; ballSpeed: number }
   ): void {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} invitation_match`
+      `${socket.id} ${socket.data.userId as string} invitation_match`
     );
 
-    const { userId, userNickname } = socket.data as {
-      userId: string;
-      userNickname: string;
-    };
-
-    const player1 = new Player(userId, userNickname, true);
-    const player2 = new Player(message.opponentId, 'dummy', false);
+    const { userId } = socket.data as { userId: string };
+    const player1 = new Player(userId, true);
+    const player2 = new Player(message.opponentId, false);
     const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
     // this.server.to(player1.id).emit('go_game_room', newRoomId);
     // this.server.to(player2.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('receive_invitation', {
       roomId: newRoomId,
-      challengerNickname: player1.nickname,
+      challengerId: player1.id,
     });
   }
 
@@ -202,7 +189,7 @@ export class UsersGateway {
     @MessageBody() message: { roomId: string }
   ): void {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} accept_invitation`
+      `${socket.id} ${socket.data.userId as string} accept_invitation`
     );
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom !== undefined) {
@@ -218,7 +205,7 @@ export class UsersGateway {
     @MessageBody() message: { roomId: string }
   ): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} decline_invitation`
+      `${socket.id} ${socket.data.userId as string} decline_invitation`
     );
     const gameRoom = this.gameRooms.get(message.roomId);
     if (gameRoom !== undefined) {
@@ -228,57 +215,60 @@ export class UsersGateway {
   }
 
   // room関連;
-  @SubscribeMessage('join_room')
+  @SubscribeMessage('join_game_room')
   async joinRoom(
     @MessageBody() message: { roomId: string },
     @ConnectedSocket() socket: Socket
   ): Promise<void> {
-    Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} join_room`
-    );
+    Logger.debug(`${socket.id} ${socket.data.userId as string} join_game_room`);
 
-    const { userId } = socket.data as { userId: string };
-
-    const gameRoom = this.gameRooms.get(message.roomId);
+    const { roomId } = message;
+    const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
-      socket.emit('invalid_room');
+      socket.emit('game_room_error', 'Invalid game room.');
 
       return;
     }
-    socket.data.roomId = message.roomId;
+    socket.data.roomId = roomId;
 
-    const isPlayer =
-      gameRoom.player1.id === userId || gameRoom.player2.id === userId;
-    // 接続してきたのが観戦者の場合、どっちでもいい
-    const [me, opponent] =
-      gameRoom.player1.id === userId
-        ? [gameRoom.player1, gameRoom.player2]
-        : [gameRoom.player2, gameRoom.player1];
+    const { userId } = socket.data as { userId: string };
+    const { player1, player2 } = gameRoom;
+    const isPlayer = player1.id === userId || player2.id === userId;
+    await (isPlayer ? socket.join(roomId) : socket.join(`watch_${roomId}`));
+
+    const gameInfo = {
+      player1: { id: player1.id, score: player1.score },
+      player2: { id: player2.id, score: player2.score },
+      isLeftSide: true,
+      nextGamePhase: GamePhase.ConfirmWaiting,
+    };
     if (isPlayer) {
-      // PresenceをINGAMEに変更
       this.updatePresence(userId, Presence.INGAME);
-    }
-    socket.emit('set_side', me.isLeftSide);
-    await socket.join(message.roomId);
-    if (!me.isReady) {
-      socket.emit(isPlayer ? 'check_confirmation' : 'wait_players');
-    } else if (!opponent.isReady) {
-      socket.emit(isPlayer ? 'wait_opponent' : 'wait_players');
-    } else if (!gameRoom.isFinished) {
-      socket.emit(isPlayer ? 'start_game' : 'watch_game');
+      const [me, opponent] =
+        player1.id === userId ? [player1, player2] : [player2, player1];
+      gameInfo.isLeftSide = me.isLeftSide;
+      const judgeGamePhase = (): GamePhase => {
+        if (!me.isReady) return GamePhase.ConfirmWaiting;
+        else if (!opponent.isReady) return GamePhase.OpponentWaiting;
+        else if (!gameRoom.isFinished) return GamePhase.InGame;
+        else return GamePhase.Result;
+      };
+      gameInfo.nextGamePhase = judgeGamePhase();
     } else {
-      socket.emit('done_game', {
-        player1Nickname: gameRoom.player1.nickname,
-        player2Nickname: gameRoom.player2.nickname,
-        player1Score: gameRoom.player1.score,
-        player2Score: gameRoom.player2.score,
-      });
+      const judgeGamePhase = (): GamePhase => {
+        if (!gameRoom.isInGame) return GamePhase.PlayerWaiting;
+        if (!gameRoom.isFinished) return GamePhase.Watch;
+        else return GamePhase.Result;
+      };
+      gameInfo.nextGamePhase = judgeGamePhase();
     }
+
+    socket.emit('set_game_info', gameInfo);
   }
 
-  @SubscribeMessage('confirm')
+  @SubscribeMessage('player_confirm')
   confirm(@ConnectedSocket() socket: Socket): void {
-    Logger.debug(`${socket.id} ${socket.data.userNickname as string} confirm`);
+    Logger.debug(`${socket.id} ${socket.data.userId as string} player_confirm`);
 
     const { userId, roomId } = socket.data as {
       userId: string;
@@ -286,35 +276,35 @@ export class UsersGateway {
     };
     const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
-      socket.emit('invalid_room');
+      socket.emit('game_room_error', 'Invalid game room.');
 
       return;
     }
 
-    const isPlayer =
-      gameRoom.player1.id === userId || gameRoom.player2.id === userId;
+    const { player1, player2 } = gameRoom;
     const [me, opponent] =
-      gameRoom.player1.id === userId
-        ? [gameRoom.player1, gameRoom.player2]
-        : [gameRoom.player2, gameRoom.player1];
+      player1.id === userId ? [player1, player2] : [player2, player1];
     me.isReady = true;
     if (!opponent.isReady) {
-      this.server.to(me.id).emit('wait_opponent');
+      this.server
+        .to(me.id)
+        .emit('update_game_phase', GamePhase.OpponentWaiting);
     } else {
-      this.server.in(roomId).emit(isPlayer ? 'start_game' : 'watch_game');
+      this.server.in(roomId).emit('update_game_phase', GamePhase.InGame);
+      this.server
+        .in(`watch_${roomId}`)
+        .emit('update_game_phase', GamePhase.Watch);
     }
   }
 
   @SubscribeMessage('connect_pong')
   connectPong(@ConnectedSocket() socket: Socket): void {
-    Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} connect_pong`
-    );
+    Logger.debug(`${socket.id} ${socket.data.userId as string} connect_pong`);
 
     const { roomId } = socket.data as { roomId: string };
     const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
-      socket.emit('invalid_room');
+      socket.emit('game_room_error', 'Invalid game room.');
 
       return;
     }
@@ -337,17 +327,17 @@ export class UsersGateway {
     const { roomId } = socket.data as { roomId: string };
     const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
-      socket.emit('invalid_room');
+      socket.emit('game_room_error', 'Invalid game room.');
 
       return;
     }
     gameRoom.handleInput(roomId, message.userCommand);
   }
 
-  @SubscribeMessage('leave_room')
+  @SubscribeMessage('leave_game_room')
   async handleLeaveGameRoom(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} leave_room`
+      `${socket.id} ${socket.data.userId as string} leave_game_room`
     );
 
     await this.leaveGameRoom(socket);
@@ -366,34 +356,33 @@ export class UsersGateway {
     if (gameRoom === undefined) {
       return;
     }
-    await socket.leave(roomId);
+    const { player1, player2 } = gameRoom;
+    const isPlayer = player1.id === userId || player2.id === userId;
+    await (isPlayer ? socket.leave(roomId) : socket.leave(`watch_${roomId}`));
     const gameRoomSockets = await this.server.in(roomId).fetchSockets();
-    const isPlayerLeft = Boolean(
-      gameRoomSockets.find((socket) => {
-        const { userId } = socket.data as { userId: string };
-
-        return gameRoom.player1.id === userId || gameRoom.player2.id === userId;
-      })
-    );
-    if (!isPlayerLeft) {
+    if (gameRoomSockets.length === 0) {
       if (!gameRoom.isFinished) {
         // 観戦者を追い出す
-        this.server.in(roomId).emit('both_players_disconnected');
+        this.server
+          .in(`watch_${roomId}`)
+          .emit('game_room_error', 'Both players disconnected.');
         clearInterval(gameRoom.interval);
       }
-      this.updatePresence(userId, Presence.ONLINE);
+      this.updatePresence(player1.id, Presence.ONLINE);
+      this.updatePresence(player2.id, Presence.ONLINE);
       this.server.socketsLeave(roomId);
+      this.server.socketsLeave(`watch_${roomId}`);
       this.gameRooms.delete(roomId);
-      this.server.to('monitor').emit('room_deleted', roomId);
+      this.server.to('monitor').emit('game_room_deleted', roomId);
     }
   }
 
-  @SubscribeMessage('join_monitoring_room')
+  @SubscribeMessage('join_game_monitor_room')
   async sendAllGameRoomIds(
     @ConnectedSocket() socket: Socket
   ): Promise<string[][]> {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} join_monitoring_room`
+      `${socket.id} ${socket.data.userId as string} join_game_monitor_room`
     );
 
     await socket.join('monitor');
@@ -409,10 +398,10 @@ export class UsersGateway {
     return inGameOutlines;
   }
 
-  @SubscribeMessage('leave_monitoring_room')
+  @SubscribeMessage('leave_game_monitor_room')
   async leaveRoomList(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userNickname as string} leave_monitoring_room`
+      `${socket.id} ${socket.data.userId as string} leave_game_monitor_room`
     );
 
     await socket.leave('monitor');

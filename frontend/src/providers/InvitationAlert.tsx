@@ -8,19 +8,23 @@ import {
   AlertDialogOverlay,
   Button,
 } from '@chakra-ui/react';
+import { useProfile } from 'hooks/api';
 
 type Props = {
   isOpen: boolean;
   cancelRef: React.MutableRefObject<null>;
   onClickDecline: () => void;
   onClickAccept: () => void;
-  challenger: string;
+  challengerId: string;
 };
 
 // このコンポーネントをprovidersに残すか、componentsに入れるか迷ったが、SocketProviderでしか使わないためprovidersに置いておく
 export const InvitationAlert: FC<Props> = memo((props) => {
-  const { isOpen, cancelRef, onClickDecline, onClickAccept, challenger } =
+  const { isOpen, cancelRef, onClickDecline, onClickAccept, challengerId } =
     props;
+  const { user: challenger } = useProfile(
+    challengerId === '' ? 'me' : challengerId
+  );
 
   return (
     <AlertDialog
@@ -35,8 +39,8 @@ export const InvitationAlert: FC<Props> = memo((props) => {
           </AlertDialogHeader>
 
           <AlertDialogBody>
-            <strong>{challenger}</strong> invited to a PongGame. Do you accept
-            this Challenge Match?
+            <strong>{challenger.nickname}</strong> invited to a PongGame. Do you
+            accept this Challenge Match?
           </AlertDialogBody>
 
           <AlertDialogFooter>

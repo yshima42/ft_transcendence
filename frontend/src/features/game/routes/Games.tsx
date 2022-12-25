@@ -9,7 +9,7 @@ export const Games: FC = memo(() => {
 
   return (
     <ContentLayout title="In-Game List">
-      <Flex align="center" justify="center">
+      <Flex flexDirection="column" align="center" justify="center" gap="3">
         {inGameOutlines.map((inGameOutline) => (
           <GameOutlineCard
             key={inGameOutline.roomId}

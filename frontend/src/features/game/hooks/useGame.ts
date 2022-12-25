@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import {
@@ -23,18 +23,9 @@ export enum GamePhase {
   Watch = 8,
 }
 
-export type GameResult = {
-  player1Nickname: string;
-  player2Nickname: string;
-  player1Score: number;
-  player2Score: number;
-};
-
-const defaultGameResult: GameResult = {
-  player1Nickname: '',
-  player2Nickname: '',
-  player1Score: 0,
-  player2Score: 0,
+export type Player = {
+  id: string;
+  score: number;
 };
 
 // ここでuseRefを使ってsocketのconnect処理ができたら理想
@@ -44,10 +35,11 @@ export const useGame = (
   gamePhase: GamePhase;
   setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
   draw: (ctx: CanvasRenderingContext2D) => void;
-  gameResult: GameResult;
+  player1: Player;
+  player2: Player;
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
-  const [gameResult, setGameResult] = useState(defaultGameResult);
+
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
@@ -55,9 +47,14 @@ export const useGame = (
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
 
-  const player1 = new Paddle(0, PADDLE_START_POS);
-  const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
-  const ball = new Ball(BALL_START_X, BALL_START_Y);
+  const player1: Player = useMemo(() => ({ id: '', score: 0 }), []);
+  const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
+  const paddle1 = useMemo(() => new Paddle(0, PADDLE_START_POS), []);
+  const paddle2 = useMemo(
+    () => new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS),
+    []
+  );
+  const ball = useMemo(() => new Ball(BALL_START_X, BALL_START_Y), []);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     // canvas背景の設定
@@ -66,8 +63,8 @@ export const useGame = (
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // ゲームオブジェクトの表示
-    player1.draw(ctx);
-    player2.draw(ctx);
+    paddle1.draw(ctx);
+    paddle2.draw(ctx);
     ball.draw(ctx);
 
     // スコアの表示
@@ -76,98 +73,77 @@ export const useGame = (
     ctx.fillText(player2.score.toString(), 960, 50);
   }, []);
 
-  const userCommand = {
-    up: false,
-    down: false,
-    isLeftSide: true,
-  };
-  let justPressed = false;
+  const userCommand = useMemo(
+    () => ({ up: false, down: false, isLeftSide: true }),
+    []
+  );
 
-  const keyDownEvent = (e: KeyboardEvent) => {
+  const keyDownEvent = useCallback((e: KeyboardEvent) => {
+    if (userCommand.down || userCommand.up) {
+      return;
+    }
     if (e.key === 'Down' || e.key === 'ArrowDown') {
-      if (!userCommand.down) {
-        justPressed = true;
-      }
       userCommand.down = true;
     } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      if (!userCommand.up) {
-        justPressed = true;
-      }
       userCommand.up = true;
     }
-    if (justPressed) {
-      socket.emit('user_command', { userCommand });
-      justPressed = false;
-    }
-  };
+    socket.emit('user_command', { userCommand });
+  }, []);
 
-  const keyUpEvent = (e: KeyboardEvent) => {
+  const keyUpEvent = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Down' || e.key === 'ArrowDown') {
       userCommand.down = false;
     } else if (e.key === 'Up' || e.key === 'ArrowUp') {
       userCommand.up = false;
     }
-  };
+  }, []);
 
   // socket イベント
   useEffect(() => {
-    socket.on('invalid_room', () => {
-      console.log('[Socket Event] invalid_room');
+    socket.on('game_room_error', (message: string) => {
       // state は、useToastCheck に合わせる。
       navigate('/app', {
         state: {
-          toastProps: { description: 'Invalid game room.', status: 'error' },
+          toastProps: { description: message, status: 'error' },
         },
       });
     });
 
-    socket.on('both_players_disconnected', () => {
-      console.log('[Socket Event] both_players_disconnected');
-      navigate('/app', {
-        state: {
-          toastProps: {
-            description: 'Both players disconnected.',
-            status: 'error',
-          },
-        },
-      });
-    });
+    socket.on(
+      'set_game_info',
+      (message: {
+        player1: { id: string; score: number };
+        player2: { id: string; score: number };
+        isLeftSide: boolean;
+        nextGamePhase: GamePhase;
+      }) => {
+        player1.id = message.player1.id;
+        player2.id = message.player2.id;
+        player1.score = message.player1.score;
+        player2.score = message.player2.score;
+        userCommand.isLeftSide = message.isLeftSide;
+        setGamePhase(message.nextGamePhase);
+      }
+    );
 
-    socket.on('set_side', (isLeftSide: boolean) => {
-      console.log('[Socket Event] set_side');
-      userCommand.isLeftSide = isLeftSide;
-    });
-
-    socket.on('check_confirmation', () => {
-      console.log('[Socket Event] check_confirmation');
-      setGamePhase(GamePhase.ConfirmWaiting);
-    });
-
-    socket.on('wait_opponent', () => {
-      console.log('[Socket Event] wait_opponent');
-      setGamePhase(GamePhase.OpponentWaiting);
-    });
-
-    socket.on('start_game', () => {
-      console.log('[Socket Event] start_game');
-      document.addEventListener('keydown', keyDownEvent, false);
-      document.addEventListener('keyup', keyUpEvent, false);
-      setGamePhase(GamePhase.InGame);
+    socket.on('update_game_phase', (nextGamePhase: GamePhase) => {
+      console.log(`[Socket Event] update_game_phase ${nextGamePhase}`);
+      setGamePhase(nextGamePhase);
     });
 
     // ゲーム中のスコア受け取り
     socket.on(
       'update_score',
-      (data: { player1Score: number; player2Score: number }) => {
-        player1.score = data.player1Score;
-        player2.score = data.player2Score;
+      (message: { player1Score: number; player2Score: number }) => {
+        player1.score = message.player1Score;
+        player2.score = message.player2Score;
       }
     );
 
     // ゲームで表示するオブジェクトのポジション受け取り
     socket.on(
-      'position_update',
-      (data: {
+      'update_position',
+      (message: {
         paddle1X: number;
         paddle1Y: number;
         paddle2X: number;
@@ -175,43 +151,19 @@ export const useGame = (
         ballX: number;
         ballY: number;
       }) => {
-        player1.x = data.paddle1X;
-        player1.y = data.paddle1Y;
-        player2.x = data.paddle2X;
-        player2.y = data.paddle2Y;
-        ball.x = data.ballX;
-        ball.y = data.ballY;
+        [paddle1.x, paddle1.y] = [message.paddle1X, message.paddle1Y];
+        [paddle2.x, paddle2.y] = [message.paddle2X, message.paddle2Y];
+        [ball.x, ball.y] = [message.ballX, message.ballY];
       }
     );
 
-    socket.on('done_game', (gameResult: GameResult) => {
-      setGameResult(gameResult);
-      setGamePhase(GamePhase.Result);
-    });
-
-    socket.on('wait_players', () => {
-      setGamePhase(GamePhase.PlayerWaiting);
-    });
-
-    socket.on('watch_game', () => {
-      setGamePhase(GamePhase.Watch);
-    });
-
     return () => {
-      socket.emit('leave_room');
-      socket.off('invalid_room');
-      socket.off('both_players_disconnected');
-      socket.off('set_side');
-      socket.off('check_confirmation');
-      socket.off('wait_opponent');
-      socket.off('start_game');
-      socket.off('done_game');
+      socket.emit('leave_game_room');
+      socket.off('game_room_error');
+      socket.off('set_game_info');
+      socket.off('update_game_phase');
       socket.off('update_score');
-      socket.off('position_update');
-      socket.off('wait_players');
-      socket.off('watch');
-      document.removeEventListener('keydown', keyDownEvent, false);
-      document.removeEventListener('keyup', keyUpEvent, false);
+      socket.off('update_position');
     };
   }, [socket, navigate]);
 
@@ -219,48 +171,46 @@ export const useGame = (
   useEffect(() => {
     switch (gamePhase) {
       case GamePhase.SocketConnecting: {
-        if (connected) {
-          setGamePhase(GamePhase.Joining);
-        }
+        if (connected) setGamePhase(GamePhase.Joining);
         break;
       }
       case GamePhase.Joining: {
         console.log('[GamePhase] Joining');
-        socket.emit('join_room', { roomId });
+        socket.emit('join_game_room', { roomId });
         break;
       }
       case GamePhase.ConfirmWaiting: {
-        console.log('[GamePhase] ConfirmWaiting');
         break;
       }
       case GamePhase.Confirming: {
-        console.log('[GamePhase] Confirming');
-        socket.emit('confirm');
+        socket.emit('player_confirm');
         break;
       }
       case GamePhase.OpponentWaiting: {
-        console.log('[GamePhase] OpponentWaiting');
         break;
       }
       case GamePhase.InGame: {
-        console.log('[GamePhase] InGame');
         socket.emit('connect_pong');
+        document.addEventListener('keydown', keyDownEvent, false);
+        document.addEventListener('keyup', keyUpEvent, false);
         break;
       }
       case GamePhase.Result: {
-        console.log('[GamePhase] Result');
         break;
       }
       case GamePhase.PlayerWaiting: {
-        console.log('[GamePhase] PlayerWaiting');
         break;
       }
       case GamePhase.Watch: {
-        console.log('[GamePhase] Watch');
         break;
       }
     }
-  }, [gamePhase, socket, roomId, connected]);
 
-  return { gamePhase, setGamePhase, draw, gameResult };
+    return () => {
+      document.removeEventListener('keydown', keyDownEvent, false);
+      document.removeEventListener('keyup', keyUpEvent, false);
+    };
+  }, [gamePhase, socket, roomId, connected, keyDownEvent, keyUpEvent]);
+
+  return { gamePhase, setGamePhase, draw, player1, player2 };
 };
