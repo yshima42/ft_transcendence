@@ -368,7 +368,8 @@ export class UsersGateway {
           .emit('game_room_error', 'Both players disconnected.');
         clearInterval(gameRoom.interval);
       }
-      this.updatePresence(userId, Presence.ONLINE);
+      this.updatePresence(player1.id, Presence.ONLINE);
+      this.updatePresence(player2.id, Presence.ONLINE);
       this.server.socketsLeave(roomId);
       this.server.socketsLeave(`watch_${roomId}`);
       this.gameRooms.delete(roomId);
