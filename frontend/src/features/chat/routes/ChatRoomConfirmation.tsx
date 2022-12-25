@@ -2,35 +2,36 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus } from '@prisma/client';
 import { AxiosError } from 'axios';
-import { axios } from 'lib/axios';
+import { useSocket } from 'hooks/socket/useSocket';
 import * as RHF from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
 type State = {
   chatRoomId: string;
-  name: string;
+  chatName: string;
   roomStatus: ChatRoomStatus;
 };
 
 export const ChatRoomConfirmation: React.FC = React.memo(() => {
+  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
+    autoConnect: false,
+  });
   const location = useLocation();
-  const { chatRoomId, name, roomStatus } = location.state as State;
+  const { chatRoomId, chatName, roomStatus } = location.state as State;
   const navigate = useNavigate();
   const { handleSubmit, register } = RHF.useForm();
   // axiosを使って、チャットルームに参加する処理を行う。
   // その後、チャットルームのページに遷移する。
-  async function joinChatRoom({ password }: { password: string }) {
+  function joinChatRoom({ password }: { password: string }) {
+    console.log('joinChatRoom');
     try {
-      console.log(password);
-      await axios.post(
-        `/chat/rooms/${chatRoomId}/users`,
-        roomStatus === ChatRoomStatus.PROTECTED
-          ? {
-              chatRoomPassword: password,
-            }
-          : undefined
-      );
+      socket.emit('joinChatRoomMemberNew', {
+        chatRoomId,
+        createChatRoomMemberDto: {
+          password,
+        },
+      });
     } catch (e) {
       const err = e as AxiosError;
       console.log(err.response?.status);
@@ -41,7 +42,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
       return;
     }
     navigate(`/app/chat/rooms/${chatRoomId}`, {
-      state: { chatRoomId, name, roomStatus },
+      state: { chatRoomId, chatName, roomStatus },
     });
   }
 
@@ -59,7 +60,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
         <form onSubmit={handleSubmit(joinChatRoom)}>
           <C.FormControl>
             <C.FormLabel>チャットルーム名</C.FormLabel>
-            <C.Text>{name}</C.Text>
+            <C.Text>{chatName}</C.Text>
           </C.FormControl>
           {roomStatus === ChatRoomStatus.PROTECTED && (
             <C.FormControl>

@@ -17,6 +17,7 @@ import { ChatMessageService } from './chat-message.service';
 })
 export class ChatMessageGateway {
   constructor(private readonly chatMessageService: ChatMessageService) {}
+
   @WebSocketServer()
   server!: Server;
 

@@ -195,11 +195,14 @@ export class ChatRoomService {
   }
 
   // remove
-  async remove(chatRoomId: string, userId: string): Promise<ChatRoom> {
+  async remove(chatRoomId: string, memberId: string): Promise<ChatRoom> {
+    Logger.debug(
+      `chat-room.service.ts: removeChatRoom: ${chatRoomId} ${memberId}`
+    );
     // userのチャットでの権限を取得
     const loginChatRoomMember = await this.chatRoomMemberService.findOne(
       chatRoomId,
-      userId
+      memberId
     );
     if (loginChatRoomMember === undefined) {
       Logger.warn(`removeChatRoom: user is not in chatRoom`);

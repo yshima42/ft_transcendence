@@ -1,12 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
+import { parse } from 'cookie';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
-
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService
+  ) {}
 
   async findAll(user: User): Promise<User[]> {
     const users = await this.prisma.user.findMany({
@@ -77,5 +81,12 @@ export class UsersService {
       }
       throw e;
     }
+  }
+
+  getUserIdFromCookie(cookie: string): string {
+    const { accessToken } = parse(cookie);
+    const { id } = this.jwt.decode(accessToken) as { id: string };
+
+    return id;
   }
 }

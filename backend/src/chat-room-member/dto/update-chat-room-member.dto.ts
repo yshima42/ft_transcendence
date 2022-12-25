@@ -1,7 +1,6 @@
 import { ChatRoomMemberStatus } from '@prisma/client';
 import * as CV from 'class-validator';
-
-type limit = '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
+import { LimitTime } from 'src/chat-room-member/chat-room-member.interface';
 
 export class UpdateChatRoomMemberDto {
   @CV.IsNotEmpty()
@@ -11,5 +10,5 @@ export class UpdateChatRoomMemberDto {
   @CV.IsOptional()
   @CV.IsString()
   @CV.IsIn(['1m', '1h', '1d', '1w', '1M', 'unlimited'])
-  limit?: limit;
+  limit?: LimitTime;
 }

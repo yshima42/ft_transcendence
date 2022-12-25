@@ -24,12 +24,12 @@ export class ChatRoomMemberService {
   async create(
     chatRoomId: string,
     createChatRoomMemberDto: CreateChatRoomMemberDto,
-    userId: string
+    chatLoginUserId: string
   ): Promise<ChatRoomMember> {
     Logger.debug(
-      `create chatRoomId=${chatRoomId} createChatRoomMemberDto=${JSON.stringify(
+      `chat-room-member.service create chatRoomId=${chatRoomId} createChatRoomMemberDto=${JSON.stringify(
         createChatRoomMemberDto
-      )} userId=${userId}`
+      )} chatLoginUserId=${chatLoginUserId}`
     );
     const chatRoomPassword = createChatRoomMemberDto.chatRoomPassword;
     // chatRoomのステータスを取得
@@ -68,7 +68,7 @@ export class ChatRoomMemberService {
       const res = await this.prisma.chatRoomMember.create({
         data: {
           chatRoomId,
-          userId,
+          userId: chatLoginUserId,
           memberStatus: ChatRoomMemberStatus.NORMAL,
         },
       });
@@ -110,13 +110,18 @@ export class ChatRoomMemberService {
   // me
   async findOne(
     chatRoomId: string,
-    userId: string
+    ChatLoginUserId: string
   ): Promise<ResponseChatRoomMember> {
+    Logger.debug(
+      `findOne
+      chatRoomId=${chatRoomId}
+      ChatLoginUserId=${ChatLoginUserId}`
+    );
     const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
       where: {
         chatRoomId_userId: {
           chatRoomId,
-          userId,
+          userId: ChatLoginUserId,
         },
       },
       select: {
@@ -142,13 +147,18 @@ export class ChatRoomMemberService {
 
   async update(
     chatRoomId: string,
-    userId: string,
+    memberId: string,
     updateChatRoomMemberDto: UpdateChatRoomMemberDto,
-    loginUserId: string
+    chatLoginUserId: string
   ): Promise<ChatRoomMember> {
+    Logger.debug(`chat-room-member.service.ts update
+    chatRoomId=${chatRoomId}
+    memberId=${memberId}
+    updateChatRoomMemberDto=${JSON.stringify(updateChatRoomMemberDto)}
+    chatLoginUserId=${chatLoginUserId}`);
     const { memberStatus, limit } = updateChatRoomMemberDto;
     // loginUserIdのchatRoomでのステータスを取得
-    const loginChatRoomMember = await this.findOne(chatRoomId, loginUserId);
+    const loginChatRoomMember = await this.findOne(chatRoomId, chatLoginUserId);
     // ADMIN -> すべての変更を許可
     // MODERATOR -> KICKED, BANED, MUTEDDの変更を許可
     // NORMAL -> 何も変更を許可しない
@@ -169,7 +179,7 @@ export class ChatRoomMemberService {
     switch (memberStatus) {
       // KICKEDの場合は、テーブルから消去する
       case ChatRoomMemberStatus.KICKED:
-        return await this.remove(chatRoomId, userId);
+        return await this.remove(chatRoomId, memberId);
 
       // ADMIN -> ADMINの場合は変更に加えて、自分のステータスをMODERATORに変更する
       case ChatRoomMemberStatus.ADMIN: {
@@ -178,7 +188,7 @@ export class ChatRoomMemberService {
             where: {
               chatRoomId_userId: {
                 chatRoomId,
-                userId,
+                userId: memberId,
               },
             },
             data: {
@@ -189,7 +199,7 @@ export class ChatRoomMemberService {
             where: {
               chatRoomId_userId: {
                 chatRoomId,
-                userId: loginUserId,
+                userId: chatLoginUserId,
               },
             },
             data: {
@@ -223,7 +233,7 @@ export class ChatRoomMemberService {
           where: {
             chatRoomId_userId: {
               chatRoomId,
-              userId,
+              userId: memberId,
             },
           },
           data: {
@@ -235,9 +245,9 @@ export class ChatRoomMemberService {
     }
   }
 
-  async remove(chatRoomId: string, userId: string): Promise<ChatRoomMember> {
-    Logger.debug(`remove chatRoomId: ${chatRoomId}, userId: ${userId}`);
-    const chatRoomMember = await this.findOne(chatRoomId, userId);
+  async remove(chatRoomId: string, memberId: string): Promise<ChatRoomMember> {
+    Logger.debug(`remove chatRoomId: ${chatRoomId}, memberId: ${memberId}`);
+    const chatRoomMember = await this.findOne(chatRoomId, memberId);
     // ADMINは退出できない
     if (chatRoomMember.memberStatus === ChatRoomMemberStatus.ADMIN) {
       throw new NestJs.HttpException(
@@ -251,7 +261,7 @@ export class ChatRoomMemberService {
         where: {
           chatRoomId_userId: {
             chatRoomId,
-            userId,
+            userId: memberId,
           },
         },
       });

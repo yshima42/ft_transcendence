@@ -1,15 +1,21 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
+import { ResponseChatRoomMember } from 'features/chat/hooks/types';
 
 type Props = {
   userId: string;
   memberStatus: ChatRoomMemberStatus;
-  onClickAction: (userId: string, memberStatus: ChatRoomMemberStatus) => void;
+  chatLoginUser: ResponseChatRoomMember;
+  changeChatRoomMemberStatus: (
+    userId: string,
+    memberStatus: ChatRoomMemberStatus,
+    chatLoginUser: ResponseChatRoomMember
+  ) => void;
 };
 
-export const MemberActionButtons: React.FC<Props> = React.memo(
-  ({ userId, memberStatus, onClickAction }) => {
+export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
+  ({ userId, memberStatus, chatLoginUser, changeChatRoomMemberStatus }) => {
     const isAdmin = memberStatus === ChatRoomMemberStatus.ADMIN;
     const isModerator = memberStatus === ChatRoomMemberStatus.MODERATOR;
     let buttons: React.ReactNode;
@@ -49,7 +55,9 @@ export const MemberActionButtons: React.FC<Props> = React.memo(
       buttons = actionButtons.map(({ memberStatus, label }) => (
         <C.Button
           key={memberStatus}
-          onClick={() => onClickAction(userId, memberStatus)}
+          onClick={() =>
+            changeChatRoomMemberStatus(userId, memberStatus, chatLoginUser)
+          }
         >
           {label}
         </C.Button>
@@ -62,7 +70,9 @@ export const MemberActionButtons: React.FC<Props> = React.memo(
   }
 );
 
-export const actionButtonTexts: { [key in ChatRoomMemberStatus]: string } = {
+export const changeChatRoomMemberStatusButtonTexts: {
+  [key in ChatRoomMemberStatus]: string;
+} = {
   ADMIN: '',
   MODERATOR: 'Demote',
   NORMAL: '',

@@ -8,3 +8,5 @@ export type ResponseChatRoomMember = {
   };
   memberStatus: ChatRoomMemberStatus;
 };
+
+export type LimitTime = '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
