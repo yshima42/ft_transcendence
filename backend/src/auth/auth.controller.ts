@@ -9,6 +9,7 @@ import {
   Redirect,
   Query,
   Delete,
+  Body,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
@@ -195,21 +196,20 @@ export class AuthController {
    * @param res - cookie用
    * @returns リダイレクト先
    */
-  @Get('otp/validation')
+  @Post('otp/validation')
   @HttpCode(200)
-  @Redirect('http://localhost:5173/app')
   @UseGuards(JwtAuthGuard)
   async validateOtp(
     @GetUser() user: User,
-    @Query('one-time-password') oneTimePassword: string,
+    @Body('oneTimePassword') oneTimePassword: string,
     @Res({ passthrough: true }) res: Response
-  ): Promise<{ url: string }> {
+  ): Promise<{ isCodeValid: boolean }> {
     const isCodeValid = await this.authService.validateOtp(
       oneTimePassword,
       user
     );
     if (!isCodeValid) {
-      return { url: 'http://localhost:5173/' };
+      return { isCodeValid };
     }
 
     const { accessToken } = await this.authService.generateJwt(
@@ -220,6 +220,34 @@ export class AuthController {
 
     res.cookie('accessToken', accessToken, this.cookieOptions);
 
-    return { url: 'http://localhost:5173/app' };
+    return { isCodeValid };
   }
+
+  // @Get('otp/validation')
+  // @HttpCode(200)
+  // @Redirect('http://localhost:5173/app')
+  // @UseGuards(JwtAuthGuard)
+  // async validateOtp(
+  //   @GetUser() user: User,
+  //   @Query('one-time-password') oneTimePassword: string,
+  //   @Res({ passthrough: true }) res: Response
+  // ): Promise<{ url: string }> {
+  //   const isCodeValid = await this.authService.validateOtp(
+  //     oneTimePassword,
+  //     user
+  //   );
+  //   if (!isCodeValid) {
+  //     return { url: 'http://localhost:5173/' };
+  //   }
+
+  //   const { accessToken } = await this.authService.generateJwt(
+  //     user.id,
+  //     user.name,
+  //     true
+  //   );
+
+  //   res.cookie('accessToken', accessToken, this.cookieOptions);
+
+  //   return { url: 'http://localhost:5173/app' };
+  // }
 }

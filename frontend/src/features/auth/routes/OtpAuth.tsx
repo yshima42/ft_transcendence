@@ -8,12 +8,21 @@ import {
   HStack,
   Input,
 } from '@chakra-ui/react';
+import { useOtpAuthValidate } from 'hooks/api/auth/useOtpAuthValidate';
+import { useNavigate } from 'react-router-dom';
 
 export const OtpAuth: FC = memo(() => {
+  const navigate = useNavigate();
   const [token, setToken] = useState('');
+  const { validateOtpAuth, isLoading } = useOtpAuthValidate();
 
   const onChangeToken = (e: ChangeEvent<HTMLInputElement>) => {
     setToken(e.target.value);
+  };
+
+  const onClickSubmit = async () => {
+    const { isCodeValid } = await validateOtpAuth({ oneTimePassword: token });
+    navigate(isCodeValid ? '/app' : '/');
   };
 
   return (
@@ -33,8 +42,9 @@ export const OtpAuth: FC = memo(() => {
           <Button
             bg="teal.300"
             color="white"
-            as="a"
-            href={`http://localhost:3000/auth/otp/validation?one-time-password=${token}`}
+            onClick={onClickSubmit}
+            isLoading={isLoading}
+            isDisabled={isLoading}
           >
             submit
           </Button>
