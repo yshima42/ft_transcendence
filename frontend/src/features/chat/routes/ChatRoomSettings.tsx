@@ -37,7 +37,6 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     useChangeChatRoomMemberStatus(chatRoomId, socket);
 
   React.useEffect(() => {
-    console.log('ChatRoomSettings');
     getChatLoginUser().catch((err) => console.log(err));
     getChatMembers().catch((err) => console.log(err));
 

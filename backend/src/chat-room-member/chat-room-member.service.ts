@@ -28,8 +28,11 @@ export class ChatRoomMemberService {
   ): Promise<ChatRoomMember> {
     Logger.debug(
       `chat-room-member.service create chatRoomId=${chatRoomId} createChatRoomMemberDto=${JSON.stringify(
-        createChatRoomMemberDto
-      )} chatLoginUserId=${chatLoginUserId}`
+        createChatRoomMemberDto,
+        null,
+        2
+      )}
+      chatLoginUserId=${chatLoginUserId}`
     );
     const chatRoomPassword = createChatRoomMemberDto.chatRoomPassword;
     // chatRoomのステータスを取得
@@ -57,13 +60,18 @@ export class ChatRoomMemberService {
         chatRoom.password
       );
       if (!isPasswordMatch) {
+        NestJs.Logger.error(
+          `chat-room-member.service create password is incorrect
+          chatRoomId=${chatRoomId}
+          chatRoomPassword=${chatRoomPassword}
+          chatRoom.password=${chatRoom.password}`
+        );
         throw new NestJs.HttpException(
           'Password is incorrect',
           NestJs.HttpStatus.UNAUTHORIZED
         );
       }
     }
-
     try {
       const res = await this.prisma.chatRoomMember.create({
         data: {
