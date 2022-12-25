@@ -1,15 +1,13 @@
 import { FC } from 'react';
 import { Grid } from '@chakra-ui/react';
-import { User } from '@prisma/client';
-import { UserCardButton } from 'features/friends/components/atoms/UserCardButton';
+import { useFriends } from 'hooks/api';
+import { DmButton } from 'components/atoms/button/DmButton';
+import { GameButton } from 'components/atoms/button/GameButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
-type Props = {
-  users: User[];
-};
+export const FriendsList: FC = () => {
+  const { users } = useFriends();
 
-export const FriendsList: FC<Props> = (props) => {
-  const { users } = props;
   if (users === undefined) return <></>;
 
   return (
@@ -27,24 +25,10 @@ export const FriendsList: FC<Props> = (props) => {
           username={user.name}
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}
-          winRate={50}
-          totalNumOfGames={100}
           buttons={
             <>
-              <UserCardButton
-                text="DM"
-                id={user.id}
-                onClick={(id) => {
-                  console.log(id);
-                }}
-              />
-              <UserCardButton
-                text="Fight"
-                id={user.id}
-                onClick={(id) => {
-                  console.log(id);
-                }}
-              />
+              <GameButton targetId={user.id} />
+              <DmButton targetId={user.id} />
             </>
           }
         />

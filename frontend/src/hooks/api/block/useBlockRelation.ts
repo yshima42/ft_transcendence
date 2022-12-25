@@ -6,8 +6,7 @@ export const useBlockRelation = (
   const {
     data: { isUserBlocked },
   } = useGetApi<{ isUserBlocked: boolean }>(
-    `/users/me/block-relations/${targetId}`,
-    ['block-relations', { targetId }]
+    `/users/me/block-relations/${targetId}`
   );
 
   return { isUserBlocked };
