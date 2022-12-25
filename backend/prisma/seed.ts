@@ -107,7 +107,7 @@ for (let i = 0; i < 30; i++) {
 }
 
 const chatRooms: ChatRoom[] = [];
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 10; i++) {
   const id = uuidv4();
   const name = 'DmRoom' + id;
   const roomStatus = 'PUBLIC' as ChatRoomStatus;
@@ -268,12 +268,12 @@ const main = async () => {
   await prisma.user.createMany({
     data: userData,
   });
-  await prisma.friendRequest.createMany({
-    data: friendRequestData,
-  });
-  await prisma.block.createMany({
-    data: blockData,
-  });
+  // await prisma.friendRequest.createMany({
+  //   data: friendRequestData,
+  // });
+  // await prisma.block.createMany({
+  //   data: blockData,
+  // });
   await prisma.chatRoom.createMany({
     data: chatRooms,
   });
