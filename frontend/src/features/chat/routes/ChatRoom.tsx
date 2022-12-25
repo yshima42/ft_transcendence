@@ -67,8 +67,7 @@ export const ChatRoom: React.FC = React.memo(() => {
   function sendMessage(content: string): void {
     if (chatLoginUser == null) return;
     socket.emit('send_message', {
-      content,
-      senderId: chatLoginUser.user.id,
+      createChatMessageDto: { content },
       chatRoomId,
     });
   }

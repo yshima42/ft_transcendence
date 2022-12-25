@@ -61,7 +61,7 @@ export class ChatRoomMemberService {
         chatRoom.password
       );
       if (!isPasswordMatch) {
-        NestJs.Logger.error(
+        NestJs.Logger.warn(
           `chat-room-member.service create password is incorrect
           chatRoomId=${chatRoomId}
           chatRoomPassword=${chatRoomPassword}
@@ -274,7 +274,7 @@ export class ChatRoomMemberService {
         },
       });
     } catch (e) {
-      Logger.error(e);
+      Logger.warn(e);
       throw new NestJs.HttpException(
         'ChatRoomMember not found',
         NestJs.HttpStatus.NOT_FOUND
@@ -311,16 +311,18 @@ export class ChatRoomMemberService {
             })
             .finally(() => {
               Logger.debug(
-                `handleCron chatRoomId=${chatRoomMember.chatRoomId} userId=${chatRoomMember.userId}`
+                `handleCron
+                  chatRoomId=${chatRoomMember.chatRoomId}
+                  userId=${chatRoomMember.userId}`
               );
             })
             .catch((e) => {
-              Logger.error(e);
+              Logger.warn(e);
             });
         });
       })
       .catch((e) => {
-        Logger.error(e);
+        Logger.warn(e);
       });
   }
 }

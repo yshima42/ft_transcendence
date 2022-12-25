@@ -40,7 +40,11 @@ export class ChatRoomMemberGateway {
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): void {
     NestJs.Logger.debug(
-      `chat-room-member.gateway leaveRoom: ${JSON.stringify(chatRoomId)}`
+      `chat-room-member.gateway leaveRoom: ${JSON.stringify(
+        chatRoomId,
+        null,
+        2
+      )}`
     );
     void client.leave(chatRoomId);
   }
@@ -62,7 +66,7 @@ export class ChatRoomMemberGateway {
     );
     const cookie = client.handshake.headers.cookie;
     if (cookie === undefined) {
-      NestJs.Logger.error('cookie is undefined');
+      NestJs.Logger.warn('cookie is undefined');
 
       return;
     }
@@ -73,14 +77,12 @@ export class ChatRoomMemberGateway {
       data.updateChatRoomMemberDto,
       chatLoginUserId
     );
-    // もし、joinしているユーザがKICKED、もしくはBANNEDの場合は、
-    // そのユーザをチャットルームから抜けさせる
-
-    NestJs.Logger.verbose('to: ' + client.id);
     const res = this.server
       .in(data.chatRoomId)
       .emit('changeChatRoomMemberStatusSocket', data); // チャットルーム内の全員に送信(自分含む)
-    NestJs.Logger.debug(res);
+    NestJs.Logger.debug(
+      `chat-room-member.gateway changeStatus: ${JSON.stringify(res, null, 2)}`
+    );
   }
 
   getUserIdFromCookie(cookie: string): string {

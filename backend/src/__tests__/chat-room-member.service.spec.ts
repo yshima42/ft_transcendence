@@ -8,9 +8,9 @@ import { CreateChatRoomDto } from 'src/chat-room/dto/create-chat-room.dto';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatRoomMemberModule } from './chat-room-member.module';
-import { ChatRoomMemberService } from './chat-room-member.service';
-import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
+import { ChatRoomMemberModule } from '../chat-room-member/chat-room-member.module';
+import { ChatRoomMemberService } from '../chat-room-member/chat-room-member.service';
+import { CreateChatRoomMemberDto } from '../chat-room-member/dto/create-chat-room-member.dto';
 
 describe('ChatRoomMemberService', () => {
   let chatRoomMemberService: ChatRoomMemberService;
