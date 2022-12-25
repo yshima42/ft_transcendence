@@ -77,24 +77,17 @@ export const useGame = (
     () => ({ up: false, down: false, isLeftSide: true }),
     []
   );
-  let justPressed = useMemo(() => false, []);
 
   const keyDownEvent = useCallback((e: KeyboardEvent) => {
+    if (userCommand.down || userCommand.up) {
+      return;
+    }
     if (e.key === 'Down' || e.key === 'ArrowDown') {
-      if (!userCommand.down) {
-        justPressed = true;
-      }
       userCommand.down = true;
     } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      if (!userCommand.up) {
-        justPressed = true;
-      }
       userCommand.up = true;
     }
-    if (justPressed) {
-      socket.emit('user_command', { userCommand });
-      justPressed = false;
-    }
+    socket.emit('user_command', { userCommand });
   }, []);
 
   const keyUpEvent = useCallback((e: KeyboardEvent) => {
