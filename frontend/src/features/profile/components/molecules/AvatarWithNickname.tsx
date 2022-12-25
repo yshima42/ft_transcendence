@@ -18,7 +18,7 @@ export const AvatarWithNickname: FC<Props> = memo((props) => {
         <UserAvatar id={id} size="md" src={avatarImageUrl} />
 
         {/* TODO:ニックネームが長くなるときどう表示するか考える。暫定で省略している */}
-        <LinkedNickname id={id} nickname={nickname} />
+        <LinkedNickname id={id} nickname={nickname} maxWidth={20} />
       </VStack>
     </Box>
   );

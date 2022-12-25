@@ -25,12 +25,14 @@ export const useProfileEdit = (): {
   editProfile: EditProfile;
   isLoading: boolean;
   isError: boolean;
+  isSuccess: boolean;
   failureReason: unknown;
 } => {
   const {
     postFunc: editProfile,
     isLoading,
     isError,
+    isSuccess,
     failureReason,
   } = usePostApi<ProfileFormData, ProfileEditResBody>(`/users/me/profile`, [
     ['/users/me/profile'],
@@ -51,5 +53,5 @@ export const useProfileEdit = (): {
     }
   }, [isError, toast, failureReason]);
 
-  return { editProfile, isLoading, isError, failureReason };
+  return { editProfile, isLoading, isError, isSuccess, failureReason };
 };
