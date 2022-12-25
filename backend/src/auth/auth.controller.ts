@@ -169,7 +169,7 @@ export class AuthController {
   /**
    * 対象ユーザーのワンタイムパスワード生成用QRコードのURLを返す。
    * @param user
-   * @returns
+   * @returns QRコードのURL
    */
   @Get('otp/qrcode-url')
   @UseGuards(JwtOtpAuthGuard)
@@ -178,10 +178,10 @@ export class AuthController {
   }
 
   /**
-   * OneTimePasswordAuthテーブル上に、特定のユーザーのレコードが存在し、
-   * isOTPEnabledプロパティがtrueかどうかを確認。
+   * OneTimePasswordAuthテーブル上に、特定のユーザーのレコードが存在するかどうか確認。
+   * また、存在してる場合、isOtpAuthEnabledプロパティがtrueかどうかを確認。
    * @param user
-   * @returns trueならOTP有効。falseなら無効。レコードが存在しない場合もfalse。
+   * @returns レコードが存在しない場合null。レコードが存在する場合bool値。
    */
   @Get('otp')
   @UseGuards(JwtOtpAuthGuard)
