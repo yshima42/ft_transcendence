@@ -56,6 +56,9 @@ export class ChatRoomMemberGateway {
     },
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): Promise<void> {
+    NestJs.Logger.debug(
+      `chat-room-member.gateway changeStatus: ${JSON.stringify(data, null, 2)}`
+    );
     const cookie = client.handshake.headers.cookie;
     if (cookie === undefined) {
       NestJs.Logger.error('cookie is undefined');
@@ -63,9 +66,6 @@ export class ChatRoomMemberGateway {
       return;
     }
     const chatLoginUserId = this.usersService.getUserIdFromCookie(cookie);
-    NestJs.Logger.debug(
-      `chat-room-member.gateway changeStatus: ${JSON.stringify(data, null, 2)}`
-    );
     await this.chatRoomMemberService.update(
       data.chatRoomId,
       data.userId,

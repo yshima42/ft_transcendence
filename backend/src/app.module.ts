@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { ChatMessageModule } from './chat-message/chat-message.module';
@@ -31,6 +32,7 @@ import { UsersModule } from './users/users.module';
     ChatRoomModule,
     DmRoomModule,
     ChatRoomMemberModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ChatRoomModule } from 'src/chat-room/chat-room.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UsersModule } from 'src/users/users.module';
@@ -7,7 +8,12 @@ import { ChatRoomMemberGateway } from './chat-room-member.gateway';
 import { ChatRoomMemberService } from './chat-room-member.service';
 
 @Module({
-  imports: [PrismaModule, forwardRef(() => ChatRoomModule), UsersModule],
+  imports: [
+    PrismaModule,
+    forwardRef(() => ChatRoomModule),
+    UsersModule,
+    ScheduleModule.forRoot(),
+  ],
   controllers: [ChatRoomMemberController],
   providers: [ChatRoomMemberService, ChatRoomMemberGateway],
   exports: [ChatRoomMemberService],
