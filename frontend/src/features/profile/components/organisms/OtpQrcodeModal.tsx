@@ -36,6 +36,8 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
   };
 
   const onClickSubmit = async () => {
+    setToken('');
+    onCloseModal();
     await activateOtpAuth({ oneTimePassword: token });
   };
 
@@ -82,11 +84,7 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
             </VStack>
           </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onCloseModal}>
-              Close
-            </Button>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
     </>
