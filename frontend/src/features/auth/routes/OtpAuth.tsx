@@ -8,7 +8,7 @@ import {
   HStack,
   Input,
 } from '@chakra-ui/react';
-import { useOtpAuthValidate } from 'hooks/api/auth/useOtpAuthValidate';
+import { useOtpAuthValidate } from 'hooks/api';
 import { useNavigate } from 'react-router-dom';
 
 export const OtpAuth: FC = memo(() => {

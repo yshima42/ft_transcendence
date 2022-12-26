@@ -4,6 +4,7 @@ export * from './auth/useIsOtpAuthEnabled';
 export * from './auth/useLogout';
 export * from './auth/useOtpAuthCreate';
 export * from './auth/useOtpAuthDelete';
+export * from './auth/useOtpAuthValidate';
 export * from './auth/useOtpQrcodeUrl';
 
 // block
