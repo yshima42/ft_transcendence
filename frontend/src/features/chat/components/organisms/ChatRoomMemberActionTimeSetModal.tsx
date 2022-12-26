@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { Limit } from 'features/chat/hooks/types';
 
-const limitList: Limit[] = ['1m', '1h', '1d', '1w', '1M', 'unlimited'];
+const limitList: Limit[] = ['1m', '1h', '1d', '1w', '1M', 'forever'];
 
 type Props = {
   isOpen: boolean;
