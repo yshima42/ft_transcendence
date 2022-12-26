@@ -4,11 +4,11 @@ import { User } from '@prisma/client';
 import { useBlockRelation } from 'hooks/api';
 import { useFriendRelation } from 'hooks/api/friend/useFriendRelation';
 import { DmButton } from 'components/atoms/button/DmButton';
-import { GameButton } from 'components/atoms/button/GameButton';
 import { OtpAuthButton } from '../atoms/OtpAuthButton';
 import { ProfileEditButton } from '../atoms/ProfileEditButton';
 import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
+import { GameAndWatchButton } from './GameAndWatchButton';
 
 type Props = {
   user: User;
@@ -36,7 +36,7 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
         <>
           {!isUserBlocked && (
             <HStack>
-              <GameButton targetId={user.id} />
+              <GameAndWatchButton targetId={user.id} />
               <DmButton targetId={user.id} />
             </HStack>
           )}
