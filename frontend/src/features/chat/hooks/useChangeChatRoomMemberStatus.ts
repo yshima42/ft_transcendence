@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChatRoomMemberStatus } from '@prisma/client';
-import { Limit } from 'features/chat/hooks/types';
+import { Limit } from 'features/chat/types/chat';
 import { Socket } from 'socket.io-client';
 
 export const useChangeChatRoomMemberStatus = (

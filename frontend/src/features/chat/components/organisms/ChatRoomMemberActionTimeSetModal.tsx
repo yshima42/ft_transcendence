@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { Limit } from 'features/chat/hooks/types';
+import { Limit } from 'features/chat/types/chat';
 
 const limitList: Limit[] = ['1m', '1h', '1d', '1w', '1M', 'forever'];
 

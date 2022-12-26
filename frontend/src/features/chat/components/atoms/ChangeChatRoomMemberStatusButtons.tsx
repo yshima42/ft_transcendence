@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
-import { ResponseChatRoomMember } from 'features/chat/hooks/types';
+import { ResponseChatRoomMember } from 'features/chat/types/chat';
 
 type Props = {
   userId: string;

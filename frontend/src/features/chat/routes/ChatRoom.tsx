@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatRoomMemberStatus } from '@prisma/client';
-import { ResponseChatMessage } from 'features/chat/hooks/types';
 import { useChatLoginUser } from 'features/chat/hooks/useChatLoginUser';
+import { ResponseChatMessage } from 'features/chat/types/chat';
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';

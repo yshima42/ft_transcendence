@@ -1,7 +1,7 @@
 import React from 'react';
 import * as C from '@chakra-ui/react';
 import { Message } from 'components/molecules/Message';
-import { ResponseDm } from '../types';
+import { ResponseDm } from '../types/dm';
 
 type Props = {
   messages: ResponseDm[];
