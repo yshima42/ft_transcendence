@@ -30,6 +30,7 @@ export class ChatRoomMemberGateway {
     NestJs.Logger.debug(
       `chat-room-member.gateway joinRoom: ${JSON.stringify(chatRoomId)}`
     );
+    // 新メンバーが入ってきたときにも、全員に通知するためにchangeChatRoomMemberStatusSocketを叩いています
     this.server.to(chatRoomId).emit('changeChatRoomMemberStatusSocket');
     void client.join(chatRoomId);
   }
@@ -50,7 +51,7 @@ export class ChatRoomMemberGateway {
   }
 
   // ユーザーのステータス変更
-  // TODO: 入力のバリデーション
+  // TODO: 入力のバリデーション ID要素をPipeでチェックしたい。
   @WebSocket.SubscribeMessage('changeChatRoomMemberStatusSocket')
   async changeStatus(
     @WebSocket.MessageBody()
