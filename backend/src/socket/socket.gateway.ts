@@ -24,6 +24,7 @@ enum Presence {
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
   public userIdToPresence: Map<string, Presence>;
+  public userIdToRoomId: Map<string, string>;
   private readonly gameRooms: Map<string, GameRoom>;
 
   constructor(
@@ -33,6 +34,7 @@ export class UsersGateway {
     private readonly prisma: PrismaService
   ) {
     this.userIdToPresence = new Map<string, Presence>();
+    this.userIdToRoomId = new Map<string, string>();
     this.gameRooms = new Map<string, GameRoom>();
   }
 
