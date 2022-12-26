@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ResponseChatRoomMember } from 'features/chat/hooks/types';
+import { ResponseChatRoomMember } from 'features/chat/types/chat';
 import { axios } from 'lib/axios';
 import { useNavigate } from 'react-router-dom';
 

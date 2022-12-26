@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
 import { DmMessages } from '../components/DmMessages';
-import { ResponseDm } from '../types';
+import { ResponseDm } from '../types/dm';
 
 type State = {
   dmRoomId: string;

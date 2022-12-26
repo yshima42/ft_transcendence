@@ -1,4 +1,4 @@
-import { ResponseDm } from 'features/dm/types';
+import { ResponseDm } from 'features/dm/types/dm';
 import { useGetApi } from '../generics/useGetApi';
 
 export const useSavedDms = (dmRoomId: string): { savedDms: ResponseDm[] } => {

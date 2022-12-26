@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ResponseChatRoom } from 'features/chat/hooks/types';
+import { ResponseChatRoom } from 'features/chat/types/chat';
 import { axios } from 'lib/axios';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
