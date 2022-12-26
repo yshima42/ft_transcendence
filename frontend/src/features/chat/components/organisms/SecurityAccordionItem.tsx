@@ -89,9 +89,7 @@ export const SecurityAccordionItem: React.FC<Props> = React.memo(
                   {...register('chatName')}
                 />
                 {errors.password != null && (
-                  <C.FormErrorMessage>
-                    {errors.password.message}
-                  </C.FormErrorMessage>
+                  <C.Text color="red.500">{errors.password.message}</C.Text>
                 )}
                 <C.Button type="submit" colorScheme="blue" mr={5}>
                   Lock
