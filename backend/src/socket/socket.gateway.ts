@@ -24,7 +24,7 @@ enum Presence {
 @WebSocketGateway({ cors: { origin: '*' } })
 export class UsersGateway {
   public userIdToPresence: Map<string, Presence>;
-  public userIdToRoomId: Map<string, string>;
+  public userIdToGameRoomId: Map<string, string>;
   private readonly gameRooms: Map<string, GameRoom>;
 
   constructor(
@@ -34,7 +34,7 @@ export class UsersGateway {
     private readonly prisma: PrismaService
   ) {
     this.userIdToPresence = new Map<string, Presence>();
-    this.userIdToRoomId = new Map<string, string>();
+    this.userIdToGameRoomId = new Map<string, string>();
     this.gameRooms = new Map<string, GameRoom>();
   }
 
@@ -74,6 +74,7 @@ export class UsersGateway {
     if (userIdSockets.length === 0) {
       socket.broadcast.emit('user_disconnected', userId);
       this.userIdToPresence.delete(userId);
+      this.userIdToGameRoomId.delete(userId);
     }
 
     // debug用
@@ -81,21 +82,33 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('handshake')
-  handshake(@ConnectedSocket() socket: Socket): Array<[string, Presence]> {
+  handshake(@ConnectedSocket() socket: Socket): {
+    userIdToPresence: Array<[string, Presence]>;
+    userIdToGameRoomId: Array<[string, string]>;
+  } {
     const { userId } = socket.data as { userId: string };
     const reconnected = this.userIdToPresence.has(userId);
+    // TODO: ここをupdatePresenceにまとめられないか
     if (!reconnected) {
       socket.broadcast.emit('update_presence', [
         userId,
         this.userIdToPresence.get(userId),
       ]);
+      socket.broadcast.emit('update_game_room_id', [
+        userId,
+        this.userIdToGameRoomId.get(userId),
+      ]);
     }
     this.userIdToPresence.set(userId, Presence.ONLINE);
+    this.userIdToGameRoomId.set(userId, '');
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
 
-    return [...this.userIdToPresence];
+    return {
+      userIdToPresence: [...this.userIdToPresence],
+      userIdToGameRoomId: [...this.userIdToGameRoomId],
+    };
   }
 
   // Game関連
@@ -155,6 +168,14 @@ export class UsersGateway {
     ]);
   }
 
+  updateGameRoomId(userId: string, gameRoomId: string): void {
+    this.userIdToGameRoomId.set(userId, gameRoomId);
+    this.server.emit('update_game_room_id', [
+      userId,
+      this.userIdToGameRoomId.get(userId),
+    ]);
+  }
+
   @SubscribeMessage('matching_cancel')
   async cancelMatching(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
@@ -177,8 +198,6 @@ export class UsersGateway {
     const player1 = new Player(userId, true);
     const player2 = new Player(message.opponentId, false);
     const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
-    // this.server.to(player1.id).emit('go_game_room', newRoomId);
-    // this.server.to(player2.id).emit('go_game_room', newRoomId);
     this.server.to(player2.id).emit('receive_invitation', {
       roomId: newRoomId,
       challengerId: player1.id,
@@ -246,6 +265,7 @@ export class UsersGateway {
     };
     if (isPlayer) {
       this.updatePresence(userId, Presence.INGAME);
+      this.updateGameRoomId(userId, gameRoom.id);
       const [me, opponent] =
         player1.id === userId ? [player1, player2] : [player2, player1];
       gameInfo.isLeftSide = me.isLeftSide;
@@ -372,6 +392,8 @@ export class UsersGateway {
       }
       this.updatePresence(player1.id, Presence.ONLINE);
       this.updatePresence(player2.id, Presence.ONLINE);
+      this.updateGameRoomId(player1.id, '');
+      this.updateGameRoomId(player2.id, '');
       this.server.socketsLeave(roomId);
       this.server.socketsLeave(`watch_${roomId}`);
       this.gameRooms.delete(roomId);

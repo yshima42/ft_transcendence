@@ -15,7 +15,7 @@ export const useUserPresence = (friendId: string): { presence: Presence } => {
       : Presence.ONLINE
     : Presence.OFFLINE;
 
-  // こちらのやり方でやりたいが、こちらでやるとオンラインになった瞬間に更新が走らないので一旦上記で対応
+  // こちらのやり方でやりたいが、オンラインになった瞬間に更新が走らないので一旦上記で対応
   // const presence = userIdToPresenceMap.get(friendId) ?? Presence.OFFLINE;
 
   return { presence };
