@@ -35,7 +35,6 @@ export const ChatRoom: React.FC = React.memo(() => {
   const { users: blockUsers } = useBlockUsers();
 
   React.useEffect(() => {
-    socket.emit('join_room', chatRoomId);
     socket.emit('join_room_member', chatRoomId);
     socket.on('receive_message', (payload: ResponseChatMessage) => {
       // メッセージを受け取ったときに実行される関数を登録
@@ -52,7 +51,6 @@ export const ChatRoom: React.FC = React.memo(() => {
       // コンポーネントの寿命が切れるときに実行される
       socket.off('receive_message');
       socket.off('changeChatRoomMemberStatusSocket');
-      socket.emit('leave_room', chatRoomId);
       socket.emit('leave_room_member', chatRoomId);
     };
   }, [chatRoomId, socket]);
