@@ -20,11 +20,11 @@ export class DmRoomController {
   constructor(private readonly dmRoomService: DmRoomService) {}
 
   @Post(':userId')
-  async create(
+  async findOrCreate(
     @Param('userId', new ParseUUIDPipe()) userId: string,
     @GetUser() user: User
   ): Promise<string> {
-    const res = await this.dmRoomService.create(userId, user.id);
+    const res = await this.dmRoomService.findOrCreate(userId, user.id);
 
     return res.id;
   }

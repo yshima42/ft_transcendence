@@ -7,23 +7,38 @@ import { ResponseDmRoom } from './dm-room.interface';
 export class DmRoomService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(userId: string, loginUserId: string): Promise<DmRoom> {
-    const dmRoom = await this.prisma.dmRoom.create({
+  // ない場合はRoomを作成、ある場合はRoomを返す
+  async findOrCreate(userId: string, loginUserId: string): Promise<DmRoom> {
+    const dmRoom = await this.prisma.dmRoom.findFirst({
+      where: {
+        dmRoomMembers: {
+          every: {
+            userId: {
+              in: [userId, loginUserId],
+            },
+          },
+        },
+      },
+    });
+
+    if (dmRoom !== null) {
+      return dmRoom;
+    }
+
+    return await this.prisma.dmRoom.create({
       data: {
         dmRoomMembers: {
           create: [
             {
-              userId: loginUserId,
+              userId,
             },
             {
-              userId,
+              userId: loginUserId,
             },
           ],
         },
       },
     });
-
-    return dmRoom;
   }
 
   async findAll(userId: string): Promise<ResponseDmRoom[]> {
