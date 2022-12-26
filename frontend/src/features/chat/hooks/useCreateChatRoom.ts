@@ -31,7 +31,7 @@ export const useCreateChatRoom = (): {
       const error = e as AxiosError;
       // 409
       if (error.response?.status === 409) {
-        alert('既に存在するチャットルーム名です');
+        alert('this name is already used');
       }
     }
   }

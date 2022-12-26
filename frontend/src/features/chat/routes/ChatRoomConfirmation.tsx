@@ -40,7 +40,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
     } catch (e) {
       const err = e as AxiosError;
       if (err.response?.status !== 201) {
-        alert('認証に失敗しました。');
+        alert('Authentication failed.');
       }
 
       return;
@@ -60,26 +60,26 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
         チャットルームのページに遷移する。
       */}
       <C.Box>
-        <C.Heading>チャットルームに参加</C.Heading>
+        <C.Heading>Join Chat Room</C.Heading>
         <form onSubmit={handleSubmit(joinChatRoom)}>
           <C.FormControl isInvalid={errors.password != null}>
-            <C.FormLabel>チャットルーム名</C.FormLabel>
+            <C.FormLabel>Chat Room Name</C.FormLabel>
             <C.Text>{chatName}</C.Text>
             {roomStatus === ChatRoomStatus.PROTECTED && (
               <>
-                <C.FormLabel>パスワード</C.FormLabel>
+                <C.FormLabel>password</C.FormLabel>
                 <C.Input
-                  placeholder="パスワード"
+                  placeholder="Password"
                   type="password"
                   {...register('password', {
-                    required: 'パスワードを入力してください。',
+                    required: 'password is required.',
                     minLength: {
                       value: 8,
-                      message: 'パスワードは8文字以上で入力してください。',
+                      message: 'password must be at least 8 characters.',
                     },
                     maxLength: {
                       value: 128,
-                      message: 'パスワードは128文字以下で入力してください。',
+                      message: 'password must be at most 128 characters.',
                     },
                   })}
                 />
@@ -89,7 +89,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
               <C.FormErrorMessage>{errors.password.message}</C.FormErrorMessage>
             )}
             <C.Button type="submit" colorScheme="teal" mt={4}>
-              チャットルームに参加
+              Join
             </C.Button>
           </C.FormControl>
         </form>

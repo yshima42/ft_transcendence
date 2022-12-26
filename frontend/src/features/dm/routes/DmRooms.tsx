@@ -13,7 +13,7 @@ export const DmRooms: React.FC = React.memo(() => {
         <C.List spacing={3}>
           {dmRooms.length === 0 && (
             <C.ListItem>
-              <C.Text>DMがありません</C.Text>
+              <C.Text>DmRoom is not found</C.Text>
             </C.ListItem>
           )}
           {dmRooms.map((dmRoom) => (

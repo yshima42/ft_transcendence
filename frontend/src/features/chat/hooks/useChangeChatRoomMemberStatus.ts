@@ -13,7 +13,7 @@ export const useChangeChatRoomMemberStatus = (
   ) => void;
   isOpen: boolean;
   onClose: () => void;
-  setSelectedLimitTime: React.Dispatch<React.SetStateAction<Limit>>;
+  setSelectedLimitTime: React.Dispatch<React.SetStateAction<Limit | undefined>>;
 } => {
   const [selectedLimitTime, setSelectedLimitTime] = React.useState<Limit>();
   const [selectedMemberStatus, setSelectedMemberStatus] =
@@ -26,7 +26,11 @@ export const useChangeChatRoomMemberStatus = (
     if (selectedMemberId === undefined || selectedMemberStatus === undefined) {
       return;
     }
-    selectLimitTime(selectedMemberId, selectedMemberStatus, selectedLimitTime);
+    selectLimitTime(
+      selectedMemberId,
+      selectedMemberStatus,
+      selectedLimitTime as Limit
+    );
     setIsOpen(false);
     setSelectedMemberId(undefined);
     setSelectedMemberStatus(undefined);
