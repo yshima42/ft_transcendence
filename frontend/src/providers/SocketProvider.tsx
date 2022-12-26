@@ -3,6 +3,7 @@ import {
   FC,
   PropsWithChildren,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -22,6 +23,7 @@ export enum Presence {
 export const SocketContext = createContext<
   | {
       userIdToPresence: Array<[string, Presence]>;
+      userIdToPresenceMap: Map<string, Presence>;
       socket: Socket;
       connected: boolean;
     }
@@ -33,6 +35,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const [userIdToPresence, setUserIdToPresence] = useState<
     Array<[string, Presence]>
   >([]);
+  const userIdToPresenceMap = useMemo(() => new Map<string, Presence>(), []);
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
   const navigate = useNavigate();
@@ -50,6 +53,9 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
           'handshake',
           (userIdToPresence: Array<[string, Presence]>) => {
             setUserIdToPresence(userIdToPresence);
+            userIdToPresence.forEach((eachUserIdToPresence) => {
+              userIdToPresenceMap.set(...eachUserIdToPresence);
+            });
           }
         );
       }
@@ -58,6 +64,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
     socket.on('update_presence', (userIdToPresence: [string, Presence]) => {
       console.log('User update presence message received');
       setUserIdToPresence((prev) => [...prev, userIdToPresence]);
+      userIdToPresenceMap.set(...userIdToPresence);
     });
 
     socket.on('user_disconnected', (userId: string) => {
@@ -67,6 +74,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
           (userIdToPresencePair) => userIdToPresencePair[0] !== userId
         )
       );
+      userIdToPresenceMap.delete(userId);
     });
 
     socket.on(
@@ -103,7 +111,9 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   return (
-    <SocketContext.Provider value={{ userIdToPresence, socket, connected }}>
+    <SocketContext.Provider
+      value={{ userIdToPresence, userIdToPresenceMap, socket, connected }}
+    >
       {children}
       <InvitationAlert
         isOpen={isOpen}
