@@ -14,8 +14,11 @@ export const GameAndWatchButton: FC<Props> = memo((props) => {
 
   return (
     <>
-      {gameRoomId === '' && <GameButton targetId={targetId} />}
-      {gameRoomId !== undefined && gameRoomId !== '' && (
+      {gameRoomId === undefined ? (
+        <></>
+      ) : gameRoomId === '' ? (
+        <GameButton targetId={targetId} />
+      ) : (
         <WatchButton gameRoomId={gameRoomId} />
       )}
     </>
