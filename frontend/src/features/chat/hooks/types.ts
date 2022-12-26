@@ -30,4 +30,4 @@ export type ResponseChatRoom = {
   }>;
 };
 
-export type Limit = '1m' | '1h' | '1d' | '1w' | '1M' | 'unlimited';
+export type Limit = '1m' | '1h' | '1d' | '1w' | '1M' | 'forever';

@@ -221,8 +221,20 @@ export class ChatRoomMemberService {
       }
 
       default: {
-        let limitDate: Date | undefined;
-        if (limitTime !== undefined && limitTime !== 'unlimited') {
+        Logger.debug(
+          `chat-room-member.service.ts update default
+          chatRoomId=${chatRoomId}
+          memberId=${memberId}
+          updateChatRoomMemberDto=${JSON.stringify(
+            updateChatRoomMemberDto,
+            null,
+            2
+          )}
+          chatLoginUserId=${chatLoginUserId}`
+        );
+
+        let limitDate: Date | null = null;
+        if (limitTime !== undefined && limitTime !== 'forever') {
           // 現在時刻からlimitを足した時間を取得
           limitDate = new Date();
           const durationInMilliseconds = {
@@ -237,7 +249,7 @@ export class ChatRoomMemberService {
           );
         }
 
-        return await this.prisma.chatRoomMember.update({
+        const res = await this.prisma.chatRoomMember.update({
           where: {
             chatRoomId_userId: {
               chatRoomId,
@@ -249,6 +261,21 @@ export class ChatRoomMemberService {
             statusUntil: limitDate,
           },
         });
+
+        Logger.debug(
+          `chat-room-member.service.ts update default res
+          chatRoomId=${chatRoomId}
+          memberId=${memberId}
+          updateChatRoomMemberDto=${JSON.stringify(
+            updateChatRoomMemberDto,
+            null,
+            2
+          )}
+          chatLoginUserId=${chatLoginUserId}
+          res=${JSON.stringify(res, null, 2)}`
+        );
+
+        return res;
       }
     }
   }
