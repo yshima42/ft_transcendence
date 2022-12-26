@@ -31,26 +31,28 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     navigate
   );
   const { chatMembers, getChatMembers } = useChatMembers(chatRoomId);
-  const { exitChatRoom } = useExitChatRoom(chatRoomId, navigate);
-  const { deleteChatRoom } = useDeleteChatRoom(chatRoomId, navigate);
   const { isOpen, onClose, changeChatRoomMemberStatus, setSelectedLimitTime } =
     useChangeChatRoomMemberStatus(chatRoomId, socket);
 
   React.useEffect(() => {
-    getChatLoginUser().catch((err) => console.log(err));
-    getChatMembers().catch((err) => console.log(err));
+    const fetchDate = async () => {
+      try {
+        await getChatLoginUser();
+        await getChatMembers();
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    void fetchDate();
 
     // webSocket
     socket.emit('join_room_member', chatRoomId);
     // webSocketのイベントを受け取る関数を登録
-    socket.on('changeChatRoomMemberStatusSocket', () => {
-      getChatLoginUser().catch((err) => console.log(err));
-      getChatMembers().catch((err) => console.log(err));
-    });
+    socket.on('changeChatRoomMemberStatusSocket', fetchDate);
 
     return () => {
       socket.emit('leave_room_member', chatRoomId);
-      socket.off('changeChatRoomMemberStatusSocket');
+      socket.off('changeChatRoomMemberStatusSocket', fetchDate);
     };
   }, []);
 
@@ -58,65 +60,36 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     <>
       <ContentLayout title="Chat Room Settings">
         <C.Accordion allowToggle>
-          <C.AccordionItem>
-            <C.AccordionButton>
-              <C.Box flex="1" textAlign="left">
-                Chat Members
-              </C.Box>
-              <C.AccordionIcon />
-            </C.AccordionButton>
-            <C.AccordionPanel pb={4}>
-              {chatLoginUser !== undefined && chatMembers !== undefined && (
-                <ChatRoomMemberList
-                  chatLoginUser={chatLoginUser}
-                  chatMembers={chatMembers}
-                  changeChatRoomMemberStatus={changeChatRoomMemberStatus}
-                />
-              )}
-            </C.AccordionPanel>
-          </C.AccordionItem>
-          {/* LoginUserがADMINならセキュリティタブを出す */}
+          {/* ChatRoomMemberListAccordion */}
+          {chatLoginUser !== undefined && chatMembers !== undefined && (
+            <CustomAccordion title="Chat Members">
+              <ChatRoomMemberList
+                chatLoginUser={chatLoginUser}
+                chatMembers={chatMembers}
+                changeChatRoomMemberStatus={changeChatRoomMemberStatus}
+              />
+            </CustomAccordion>
+          )}
+          {/* SecurityAccordion */}
           {chatLoginUser !== undefined &&
             chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
-              <C.AccordionItem>
-                <C.AccordionButton>
-                  <C.Box flex="1" textAlign="left">
-                    Security
-                  </C.Box>
-                  <C.AccordionIcon />
-                </C.AccordionButton>
-                <C.AccordionPanel pb={4}>
-                  <SecurityAccordionItem
-                    roomStatus={roomStatus}
-                    chatRoomId={chatRoomId}
-                    chatName={chatName}
-                    navigate={navigate}
-                  />
-                </C.AccordionPanel>
-              </C.AccordionItem>
+              <CustomAccordion title="Security">
+                <SecurityAccordionItem
+                  roomStatus={roomStatus}
+                  chatRoomId={chatRoomId}
+                  chatName={chatName}
+                  navigate={navigate}
+                />
+              </CustomAccordion>
             )}
         </C.Accordion>
         {/* 退出ボタン */}
-        {/* ADMINには退出ボタンを表示しない */}
-        {chatLoginUser !== undefined &&
-          chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN && (
-            <C.Button
-              colorScheme="red"
-              onClick={async () => await exitChatRoom()}
-            >
-              Exit
-            </C.Button>
-          )}
-        {/* LoginUserがADMINなら消去ボタンを出す */}
-        {chatLoginUser !== undefined &&
-          chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
-            <C.Button
-              colorScheme="red"
-              onClick={async () => await deleteChatRoom()}
-            >
-              Delete
-            </C.Button>
-          )}
+        {/* ADMINにはDeleteボタンを表示する */}
+        <LeaveButton
+          chatRoomId={chatRoomId}
+          chatLoginUser={chatLoginUser}
+          navigate={navigate}
+        />
       </ContentLayout>
       <ChatRoomMemberActionTimeSetModal
         isOpen={isOpen}
@@ -126,6 +99,48 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
           onClose();
         }}
       />
+    </>
+  );
+});
+
+// AccordionItemの共通化
+const CustomAccordion: React.FC<{
+  title: string;
+  children: React.ReactNode;
+}> = React.memo(({ title, children }) => {
+  return (
+    <C.AccordionItem>
+      <C.AccordionButton>
+        <C.Box flex="1" textAlign="left">
+          {title}
+        </C.Box>
+        <C.AccordionIcon />
+      </C.AccordionButton>
+      <C.AccordionPanel pb={4}>{children}</C.AccordionPanel>
+    </C.AccordionItem>
+  );
+});
+
+const LeaveButton: React.FC<{
+  chatRoomId: string;
+  navigate: ReturnType<typeof useNavigate>;
+  chatLoginUser: ReturnType<typeof useChatLoginUser>['chatLoginUser'];
+}> = React.memo(({ chatRoomId, navigate, chatLoginUser }) => {
+  const { exitChatRoom } = useExitChatRoom(chatRoomId, navigate);
+  const { deleteChatRoom } = useDeleteChatRoom(chatRoomId, navigate);
+
+  return (
+    <>
+      {chatLoginUser !== undefined &&
+        (chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN ? (
+          <C.Button colorScheme="red" onClick={exitChatRoom}>
+            Exit
+          </C.Button>
+        ) : (
+          <C.Button colorScheme="red" onClick={deleteChatRoom}>
+            Delete
+          </C.Button>
+        ))}
     </>
   );
 });

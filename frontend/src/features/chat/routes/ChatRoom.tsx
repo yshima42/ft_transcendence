@@ -35,22 +35,31 @@ export const ChatRoom: React.FC = React.memo(() => {
   const { users: blockUsers } = useBlockUsers();
 
   React.useEffect(() => {
-    socket.emit('join_room_member', chatRoomId);
-    socket.on('receive_message', (payload: ResponseChatMessage) => {
-      // メッセージを受け取ったときに実行される関数を登録
+    const receiveMessageHandler = (payload: ResponseChatMessage) => {
       setMessages((prev) => {
         return [...prev, payload];
       });
-    });
-    // webSocketのイベントを受け取る関数を登録
-    socket.on('changeChatRoomMemberStatusSocket', () => {
+    };
+    const changeChatRoomMemberStatusSocketHandler = () => {
       getChatLoginUser().catch((err) => console.log(err));
-    });
+    };
+
+    socket.emit('join_room_member', chatRoomId);
+    // メッセージを受け取ったときに実行される関数を登録
+    socket.on('receive_message', receiveMessageHandler);
+    // webSocketのイベントを受け取る関数を登録
+    socket.on(
+      'changeChatRoomMemberStatusSocket',
+      changeChatRoomMemberStatusSocketHandler
+    );
 
     return () => {
       // コンポーネントの寿命が切れるときに実行される
-      socket.off('receive_message');
-      socket.off('changeChatRoomMemberStatusSocket');
+      socket.off('receive_message', receiveMessageHandler);
+      socket.off(
+        'changeChatRoomMemberStatusSocket',
+        changeChatRoomMemberStatusSocketHandler
+      );
       socket.emit('leave_room_member', chatRoomId);
     };
   }, [chatRoomId, socket]);
@@ -120,17 +129,15 @@ export const ChatRoom: React.FC = React.memo(() => {
         </C.Flex>
         <C.Divider />
         {/* メッセージ送信フォーム  loginUserがMUTEDのときは送信できないようにする */}
-        {chatLoginUser != null &&
-          chatLoginUser.memberStatus === ChatRoomMemberStatus.MUTED && (
-            <C.Alert status="warning" mb={4}>
-              <C.AlertIcon />
-              You are muted.
-            </C.Alert>
-          )}
-        {chatLoginUser != null &&
-          chatLoginUser.memberStatus !== ChatRoomMemberStatus.MUTED && (
-            <MessageSendForm onSubmit={sendMessage} />
-          )}
+        {chatLoginUser == null ? null : chatLoginUser.memberStatus ===
+          ChatRoomMemberStatus.MUTED ? (
+          <C.Alert status="warning" mb={4}>
+            <C.AlertIcon />
+            You are muted.
+          </C.Alert>
+        ) : (
+          <MessageSendForm onSubmit={sendMessage} />
+        )}
       </ContentLayout>
     </>
   );
