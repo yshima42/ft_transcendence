@@ -60,6 +60,14 @@ export class DmRoomService {
             },
           },
         },
+        // 自分自身が入っているルームのみ取得
+        AND: {
+          dmRoomMembers: {
+            some: {
+              userId,
+            },
+          },
+        },
       },
       select: {
         id: true,
