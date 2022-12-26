@@ -22,7 +22,6 @@ export enum Presence {
 
 export const SocketContext = createContext<
   | {
-      userIdToPresence: Array<[string, Presence]>;
       userIdToPresenceMap: Map<string, Presence>;
       socket: Socket;
       connected: boolean;
@@ -32,9 +31,7 @@ export const SocketContext = createContext<
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
-  const [userIdToPresence, setUserIdToPresence] = useState<
-    Array<[string, Presence]>
-  >([]);
+  const [, setUserIdToPresence] = useState<Array<[string, Presence]>>([]);
   const userIdToPresenceMap = useMemo(() => new Map<string, Presence>(), []);
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
@@ -111,9 +108,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   return (
-    <SocketContext.Provider
-      value={{ userIdToPresence, userIdToPresenceMap, socket, connected }}
-    >
+    <SocketContext.Provider value={{ userIdToPresenceMap, socket, connected }}>
       {children}
       <InvitationAlert
         isOpen={isOpen}
