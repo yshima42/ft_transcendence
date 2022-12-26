@@ -88,7 +88,7 @@ export class UsersGateway {
   } {
     const { userId } = socket.data as { userId: string };
     const reconnected = this.userIdToPresence.has(userId);
-    // TODO: ここをupdatePresenceにまとめられないか
+    // TODO: ここをthis.updatePresenceにまとめられないか
     if (!reconnected) {
       socket.broadcast.emit('update_presence', [
         userId,
