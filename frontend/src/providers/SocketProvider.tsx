@@ -3,6 +3,7 @@ import {
   FC,
   PropsWithChildren,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -21,7 +22,8 @@ export enum Presence {
 
 export const SocketContext = createContext<
   | {
-      userIdToPresence: Array<[string, Presence]>;
+      userIdToPresenceMap: Map<string, Presence>;
+      userIdToGameRoomIdMap: Map<string, string>;
       socket: Socket;
       connected: boolean;
     }
@@ -30,13 +32,14 @@ export const SocketContext = createContext<
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
-  const [userIdToPresence, setUserIdToPresence] = useState<
-    Array<[string, Presence]>
-  >([]);
+  const [, setUserIdToPresence] = useState<Array<[string, Presence]>>([]);
+  const userIdToPresenceMap = useMemo(() => new Map<string, Presence>(), []);
+  const [, setUserIdToGameRoomId] = useState<Array<[string, string]>>([]);
+  const userIdToGameRoomIdMap = useMemo(() => new Map<string, string>(), []);
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
   const navigate = useNavigate();
-  const [roomId, setRoomId] = useState('');
+  const [invitationGameRoomId, setInvitationGameRoomId] = useState('');
   const [challengerId, setChallengerId] = useState('');
 
   useEffect(() => {
@@ -48,16 +51,34 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
         setConnected(true);
         socket.emit(
           'handshake',
-          (userIdToPresence: Array<[string, Presence]>) => {
-            setUserIdToPresence(userIdToPresence);
+          (message: {
+            userIdToPresence: Array<[string, Presence]>;
+            userIdToGameRoomId: Array<[string, string]>;
+          }) => {
+            setUserIdToPresence(message.userIdToPresence);
+            message.userIdToPresence.forEach((eachUserIdToPresence) => {
+              userIdToPresenceMap.set(...eachUserIdToPresence);
+            });
+            setUserIdToGameRoomId(message.userIdToGameRoomId);
+            message.userIdToGameRoomId.forEach((eachUserIdToGameRoomId) => {
+              userIdToGameRoomIdMap.set(...eachUserIdToGameRoomId);
+            });
           }
         );
       }
     });
 
+    // TODO: update_presenceとupdate_game_room_idをまとめるかどうか検討
     socket.on('update_presence', (userIdToPresence: [string, Presence]) => {
       console.log('User update presence message received');
       setUserIdToPresence((prev) => [...prev, userIdToPresence]);
+      userIdToPresenceMap.set(...userIdToPresence);
+    });
+
+    socket.on('update_game_room_id', (userIdToGameRoomId: [string, string]) => {
+      console.log('User update gameRoomId message received');
+      setUserIdToGameRoomId((prev) => [...prev, userIdToGameRoomId]);
+      userIdToGameRoomIdMap.set(...userIdToGameRoomId);
     });
 
     socket.on('user_disconnected', (userId: string) => {
@@ -67,6 +88,14 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
           (userIdToPresencePair) => userIdToPresencePair[0] !== userId
         )
       );
+      userIdToPresenceMap.delete(userId);
+
+      setUserIdToGameRoomId((prev) =>
+        prev.filter(
+          (userIdToGameRoomIdPair) => userIdToGameRoomIdPair[0] !== userId
+        )
+      );
+      userIdToGameRoomIdMap.delete(userId);
     });
 
     socket.on(
@@ -74,13 +103,14 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       (message: { roomId: string; challengerId: string }) => {
         setChallengerId(message.challengerId);
         onOpen();
-        setRoomId(message.roomId);
+        setInvitationGameRoomId(message.roomId);
       }
     );
 
     return () => {
       socket.off('connect_established');
       socket.off('update_presence');
+      socket.off('update_game_room_id');
       socket.off('user_disconnected');
       socket.off('receive_invitation');
     };
@@ -93,17 +123,19 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const onClickAccept = () => {
     onClose();
-    socket.emit('accept_invitation', { roomId });
-    navigate(`/app/games/${roomId}`);
+    socket.emit('accept_invitation', { roomId: invitationGameRoomId });
+    navigate(`/app/games/${invitationGameRoomId}`);
   };
 
   const onClickDecline = () => {
     onClose();
-    socket.emit('decline_invitation', { roomId });
+    socket.emit('decline_invitation', { roomId: invitationGameRoomId });
   };
 
   return (
-    <SocketContext.Provider value={{ userIdToPresence, socket, connected }}>
+    <SocketContext.Provider
+      value={{ userIdToPresenceMap, userIdToGameRoomIdMap, socket, connected }}
+    >
       {children}
       <InvitationAlert
         isOpen={isOpen}
