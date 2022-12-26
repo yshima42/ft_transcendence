@@ -1,4 +1,11 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import {
@@ -37,10 +44,11 @@ export const useGame = (
   draw: (ctx: CanvasRenderingContext2D) => void;
   player1: Player;
   player2: Player;
-  countDownNum: number;
+  readyCountDownNum: number;
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
-  const [countDownNum, setCountDownNum] = useState<number>(0);
+  const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
+  const restartCountDownNum = useRef(0);
 
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
@@ -73,6 +81,9 @@ export const useGame = (
     ctx.font = '48px serif';
     ctx.fillText(player1.score.toString(), 20, 50);
     ctx.fillText(player2.score.toString(), 960, 50);
+    if (restartCountDownNum.current !== 0) {
+      ctx.fillText(restartCountDownNum.current.toString(), 485, 200);
+    }
   }, []);
 
   const userCommand = useMemo(
@@ -117,7 +128,8 @@ export const useGame = (
         player1: { id: string; score: number };
         player2: { id: string; score: number };
         isLeftSide: boolean;
-        countDownNum: number;
+        readyCountDownNum: number;
+        restartCountDownNum: number;
         nextGamePhase: GamePhase;
       }) => {
         console.log('[Socket Event] set_game_info');
@@ -126,14 +138,20 @@ export const useGame = (
         player1.score = message.player1.score;
         player2.score = message.player2.score;
         userCommand.isLeftSide = message.isLeftSide;
-        setCountDownNum(message.countDownNum);
+        setReadyCountDownNum(message.readyCountDownNum);
+        restartCountDownNum.current = message.restartCountDownNum;
         setGamePhase(message.nextGamePhase);
       }
     );
 
-    socket.on('set_count_down_num', (newCountDownNum: number) => {
-      console.log('[Socket Event] set_count_down_num');
-      setCountDownNum(newCountDownNum);
+    socket.on('update_ready_count_down_num', (newCountDownNum: number) => {
+      console.log('[Socket Event] update_ready_count_down_num');
+      setReadyCountDownNum(newCountDownNum);
+    });
+
+    socket.on('update_restart_count_down_num', (newCountDownNum: number) => {
+      console.log('[Socket Event] update_restart_count_down_num');
+      restartCountDownNum.current = newCountDownNum;
     });
 
     socket.on('update_game_phase', (nextGamePhase: GamePhase) => {
@@ -171,7 +189,8 @@ export const useGame = (
       socket.emit('leave_game_room');
       socket.off('game_room_error');
       socket.off('set_game_info');
-      socket.off('set_count_down_num');
+      socket.off('update_ready_count_down_num');
+      socket.off('update_restart_count_down_num');
       socket.off('update_game_phase');
       socket.off('update_score');
       socket.off('update_position');
@@ -223,5 +242,5 @@ export const useGame = (
     };
   }, [gamePhase, socket, roomId, connected, keyDownEvent, keyUpEvent]);
 
-  return { gamePhase, setGamePhase, draw, player1, player2, countDownNum };
+  return { gamePhase, setGamePhase, draw, player1, player2, readyCountDownNum };
 };

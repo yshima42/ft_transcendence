@@ -88,7 +88,9 @@ export class GameRoom {
   interval: NodeJS.Timer;
   isInGame: boolean;
   isFinished: boolean;
-  countDownNum: number;
+  isBallStop: boolean;
+  readyCountDownNum: number;
+  restartCountDownNum: number;
 
   constructor(
     gameService: GameService,
@@ -111,14 +113,20 @@ export class GameRoom {
     });
     this.isInGame = false;
     this.isFinished = false;
-    this.countDownNum = 10;
+    this.isBallStop = true;
+    this.readyCountDownNum = 0;
+    this.restartCountDownNum = 0;
     this.countDownUntilPlayerReady();
   }
 
   countDownUntilPlayerReady(): void {
+    this.readyCountDownNum = 10;
+    this.server
+      .in([this.id, `watch_${this.id}`])
+      .emit('update_ready_count_down_num', this.readyCountDownNum);
     const timer = setInterval(() => {
-      this.countDownNum--;
-      if (this.countDownNum === 0) {
+      this.readyCountDownNum--;
+      if (this.readyCountDownNum === 0) {
         this.server
           .in([this.id, `watch_${this.id}`])
           .emit('game_room_error', 'No player response.');
@@ -128,7 +136,25 @@ export class GameRoom {
       } else {
         this.server
           .in([this.id, `watch_${this.id}`])
-          .emit('set_count_down_num', this.countDownNum);
+          .emit('update_ready_count_down_num', this.readyCountDownNum);
+      }
+    }, 1000);
+  }
+
+  countDownUntilGameRestart(): void {
+    this.isBallStop = true;
+    this.restartCountDownNum = 3;
+    this.server
+      .in([this.id, `watch_${this.id}`])
+      .emit('update_restart_count_down_num', this.restartCountDownNum);
+    const timer = setInterval(() => {
+      this.restartCountDownNum--;
+      this.server
+        .in([this.id, `watch_${this.id}`])
+        .emit('update_restart_count_down_num', this.restartCountDownNum);
+      if (this.restartCountDownNum === 0) {
+        this.isBallStop = false;
+        clearInterval(timer);
       }
     }, 1000);
   }
@@ -139,6 +165,8 @@ export class GameRoom {
   }
 
   gameStart(socket: Socket, roomId: string): void {
+    this.countDownUntilGameRestart();
+
     this.interval = setInterval(() => {
       // ゲームロジック
       this.gameLogic(roomId);
@@ -151,9 +179,11 @@ export class GameRoom {
   }
 
   gameLogic(roomId: string): void {
-    // フレームごとのボールポジションの移動
-    this.ball.x += this.ball.dx;
-    this.ball.y += this.ball.dy;
+    if (!this.isBallStop) {
+      // フレームごとのボールポジションの移動
+      this.ball.x += this.ball.dx;
+      this.ball.y += this.ball.dy;
+    }
 
     // x軸のボールの動き(パドルで跳ね返る処理)
     if (this.ball.x + this.ball.dx > CANVAS_WIDTH - BALL_SIZE) {
@@ -165,7 +195,12 @@ export class GameRoom {
       } else {
         this.player1.score++;
         this.updateScore(roomId);
-        this.setBallCenter();
+        if (this.player1.score === SCORE_TO_WIN) {
+          void this.doneGame(roomId);
+        } else {
+          this.setBallCenter();
+          this.countDownUntilGameRestart();
+        }
       }
     } else if (this.ball.x + this.ball.dx < BALL_SIZE) {
       if (
@@ -176,7 +211,12 @@ export class GameRoom {
       } else {
         this.player2.score++;
         this.updateScore(roomId);
-        this.setBallCenter();
+        if (this.player2.score === SCORE_TO_WIN) {
+          void this.doneGame(roomId);
+        } else {
+          this.setBallCenter();
+          this.countDownUntilGameRestart();
+        }
       }
     }
 
@@ -186,14 +226,6 @@ export class GameRoom {
       this.ball.y + this.ball.dy < BALL_SIZE
     ) {
       this.ball.boundY();
-    }
-
-    // ゲーム終了処理
-    if (
-      this.player1.score === SCORE_TO_WIN ||
-      this.player2.score === SCORE_TO_WIN
-    ) {
-      void this.doneGame(roomId);
     }
   }
 

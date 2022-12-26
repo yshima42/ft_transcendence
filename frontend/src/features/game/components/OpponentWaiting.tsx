@@ -10,11 +10,11 @@ import {
 } from '@chakra-ui/react';
 
 type Props = {
-  countDownNum: number;
+  readyCountDownNum: number;
 };
 
 export const OpponentWaiting: FC<Props> = memo((props) => {
-  const { countDownNum } = props;
+  const { readyCountDownNum } = props;
 
   return (
     <Flex align="center" justify="center" height="40vh">
@@ -22,7 +22,7 @@ export const OpponentWaiting: FC<Props> = memo((props) => {
         <Heading as="h1" size="lg" textAlign="center">
           Waiting for the opponent&apos;s confirmation...
         </Heading>
-        <Text textAlign="center">{countDownNum}</Text>
+        <Text textAlign="center">{readyCountDownNum}</Text>
         <Divider />
         <Stack spacing={4} py={4} px={10} align="center">
           <Spinner />
