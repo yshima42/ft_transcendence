@@ -12,11 +12,7 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 const schema = yup.object().shape(
   {
     // nameスペースはだめ
-    name: yup
-      .string()
-      .trim()
-      .required('チャットルーム名を入力してください')
-      .max(50),
+    name: yup.string().trim().required('name is required').max(50),
     password: yup
       .string()
       .optional()
@@ -46,14 +42,14 @@ export const CreateChatRooms: React.FC = React.memo(() => {
           <C.Heading>Create Chat Room</C.Heading>
           <form onSubmit={handleSubmit(CreateChatRoom)}>
             <C.FormControl isInvalid={!(errors.name == null)}>
-              <C.FormLabel>チャットルーム名</C.FormLabel>
-              <C.Input placeholder="チャットルーム名" {...register('name')} />
+              <C.FormLabel>Create Chat Room</C.FormLabel>
+              <C.Input placeholder="name" {...register('name')} />
               <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
             </C.FormControl>
             <C.FormControl isInvalid={!(errors.password == null)}>
-              <C.FormLabel>パスワード (任意)</C.FormLabel>
+              <C.FormLabel>password (optional)</C.FormLabel>
               <C.Input
-                placeholder="パスワード"
+                placeholder="Password"
                 {...register('password')}
                 type="password"
               />
@@ -62,7 +58,7 @@ export const CreateChatRooms: React.FC = React.memo(() => {
               </C.FormErrorMessage>
             </C.FormControl>
             <C.Button type="submit" colorScheme="teal" mt={4}>
-              チャットルームを作成
+              Create
             </C.Button>
           </form>
         </C.Box>
