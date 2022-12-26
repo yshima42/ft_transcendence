@@ -90,7 +90,13 @@ export class ChatRoomService {
         },
       },
     });
-    Logger.debug(`findAllChatRoom: ${JSON.stringify(chatRooms)}`);
+    Logger.debug(
+      `chat-room.service: findAllWithOutMe: ${JSON.stringify(
+        chatRooms,
+        null,
+        2
+      )}`
+    );
 
     return chatRooms;
   }
@@ -124,7 +130,9 @@ export class ChatRoomService {
         },
       },
     });
-    Logger.debug(`findAllChatRoom: ${JSON.stringify(chatRooms)}`);
+    Logger.debug(
+      `chat-room.service: findAllByMe: ${JSON.stringify(chatRooms, null, 2)}`
+    );
 
     return chatRooms;
   }
@@ -144,7 +152,9 @@ export class ChatRoomService {
         NestJS.HttpStatus.NOT_FOUND
       );
     }
-    Logger.debug(`findOneChatRoom: ${JSON.stringify(chatRoom, null, 2)}`);
+    Logger.debug(
+      `chat-room.service: findOne: ${JSON.stringify(chatRoom, null, 2)}`
+    );
 
     return chatRoom;
   }
@@ -156,7 +166,9 @@ export class ChatRoomService {
     userId: string
   ): Promise<ChatRoom> {
     const { password } = updateChatroomDto;
-    Logger.debug(`updateChatRoom: ${JSON.stringify(updateChatroomDto)}`);
+    Logger.debug(
+      `chat-room.service: update: ${JSON.stringify(updateChatroomDto, null, 2)}`
+    );
     let hashedPassword: string | undefined;
     if (password !== undefined) {
       Logger.debug(`updateChatRoom: password is not undefined`);
@@ -173,7 +185,7 @@ export class ChatRoomService {
     });
     // もしADMINじゃなかったらエラー
     if (chatRoomMember?.memberStatus !== ChatRoomMemberStatus.ADMIN) {
-      Logger.warn(`updateChatRoom: user is not admin`);
+      Logger.warn(`chat-room.service: update: user is not admin`);
 
       throw new Error('User is not admin');
     }
@@ -190,7 +202,9 @@ export class ChatRoomService {
             : ChatRoomStatus.PROTECTED,
       },
     });
-    Logger.debug(`updateChatRoom: ${JSON.stringify(chatRoom)}`);
+    Logger.debug(
+      `chat-room.service: update: ${JSON.stringify(chatRoom, null, 2)}`
+    );
 
     return chatRoom;
   }
@@ -206,7 +220,9 @@ export class ChatRoomService {
       memberId
     );
     if (loginChatRoomMember === undefined) {
-      Logger.warn(`removeChatRoom: user is not in chatRoom`);
+      Logger.warn(
+        `chat-room.service.ts: removeChatRoom: user is not in chatRoom`
+      );
 
       throw new NestJS.HttpException(
         'User is not in chatRoom',
@@ -215,7 +231,7 @@ export class ChatRoomService {
     }
     // もしADMINじゃなかったらエラー
     if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.ADMIN) {
-      Logger.warn(`removeChatRoom: user is not admin`);
+      Logger.warn(`chat-room.service.ts: removeChatRoom: user is not admin`);
 
       throw new NestJS.HttpException(
         'User is not admin',
@@ -227,7 +243,13 @@ export class ChatRoomService {
         id: chatRoomId,
       },
     });
-    Logger.debug(`removeChatRoom: ${JSON.stringify(chatRoom)}`);
+    Logger.debug(
+      `chat-room.service.ts: removeChatRoom: ${JSON.stringify(
+        chatRoom,
+        null,
+        2
+      )}`
+    );
 
     return chatRoom;
   }
