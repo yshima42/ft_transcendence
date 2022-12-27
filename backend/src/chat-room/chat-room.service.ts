@@ -183,11 +183,24 @@ export class ChatRoomService {
         },
       },
     });
+    if (chatRoomMember === null) {
+      Logger.warn(
+        `chat-room.service.ts: update: user is not in chatRoom: ${chatRoomId}`
+      );
+
+      throw new NestJS.HttpException(
+        'User is not in chatRoom',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
     // もしADMINじゃなかったらエラー
     if (chatRoomMember?.memberStatus !== ChatRoomMemberStatus.ADMIN) {
-      Logger.warn(`chat-room.service: update: user is not admin`);
+      Logger.warn(`chat-room.service: update: user is not admin ${userId}`);
 
-      throw new Error('User is not admin');
+      throw new NestJS.HttpException(
+        'User is not admin',
+        NestJS.HttpStatus.FORBIDDEN
+      );
     }
 
     const chatRoom = await this.prisma.chatRoom.update({
