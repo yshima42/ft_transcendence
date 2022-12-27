@@ -7,13 +7,11 @@ import {
   Heading,
   Spacer,
   Stack,
-  VStack,
 } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
 import { useNavigate } from 'react-router-dom';
-import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { Player } from '../hooks/useGame';
+import { AvatarWithNickname } from './AvatarWithNickname';
 
 type Props = {
   player1: Player;
@@ -33,27 +31,13 @@ export const Result: FC<Props> = memo((props) => {
         <Box bg="white" w="md" p={4} borderRadius="md" shadow="md">
           <Flex alignItems="center" p={4}>
             <Spacer />
-            <VStack alignItems={'center'}>
-              <UserAvatar id={user1.id} src={user1.avatarImageUrl} />
-              <LinkedNickname
-                id={user1.id}
-                nickname={user1.nickname}
-                maxWidth={200}
-              />
-            </VStack>
+            <AvatarWithNickname user={user1} />
             <Spacer />
             <Heading as="h2" size="lg" textAlign="center">
               {player1.score} - {player2.score}
             </Heading>
             <Spacer />
-            <VStack alignItems={'center'}>
-              <UserAvatar id={user2.id} src={user2.avatarImageUrl} />
-              <LinkedNickname
-                id={user2.id}
-                nickname={user2.nickname}
-                maxWidth={200}
-              />
-            </VStack>
+            <AvatarWithNickname user={user2} />
             <Spacer />
           </Flex>
           <Divider />
