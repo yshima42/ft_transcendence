@@ -12,9 +12,8 @@ import { GamePhase, useGame } from '../hooks/useGame';
 
 export const Game: FC = memo(() => {
   const { id: roomId } = useParams();
-  const { gamePhase, setGamePhase, draw, player1, player2 } = useGame(
-    roomId ?? ''
-  );
+  const { gamePhase, setGamePhase, draw, player1, player2, readyCountDownNum } =
+    useGame(roomId ?? '');
 
   const gamePage = useMemo(() => {
     switch (gamePhase) {
@@ -22,20 +21,25 @@ export const Game: FC = memo(() => {
       case GamePhase.Joining:
         return <CenterSpinner h="40vh" />;
       case GamePhase.ConfirmWaiting:
-        return <Confirmation setGamePhase={setGamePhase} />;
+        return (
+          <Confirmation
+            setGamePhase={setGamePhase}
+            readyCountDownNum={readyCountDownNum}
+          />
+        );
       case GamePhase.Confirming:
         return <CenterSpinner h="40vh" />;
       case GamePhase.OpponentWaiting:
-        return <OpponentWaiting />;
+        return <OpponentWaiting readyCountDownNum={readyCountDownNum} />;
       case GamePhase.PlayerWaiting:
-        return <PlayerWaiting />;
+        return <PlayerWaiting readyCountDownNum={readyCountDownNum} />;
       case GamePhase.InGame:
       case GamePhase.Watch:
         return <PongGame draw={draw} />;
       case GamePhase.Result:
         return <Result player1={player1} player2={player2} />;
     }
-  }, [gamePhase, setGamePhase, draw, player1, player2]);
+  }, [gamePhase, setGamePhase, draw, player1, player2, readyCountDownNum]);
 
   return (
     <ContentLayout title="">
