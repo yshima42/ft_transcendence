@@ -2,17 +2,17 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 
 type Props = {
-  onSubmit: (content: string) => void;
+  sendMessage: (content: string) => void;
 };
 
-export const MessageSendForm: React.FC<Props> = ({ onSubmit }) => {
+export const MessageSendForm: React.FC<Props> = ({ sendMessage }) => {
   const [content, setContent] = React.useState('');
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit(content);
+        sendMessage(content);
         setContent('');
       }}
     >

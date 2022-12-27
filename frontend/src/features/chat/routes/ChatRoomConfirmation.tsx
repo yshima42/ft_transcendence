@@ -26,13 +26,11 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
     register,
     formState: { errors },
   } = ReactHookForm.useForm<Inputs>();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   // axiosを使って、チャットルームに参加する処理を行う。
   // その後、チャットルームのページに遷移する。
-
   const joinChatRoom: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
     const { password } = data;
-    console.log(`roomStatus: ${roomStatus}`);
-    console.log(`password : ${password}`);
     try {
       await axios.post(`/chat/rooms/${chatRoomId}/members`, {
         chatRoomPassword: password,
@@ -50,6 +48,12 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
     });
   };
 
+  const onSubmit: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
+    setIsSubmitting(true);
+    await joinChatRoom(data);
+    setIsSubmitting(false);
+  };
+
   return (
     <ContentLayout title="Chat Room Confirmation">
       {/*
@@ -61,7 +65,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
       */}
       <C.Box>
         <C.Heading>Join Chat Room</C.Heading>
-        <form onSubmit={handleSubmit(joinChatRoom)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <C.FormControl isInvalid={errors.password != null}>
             <C.FormLabel>Chat Room Name</C.FormLabel>
             <C.Text>{chatName}</C.Text>
@@ -88,7 +92,12 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
             {errors.password != null && (
               <C.FormErrorMessage>{errors.password.message}</C.FormErrorMessage>
             )}
-            <C.Button type="submit" colorScheme="teal" mt={4}>
+            <C.Button
+              type="submit"
+              colorScheme="teal"
+              mt={4}
+              isDisabled={isSubmitting}
+            >
               Join
             </C.Button>
           </C.FormControl>
