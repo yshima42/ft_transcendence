@@ -30,7 +30,7 @@ export const Result: FC<Props> = memo((props) => {
   return (
     <>
       <Flex align="center" justify="center" height="40vh">
-        <Box bg="white" w="sz" p={4} borderRadius="md" shadow="md">
+        <Box bg="white" w="md" p={4} borderRadius="md" shadow="md">
           <Flex alignItems="center" p={4}>
             <Spacer />
             <VStack alignItems={'center'}>
@@ -54,6 +54,7 @@ export const Result: FC<Props> = memo((props) => {
                 maxWidth={200}
               />
             </VStack>
+            <Spacer />
           </Flex>
           <Divider />
           <Stack py={3} align="center">
