@@ -124,12 +124,12 @@ export class GameRoom {
       .emit('update_ready_count_down_num', this.readyCountDownNum);
     const timer = setInterval(() => {
       this.readyCountDownNum--;
-      if (this.readyCountDownNum === 0) {
+      if (this.isInGame) {
+        clearInterval(timer);
+      } else if (this.readyCountDownNum === 0) {
         this.server
           .in([this.id, `watch_${this.id}`])
           .emit('game_room_error', 'The game was canceled.');
-        clearInterval(timer);
-      } else if (this.isInGame) {
         clearInterval(timer);
       } else {
         this.server
