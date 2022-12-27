@@ -35,11 +35,11 @@ export class ChatRoomMemberService {
       )}
       chatLoginUserId=${chatLoginUserId}`
     );
-    const chatRoomPassword = createChatRoomMemberDto.chatRoomPassword;
+    const enteredPassword = createChatRoomMemberDto.chatRoomPassword;
     // chatRoomのステータスを取得
     const chatRoom = await this.chatRoomService.findOne(chatRoomId);
     if (chatRoom.roomStatus === ChatRoomStatus.PROTECTED) {
-      if (chatRoomPassword === undefined || chatRoomPassword === '') {
+      if (enteredPassword === undefined || enteredPassword === '') {
         throw new NestJs.HttpException(
           'Password is required',
           NestJs.HttpStatus.BAD_REQUEST
@@ -57,14 +57,14 @@ export class ChatRoomMemberService {
       }
       // パスワードが一致しない場合はエラー
       const isPasswordMatch = await bcrypt.compare(
-        chatRoomPassword,
+        enteredPassword,
         chatRoom.password
       );
       if (!isPasswordMatch) {
         NestJs.Logger.warn(
           `chat-room-member.service create password is incorrect
           chatRoomId=${chatRoomId}
-          chatRoomPassword=${chatRoomPassword}
+          chatRoomPassword=${enteredPassword}
           chatRoom.password=${chatRoom.password}`
         );
         throw new NestJs.HttpException(
