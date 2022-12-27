@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
 import { ResponseChatRoomMember } from 'features/chat/types/chat';
+import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import {
   ChangeChatRoomMemberStatusButtons,
   changeChatRoomMemberStatusButtonTexts,
@@ -24,11 +25,12 @@ export const ChatRoomMemberList: React.FC<Props> = React.memo(
         {chatMembers.map((user) => (
           <C.ListItem key={user.user.id}>
             <C.Flex>
-              <C.Avatar
+              <UserAvatar
+                id={user.user.id}
                 size="sm"
                 name={user.user.nickname}
                 src={user.user.avatarImageUrl}
-              ></C.Avatar>
+              ></UserAvatar>
               <C.Text ml={10}>{user.user.nickname}</C.Text>
               <C.Spacer />
               <C.Flex>
