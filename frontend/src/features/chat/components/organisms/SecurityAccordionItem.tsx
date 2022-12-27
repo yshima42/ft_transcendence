@@ -3,13 +3,11 @@ import * as C from '@chakra-ui/react';
 import { ChatRoomStatus } from '@prisma/client';
 import { useChatRoomProtectSetting } from 'features/chat/hooks/useChatRoomProtectSetting';
 import * as ReactHookForm from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 
 type Props = {
   roomStatus: ChatRoomStatus;
   chatRoomId: string;
   chatName: string;
-  navigate: ReturnType<typeof useNavigate>;
 };
 
 type Inputs = {
@@ -19,9 +17,8 @@ type Inputs = {
 };
 
 export const SecurityAccordionItem: React.FC<Props> = React.memo(
-  ({ roomStatus, chatRoomId, chatName, navigate }) => {
-    const { protectChatRoom, publicChatRoom } =
-      useChatRoomProtectSetting(navigate);
+  ({ roomStatus, chatRoomId, chatName }) => {
+    const { protectChatRoom, publicChatRoom } = useChatRoomProtectSetting();
     const {
       register,
       handleSubmit,

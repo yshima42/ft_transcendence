@@ -4,12 +4,12 @@ import { axios } from 'lib/axios';
 import { useNavigate } from 'react-router-dom';
 
 export const useChatLoginUser = (
-  chatRoomId: string,
-  navigate: ReturnType<typeof useNavigate>
+  chatRoomId: string
 ): {
   chatLoginUser: ResponseChatRoomMember | undefined;
   getChatLoginUser: () => Promise<ResponseChatRoomMember | undefined>;
 } => {
+  const navigate = useNavigate();
   const [chatLoginUser, setChatLoginUser] =
     React.useState<ResponseChatRoomMember>();
 
