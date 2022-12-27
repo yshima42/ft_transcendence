@@ -18,7 +18,7 @@ export const DmRooms: React.FC = React.memo(() => {
           )}
           {dmRooms.map((dmRoom) => (
             <C.ListItem key={dmRoom.id}>
-              <Link to={`rooms/${dmRoom.id}`} state={{ dmRoomId: dmRoom.id }}>
+              <Link to={`${dmRoom.id}`} state={{ dmRoomId: dmRoom.id }}>
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
                     <C.Box>
