@@ -1,6 +1,6 @@
 import { memo, FC } from 'react';
+import { useCanvas } from '../hooks/useCanvas';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../utils/gameConfig';
-import { Canvas } from './Canvas';
 
 type Props = {
   draw: (ctx: CanvasRenderingContext2D) => void;
@@ -8,6 +8,7 @@ type Props = {
 
 export const PongGame: FC<Props> = memo((props) => {
   const { draw } = props;
+  const canvasRef = useCanvas(draw);
 
-  return <Canvas draw={draw} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />;
+  return <canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT} ref={canvasRef} />;
 });
