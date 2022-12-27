@@ -1,4 +1,10 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -14,7 +20,7 @@ export class ChatMessageController {
 
   @Get()
   async findAllNotBlocked(
-    @Param('chatRoomId') chatRoomId: string,
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<ResponseChatMessage[]> {
     return await this.chatMessageService.findAllNotBlocked(chatRoomId, user.id);

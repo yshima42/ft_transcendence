@@ -1,4 +1,10 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseDm } from './dm.interface';
@@ -11,7 +17,9 @@ export class DmController {
   constructor(private readonly dmService: DmService) {}
 
   @Get()
-  async findDms(@Param('dmRoomId') dmRoomId: string): Promise<ResponseDm[]> {
+  async findDms(
+    @Param('dmRoomId', new ParseUUIDPipe()) dmRoomId: string
+  ): Promise<ResponseDm[]> {
     return await this.dmService.findDms(dmRoomId);
   }
 }
