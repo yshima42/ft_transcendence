@@ -90,7 +90,6 @@ export class GameRoom {
   isFinished: boolean;
   isBallStop: boolean;
   readyCountDownNum: number;
-  restartCountDownNum: number;
 
   constructor(
     gameService: GameService,
@@ -115,7 +114,6 @@ export class GameRoom {
     this.isFinished = false;
     this.isBallStop = true;
     this.readyCountDownNum = 0;
-    this.restartCountDownNum = 0;
     this.countDownUntilPlayerReady();
   }
 
@@ -143,19 +141,8 @@ export class GameRoom {
 
   countDownUntilGameRestart(): void {
     this.isBallStop = true;
-    this.restartCountDownNum = 3;
-    this.server
-      .in([this.id, `watch_${this.id}`])
-      .emit('update_restart_count_down_num', this.restartCountDownNum);
-    const timer = setInterval(() => {
-      this.restartCountDownNum--;
-      this.server
-        .in([this.id, `watch_${this.id}`])
-        .emit('update_restart_count_down_num', this.restartCountDownNum);
-      if (this.restartCountDownNum === 0) {
-        this.isBallStop = false;
-        clearInterval(timer);
-      }
+    setTimeout(() => {
+      this.isBallStop = false;
     }, 1000);
   }
 

@@ -241,7 +241,6 @@ export class UsersGateway {
       player2: { id: player2.id, score: player2.score },
       isLeftSide: true,
       readyCountDownNum: gameRoom.readyCountDownNum,
-      restartCountDownNum: gameRoom.restartCountDownNum,
       nextGamePhase: GamePhase.ConfirmWaiting,
     };
     if (isPlayer) {
