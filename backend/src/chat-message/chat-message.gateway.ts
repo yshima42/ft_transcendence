@@ -59,36 +59,6 @@ export class ChatMessageGateway {
     this.server.in(chatRoomId).emit('receive_message', newMessage);
   }
 
-  @SubscribeMessage('join_room')
-  joinRoom(
-    @MessageBody() chatRoomId: string,
-    @ConnectedSocket() client: Socket
-  ): void {
-    Logger.debug(
-      `chat-message.gateway.ts: joinRoom: ${JSON.stringify(
-        chatRoomId,
-        null,
-        2
-      )}`
-    );
-    void client.join(chatRoomId);
-  }
-
-  @SubscribeMessage('leave_room')
-  leaveRoom(
-    @MessageBody() chatRoomId: string,
-    @ConnectedSocket() client: Socket
-  ): void {
-    Logger.debug(
-      `chat-message.gateway.ts: leaveRoom: ${JSON.stringify(
-        chatRoomId,
-        null,
-        2
-      )}`
-    );
-    void client.leave(chatRoomId);
-  }
-
   getUserIdFromCookie(cookie: string): string {
     const { accessToken } = parse(cookie);
     const { id } = this.jwt.decode(accessToken) as { id: string };
