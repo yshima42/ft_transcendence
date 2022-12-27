@@ -1,10 +1,9 @@
 import { memo, FC } from 'react';
-import { Button, Card, Flex, Spacer, Text, VStack } from '@chakra-ui/react';
+import { Button, Card, Flex, Spacer, Text } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
 import { useNavigate } from 'react-router-dom';
-import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { GameOutline } from '../hooks/useGameMonitoring';
+import { AvatarWithNickname } from './AvatarWithNickname';
 
 type Props = {
   gameOutline: GameOutline;
@@ -23,25 +22,11 @@ export const GameOutlineCard: FC<Props> = memo((props) => {
     <Card borderRadius="md" w="lg">
       <Flex alignItems="center" p={4}>
         <Spacer />
-        <VStack alignItems={'center'}>
-          <UserAvatar id={user1.id} src={user1.avatarImageUrl} />
-          <LinkedNickname
-            id={user1.id}
-            nickname={user1.nickname}
-            maxWidth={200}
-          />
-        </VStack>
+        <AvatarWithNickname user={user1} />
         <Spacer />
         <Text fontSize="xl">vs</Text>
         <Spacer />
-        <VStack>
-          <UserAvatar id={user2.id} src={user2.avatarImageUrl} />
-          <LinkedNickname
-            id={user2.id}
-            nickname={user2.nickname}
-            maxWidth={200}
-          />
-        </VStack>
+        <AvatarWithNickname user={user2} />
         <Spacer />
         <Button onClick={() => navigate(`/app/games/${gameOutline.roomId}`)}>
           {isPlayer ? 'Reconnect' : 'Watch'}
@@ -50,5 +35,3 @@ export const GameOutlineCard: FC<Props> = memo((props) => {
     </Card>
   );
 });
-
-/* <Card bg="white" w="sm" borderRadius="md" shadow="md"> */
