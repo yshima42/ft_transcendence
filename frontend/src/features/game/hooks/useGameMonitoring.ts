@@ -3,8 +3,8 @@ import { SocketContext } from 'providers/SocketProvider';
 
 export interface GameOutline {
   roomId: string;
-  leftPlayerId: string;
-  rightPlayerId: string;
+  player1Id: string;
+  player2Id: string;
 }
 
 export const useGameMonitoring = (): {
@@ -28,8 +28,8 @@ export const useGameMonitoring = (): {
         inGameOutlines.forEach((inGameOutline) =>
           inGameOutlineMap.set(inGameOutline[0], {
             roomId: inGameOutline[0],
-            leftPlayerId: inGameOutline[1],
-            rightPlayerId: inGameOutline[2],
+            player1Id: inGameOutline[1],
+            player2Id: inGameOutline[2],
           })
         );
         setInGameOutlines(Array.from(inGameOutlineMap.values()));
@@ -40,8 +40,8 @@ export const useGameMonitoring = (): {
       console.log('[Socket Event] game_room_created');
       inGameOutlineMap.set(createdRoomOutline[0], {
         roomId: createdRoomOutline[0],
-        leftPlayerId: createdRoomOutline[1],
-        rightPlayerId: createdRoomOutline[2],
+        player1Id: createdRoomOutline[1],
+        player2Id: createdRoomOutline[2],
       });
       setInGameOutlines(Array.from(inGameOutlineMap.values()));
     });
