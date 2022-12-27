@@ -51,7 +51,7 @@ export class DmRoomService {
             user: {
               blocking: {
                 every: {
-                  targetId: {
+                  sourceId: {
                     not: {
                       equals: userId,
                     },
