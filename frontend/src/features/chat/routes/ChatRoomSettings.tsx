@@ -26,10 +26,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
   const location = useLocation();
   const navigate: ReturnType<typeof useNavigate> = useNavigate();
   const { chatRoomId, chatName, roomStatus } = location.state as State;
-  const { chatLoginUser, getChatLoginUser } = useChatLoginUser(
-    chatRoomId,
-    navigate
-  );
+  const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
   const { chatMembers, getChatMembers } = useChatMembers(chatRoomId);
   const { isOpen, onClose, changeChatRoomMemberStatus, setSelectedLimitTime } =
     useChangeChatRoomMemberStatus(chatRoomId, socket);
@@ -78,7 +75,6 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
                   roomStatus={roomStatus}
                   chatRoomId={chatRoomId}
                   chatName={chatName}
-                  navigate={navigate}
                 />
               </CustomAccordion>
             )}
@@ -123,11 +119,10 @@ const CustomAccordion: React.FC<{
 
 const LeaveButton: React.FC<{
   chatRoomId: string;
-  navigate: ReturnType<typeof useNavigate>;
   chatLoginUser: ReturnType<typeof useChatLoginUser>['chatLoginUser'];
-}> = React.memo(({ chatRoomId, navigate, chatLoginUser }) => {
-  const { exitChatRoom } = useExitChatRoom(chatRoomId, navigate);
-  const { deleteChatRoom } = useDeleteChatRoom(chatRoomId, navigate);
+}> = React.memo(({ chatRoomId, chatLoginUser }) => {
+  const { exitChatRoom } = useExitChatRoom(chatRoomId);
+  const { deleteChatRoom } = useDeleteChatRoom(chatRoomId);
 
   return (
     <>

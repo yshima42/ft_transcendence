@@ -9,12 +9,11 @@ type Inputs = {
   chatName: string;
 };
 
-export const useChatRoomProtectSetting = (
-  navigate: ReturnType<typeof useNavigate>
-): {
+export const useChatRoomProtectSetting = (): {
   protectChatRoom: ReactHookForm.SubmitHandler<Inputs>;
   publicChatRoom: ReactHookForm.SubmitHandler<Omit<Inputs, 'password'>>;
 } => {
+  const navigate = useNavigate();
   const protectChatRoom: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
     const { password, chatRoomId, chatName } = data;
 

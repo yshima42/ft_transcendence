@@ -6,7 +6,7 @@ import { ResponseChatMessage } from 'features/chat/types/chat';
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -22,13 +22,9 @@ export const ChatRoom: React.FC = React.memo(() => {
     autoConnect: false,
   });
   const location = useLocation();
-  const navigate: ReturnType<typeof useNavigate> = useNavigate();
   const { chatRoomId, chatName, roomStatus } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
-  const { chatLoginUser, getChatLoginUser } = useChatLoginUser(
-    chatRoomId,
-    navigate
-  );
+  const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
 
   // ブロックユーザー
