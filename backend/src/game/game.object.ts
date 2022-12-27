@@ -127,7 +127,7 @@ export class GameRoom {
       if (this.readyCountDownNum === 0) {
         this.server
           .in([this.id, `watch_${this.id}`])
-          .emit('game_room_error', 'No player response.');
+          .emit('game_room_error', 'The game was canceled.');
         clearInterval(timer);
       } else if (this.isInGame) {
         clearInterval(timer);
