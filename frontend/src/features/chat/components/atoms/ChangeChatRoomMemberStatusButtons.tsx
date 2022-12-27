@@ -18,53 +18,49 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
   ({ userId, memberStatus, chatLoginUser, changeChatRoomMemberStatus }) => {
     const isAdmin = memberStatus === ChatRoomMemberStatus.ADMIN;
     const isModerator = memberStatus === ChatRoomMemberStatus.MODERATOR;
-    let buttons: React.ReactNode;
+    if (!isAdmin && !isModerator) return <></>;
 
-    if (isAdmin || isModerator) {
-      const actionButtons: Array<{
-        memberStatus: ChatRoomMemberStatus;
-        label: string;
-      }> = [
+    const actionButtons: Array<{
+      memberStatus: ChatRoomMemberStatus;
+      label: string;
+    }> = [
+      {
+        memberStatus: ChatRoomMemberStatus.KICKED,
+        label: 'Kick',
+      },
+      {
+        memberStatus: ChatRoomMemberStatus.BANNED,
+        label: 'Ban',
+      },
+      {
+        memberStatus: ChatRoomMemberStatus.MUTED,
+        label: 'Mute',
+      },
+    ];
+
+    if (isAdmin) {
+      actionButtons.push(
         {
-          memberStatus: ChatRoomMemberStatus.KICKED,
-          label: 'Kick',
+          memberStatus: ChatRoomMemberStatus.MODERATOR,
+          label: 'Promote',
         },
         {
-          memberStatus: ChatRoomMemberStatus.BANNED,
-          label: 'Ban',
-        },
-        {
-          memberStatus: ChatRoomMemberStatus.MUTED,
-          label: 'Mute',
-        },
-      ];
-
-      if (isAdmin) {
-        actionButtons.push(
-          {
-            memberStatus: ChatRoomMemberStatus.MODERATOR,
-            label: 'Promote',
-          },
-          {
-            memberStatus: ChatRoomMemberStatus.ADMIN,
-            label: 'Appoint',
-          }
-        );
-      }
-
-      buttons = actionButtons.map(({ memberStatus, label }) => (
-        <C.Button
-          key={memberStatus}
-          onClick={() =>
-            changeChatRoomMemberStatus(userId, memberStatus, chatLoginUser)
-          }
-        >
-          {label}
-        </C.Button>
-      ));
-    } else {
-      buttons = <></>;
+          memberStatus: ChatRoomMemberStatus.ADMIN,
+          label: 'Appoint',
+        }
+      );
     }
+
+    const buttons = actionButtons.map(({ memberStatus, label }) => (
+      <C.Button
+        key={memberStatus}
+        onClick={() =>
+          changeChatRoomMemberStatus(userId, memberStatus, chatLoginUser)
+        }
+      >
+        {label}
+      </C.Button>
+    ));
 
     return <>{buttons}</>;
   }
