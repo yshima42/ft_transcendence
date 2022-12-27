@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
@@ -17,7 +16,6 @@ import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseChatRoomMember } from './chat-room-member.interface';
 import { ChatRoomMemberService } from './chat-room-member.service';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
-import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
 @Controller('chat/rooms/:chatRoomId/members')
 @Sw.ApiTags('chat-room-user')
@@ -73,32 +71,6 @@ export class ChatRoomMemberController {
     );
 
     return await this.chatRoomMemberService.findOne(chatRoomId, user.id);
-  }
-
-  @Patch(':memberId')
-  async update(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Param('memberId', new ParseUUIDPipe()) memberId: string,
-    @Body() updateChatRoomMemberDto: UpdateChatRoomMemberDto,
-    @GetUser() user: User
-  ): Promise<void> {
-    Logger.debug(
-      `chat-room-member.controller update
-          chatRoomId=${chatRoomId}
-          memberId=${memberId}
-          updateChatRoomMemberDto=${JSON.stringify(
-            updateChatRoomMemberDto,
-            null,
-            2
-          )}
-          user=${JSON.stringify(user)}`
-    );
-    await this.chatRoomMemberService.update(
-      chatRoomId,
-      memberId,
-      updateChatRoomMemberDto,
-      user.id
-    );
   }
 
   // 退出

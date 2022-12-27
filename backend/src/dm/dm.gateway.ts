@@ -39,7 +39,7 @@ export class DmGateway {
     this.server.in(dmRoomId).emit('receive_message', newMessage);
   }
 
-  @SubscribeMessage('join_room')
+  @SubscribeMessage('join_dm_room')
   joinRoom(
     @MessageBody() dmRoomId: string,
     @ConnectedSocket() client: Socket
@@ -48,7 +48,7 @@ export class DmGateway {
     void client.join(dmRoomId);
   }
 
-  @SubscribeMessage('leave_room')
+  @SubscribeMessage('leave_dm_room')
   leaveRoom(
     @MessageBody() dmRoomId: string,
     @ConnectedSocket() client: Socket

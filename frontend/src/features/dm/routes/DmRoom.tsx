@@ -24,7 +24,7 @@ export const DmRoom: React.FC = React.memo(() => {
   });
 
   React.useEffect(() => {
-    socket.emit('join_room', dmRoomId);
+    socket.emit('join_dm_room', dmRoomId);
     socket.on('receive_message', (payload: ResponseDm) => {
       setMessages((prev) => {
         return [...prev, payload];
@@ -33,7 +33,7 @@ export const DmRoom: React.FC = React.memo(() => {
 
     return () => {
       socket.off('receive_message');
-      socket.emit('leave_room', dmRoomId);
+      socket.emit('leave_dm_room', dmRoomId);
     };
   }, [dmRoomId, socket]);
 
