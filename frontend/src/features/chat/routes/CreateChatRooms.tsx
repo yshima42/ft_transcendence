@@ -18,7 +18,7 @@ const schema = yup.object().shape(
       .optional()
       .when('password', {
         is: (value: string) => value?.length > 0,
-        then: (rule) => rule.min(8).max(255),
+        then: (rule) => rule.min(8).max(128),
       }),
   },
   [['password', 'password']]
@@ -35,12 +35,20 @@ export const CreateChatRooms: React.FC = React.memo(() => {
   });
   const { CreateChatRoom } = useCreateChatRoom();
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const onSubmit = async (values: ChatRoomCreateFormValues) => {
+    setIsSubmitting(true);
+    await CreateChatRoom(values);
+    setIsSubmitting(false);
+  };
+
   return (
     <>
       <ContentLayout title="Create Chat Room">
         <C.Box>
           <C.Heading>Create Chat Room</C.Heading>
-          <form onSubmit={handleSubmit(CreateChatRoom)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <C.FormControl isInvalid={!(errors.name == null)}>
               <C.FormLabel>Create Chat Room</C.FormLabel>
               <C.Input placeholder="name" {...register('name')} />
@@ -57,7 +65,12 @@ export const CreateChatRooms: React.FC = React.memo(() => {
                 {errors.password?.message}
               </C.FormErrorMessage>
             </C.FormControl>
-            <C.Button type="submit" colorScheme="teal" mt={4}>
+            <C.Button
+              type="submit"
+              colorScheme="teal"
+              mt={4}
+              isDisabled={isSubmitting}
+            >
               Create
             </C.Button>
           </form>

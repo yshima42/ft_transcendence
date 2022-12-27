@@ -52,7 +52,7 @@ export const DmRoom: React.FC = React.memo(() => {
         <C.Divider />
         <DmMessages messages={messages} />
         <C.Divider />
-        <MessageSendForm onSubmit={sendMessage} />
+        <MessageSendForm sendMessage={sendMessage} />
       </ContentLayout>
     </>
   );

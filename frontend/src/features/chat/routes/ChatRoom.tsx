@@ -136,7 +136,7 @@ export const ChatRoom: React.FC = React.memo(() => {
             You are muted.
           </C.Alert>
         ) : (
-          <MessageSendForm onSubmit={sendMessage} />
+          <MessageSendForm sendMessage={sendMessage} />
         )}
       </ContentLayout>
     </>
