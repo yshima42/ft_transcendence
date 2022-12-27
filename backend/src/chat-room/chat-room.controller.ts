@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { ChatRoom, User } from '@prisma/client';
@@ -43,10 +44,18 @@ export class ChatRoomController {
     return await this.chatRoomService.findAllByMe(user.id);
   }
 
+  // chatRoomIdで検索
+  @Get(':chatRoomId')
+  async findOne(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
+  ): Promise<ChatRoom> {
+    return await this.chatRoomService.findOne(chatRoomId);
+  }
+
   // update
   @Patch(':chatRoomId')
   async update(
-    @Param('chatRoomId') chatRoomId: string,
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Body() updateChatRoomDto: UpdateChatRoomDto,
     @GetUser() user: User
   ): Promise<ChatRoom> {
@@ -60,7 +69,7 @@ export class ChatRoomController {
   // delete
   @Delete(':chatRoomId')
   async remove(
-    @Param('chatRoomId') chatRoomId: string,
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<void> {
     await this.chatRoomService.remove(chatRoomId, user.id);
