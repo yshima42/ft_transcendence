@@ -20,7 +20,7 @@ export class DmRoomController {
   constructor(private readonly dmRoomService: DmRoomService) {}
 
   @Post(':userId')
-  async findOrCreate(
+  async findOneOrCreate(
     @Param('userId', new ParseUUIDPipe()) userId: string,
     @GetUser() user: User
   ): Promise<string> {
