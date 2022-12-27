@@ -32,10 +32,11 @@ export const ChatRoom: React.FC = React.memo(() => {
 
   React.useEffect(() => {
     socket.emit('join_room_member', chatRoomId);
-    socket.on('receive_message', (payload: ResponseChatMessage) => {
+    socket.on('receive_message', (message: ResponseChatMessage) => {
       // メッセージを受け取ったときに実行される関数を登録
+      if (blockUsers.some((user) => user.id === message.sender.id)) return;
       setMessages((prev) => {
-        return [...prev, payload];
+        return [...prev, message];
       });
     });
     // webSocketのイベントを受け取る関数を登録
@@ -98,19 +99,16 @@ export const ChatRoom: React.FC = React.memo(() => {
           height="70vh"
         >
           {/* ブロックユーザーのメッセージは表示しない */}
-          {messages.map(
-            (message) =>
-              !blockUsers.some((user) => user.id === message.sender.id) && (
-                <Message
-                  key={message.id}
-                  id={message.id}
-                  content={message.content}
-                  createdAt={message.createdAt}
-                  name={message.sender.name}
-                  avatarImageUrl={message.sender.avatarImageUrl}
-                />
-              )
-          )}
+          {messages.map((message) => (
+            <Message
+              key={message.id}
+              id={message.id}
+              content={message.content}
+              createdAt={message.createdAt}
+              name={message.sender.name}
+              avatarImageUrl={message.sender.avatarImageUrl}
+            />
+          ))}
           <div ref={scrollBottomRef} />
         </C.Flex>
         <C.Divider />
