@@ -45,11 +45,7 @@ export class ChatRoomMemberService {
           NestJs.HttpStatus.BAD_REQUEST
         );
       }
-      if (
-        chatRoom.password === undefined ||
-        chatRoom.password === '' ||
-        chatRoom.password === null
-      ) {
+      if (chatRoom.password == null) {
         throw new NestJs.HttpException(
           'Password is not set',
           NestJs.HttpStatus.BAD_REQUEST
