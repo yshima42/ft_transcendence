@@ -79,9 +79,9 @@ export const publicRoutes = [
     element: <App />,
     children: [
       { path: 'users', element: <Users /> },
-      { path: 'chat/me', element: <ChatRoomsMe /> },
-      { path: 'chat', element: <ChatRooms /> },
-      { path: 'chat/create', element: <CreateChatRooms /> },
+      { path: 'chat/rooms', element: <ChatRooms /> },
+      { path: 'chat/rooms/me', element: <ChatRoomsMe /> },
+      { path: 'chat/rooms/create', element: <CreateChatRooms /> },
       { path: 'chat/rooms/:id', element: <ChatRoom /> },
       { path: 'chat/rooms/:id/settings', element: <ChatRoomSettings /> },
       {
@@ -91,7 +91,7 @@ export const publicRoutes = [
       { path: 'games', element: <Games /> },
       { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
-      { path: 'dm', element: <DmRooms /> },
+      { path: 'dm/rooms', element: <DmRooms /> },
       { path: 'dm/rooms/:id', element: <DmRoom /> },
       { path: 'profile', element: <Profile /> },
       { path: 'users/:id', element: <Profile /> },
