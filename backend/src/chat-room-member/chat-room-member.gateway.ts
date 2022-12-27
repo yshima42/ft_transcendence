@@ -47,6 +47,7 @@ export class ChatRoomMemberGateway {
         2
       )}`
     );
+    this.server.to(chatRoomId).emit('changeChatRoomMemberStatusSocket');
     void client.leave(chatRoomId);
   }
 
