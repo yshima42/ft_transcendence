@@ -35,7 +35,7 @@ export const Game: FC = memo(() => {
         return <PlayerWaiting readyCountDownNum={readyCountDownNum} />;
       case GamePhase.InGame:
       case GamePhase.Watch:
-        return <PongGame draw={draw} />;
+        return <PongGame draw={draw} player1={player1} player2={player2} />;
       case GamePhase.Result:
         return <Result player1={player1} player2={player2} />;
     }
