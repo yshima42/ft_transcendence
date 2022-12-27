@@ -7,7 +7,7 @@ import { useChatMembers } from 'features/chat/hooks/useChatMembers';
 import { useDeleteChatRoom } from 'features/chat/hooks/useDeleteChatRoom';
 import { useExitChatRoom } from 'features/chat/hooks/useExitChatRoom';
 import { useSocket } from 'hooks/socket/useSocket';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { ChatRoomMemberActionTimeSetModal } from 'features/chat/components/organisms/ChatRoomMemberActionTimeSetModal';
 import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomMemberList';
@@ -24,7 +24,6 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
     autoConnect: false,
   });
   const location = useLocation();
-  const navigate: ReturnType<typeof useNavigate> = useNavigate();
   const { chatRoomId, chatName, roomStatus } = location.state as State;
   const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
   const { chatMembers, getChatMembers } = useChatMembers(chatRoomId);
@@ -81,11 +80,7 @@ export const ChatRoomSettings: React.FC = React.memo(() => {
         </C.Accordion>
         {/* 退出ボタン */}
         {/* ADMINにはDeleteボタンを表示する */}
-        <LeaveButton
-          chatRoomId={chatRoomId}
-          chatLoginUser={chatLoginUser}
-          navigate={navigate}
-        />
+        <LeaveButton chatRoomId={chatRoomId} chatLoginUser={chatLoginUser} />
       </ContentLayout>
       <ChatRoomMemberActionTimeSetModal
         isOpen={isOpen}
