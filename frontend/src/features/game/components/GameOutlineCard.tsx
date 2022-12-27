@@ -14,10 +14,9 @@ export const GameOutlineCard: FC<Props> = memo((props) => {
   const { gameOutline } = props;
   const { user } = useProfile();
   const isPlayer =
-    user.id === gameOutline.leftPlayerId ||
-    user.id === gameOutline.rightPlayerId;
-  const { user: leftPlayer } = useProfile(gameOutline.leftPlayerId);
-  const { user: rightPlayer } = useProfile(gameOutline.rightPlayerId);
+    user.id === gameOutline.player1Id || user.id === gameOutline.player2Id;
+  const { user: user1 } = useProfile(gameOutline.player1Id);
+  const { user: user2 } = useProfile(gameOutline.player2Id);
   const navigate = useNavigate();
 
   return (
@@ -25,10 +24,10 @@ export const GameOutlineCard: FC<Props> = memo((props) => {
       <Flex alignItems="center" p={4}>
         <Spacer />
         <VStack alignItems={'center'}>
-          <UserAvatar id={leftPlayer.id} src={leftPlayer.avatarImageUrl} />
+          <UserAvatar id={user1.id} src={user1.avatarImageUrl} />
           <LinkedNickname
-            id={leftPlayer.id}
-            nickname={leftPlayer.nickname}
+            id={user1.id}
+            nickname={user1.nickname}
             maxWidth={200}
           />
         </VStack>
@@ -36,10 +35,10 @@ export const GameOutlineCard: FC<Props> = memo((props) => {
         <Text fontSize="xl">vs</Text>
         <Spacer />
         <VStack>
-          <UserAvatar id={rightPlayer.id} src={rightPlayer.avatarImageUrl} />
+          <UserAvatar id={user2.id} src={user2.avatarImageUrl} />
           <LinkedNickname
-            id={rightPlayer.id}
-            nickname={rightPlayer.nickname}
+            id={user2.id}
+            nickname={user2.nickname}
             maxWidth={200}
           />
         </VStack>
