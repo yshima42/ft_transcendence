@@ -86,17 +86,4 @@ export class ChatRoomMemberController {
     );
     await this.chatRoomMemberService.remove(chatRoomId, user.id);
   }
-
-  @Delete(':memberId')
-  async remove(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Param('memberId', new ParseUUIDPipe()) memberId: string
-  ): Promise<void> {
-    Logger.debug(
-      `chat-room-member.controller remove
-          chatRoomId=${chatRoomId}
-          memberId=${memberId}`
-    );
-    await this.chatRoomMemberService.remove(chatRoomId, memberId);
-  }
 }
