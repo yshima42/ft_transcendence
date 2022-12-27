@@ -35,32 +35,22 @@ export const ChatRoom: React.FC = React.memo(() => {
   const { users: blockUsers } = useBlockUsers();
 
   React.useEffect(() => {
-    const receiveMessageHandler = (payload: ResponseChatMessage) => {
+    socket.emit('join_room_member', chatRoomId);
+    socket.on('receive_message', (payload: ResponseChatMessage) => {
+      // メッセージを受け取ったときに実行される関数を登録
       setMessages((prev) => {
         return [...prev, payload];
       });
-    };
-    const changeChatRoomMemberStatusSocketHandler = () => {
-      getChatLoginUser().catch((err) => console.log(err));
-    };
-
-    socket.emit('join_room_member', chatRoomId);
-    // メッセージを受け取ったときに実行される関数を登録
-    socket.on('receive_message', receiveMessageHandler);
+    });
     // webSocketのイベントを受け取る関数を登録
-    socket.on(
-      'changeChatRoomMemberStatusSocket',
-      changeChatRoomMemberStatusSocketHandler
-    );
+    socket.on('changeChatRoomMemberStatusSocket', () => {
+      getChatLoginUser().catch((err) => console.log(err));
+    });
 
     return () => {
       // コンポーネントの寿命が切れるときに実行される
-      socket.off('receive_message', receiveMessageHandler);
-      socket.off(
-        'changeChatRoomMemberStatusSocket',
-        changeChatRoomMemberStatusSocketHandler
-      );
       socket.emit('leave_room_member', chatRoomId);
+      socket.off();
     };
   }, [chatRoomId, socket]);
 
