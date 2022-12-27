@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   frontend:
@@ -17,8 +17,7 @@ services:
       - 3000:3000
     # restart: always
     depends_on:
-      database:
-        condition: service_healthy
+      - database
     networks:
       - front-tier
       - back-tier
@@ -41,7 +40,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 30s
 
 networks:
   front-tier:
