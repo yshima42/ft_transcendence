@@ -8,4 +8,8 @@ export default defineConfig({
   server: {
     host: true,
   },
+  resolve: {
+    // https://github.com/vitejs/vite/issues/5010
+    preserveSymlinks: true
+  }
 });
