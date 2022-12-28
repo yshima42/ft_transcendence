@@ -1,9 +1,10 @@
 // auth
 export * from './auth/useDummyLogin';
-export * from './auth/useIsOtpAuthEnabled';
 export * from './auth/useLogout';
-export * from './auth/useOtpAuthCreate';
-export * from './auth/useOtpAuthDelete';
+export * from './auth/useOtoAuthActivate';
+export * from './auth/useOtpAuth';
+export * from './auth/useOtpAuthInactivate';
+export * from './auth/useOtpAuthValidate';
 export * from './auth/useOtpQrcodeUrl';
 
 // block
