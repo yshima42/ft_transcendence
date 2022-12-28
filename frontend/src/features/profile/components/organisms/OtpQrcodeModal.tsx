@@ -19,7 +19,7 @@ import { useQRCode } from 'next-qrcode';
 type Props = {
   isOpen: boolean;
   onCloseModal: () => void;
-  qrcodeUrl: string;
+  qrcodeUrl: string | null;
 };
 
 export const OtpQrcodeModal: FC<Props> = memo((props) => {
