@@ -92,19 +92,19 @@ export class GameRoom {
   isFinished: boolean;
   isBallStop: boolean;
   readyCountDownNum: number;
-  gameRoomOff: (gameRoom: GameRoom) => void;
+  deleteGameRoom: (gameRoom: GameRoom) => void;
 
   constructor(
     gameService: GameService,
     server: Server,
-    gameRoomOff: (gameRoom: GameRoom) => void,
+    deleteGameRoom: (gameRoom: GameRoom) => void,
     player1: Player,
     player2: Player,
     ballSpeed?: number
   ) {
     this.gameService = gameService;
     this.server = server;
-    this.gameRoomOff = gameRoomOff;
+    this.deleteGameRoom = deleteGameRoom;
     this.id = uuidv4();
     this.player1 = player1;
     this.player2 = player2;
@@ -224,7 +224,7 @@ export class GameRoom {
     this.isFinished = true;
     // setIntervalを止める処理
     clearInterval(this.interval);
-    this.gameRoomOff(this);
+    this.deleteGameRoom(this);
     this.server
       .in([roomId, `watch_${roomId}`])
       .emit('update_game_phase', GamePhase.Result);
