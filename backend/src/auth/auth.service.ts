@@ -1,17 +1,16 @@
 import {
   BadRequestException,
-  HttpException,
-  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { OneTimePasswordAuth, User } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { authenticator } from 'otplib';
 import { PrismaService } from '../prisma/prisma.service';
+import { OneTimePasswordAuthResponse } from './interfaces/otp-auth-response.interface';
 import { SignUpUser } from './interfaces/sign-up-user.interface';
+import { UpdateOtpAuth } from './interfaces/update-otp-auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +25,7 @@ export class AuthService {
     signUpUser?: SignUpUser
   ): Promise<{
     accessToken: string;
-    isOtpAuthEnabled: boolean | null;
+    isOtpAuthEnabled: boolean;
     isSignUp: boolean;
   }> {
     let user = await this.prisma.user.findUnique({ where: { name } });
@@ -41,7 +40,7 @@ export class AuthService {
 
     const { accessToken } = await this.generateJwt(user.id, user.name);
 
-    const { isOtpAuthEnabled } = await this.isOtpAuthEnabled(user.id);
+    const { isOtpAuthEnabled } = await this.findOtpAuth(user.id);
 
     return { accessToken, isOtpAuthEnabled, isSignUp };
   }
@@ -61,31 +60,25 @@ export class AuthService {
   }
 
   /**
-   * 特定のユーザーがOTPによる２要素認証を有効にしているか
-   * どうか確認する。
-   * OneTimePasswordAuthテーブルのisOtpAuthEnabledを確認。
-   * trueならOTPが有効。falseなら無効。
-   * レコードがない場合も無効。
-   * @param authUserId - uuid(string)
-   * @returns bool値またはnull
+   * OneTimePassword Auth
    */
-  async isOtpAuthEnabled(
-    authUserId: string
-  ): Promise<{ isOtpAuthEnabled: boolean | null }> {
-    const ret = await this.prisma.oneTimePasswordAuth.findUnique({
-      where: { authUserId },
-    });
 
-    return { isOtpAuthEnabled: ret === null ? null : ret.isOtpAuthEnabled };
+  async findOtpAuth(authUserId: string): Promise<OneTimePasswordAuthResponse> {
+    const oneTimePasswordAuth =
+      await this.prisma.oneTimePasswordAuth.findUnique({
+        where: { authUserId },
+      });
+
+    if (oneTimePasswordAuth === null) {
+      throw new BadRequestException('Invalid userId');
+    }
+
+    return this.excludeOtpSecret(oneTimePasswordAuth);
   }
 
-  /**
-   * ワンタイムパスワード生成用のシークレットとurlを生成し。
-   * OneTimePasswordAuthテーブルに新規レコード作成。
-   * @param user
-   * @returns 登録されたOneTimePasswordAuthレコード
-   */
-  async createOtpAuth(user: User): Promise<OneTimePasswordAuth> {
+  async createOtpAuthQrcodeUrl(
+    user: User
+  ): Promise<OneTimePasswordAuthResponse> {
     const secret = authenticator.generateSecret();
 
     const qrcodeUrl = authenticator.keyuri(
@@ -94,92 +87,97 @@ export class AuthService {
       secret
     );
 
-    try {
-      const oneTimePasswordAuth = await this.prisma.oneTimePasswordAuth.create({
-        data: {
-          authUserId: user.id,
-          isOtpAuthEnabled: false,
-          qrcodeUrl,
-          secret,
-        },
-      });
+    const oneTimePasswordAuth = await this.prisma.oneTimePasswordAuth.update({
+      where: { authUserId: user.id },
+      data: {
+        qrcodeUrl,
+        secret,
+      },
+    });
 
-      return oneTimePasswordAuth;
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new HttpException(
-            'OneTimePassword is already exists',
-            HttpStatus.CONFLICT
-          );
-        }
-      }
-      throw new BadRequestException('createTwoFactorAuth failed.');
-    }
+    return this.excludeOtpSecret(oneTimePasswordAuth);
   }
 
-  /**
-   * OneTimePasswordAuthテーブルからレコードを削除。
-   * データベースに該当がなければ例外送出。
-   * @param user
-   * @returns 削除されたOneTimePasswordAuthレコード
-   */
-  async deleteOtpAuth(user: User): Promise<OneTimePasswordAuth> {
-    try {
-      return await this.prisma.oneTimePasswordAuth.delete({
-        where: {
-          authUserId: user.id,
-        },
-      });
-    } catch (error) {
-      throw new BadRequestException('deleteTwoFactorAuth failed.');
-    }
+  async activeOtp(
+    user: User,
+    oneTimePassword: string
+  ): Promise<{
+    otpAuthResponse: OneTimePasswordAuthResponse;
+    accessToken: string;
+  }> {
+    const { accessToken } = await this.validateOtp(oneTimePassword, user);
+
+    const otpAuthResponse = await this.updateOtp(user.id, {
+      isOtpAuthEnabled: true,
+    });
+
+    return { otpAuthResponse, accessToken };
   }
 
-  /**
-   * 対象ユーザーのワンタイムパスワード生成用QRコードのURLを返す。
-   * @param user
-   * @returns qrcodeUrl
-   */
-  async getOtpQrcodeUrl(user: User): Promise<{ qrcodeUrl: string }> {
+  async inactiveOtp(user: User): Promise<{
+    otpAuthResponse: OneTimePasswordAuthResponse;
+    accessToken: string;
+  }> {
+    const otpAuthResponse = await this.updateOtp(user.id, {
+      isOtpAuthEnabled: false,
+      qrcodeUrl: null,
+      secret: null,
+    });
+
+    const { accessToken } = await this.generateJwt(user.id, user.name, false);
+
+    return { otpAuthResponse, accessToken };
+  }
+
+  async updateOtp(
+    authUserId: string,
+    updateOtpAuth: UpdateOtpAuth
+  ): Promise<OneTimePasswordAuthResponse> {
+    const oneTimePasswordAuth = await this.prisma.oneTimePasswordAuth.update({
+      where: { authUserId },
+      data: updateOtpAuth,
+    });
+
+    return this.excludeOtpSecret(oneTimePasswordAuth);
+  }
+
+  async validateOtp(
+    oneTimePassword: string,
+    user: User
+  ): Promise<{ accessToken: string }> {
     const ret = await this.prisma.oneTimePasswordAuth.findUnique({
       where: { authUserId: user.id },
     });
-    if (ret === null) return { qrcodeUrl: '' };
+    if (ret === null) throw new BadRequestException('Invalid userId.');
 
-    return { qrcodeUrl: ret.qrcodeUrl };
-  }
+    if (ret.secret === null || ret.secret === '')
+      throw new BadRequestException('OneTimePasswordAuth is inactive.');
 
-  /**
-   * ２要素認証を有効化させる。
-   * @param user
-   * @returns 有効化されたOneTimePasswordAuthレコード
-   */
-  async activateOtp(user: User): Promise<OneTimePasswordAuth> {
-    return await this.prisma.oneTimePasswordAuth.update({
-      where: { authUserId: user.id },
-      data: { isOtpAuthEnabled: true },
-    });
-  }
-
-  /**
-   * 入力されたワンタイムパスワードを検証する。
-   * @param oneTimePassword - 入力されたワンタイムパスワード
-   * @param user - ログインユーザー
-   * @returns bool値(検証結果)
-   */
-  async validateOtp(oneTimePassword: string, user: User): Promise<boolean> {
-    const ret = await this.prisma.oneTimePasswordAuth.findUnique({
-      where: { authUserId: user.id },
-    });
-    if (ret === null)
-      throw new BadRequestException(
-        'This user does not exist in OneTimePassword table.'
-      );
-
-    return authenticator.verify({
+    const isCodeValid = authenticator.verify({
       token: oneTimePassword,
       secret: ret.secret,
     });
+
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong authentication code');
+    }
+
+    return await this.generateJwt(user.id, user.name, true);
+  }
+
+  excludeOtpSecret(
+    oneTimePasswordAuth: OneTimePasswordAuth
+  ): OneTimePasswordAuthResponse {
+    const { authUserId, isOtpAuthEnabled, qrcodeUrl, createdAt } =
+      oneTimePasswordAuth;
+
+    const oneTimePasswordAuthResponse = {
+      authUserId,
+      isOtpAuthEnabled,
+      qrcodeUrl,
+      createdAt,
+    };
+
+    return oneTimePasswordAuthResponse;
   }
 }

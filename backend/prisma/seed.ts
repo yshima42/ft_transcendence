@@ -10,6 +10,7 @@ import {
   DmRoomUser,
   Dm,
   MatchResult,
+  OneTimePasswordAuth,
 } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -36,7 +37,6 @@ const getFriendRequestStatus = () => {
 };
 
 const userData: User[] = [];
-
 idMap.forEach((value, key) => {
   userData.push({
     id: value,
@@ -47,6 +47,17 @@ idMap.forEach((value, key) => {
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
+  });
+});
+
+const otpAuthData: OneTimePasswordAuth[] = [];
+userData.forEach((value) => {
+  otpAuthData.push({
+    authUserId: value.id,
+    isOtpAuthEnabled: false,
+    qrcodeUrl: null,
+    secret: null,
+    createdAt: new Date(),
   });
 });
 
@@ -257,6 +268,9 @@ const main = async () => {
 
   await prisma.user.createMany({
     data: userData,
+  });
+  await prisma.oneTimePasswordAuth.createMany({
+    data: otpAuthData,
   });
   await prisma.friendRequest.createMany({
     data: friendRequestData,
