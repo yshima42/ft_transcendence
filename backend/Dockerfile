@@ -1,21 +1,33 @@
-# https://nodejs.org/ja/docs/guides/nodejs-docker-webapp/
-FROM node:slim
-# FROM node:slim As builder
+# ソースをビルドするステージ
+FROM node:slim As builder
 
-# アプリケーションディレクトリを指定する
 WORKDIR /usr/src/app
 
-# アプリケーションの依存関係をインストールする
-COPY package.json yarn.lock ./
+COPY package.json .
+COPY yarn.lock .
 
-RUN yarn install
-# # 本番用のパッケージをインストールする
-# RUN yarn install --production=true
+RUN yarn global add @nestjs/cli
+RUN yarn install --production=true
 
-# アプリケーションのソースをバンドルする
 COPY . .
+RUN yarn prisma generate
+RUN yarn build
 
-RUN apt-get update -q && apt-get install -qy postgresql-client
+# 前のステージから必要なものをコピーするステージ
+FROM node:slim
+
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/package.json ./
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/prisma ./prisma
+COPY --from=builder /usr/src/app/wait-for-postgres.sh ./wait-for-postgres.sh
+COPY --from=builder /usr/src/app/docker-entrypoint.sh ./docker-entrypoint.sh
+COPY --from=builder /usr/src/app/.env ./.env
+
+# DBの起動を待つためクライアントが必要
+RUN apt-get -q update && apt-get -qy install postgresql-client
 
 EXPOSE 3000
 CMD [ "./docker-entrypoint.sh" ]
