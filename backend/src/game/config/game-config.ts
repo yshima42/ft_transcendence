@@ -1,6 +1,6 @@
 // TODO: これらを設定などで変えられる機能を作る
 // TODO: フロントと共通にしないといけない
-export const CANVAS_WIDTH = 800;
+export const CANVAS_WIDTH = 1000;
 export const CANVAS_HEIGHT = 500;
 export const BALL_START_X = CANVAS_WIDTH / 2;
 export const BALL_START_Y = CANVAS_HEIGHT / 2;
