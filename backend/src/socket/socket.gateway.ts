@@ -139,7 +139,6 @@ export class UsersGateway {
     this.server.to('matching').emit('go_game_room', gameRoom.id);
     this.server.socketsLeave('matching');
     socket.emit('go_game_room', gameRoom.id);
-    this.gameRoomOn(gameRoom);
   }
 
   @SubscribeMessage('matching_cancel')
@@ -168,7 +167,6 @@ export class UsersGateway {
       roomId: gameRoom.id,
       challengerId: player1.id,
     });
-    this.gameRoomOn(gameRoom);
   }
 
   @SubscribeMessage('accept_invitation')
@@ -355,9 +353,8 @@ export class UsersGateway {
           .in(`watch_${roomId}`)
           .emit('game_room_error', 'Both players disconnected.');
         clearInterval(gameRoom.interval);
-        this.gameRoomOff(gameRoom);
+        this.deleteGameRoom(gameRoom);
       }
-      this.gameRooms.delete(roomId);
     }
   }
 
@@ -400,31 +397,28 @@ export class UsersGateway {
     const gameRoom = new GameRoom(
       this.gameService,
       this.server,
-      (gameRoom: GameRoom) => this.gameRoomOff(gameRoom),
+      (gameRoom: GameRoom) => this.deleteGameRoom(gameRoom),
       player1,
       player2,
       ballSpeed
     );
     this.gameRooms.set(gameRoom.id, gameRoom);
 
+    this.updatePresence(player1.id, Presence.INGAME);
+    this.updateGameRoomId(player1.id, gameRoom.id);
+    this.updatePresence(player2.id, Presence.INGAME);
+    this.updateGameRoomId(player2.id, gameRoom.id);
+    this.server
+      .to('monitor')
+      .emit('game_room_created', [gameRoom.id, player1.id, player2.id]);
+
     return gameRoom;
   }
 
-  gameRoomOn(gameRoom: GameRoom): void {
+  deleteGameRoom(gameRoom: GameRoom): void {
     const { id: roomId, player1, player2 } = gameRoom;
 
-    this.updatePresence(player1.id, Presence.INGAME);
-    this.updateGameRoomId(player1.id, roomId);
-    this.updatePresence(player2.id, Presence.INGAME);
-    this.updateGameRoomId(player2.id, roomId);
-    this.server
-      .to('monitor')
-      .emit('game_room_created', [roomId, player1.id, player2.id]);
-  }
-
-  gameRoomOff(gameRoom: GameRoom): void {
-    const { id: roomId, player1, player2 } = gameRoom;
-
+    this.gameRooms.delete(roomId);
     this.updatePresence(player1.id, Presence.ONLINE);
     this.updatePresence(player2.id, Presence.ONLINE);
     this.updateGameRoomId(player1.id, '');
