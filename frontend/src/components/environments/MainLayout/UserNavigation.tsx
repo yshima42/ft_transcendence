@@ -24,7 +24,13 @@ export const UserNavigation: FC = memo(() => {
             {user.nickname}
           </Heading>
         </Link>
-        <Button size="xs" rounded="lg" onClick={onClickLogout} color="gray">
+        <Button
+          size="xs"
+          rounded="lg"
+          onClick={onClickLogout}
+          color="gray"
+          maxW={90}
+        >
           Logout
         </Button>
       </Flex>

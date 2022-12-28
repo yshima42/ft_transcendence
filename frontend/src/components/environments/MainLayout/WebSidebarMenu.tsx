@@ -19,8 +19,8 @@ export const WebSidebarMenu: FC<Props> = memo((props) => {
         h="100vh"
         marginTop="0"
         boxShadow="0 4px 12px 0 rgba(0,0,0,0.15)"
-        minW={{ base: '50px', md: '180px' }}
-        maxW={{ base: '50px', md: '180px' }}
+        minW={{ base: '50px', md: '170px' }}
+        maxW={{ base: '50px', md: '170px' }}
         flexDir="column"
         justifyContent="space-between"
         display={{ base: 'none', md: 'flex' }}
