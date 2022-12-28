@@ -30,6 +30,7 @@ export const UserNavigation: FC = memo(() => {
           onClick={onClickLogout}
           color="gray"
           maxW={90}
+          minW={90}
         >
           Logout
         </Button>
