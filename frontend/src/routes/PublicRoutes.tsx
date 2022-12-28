@@ -8,6 +8,7 @@ import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
 import { OtpAuth } from 'features/auth/routes/OtpAuth';
 import { Page404 } from 'features/auth/routes/Page404';
+import { SignUp } from 'features/auth/routes/SignUp';
 import { UnexpectedError } from 'features/auth/routes/UnexpectedError';
 import { ChatRoom } from 'features/chat/routes/ChatRoom';
 import { ChatRooms } from 'features/chat/routes/ChatRooms';
@@ -19,7 +20,6 @@ import { Matching } from 'features/game/components/Matching';
 import { Games } from 'features/game/routes/Games';
 import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
-import { ProfileEdit } from 'features/profile/routes/ProfileEdit';
 import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
@@ -67,6 +67,7 @@ export const publicRoutes = [
     path: '/',
     element: <Login />,
   },
+  { path: '/sign-up', element: <SignUp /> },
   { path: '/otp', element: <OtpAuth /> },
   { path: '*', element: <Page404 /> },
   { path: 'error', element: <UnexpectedError /> },
@@ -84,7 +85,6 @@ export const publicRoutes = [
       { path: 'dm', element: <DmRooms /> },
       { path: 'dm/:id', element: <DmRoom /> },
       { path: 'profile', element: <Profile /> },
-      { path: 'profile/edit', element: <ProfileEdit /> },
       // { path: 'users/:id', element: <UserProfile /> },
       { path: 'users/:id', element: <Profile /> },
       { path: '*', element: <Page404 /> },

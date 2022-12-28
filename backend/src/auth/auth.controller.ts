@@ -73,7 +73,7 @@ export class AuthController {
     console.log(accessToken);
 
     if (isSignUp) {
-      return { url: `${this.frontendUrl}/app/profile/edit` };
+      return { url: `${this.frontendUrl}/sign-up` };
     } else if (isOtpAuthEnabled) {
       return { url: `${this.frontendUrl}/otp` };
     } else {

@@ -18,16 +18,20 @@ export const useFriendRequestReject = (
 ): {
   rejectFriendRequest: RejectFriendRequest;
   isLoading: boolean;
+  isSuccess: boolean;
 } => {
-  const { deleteFunc: rejectFriendRequest, isLoading } =
-    useDeleteApi<FriendRequestRejectResBody>(
-      `/users/me/friend-requests/incoming/${targetId}`,
-      [
-        ['/users/me/friend-requests/incoming'],
-        ['/users/me/requestable-users'],
-        [`/users/me/friend-relations/${targetId}`],
-      ]
-    );
+  const {
+    deleteFunc: rejectFriendRequest,
+    isLoading,
+    isSuccess,
+  } = useDeleteApi<FriendRequestRejectResBody>(
+    `/users/me/friend-requests/incoming/${targetId}`,
+    [
+      ['/users/me/friend-requests/incoming'],
+      ['/users/me/requestable-users'],
+      [`/users/me/friend-relations/${targetId}`],
+    ]
+  );
 
-  return { rejectFriendRequest, isLoading };
+  return { rejectFriendRequest, isLoading, isSuccess };
 };

@@ -14,6 +14,7 @@ export function usePostApi<ReqBody, ResBody>(
   postFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
   isLoading: boolean;
   isError: boolean;
+  isSuccess: boolean;
   failureReason: unknown;
 } {
   const axiosPost = async (reqBody: ReqBody) => {
@@ -28,6 +29,7 @@ export function usePostApi<ReqBody, ResBody>(
     mutateAsync: postFunc,
     isLoading,
     isError,
+    isSuccess,
     failureReason,
   } = useMutation(axiosPost, {
     onSuccess: () => {
@@ -39,5 +41,5 @@ export function usePostApi<ReqBody, ResBody>(
     },
   });
 
-  return { postFunc, isLoading, isError, failureReason };
+  return { postFunc, isLoading, isError, isSuccess, failureReason };
 }
