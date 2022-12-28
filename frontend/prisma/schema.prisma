@@ -118,9 +118,9 @@ model User {
 
 model OneTimePasswordAuth {
   authUserId       String   @id @db.Uuid
-  isOtpAuthEnabled Boolean
-  qrcodeUrl        String
-  secret           String
+  isOtpAuthEnabled Boolean  @default(false)
+  qrcodeUrl        String?
+  secret           String?
   createdAt        DateTime @default(now())
   User             User     @relation(fields: [authUserId], references: [id])
 }
