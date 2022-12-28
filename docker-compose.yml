@@ -21,6 +21,7 @@ services:
     networks:
       - front-tier
       - back-tier
+    tty: true
 
   database:
     image: postgres:14.4-alpine
