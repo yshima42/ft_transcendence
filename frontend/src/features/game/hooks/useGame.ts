@@ -5,11 +5,11 @@ import {
   BALL_START_X,
   BALL_START_Y,
   BG_COLOR,
-  CANVAS_WIDTH,
   PADDLE_START_POS,
   PADDLE_WIDTH,
 } from '../utils/gameConfig';
 import { Ball, Paddle } from '../utils/gameObjs';
+import { useCanvasSize } from './useCanvasSize';
 
 export enum GamePhase {
   SocketConnecting = 0,
@@ -41,6 +41,7 @@ export const useGame = (
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
+  const { canvasWidth } = useCanvasSize();
 
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
@@ -53,7 +54,7 @@ export const useGame = (
   const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
   const paddle1 = useMemo(() => new Paddle(0, PADDLE_START_POS), []);
   const paddle2 = useMemo(
-    () => new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS),
+    () => new Paddle(canvasWidth - PADDLE_WIDTH, PADDLE_START_POS),
     []
   );
   const ball = useMemo(() => new Ball(BALL_START_X, BALL_START_Y), []);
