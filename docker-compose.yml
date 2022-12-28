@@ -15,12 +15,17 @@ services:
     build: ./backend
     ports:
       - 3000:3000
+    environment:
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
     # restart: always
     depends_on:
       - database
     networks:
       - front-tier
       - back-tier
+    command: ["sh", "-c", "./wait-for-postgres.sh database ./docker-entrypoint.sh"]
     tty: true
 
   database:

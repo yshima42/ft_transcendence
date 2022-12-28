@@ -1,5 +1,6 @@
 # https://nodejs.org/ja/docs/guides/nodejs-docker-webapp/
 FROM node:slim
+# FROM node:slim As builder
 
 # アプリケーションディレクトリを指定する
 WORKDIR /usr/src/app
@@ -13,6 +14,8 @@ RUN yarn install
 
 # アプリケーションのソースをバンドルする
 COPY . .
+
+RUN apt-get update -q && apt-get install -qy postgresql-client
 
 EXPOSE 3000
 CMD [ "./docker-entrypoint.sh" ]
