@@ -22,7 +22,7 @@ dclean:
 	docker ps -q -a | xargs docker rm -f
 
 vclean:
-	docker volume rm ft_transcendence_database-volume
+	docker volume rm postgres_data-volume
 
 re: down run
 
