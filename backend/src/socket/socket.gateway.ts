@@ -14,7 +14,6 @@ import { BALL_SPEED } from 'src/game/config/game-config';
 import { GamePhase, GameRoom, Player } from 'src/game/game.object';
 import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { v4 as uuidv4 } from 'uuid';
 
 enum Presence {
   ONLINE = 1,
@@ -136,44 +135,10 @@ export class UsersGateway {
     const player1 = new Player(waitUserId, true);
     const player2 = new Player(userId, false);
     // 2人揃ったらマッチルーム作る
-    const newRoomId = this.createGameRoom(player1, player2, BALL_SPEED);
-    this.server.to('matching').emit('go_game_room', newRoomId);
+    const gameRoom = this.createGameRoom(player1, player2, BALL_SPEED);
+    this.server.to('matching').emit('go_game_room', gameRoom.id);
     this.server.socketsLeave('matching');
-    socket.emit('go_game_room', newRoomId);
-    this.server
-      .to('monitor')
-      .emit('game_room_created', [newRoomId, player1.id, player2.id]);
-  }
-
-  createGameRoom(player1: Player, player2: Player, ballSpeed: number): string {
-    const id = uuidv4();
-    const gameRoom = new GameRoom(
-      this.gameService,
-      id,
-      this.server,
-      player1,
-      player2,
-      ballSpeed
-    );
-    this.gameRooms.set(id, gameRoom);
-
-    return id;
-  }
-
-  updatePresence(userId: string, presence: Presence): void {
-    this.userIdToPresence.set(userId, presence);
-    this.server.emit('update_presence', [
-      userId,
-      this.userIdToPresence.get(userId),
-    ]);
-  }
-
-  updateGameRoomId(userId: string, gameRoomId: string): void {
-    this.userIdToGameRoomId.set(userId, gameRoomId);
-    this.server.emit('update_game_room_id', [
-      userId,
-      this.userIdToGameRoomId.get(userId),
-    ]);
+    socket.emit('go_game_room', gameRoom.id);
   }
 
   @SubscribeMessage('matching_cancel')
@@ -197,9 +162,9 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
     const player1 = new Player(userId, true);
     const player2 = new Player(message.opponentId, false);
-    const newRoomId = this.createGameRoom(player1, player2, message.ballSpeed);
+    const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
     this.server.to(player2.id).emit('receive_invitation', {
-      roomId: newRoomId,
+      roomId: gameRoom.id,
       challengerId: player1.id,
     });
   }
@@ -265,8 +230,6 @@ export class UsersGateway {
       nextGamePhase: GamePhase.ConfirmWaiting,
     };
     if (isPlayer) {
-      this.updatePresence(userId, Presence.INGAME);
-      this.updateGameRoomId(userId, gameRoom.id);
       const [me, opponent] =
         player1.id === userId ? [player1, player2] : [player2, player1];
       gameInfo.isLeftSide = me.isLeftSide;
@@ -384,21 +347,14 @@ export class UsersGateway {
     await (isPlayer ? socket.leave(roomId) : socket.leave(`watch_${roomId}`));
     const gameRoomSockets = await this.server.in(roomId).fetchSockets();
     if (gameRoomSockets.length === 0) {
+      // 両プレイヤーゲームルームを抜けたら無効試合
       if (!gameRoom.isFinished) {
-        // 観戦者を追い出す
         this.server
           .in(`watch_${roomId}`)
           .emit('game_room_error', 'Both players disconnected.');
         clearInterval(gameRoom.interval);
+        this.deleteGameRoom(gameRoom);
       }
-      this.updatePresence(player1.id, Presence.ONLINE);
-      this.updatePresence(player2.id, Presence.ONLINE);
-      this.updateGameRoomId(player1.id, '');
-      this.updateGameRoomId(player2.id, '');
-      this.server.socketsLeave(roomId);
-      this.server.socketsLeave(`watch_${roomId}`);
-      this.gameRooms.delete(roomId);
-      this.server.to('monitor').emit('game_room_deleted', roomId);
     }
   }
 
@@ -413,6 +369,7 @@ export class UsersGateway {
     await socket.join('monitor');
     const inGameOutlines: string[][] = [];
     this.gameRooms.forEach((gameRoom) => {
+      if (gameRoom.isFinished) return;
       inGameOutlines.push([
         gameRoom.id,
         gameRoom.player1.id,
@@ -430,5 +387,58 @@ export class UsersGateway {
     );
 
     await socket.leave('monitor');
+  }
+
+  createGameRoom(
+    player1: Player,
+    player2: Player,
+    ballSpeed?: number
+  ): GameRoom {
+    const gameRoom = new GameRoom(
+      this.gameService,
+      this.server,
+      (gameRoom: GameRoom) => this.deleteGameRoom(gameRoom),
+      player1,
+      player2,
+      ballSpeed
+    );
+    this.gameRooms.set(gameRoom.id, gameRoom);
+
+    this.updatePresence(player1.id, Presence.INGAME);
+    this.updateGameRoomId(player1.id, gameRoom.id);
+    this.updatePresence(player2.id, Presence.INGAME);
+    this.updateGameRoomId(player2.id, gameRoom.id);
+    this.server
+      .to('monitor')
+      .emit('game_room_created', [gameRoom.id, player1.id, player2.id]);
+
+    return gameRoom;
+  }
+
+  deleteGameRoom(gameRoom: GameRoom): void {
+    const { id: roomId, player1, player2 } = gameRoom;
+
+    this.gameRooms.delete(roomId);
+    this.updatePresence(player1.id, Presence.ONLINE);
+    this.updatePresence(player2.id, Presence.ONLINE);
+    this.updateGameRoomId(player1.id, '');
+    this.updateGameRoomId(player2.id, '');
+    this.server.to('monitor').emit('game_room_deleted', roomId);
+  }
+
+  updatePresence(userId: string, presence: Presence): void {
+    this.userIdToPresence.set(userId, presence);
+    this.server.emit('update_presence', [
+      userId,
+      this.userIdToPresence.get(userId),
+    ]);
+  }
+
+  updateGameRoomId(userId: string, gameRoomId: string): void {
+    this.userIdToGameRoomId.set(userId, gameRoomId);
+    this.server.emit('update_game_room_id', [
+      userId,
+      this.userIdToGameRoomId.get(userId),
+    ]);
   }
 }
