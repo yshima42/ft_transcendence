@@ -1,6 +1,8 @@
 import { Socket, Server } from 'socket.io';
+import { v4 as uuidv4 } from 'uuid';
 import {
   BALL_SIZE,
+  BALL_SPEED,
   BALL_START_X,
   BALL_START_Y,
   CANVAS_HEIGHT,
@@ -90,23 +92,25 @@ export class GameRoom {
   isFinished: boolean;
   isBallStop: boolean;
   readyCountDownNum: number;
+  gameRoomOff: (gameRoom: GameRoom) => void;
 
   constructor(
     gameService: GameService,
-    id: string,
     server: Server,
+    gameRoomOff: (gameRoom: GameRoom) => void,
     player1: Player,
     player2: Player,
-    ballSpeed: number
+    ballSpeed?: number
   ) {
     this.gameService = gameService;
-    this.id = id;
     this.server = server;
+    this.gameRoomOff = gameRoomOff;
+    this.id = uuidv4();
     this.player1 = player1;
     this.player2 = player2;
     this.paddle1 = new Paddle(0);
     this.paddle2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH);
-    this.ball = new Ball(ballSpeed);
+    this.ball = new Ball(ballSpeed ?? BALL_SPEED);
     this.interval = setInterval(() => {
       // イニシャライズのための空変数
     });
@@ -220,6 +224,10 @@ export class GameRoom {
     this.isFinished = true;
     // setIntervalを止める処理
     clearInterval(this.interval);
+    this.gameRoomOff(this);
+    this.server
+      .in([roomId, `watch_${roomId}`])
+      .emit('update_game_phase', GamePhase.Result);
 
     // データベースへスコアの保存
     const muchResult: CreateMatchResultDto = {
@@ -229,10 +237,6 @@ export class GameRoom {
       playerTwoScore: this.player2.score,
     };
     await this.gameService.addMatchResult(muchResult);
-
-    this.server
-      .in([roomId, `watch_${roomId}`])
-      .emit('update_game_phase', GamePhase.Result);
   }
 
   // TODO: disconnect処理を実行
