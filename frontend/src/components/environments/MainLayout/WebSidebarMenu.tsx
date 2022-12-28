@@ -23,7 +23,6 @@ export const WebSidebarMenu: FC<Props> = memo((props) => {
         maxW={{ base: '50px', md: '170px' }}
         flexDir="column"
         justifyContent="space-between"
-        display={{ base: 'none', md: 'flex' }}
       >
         <Flex p="5%" flexDir="column" w="100%" alignItems="flex-start" as="nav">
           <Flex mt={5} flexDir="column" w="100%" alignItems="flex-start">
