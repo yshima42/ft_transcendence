@@ -3,38 +3,37 @@ import { useToast } from '@chakra-ui/react';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { usePatchApi } from '../generics/usePatchApi';
+import { OneTimePasswordAuthResponse } from './useOtpAuth';
 
-export interface ActivateOtpAuthReqBody {
-  oneTimePassword: string;
+export type InactivateOtpAuthReqBody = Record<string, never>;
+
+export interface InactivateOtpAuthResBody {
+  oneTimePasswordAuthResponse: OneTimePasswordAuthResponse;
 }
 
-export interface ActivateOtpAuthResBody {
-  message: string;
-}
-
-export type ActivateOtpAuth = UseMutateAsyncFunction<
-  ActivateOtpAuthResBody,
+export type InactivateOtpAuth = UseMutateAsyncFunction<
+  InactivateOtpAuthResBody,
   unknown,
-  ActivateOtpAuthReqBody,
+  InactivateOtpAuthReqBody,
   unknown
 >;
 
-export const useOtpAuthActivate = (): {
-  activateOtpAuth: ActivateOtpAuth;
+export const useOtpAuthInactivate = (): {
+  inactivateOtpAuth: InactivateOtpAuth;
   isLoading: boolean;
   isError: boolean;
   isSuccess: boolean;
 } => {
   const {
-    patchFunc: activateOtpAuth,
+    patchFunc: inactivateOtpAuth,
     isLoading,
     isError,
     isSuccess,
     failureReason,
-  } = usePatchApi<ActivateOtpAuthReqBody, ActivateOtpAuthResBody>(`/auth/otp`, [
-    ['/auth/otp'],
-    [`/auth/otp/qrcode-url`],
-  ]);
+  } = usePatchApi<InactivateOtpAuthReqBody, InactivateOtpAuthResBody>(
+    `/auth/otp/off`,
+    [['/auth/otp']]
+  );
 
   const toast = useToast();
   useEffect(() => {
@@ -50,5 +49,5 @@ export const useOtpAuthActivate = (): {
     }
   }, [isError, toast, failureReason]);
 
-  return { activateOtpAuth, isLoading, isError, isSuccess };
+  return { inactivateOtpAuth, isLoading, isError, isSuccess };
 };

@@ -1,25 +1,24 @@
 import { FC, memo, useState } from 'react';
 import { Button } from '@chakra-ui/react';
-import { useOtpAuthCreate } from 'hooks/api';
-import { useIsOtpAuthEnabled } from 'hooks/api/auth/useIsOtpAuthEnabled';
-import { useOtpAuthDelete } from 'hooks/api/auth/useOtpAuthDelete';
+import { useOtpAuthQrcodeUrl } from 'hooks/api';
+import { useOtpAuth } from 'hooks/api/auth/useOtpAuth';
+import { useOtpAuthInactivate } from 'hooks/api/auth/useOtpAuthInactivate';
 import { OtpQrcodeModal } from '../organisms/OtpQrcodeModal';
 
 export const OtpAuthButton: FC = memo(() => {
-  const { isOtpAuthEnabled } = useIsOtpAuthEnabled();
-  const { createOtpAuth } = useOtpAuthCreate();
-  const { deleteOtpAuth } = useOtpAuthDelete();
+  const { isOtpAuthEnabled, qrcodeUrl } = useOtpAuth();
+  const { createOtpAuthQrcodeUrl } = useOtpAuthQrcodeUrl();
+  const { inactivateOtpAuth } = useOtpAuthInactivate();
+
   const [showFlag, setShowFlag] = useState(false);
 
   const onClickInactive = async () => {
-    if (isOtpAuthEnabled === null) {
-      await createOtpAuth({});
-    }
+    await createOtpAuthQrcodeUrl({});
     setShowFlag(true);
   };
 
   const onClickActive = async () => {
-    await deleteOtpAuth();
+    await inactivateOtpAuth({});
     setShowFlag(false);
   };
 
@@ -29,7 +28,7 @@ export const OtpAuthButton: FC = memo(() => {
 
   return (
     <>
-      {isOtpAuthEnabled === null || !isOtpAuthEnabled ? (
+      {!isOtpAuthEnabled ? (
         <Button size="xs" fontSize="xs" bg="red.200" onClick={onClickInactive}>
           inactive
         </Button>
@@ -39,7 +38,11 @@ export const OtpAuthButton: FC = memo(() => {
         </Button>
       )}
 
-      <OtpQrcodeModal isOpen={showFlag} onCloseModal={onCloseModal} />
+      <OtpQrcodeModal
+        isOpen={showFlag}
+        onCloseModal={onCloseModal}
+        qrcodeUrl={qrcodeUrl}
+      />
     </>
   );
 });
