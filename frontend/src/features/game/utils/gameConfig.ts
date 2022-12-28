@@ -1,5 +1,5 @@
 // TODO: バックエンドと共通にする
-export const BACKEND_CANVAS_WIDTH = 1000;
+export const BACKEND_CANVAS_WIDTH = 800;
 export const BACKEND_CANVAS_HEIGHT = 500;
 export const BALL_START_X = BACKEND_CANVAS_WIDTH / 2;
 export const BALL_START_Y = BACKEND_CANVAS_HEIGHT / 2;

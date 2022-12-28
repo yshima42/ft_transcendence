@@ -10,9 +10,10 @@ export class Ball {
   x: number;
   y: number;
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
+  // 位置はサーバーから取ってくるため初期値必要なし
+  constructor() {
+    this.x = 0;
+    this.y = 0;
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {
@@ -33,9 +34,9 @@ export class Paddle {
   x: number;
   y: number;
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
+  constructor() {
+    this.x = 0;
+    this.y = 0;
   }
 
   draw = (ctx: CanvasRenderingContext2D): void => {

@@ -1,15 +1,8 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
-import {
-  BALL_START_X,
-  BALL_START_Y,
-  BG_COLOR,
-  PADDLE_START_POS,
-  PADDLE_WIDTH,
-} from '../utils/gameConfig';
+import { BACKEND_CANVAS_WIDTH, BG_COLOR } from '../utils/gameConfig';
 import { Ball, Paddle } from '../utils/gameObjs';
-import { useCanvasSize } from './useCanvasSize';
 
 export enum GamePhase {
   SocketConnecting = 0,
@@ -41,7 +34,6 @@ export const useGame = (
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
-  const { canvasWidth } = useCanvasSize();
 
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
@@ -52,12 +44,9 @@ export const useGame = (
 
   const player1: Player = useMemo(() => ({ id: '', score: 0 }), []);
   const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
-  const paddle1 = useMemo(() => new Paddle(0, PADDLE_START_POS), []);
-  const paddle2 = useMemo(
-    () => new Paddle(canvasWidth - PADDLE_WIDTH, PADDLE_START_POS),
-    []
-  );
-  const ball = useMemo(() => new Ball(BALL_START_X, BALL_START_Y), []);
+  const paddle1 = useMemo(() => new Paddle(), []);
+  const paddle2 = useMemo(() => new Paddle(), []);
+  const ball = useMemo(() => new Ball(), []);
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     // canvas背景の設定
@@ -73,7 +62,7 @@ export const useGame = (
     // スコアの表示
     ctx.font = '48px serif';
     ctx.fillText(player1.score.toString(), 20, 50);
-    ctx.fillText(player2.score.toString(), 960, 50);
+    ctx.fillText(player2.score.toString(), BACKEND_CANVAS_WIDTH - 40, 50);
   }, []);
 
   const userCommand = useMemo(
