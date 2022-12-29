@@ -25,7 +25,7 @@ type Props = {
 export const OtpQrcodeModal: FC<Props> = memo((props) => {
   const { isOpen, onCloseModal, qrcodeUrl } = props;
   const { Canvas } = useQRCode();
-  const { activateOtpAuth } = useOtpAuthActivate();
+  const { activateOtpAuth, isLoading } = useOtpAuthActivate();
   const [token, setToken] = useState('');
 
   const onChangeToken = (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,9 +33,9 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
   };
 
   const onClickSubmit = async () => {
+    await activateOtpAuth({ oneTimePassword: token });
     setToken('');
     onCloseModal();
-    await activateOtpAuth({ oneTimePassword: token });
   };
 
   return (
@@ -74,7 +74,13 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
                   value={token}
                   onChange={onChangeToken}
                 />
-                <Button bg="teal.300" color="white" onClick={onClickSubmit}>
+                <Button
+                  bg="teal.300"
+                  color="white"
+                  isLoading={isLoading}
+                  isDisabled={isLoading}
+                  onClick={onClickSubmit}
+                >
                   submit
                 </Button>
               </HStack>
