@@ -65,7 +65,11 @@ const friendRequestData: FriendRequest[] = [];
 for (let i = 2; i < 30; i++) {
   const creatorId = idMap.get('dummy1');
   const receiverId = idMap.get('dummy' + i.toString());
-  if (creatorId !== undefined && receiverId !== undefined) {
+  if (
+    creatorId !== undefined &&
+    receiverId !== undefined &&
+    creatorId !== receiverId
+  ) {
     friendRequestData.push({
       creatorId,
       receiverId,
@@ -83,7 +87,11 @@ for (let i = 2; i < 30; i++) {
 for (let i = 40; i < 60; i++) {
   const creatorId = idMap.get('dummy' + i.toString());
   const receiverId = idMap.get('dummy1');
-  if (creatorId !== undefined && receiverId !== undefined) {
+  if (
+    creatorId !== undefined &&
+    receiverId !== undefined &&
+    creatorId !== receiverId
+  ) {
     friendRequestData.push({
       creatorId,
       receiverId,
@@ -101,7 +109,11 @@ for (let i = 40; i < 60; i++) {
 for (let i = 2; i < 30; i++) {
   const creatorId = idMap.get('dummy' + i.toString());
   const receiverId = idMap.get('dummy' + (i + 1).toString());
-  if (creatorId !== undefined && receiverId !== undefined) {
+  if (
+    creatorId !== undefined &&
+    receiverId !== undefined &&
+    creatorId !== receiverId
+  ) {
     friendRequestData.push({
       creatorId,
       receiverId,
@@ -119,7 +131,11 @@ const blockData: Block[] = [];
 for (let i = 2; i < 30; i++) {
   const sourceId = idMap.get('dummy1');
   const targetId = idMap.get('dummy' + i.toString());
-  if (targetId !== undefined && sourceId !== undefined) {
+  if (
+    targetId !== undefined &&
+    sourceId !== undefined &&
+    targetId !== sourceId
+  ) {
     blockData.push({
       targetId,
       sourceId,
