@@ -17,14 +17,16 @@ async function bootstrap() {
   Logger.log('info');
   Logger.debug('development environment');
   Logger.verbose('local environment');
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
   const configService = app.get(ConfigService);
-  const frontendUrl = configService.get<string>('FRONTEND_URL');
+  const frontendUrl = configService.get<string>('FRONTEND_URL') as string;
   app.enableCors({
     credentials: true,
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     origin: [`${frontendUrl}`],
   });
+
   app.use(cookieParser());
 
   const config = new DocumentBuilder()
