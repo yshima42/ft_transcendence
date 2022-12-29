@@ -28,6 +28,9 @@ jobs:
           echo "FT_CID='${FT_CID}'" >> backend/.env
           echo "FT_SECRET='${FT_SECRET}'" >> backend/.env
           echo "TWO_FACTOR_AUTHENTICATION_APP_NAME='${TWO_FACTOR_AUTH_APP_NAME}'" >> backend/.env
+          echo "FT_SECRET='${FT_SECRET}'" >> backend/.env
+          echo "FRONTEND_URL='${FRONTEND_URL}'" >> backend/.env
+          echo "BACKEND_URL='${BACKEND_URL}'" >> backend/.env
           echo "VITE_APP_TITLE='${VITE_APP_TITLE}'" > frontend/.env
           echo "VITE_API_URL='${VITE_API_URL}'" >> frontend/.env
           echo "DATABASE_URL='${DATABASE_URL}'" >> frontend/.env
@@ -39,6 +42,8 @@ jobs:
           TWO_FACTOR_AUTH_APP_NAME: "TransPong"
           VITE_APP_TITLE: "My Super Awsome APP"
           VITE_API_URL: "http://localhost:3000"
+          FRONTEND_URL: "http://localhost:5173"
+          BACKEND_URL: "http://localhost:3000"
       - name: docker-compose up
         run: docker-compose -f backend/docker-compose.yml up -d
       - name: backend install
