@@ -69,27 +69,30 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
     });
 
     // TODO: update_presenceとupdate_game_room_idをまとめるかどうか検討
-    socket.on('update_presence', (userIdToPresence: [string, Presence]) => {
+    socket.on('set_presence', (userIdToPresence: [string, Presence]) => {
       console.log('User update presence message received');
       setUserIdToPresence((prev) => [...prev, userIdToPresence]);
       userIdToPresenceMap.set(...userIdToPresence);
     });
 
-    socket.on('update_game_room_id', (userIdToGameRoomId: [string, string]) => {
-      console.log('User update gameRoomId message received');
-      setUserIdToGameRoomId((prev) => [...prev, userIdToGameRoomId]);
-      userIdToGameRoomIdMap.set(...userIdToGameRoomId);
-    });
-
-    socket.on('user_disconnected', (userId: string) => {
-      console.info('User disconnected message received');
+    socket.on('delete_presence', (userId: string) => {
+      console.info('User delete presence message received');
       setUserIdToPresence((prev) =>
         prev.filter(
           (userIdToPresencePair) => userIdToPresencePair[0] !== userId
         )
       );
       userIdToPresenceMap.delete(userId);
+    });
 
+    socket.on('set_game_room_id', (userIdToGameRoomId: [string, string]) => {
+      console.log('User update gameRoomId message received');
+      setUserIdToGameRoomId((prev) => [...prev, userIdToGameRoomId]);
+      userIdToGameRoomIdMap.set(...userIdToGameRoomId);
+    });
+
+    socket.on('delete_game_room_id', (userId: string) => {
+      console.log('User delete gameRoomId message received');
       setUserIdToGameRoomId((prev) =>
         prev.filter(
           (userIdToGameRoomIdPair) => userIdToGameRoomIdPair[0] !== userId
@@ -109,9 +112,10 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
     return () => {
       socket.off('connect_established');
-      socket.off('update_presence');
-      socket.off('update_game_room_id');
-      socket.off('user_disconnected');
+      socket.off('set_presence');
+      socket.off('delete_presence');
+      socket.off('set_game_room_id');
+      socket.off('delete_game_room_id');
       socket.off('receive_invitation');
     };
   }, [socket]);
