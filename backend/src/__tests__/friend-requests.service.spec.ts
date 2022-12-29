@@ -161,26 +161,6 @@ describe('FriendRequestsService', () => {
         })
       ).resolves.toHaveProperty('status', 'ACCEPTED');
     });
-
-    it('should update request from pending to declined', async () => {
-      const pendingRequest = await prisma.friendRequest.create({
-        data: {
-          creatorId: userArray[0].id,
-          receiverId: userArray[1].id,
-          status: 'PENDING',
-          createdAt: date,
-          updatedAt: date,
-        },
-      });
-
-      await expect(
-        friendRequestsService.update({
-          creatorId: pendingRequest.creatorId,
-          receiverId: pendingRequest.receiverId,
-          status: 'DECLINED',
-        })
-      ).resolves.toHaveProperty('status', 'DECLINED');
-    });
   });
 
   describe('remove', () => {
@@ -249,31 +229,6 @@ describe('FriendRequestsService', () => {
       ).resolves.toHaveProperty('count', 1);
     });
 
-    it('should remove requests including declined request', async () => {
-      const testUsers = [userArray[0], userArray[1]];
-      await prisma.friendRequest.createMany({
-        data: [
-          {
-            creatorId: testUsers[0].id,
-            receiverId: testUsers[1].id,
-            status: 'DECLINED',
-          },
-          {
-            creatorId: testUsers[1].id,
-            receiverId: testUsers[0].id,
-            status: 'ACCEPTED',
-          },
-        ],
-      });
-
-      await expect(
-        friendRequestsService.removeBetweenFriends(
-          testUsers[0].id,
-          testUsers[1].id
-        )
-      ).resolves.toHaveProperty('count', 2);
-    });
-
     it('should not remove non-existent friend', async () => {
       await expect(
         friendRequestsService.removeBetweenFriends(
@@ -324,7 +279,7 @@ describe('FriendRequestsService', () => {
           {
             creatorId: userArray[4].id,
             receiverId: userArray[0].id,
-            status: 'DECLINED',
+            status: 'ACCEPTED',
           },
           {
             creatorId: userArray[0].id,
@@ -367,7 +322,7 @@ describe('FriendRequestsService', () => {
           {
             creatorId: userArray[0].id,
             receiverId: userArray[4].id,
-            status: 'DECLINED',
+            status: 'ACCEPTED',
           },
           {
             creatorId: userArray[5].id,
@@ -410,7 +365,7 @@ describe('FriendRequestsService', () => {
           {
             creatorId: userArray[0].id,
             receiverId: userArray[4].id,
-            status: 'DECLINED',
+            status: 'PENDING',
           },
           {
             creatorId: userArray[5].id,
