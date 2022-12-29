@@ -80,7 +80,6 @@ model FriendRequest {
 enum FriendRequestStatus {
   PENDING
   ACCEPTED
-  DECLINED
 }
 
 model Block {
