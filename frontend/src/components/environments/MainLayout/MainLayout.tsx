@@ -27,13 +27,19 @@ export const MainLayout: FC<MainProps> = memo((props) => {
     },
     {
       title: 'DM',
-      to: 'dm',
+      to: 'dm/rooms',
       icon: EmailIcon,
       iconComponent: <EmailIcon />,
     },
     {
+      title: 'MyChat',
+      to: 'chat/rooms/me',
+      icon: ChatIcon,
+      iconComponent: <ChatIcon />,
+    },
+    {
       title: 'Chat',
-      to: 'chat',
+      to: 'chat/rooms',
       icon: ChatIcon,
       iconComponent: <ChatIcon />,
     },

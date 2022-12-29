@@ -1,7 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import * as ClassValidator from 'class-validator';
 
 export class CreateDmDto {
-  @IsNotEmpty()
-  @IsString()
+  @ClassValidator.IsNotEmpty()
+  @ClassValidator.IsString()
+  @ClassValidator.Length(1, 255)
   content!: string;
 }
