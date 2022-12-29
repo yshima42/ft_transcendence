@@ -19,7 +19,6 @@
     "format": "prettier --write --loglevel=warn '{src,cypress}/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",
     "fix": "npm run --silent format; npm run --silent lint:fix",
     "test": "jest --config ./jest.config.json",
-    "preinstall": "npx typesync || :",
     "test:watch": "npm run test -- --watch",
     "storybook": "export NODE_OPTIONS=--openssl-legacy-provider && start-storybook -p 6006",
     "build-storybook": "build-storybook",
