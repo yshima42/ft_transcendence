@@ -1,7 +1,8 @@
 run: 
-	docker-compose up --build
+	docker-compose up --build -d
 
-test: up log
+debug: 
+	docker-compose up --build
 
 up: 
 	docker-compose up -d
@@ -15,15 +16,7 @@ build:
 ps: 
 	docker-compose ps
 
-log: 
-	docker-compose logs -f backend
-
 dclean:
 	docker ps -q -a | xargs docker rm -f
 
-vclean:
-	docker volume rm postgres_data-volume
-
 re: down run
-
-rev: down vclean run
