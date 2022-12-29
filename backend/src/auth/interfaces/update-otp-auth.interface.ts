@@ -1,5 +1,5 @@
 export interface UpdateOtpAuth {
-  isOtpAuthEnabled?: boolean;
+  isEnabled?: boolean;
   qrcodeUrl?: string | null;
   secret?: string | null;
 }

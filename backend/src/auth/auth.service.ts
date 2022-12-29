@@ -40,7 +40,7 @@ export class AuthService {
 
     const { accessToken } = await this.generateJwt(user.id, user.name);
 
-    const { isOtpAuthEnabled } = await this.findOtpAuth(user.id);
+    const { isEnabled: isOtpAuthEnabled } = await this.findOtpAuth(user.id);
 
     return { accessToken, isOtpAuthEnabled, isSignUp };
   }
@@ -87,15 +87,7 @@ export class AuthService {
       secret
     );
 
-    const oneTimePasswordAuth = await this.prisma.oneTimePasswordAuth.update({
-      where: { authUserId: user.id },
-      data: {
-        qrcodeUrl,
-        secret,
-      },
-    });
-
-    return this.excludeOtpSecret(oneTimePasswordAuth);
+    return await this.updateOtp(user.id, { qrcodeUrl, secret });
   }
 
   async activeOtp(
@@ -108,7 +100,7 @@ export class AuthService {
     const { accessToken } = await this.validateOtp(oneTimePassword, user);
 
     const otpAuthResponse = await this.updateOtp(user.id, {
-      isOtpAuthEnabled: true,
+      isEnabled: true,
     });
 
     return { otpAuthResponse, accessToken };
@@ -119,7 +111,7 @@ export class AuthService {
     accessToken: string;
   }> {
     const otpAuthResponse = await this.updateOtp(user.id, {
-      isOtpAuthEnabled: false,
+      isEnabled: false,
       qrcodeUrl: null,
       secret: null,
     });
@@ -168,12 +160,11 @@ export class AuthService {
   excludeOtpSecret(
     oneTimePasswordAuth: OneTimePasswordAuth
   ): OneTimePasswordAuthResponse {
-    const { authUserId, isOtpAuthEnabled, qrcodeUrl, createdAt } =
-      oneTimePasswordAuth;
+    const { authUserId, isEnabled, qrcodeUrl, createdAt } = oneTimePasswordAuth;
 
     const oneTimePasswordAuthResponse = {
       authUserId,
-      isOtpAuthEnabled,
+      isEnabled,
       qrcodeUrl,
       createdAt,
     };
