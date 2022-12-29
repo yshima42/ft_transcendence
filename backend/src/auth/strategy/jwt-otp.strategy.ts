@@ -37,7 +37,7 @@ export class JwtOtpStrategy extends PassportStrategy(Strategy, 'jwt-otp') {
       include: {
         oneTimePasswordAuth: {
           select: {
-            isOtpAuthEnabled: true,
+            isEnabled: true,
           },
         },
       },
@@ -45,7 +45,7 @@ export class JwtOtpStrategy extends PassportStrategy(Strategy, 'jwt-otp') {
     if (
       user === null ||
       user.oneTimePasswordAuth === null ||
-      (user.oneTimePasswordAuth.isOtpAuthEnabled && !isOtpValid)
+      (user.oneTimePasswordAuth.isEnabled && !isOtpValid)
     ) {
       throw new UnauthorizedException();
     }

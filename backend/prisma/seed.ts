@@ -54,7 +54,7 @@ const otpAuthData: OneTimePasswordAuth[] = [];
 userData.forEach((value) => {
   otpAuthData.push({
     authUserId: value.id,
-    isOtpAuthEnabled: false,
+    isEnabled: false,
     qrcodeUrl: null,
     secret: null,
     createdAt: new Date(),
