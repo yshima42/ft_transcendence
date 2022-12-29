@@ -32,6 +32,7 @@ export const useGame = (
   player1: Player;
   player2: Player;
   readyCountDownNum: number;
+  size: number[];
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
@@ -225,5 +226,13 @@ export const useGame = (
     };
   }, [gamePhase, socket, roomId, connected, keyDownEvent, keyUpEvent]);
 
-  return { gamePhase, setGamePhase, draw, player1, player2, readyCountDownNum };
+  return {
+    gamePhase,
+    setGamePhase,
+    draw,
+    player1,
+    player2,
+    readyCountDownNum,
+    size,
+  };
 };
