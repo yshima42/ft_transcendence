@@ -4,10 +4,9 @@ export const useCanvasSize = (): {
   canvasWidth: number;
   canvasHeight: number;
 } => {
-  // TODO: heightを使って比率計算する
-  const [width] = useWindowSize();
-  const canvasWidth = width - 300;
-  const canvasHeight = (width - 300) / 2;
+  const size = useWindowSize();
+  const canvasWidth = size[0] - 300;
+  const canvasHeight = (size[0] - 300) / 2;
 
   return { canvasWidth, canvasHeight };
 };

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import { BACKEND_CANVAS_WIDTH, BG_COLOR } from '../utils/gameConfig';
 import { Ball, Paddle } from '../utils/gameObjs';
+import { useWindowSize } from './useWindowSize';
 
 export enum GamePhase {
   SocketConnecting = 0,
@@ -47,6 +48,8 @@ export const useGame = (
   const paddle1 = useMemo(() => new Paddle(), []);
   const paddle2 = useMemo(() => new Paddle(), []);
   const ball = useMemo(() => new Ball(), []);
+  // const { canvasWidth } = useCanvasSize();
+  const size = useWindowSize();
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     // canvas背景の設定
@@ -151,9 +154,18 @@ export const useGame = (
         ballX: number;
         ballY: number;
       }) => {
-        [paddle1.x, paddle1.y] = [message.paddle1X, message.paddle1Y];
-        [paddle2.x, paddle2.y] = [message.paddle2X, message.paddle2Y];
-        [ball.x, ball.y] = [message.ballX, message.ballY];
+        [paddle1.x, paddle1.y] = [
+          message.paddle1X * ((size[0] - 300) / BACKEND_CANVAS_WIDTH),
+          message.paddle1Y * ((size[0] - 300) / BACKEND_CANVAS_WIDTH),
+        ];
+        [paddle2.x, paddle2.y] = [
+          message.paddle2X * ((size[0] - 300) / BACKEND_CANVAS_WIDTH),
+          message.paddle2Y * ((size[0] - 300) / BACKEND_CANVAS_WIDTH),
+        ];
+        [ball.x, ball.y] = [
+          message.ballX * ((size[0] - 300) / BACKEND_CANVAS_WIDTH),
+          message.ballY * ((size[0] - 300) / BACKEND_CANVAS_WIDTH),
+        ];
       }
     );
 
