@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import {
   Controller,
   Get,
@@ -31,10 +30,10 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly config: ConfigService
   ) {
-    this.frontendUrl = this.config.get<string>('FRONTEND_URL');
+    this.frontendUrl = this.config.get<string>('FRONTEND_URL') as string;
   }
 
-  private readonly frontendUrl: string | undefined;
+  private readonly frontendUrl: string;
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,

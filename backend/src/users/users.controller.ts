@@ -156,10 +156,9 @@ export class UsersController {
     @UploadedFile(FileService.parseFilePipe()) file: Express.Multer.File
   ): Promise<User> {
     this.fileService.deleteOldFile(file.filename, user);
-    const backendUrl = this.config.get<string>('BACKEND_URL');
+    const backendUrl = this.config.get<string>('BACKEND_URL') as string;
 
     const UpdateUserDto = {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       avatarImageUrl: `${backendUrl}/users/${user.id}/avatar/${file.filename}`,
     };
 

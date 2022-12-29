@@ -10,10 +10,9 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
     super({
       clientID: config.get<string>('FT_CID'),
       clientSecret: config.get<string>('FT_SECRET'),
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      callbackURL: `${config.get<string>(
-        'BACKEND_URL'
-      )}/auth/login/42/callback`,
+      callbackURL: `${
+        config.get<string>('BACKEND_URL') as string
+      }/auth/login/42/callback`,
     });
   }
 
