@@ -2,7 +2,7 @@
 CREATE TYPE "OnlineStatus" AS ENUM ('ONLINE', 'OFFLINE', 'INGAME');
 
 -- CreateEnum
-CREATE TYPE "FriendRequestStatus" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED');
+CREATE TYPE "FriendRequestStatus" AS ENUM ('PENDING', 'ACCEPTED');
 
 -- CreateEnum
 CREATE TYPE "ChatUserStatus" AS ENUM ('OWNER', 'MEMBER');
