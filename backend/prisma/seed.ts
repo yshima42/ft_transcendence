@@ -4,12 +4,13 @@ import {
   PrismaClient,
   User,
   ChatRoom,
-  ChatRoomUser,
+  ChatRoomMember,
   ChatMessage,
   DmRoom,
-  DmRoomUser,
+  DmRoomMember,
   Dm,
   MatchResult,
+  ChatRoomStatus,
 } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -144,36 +145,44 @@ for (let i = 2; i < 30; i++) {
 }
 
 const chatRooms: ChatRoom[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 10; i++) {
   const id = uuidv4();
   const name = 'DmRoom' + id;
+  const roomStatus = 'PUBLIC' as ChatRoomStatus;
   chatRooms.push({
     id,
     name,
+    roomStatus,
+    password: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
 }
 
-const chatRoomUsers: ChatRoomUser[] = [];
-for (let i = 0; i < 1; i++) {
+const chatRoomMembers: ChatRoomMember[] = [];
+for (let i = 0; i < 2; i++) {
   const chatRoomId = chatRooms[i].id;
-  const userId = idMap.get('dummy1');
-  const status = 'OWNER';
+  const userId = idMap.get('dummy' + i.toString());
+  const memberStatus = 'ADMIN';
   if (userId !== undefined) {
-    chatRoomUsers.push({
+    chatRoomMembers.push({
       chatRoomId,
       userId,
-      status,
+      memberStatus,
+      statusUntil: null,
     });
   }
-  const userId2 = idMap.get('dummy2');
-  const status2 = 'OWNER';
-  if (userId2 !== undefined) {
-    chatRoomUsers.push({
+}
+for (let i = 2; i < 100; i++) {
+  const chatRoomId = chatRooms[1].id;
+  const userId = idMap.get('dummy' + i.toString());
+  const memberStatus = 'NORMAL';
+  if (userId !== undefined) {
+    chatRoomMembers.push({
       chatRoomId,
-      userId: userId2,
-      status: status2,
+      userId,
+      memberStatus,
+      statusUntil: null,
     });
   }
 }
@@ -196,7 +205,7 @@ for (let i = 0; i < 1; i++) {
 }
 
 const dmRooms: DmRoom[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 2; i++) {
   const id = uuidv4();
   dmRooms.push({
     id,
@@ -205,19 +214,20 @@ for (let i = 0; i < 1; i++) {
   });
 }
 
-const dmRoomUsers: DmRoomUser[] = [];
-for (let i = 0; i < 1; i++) {
+const dmRoomMembers: DmRoomMember[] = [];
+for (let i = 0; i < 2; i++) {
   const dmRoomId = dmRooms[i].id;
   const userId = idMap.get('dummy1');
   if (userId !== undefined) {
-    dmRoomUsers.push({
+    dmRoomMembers.push({
       dmRoomId,
       userId,
     });
   }
-  const userId2 = idMap.get('dummy2');
+  // const userId2 = idMap.get('dummy2');
+  const userId2 = idMap.get(`dummy${i + 2}`);
   if (userId2 !== undefined) {
-    dmRoomUsers.push({
+    dmRoomMembers.push({
       dmRoomId,
       userId: userId2,
     });
@@ -225,7 +235,7 @@ for (let i = 0; i < 1; i++) {
 }
 
 const dms: Dm[] = [];
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 2; i++) {
   const id = uuidv4();
   const content = 'Hello' + id;
   const dmRoomId = dmRooms[i].id;
@@ -302,30 +312,30 @@ const main = async () => {
   await prisma.user.createMany({
     data: userData,
   });
-  await prisma.friendRequest.createMany({
-    data: friendRequestData,
-  });
-  await prisma.block.createMany({
-    data: blockData,
-  });
+  // await prisma.friendRequest.createMany({
+  //   data: friendRequestData,
+  // });
+  // await prisma.block.createMany({
+  //   data: blockData,
+  // });
   await prisma.chatRoom.createMany({
     data: chatRooms,
   });
-  await prisma.chatRoomUser.createMany({
-    data: chatRoomUsers,
+  await prisma.chatRoomMember.createMany({
+    data: chatRoomMembers,
   });
   await prisma.chatMessage.createMany({
     data: chatMessages,
   });
-  await prisma.dmRoom.createMany({
-    data: dmRooms,
-  });
-  await prisma.dmRoomUser.createMany({
-    data: dmRoomUsers,
-  });
-  await prisma.dm.createMany({
-    data: dms,
-  });
+  // await prisma.dmRoom.createMany({
+  //   data: dmRooms,
+  // });
+  // await prisma.dmRoomMember.createMany({
+  //   data: dmRoomMembers,
+  // });
+  // await prisma.dm.createMany({
+  //   data: dms,
+  // });
   await prisma.matchResult.createMany({
     data: matchResultData,
   });

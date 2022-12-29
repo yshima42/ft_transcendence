@@ -1,72 +1,58 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { OnlineStatus } from '@prisma/client';
-import { axios } from 'lib/axios';
+import { useProfile } from 'hooks/api';
+import { useSavedDms } from 'hooks/api/dm/useSavedDms';
+import { useSocket } from 'hooks/socket/useSocket';
 import { useLocation } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
-
-export type ResponseDm = {
-  id: string;
-  content: string;
-  createdAt: Date;
-  sender: {
-    name: string;
-    avatarImageUrl: string;
-    onlineStatus: OnlineStatus;
-  };
-};
+import { DmMessages } from '../components/DmMessages';
+import { ResponseDm } from '../types/dm';
 
 type State = {
-  id: string;
+  dmRoomId: string;
 };
 
 export const DmRoom: React.FC = React.memo(() => {
+  const { user } = useProfile();
   const location = useLocation();
-  const { id: dmRoomId } = location.state as State;
-  const [messages, setMessages] = React.useState<ResponseDm[]>([]);
-
-  async function getAllDm(): Promise<void> {
-    const res: { data: ResponseDm[] } = await axios.get(
-      `/dm/message/${dmRoomId}`
-    );
-    setMessages(res.data);
-  }
-  // 送信ボタンを押したときの処理
-  async function sendMessage(content: string): Promise<void> {
-    await axios.post(`/dm/message/${dmRoomId}`, { content, dmRoomId });
-    getAllDm().catch((err) => console.error(err));
-  }
+  const { dmRoomId } = location.state as State;
+  const { savedDms } = useSavedDms(dmRoomId);
+  const [messages, setMessages] = React.useState<ResponseDm[]>(savedDms);
+  const socket = useSocket(import.meta.env.VITE_WS_DM_URL, {
+    autoConnect: false,
+  });
 
   React.useEffect(() => {
-    getAllDm().catch((err) => console.error(err));
-  }, []);
+    socket.emit('join_dm_room', dmRoomId);
+    socket.on('receive_message', (payload: ResponseDm) => {
+      setMessages((prev) => {
+        return [...prev, payload];
+      });
+    });
+
+    return () => {
+      socket.off('receive_message');
+      socket.emit('leave_dm_room', dmRoomId);
+    };
+  }, [dmRoomId, socket]);
+
+  // 送信ボタンを押したときの処理
+  function sendMessage(content: string): void {
+    socket.emit('send_message', {
+      content,
+      senderId: user.id,
+      dmRoomId,
+    });
+  }
 
   return (
     <>
       <ContentLayout title="Direct Message">
         <C.Divider />
-        <C.Flex
-          flexDir="column"
-          alignItems="flex-start"
-          padding={4}
-          overflowY="auto"
-          overflowX="hidden"
-        >
-          {messages.map((message) => (
-            <Message
-              key={message.id}
-              id={message.id}
-              content={message.content}
-              createdAt={message.createdAt}
-              name={message.sender.name}
-              avatarImageUrl={message.sender.avatarImageUrl}
-            />
-          ))}
-        </C.Flex>
+        <DmMessages messages={messages} />
         <C.Divider />
-        <MessageSendForm onSubmit={sendMessage} />
+        <MessageSendForm sendMessage={sendMessage} />
       </ContentLayout>
     </>
   );
