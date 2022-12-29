@@ -25,10 +25,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "preinstall": "npx typesync || :",
     "prepare": "npx simple-git-hooks || :",
-    "setup:dev": "bash ./setup-dev.sh",
-    "nest:update": "nest update",
-    "nest:help": "nest --help",
-    "nest:version": "nest --version"
+    "setup:dev": "bash ./setup-dev.sh"
   },
   "dependencies": {
     "@nestjs/cli": "^9.1.7",
