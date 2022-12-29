@@ -271,20 +271,4 @@ export class FriendRequestsService {
 
     return { friendRelation };
   }
-
-  // 2つのid間でどちらか一方、もしくは両方がブロックしているか
-  async isBlockRelation(user1Id: string, user2Id: string): Promise<boolean> {
-    const userBlocked = await this.prisma.block.findMany({
-      where: {
-        sourceId: user2Id,
-        targetId: user1Id,
-        OR: {
-          sourceId: user1Id,
-          targetId: user2Id,
-        },
-      },
-    });
-
-    return userBlocked.length > 0;
-  }
 }
