@@ -139,7 +139,6 @@ enum ChatRoomMemberStatus {
 enum FriendRequestStatus {
   PENDING
   ACCEPTED
-  DECLINED
 }
 
 enum OnlineStatus {
