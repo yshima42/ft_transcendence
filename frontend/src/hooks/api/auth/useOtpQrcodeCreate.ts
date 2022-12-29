@@ -15,7 +15,7 @@ export type CreateOtpAuthQrcodeUrl = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useOtpAuthQrcodeUrl = (): {
+export const useOtpAuthQrcodeCreate = (): {
   createOtpAuthQrcodeUrl: CreateOtpAuthQrcodeUrl;
   isLoading: boolean;
   isSuccess: boolean;
