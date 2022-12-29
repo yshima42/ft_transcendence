@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: backend install
-        run: yarn --cwd backend install
+        run: yarn --cwd backend install --production=true
       - name: backend build
         run: yarn --cwd backend build
       - name: frontend install
