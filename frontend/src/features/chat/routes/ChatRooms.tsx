@@ -75,6 +75,11 @@ const ChatRoomList: React.FC = React.memo(() => {
 
   return (
     <C.List spacing={3} data-testid="chat-room-list">
+      {chatRooms.length === 0 && (
+        <C.Center h="50vh">
+          <C.Text textAlign="center">Chat Room is not found.</C.Text>
+        </C.Center>
+      )}
       {chatRooms.map((chatRoom) => (
         <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
           <C.Link
