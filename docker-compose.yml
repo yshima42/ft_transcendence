@@ -24,6 +24,8 @@ services:
     networks:
       - front-tier
       - back-tier
+    volumes:
+      - upload-data-volume:/usr/src/app/upload
     # 新しいバージョンならhealthcheckとdependsonで対応するところ
     command: ["sh", "-c", "./wait-for-postgres.sh database ./docker-entrypoint.sh"]
 
@@ -49,3 +51,4 @@ networks:
 
 volumes:
   postgres-data-volume:
+  upload-data-volume:
