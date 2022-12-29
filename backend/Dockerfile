@@ -5,12 +5,12 @@ WORKDIR /usr/src/app
 
 COPY package.json .
 COPY yarn.lock .
+COPY prisma .
 
 RUN yarn global add @nestjs/cli
 RUN yarn install --production=true
 
 COPY . .
-RUN yarn prisma generate
 RUN yarn build
 
 # 前のステージから必要なものをコピーするステージ

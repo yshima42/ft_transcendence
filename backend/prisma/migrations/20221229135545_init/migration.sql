@@ -5,7 +5,10 @@ CREATE TYPE "OnlineStatus" AS ENUM ('ONLINE', 'OFFLINE', 'INGAME');
 CREATE TYPE "FriendRequestStatus" AS ENUM ('PENDING', 'ACCEPTED');
 
 -- CreateEnum
-CREATE TYPE "ChatUserStatus" AS ENUM ('OWNER', 'MEMBER');
+CREATE TYPE "ChatRoomMemberStatus" AS ENUM ('ADMIN', 'MODERATOR', 'NORMAL', 'KICKED', 'BANNED', 'MUTED');
+
+-- CreateEnum
+CREATE TYPE "ChatRoomStatus" AS ENUM ('PUBLIC', 'PROTECTED');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -14,8 +17,8 @@ CREATE TABLE "User" (
     "avatarImageUrl" TEXT NOT NULL,
     "nickname" TEXT NOT NULL,
     "onlineStatus" "OnlineStatus" NOT NULL DEFAULT 'ONLINE',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -25,7 +28,7 @@ CREATE TABLE "OneTimePasswordAuth" (
     "authUserId" UUID NOT NULL,
     "qrcodeUrl" TEXT NOT NULL,
     "secret" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "OneTimePasswordAuth_pkey" PRIMARY KEY ("authUserId")
 );
@@ -35,8 +38,8 @@ CREATE TABLE "FriendRequest" (
     "creatorId" UUID NOT NULL,
     "receiverId" UUID NOT NULL,
     "status" "FriendRequestStatus" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "FriendRequest_pkey" PRIMARY KEY ("creatorId","receiverId")
 );
@@ -56,7 +59,7 @@ CREATE TABLE "MatchResult" (
     "playerTwoId" UUID NOT NULL,
     "playerOneScore" INTEGER NOT NULL,
     "playerTwoScore" INTEGER NOT NULL,
-    "finishedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "finishedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "MatchResult_pkey" PRIMARY KEY ("id")
 );
@@ -65,7 +68,7 @@ CREATE TABLE "MatchResult" (
 CREATE TABLE "ChatMessage" (
     "id" UUID NOT NULL,
     "content" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "chatRoomId" UUID NOT NULL,
     "senderId" UUID NOT NULL,
 
@@ -76,26 +79,29 @@ CREATE TABLE "ChatMessage" (
 CREATE TABLE "ChatRoom" (
     "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "roomStatus" "ChatRoomStatus" NOT NULL DEFAULT 'PUBLIC',
+    "password" TEXT,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "ChatRoom_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "ChatRoomUser" (
+CREATE TABLE "ChatRoomMember" (
     "chatRoomId" UUID NOT NULL,
     "userId" UUID NOT NULL,
-    "status" "ChatUserStatus" NOT NULL,
+    "memberStatus" "ChatRoomMemberStatus" NOT NULL DEFAULT 'NORMAL',
+    "statusUntil" TIMESTAMPTZ(3),
 
-    CONSTRAINT "ChatRoomUser_pkey" PRIMARY KEY ("chatRoomId","userId")
+    CONSTRAINT "ChatRoomMember_pkey" PRIMARY KEY ("chatRoomId","userId")
 );
 
 -- CreateTable
 CREATE TABLE "Dm" (
     "id" UUID NOT NULL,
     "content" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "dmRoomId" UUID NOT NULL,
     "senderId" UUID NOT NULL,
 
@@ -105,18 +111,18 @@ CREATE TABLE "Dm" (
 -- CreateTable
 CREATE TABLE "DmRoom" (
     "id" UUID NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "DmRoom_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "DmRoomUser" (
+CREATE TABLE "DmRoomMember" (
     "dmRoomId" UUID NOT NULL,
     "userId" UUID NOT NULL,
 
-    CONSTRAINT "DmRoomUser_pkey" PRIMARY KEY ("dmRoomId","userId")
+    CONSTRAINT "DmRoomMember_pkey" PRIMARY KEY ("dmRoomId","userId")
 );
 
 -- CreateIndex
@@ -150,25 +156,25 @@ ALTER TABLE "MatchResult" ADD CONSTRAINT "MatchResult_playerOneId_fkey" FOREIGN 
 ALTER TABLE "MatchResult" ADD CONSTRAINT "MatchResult_playerTwoId_fkey" FOREIGN KEY ("playerTwoId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ChatMessage" ADD CONSTRAINT "ChatMessage_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "ChatRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ChatMessage" ADD CONSTRAINT "ChatMessage_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "ChatRoom"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ChatMessage" ADD CONSTRAINT "ChatMessage_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ChatMessage" ADD CONSTRAINT "ChatMessage_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ChatRoomUser" ADD CONSTRAINT "ChatRoomUser_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "ChatRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ChatRoomMember" ADD CONSTRAINT "ChatRoomMember_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "ChatRoom"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ChatRoomUser" ADD CONSTRAINT "ChatRoomUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ChatRoomMember" ADD CONSTRAINT "ChatRoomMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Dm" ADD CONSTRAINT "Dm_dmRoomId_fkey" FOREIGN KEY ("dmRoomId") REFERENCES "DmRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Dm" ADD CONSTRAINT "Dm_dmRoomId_fkey" FOREIGN KEY ("dmRoomId") REFERENCES "DmRoom"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Dm" ADD CONSTRAINT "Dm_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Dm" ADD CONSTRAINT "Dm_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DmRoomUser" ADD CONSTRAINT "DmRoomUser_dmRoomId_fkey" FOREIGN KEY ("dmRoomId") REFERENCES "DmRoom"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DmRoomMember" ADD CONSTRAINT "DmRoomMember_dmRoomId_fkey" FOREIGN KEY ("dmRoomId") REFERENCES "DmRoom"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DmRoomUser" ADD CONSTRAINT "DmRoomUser_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DmRoomMember" ADD CONSTRAINT "DmRoomMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

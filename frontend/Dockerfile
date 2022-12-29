@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 
 COPY package.json .
 COPY yarn.lock .
+COPY prisma .
 
 RUN yarn install
 
