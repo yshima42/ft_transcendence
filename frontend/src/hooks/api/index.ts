@@ -5,7 +5,7 @@ export * from './auth/useOtoAuthActivate';
 export * from './auth/useOtpAuth';
 export * from './auth/useOtpAuthInactivate';
 export * from './auth/useOtpAuthValidate';
-export * from './auth/useOtpQrcodeUrl';
+export * from './auth/useOtpQrcodeCreate';
 
 // block
 export * from './block/useBlockRelation';
