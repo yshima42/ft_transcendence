@@ -49,4 +49,3 @@ networks:
 
 volumes:
   postgres-data-volume:
-    name: postgres-data
