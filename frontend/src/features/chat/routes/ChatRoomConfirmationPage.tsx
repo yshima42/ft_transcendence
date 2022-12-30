@@ -1,25 +1,24 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomStatus } from '@prisma/client';
+import { ChatRoomStatus, ChatRoom } from '@prisma/client';
 import { AxiosError } from 'axios';
+import { ResponseChatRoomMemberStatus } from 'features/chat/types/chat';
+import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { axios } from 'lib/axios';
 import * as ReactHookForm from 'react-hook-form';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-
-type State = {
-  chatRoomId: string;
-  chatName: string;
-  roomStatus: ChatRoomStatus;
-};
 
 type Inputs = {
   password: string;
 };
 
 const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
-  const location = useLocation();
-  const { chatRoomId, chatName, roomStatus } = location.state as State;
+  const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
+  const { data: chatRoomData } = useGetApi2<ResponseChatRoomMemberStatus>(
+    `/chat/rooms/${chatRoomId}`
+  );
   const navigate = useNavigate();
   const {
     handleSubmit,
@@ -27,6 +26,8 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
     formState: { errors },
   } = ReactHookForm.useForm<Inputs>();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { name: chatName, roomStatus } = chatRoomData as ChatRoom;
+
   // axiosを使って、チャットルームに参加する処理を行う。
   // その後、チャットルームのページに遷移する。
   const joinChatRoom: ReactHookForm.SubmitHandler<Inputs> = async (data) => {

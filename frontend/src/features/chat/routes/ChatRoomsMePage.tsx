@@ -4,16 +4,10 @@ import { ResponseChatRoom } from 'features/chat/types/chat';
 import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { AlertModal } from 'features/chat/components/atoms/AlertModal';
-import { Spinner } from 'features/chat/components/atoms/Spinner';
 import { ChatRoomBox } from 'features/chat/components/organisms/ChatRoomBox';
 
 export const ChatRoomsMePage: React.FC = React.memo(() => {
-  const { data, isLoading, isError, error } =
-    useGetApi2<ResponseChatRoom[]>('/chat/rooms/me');
-  if (isLoading) return <Spinner />;
-  if (isError) return <AlertModal error={error as Error} />;
-
+  const { data } = useGetApi2<ResponseChatRoom[]>('/chat/rooms/me');
   const chatRooms = data as ResponseChatRoom[];
 
   return (
@@ -28,15 +22,7 @@ export const ChatRoomsMePage: React.FC = React.memo(() => {
           )}
           {chatRooms.map((chatRoom) => (
             <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
-              <C.Link
-                as={Link}
-                to={`/app/chat/rooms/${chatRoom.id}`}
-                state={{
-                  chatRoomId: chatRoom.id,
-                  chatName: chatRoom.name,
-                  roomStatus: chatRoom.roomStatus,
-                }}
-              >
+              <C.Link as={Link} to={`/app/chat/rooms/${chatRoom.id}`}>
                 <ChatRoomBox chatRoom={chatRoom} />
               </C.Link>
             </C.ListItem>
