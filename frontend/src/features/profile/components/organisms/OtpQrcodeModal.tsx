@@ -1,29 +1,42 @@
-import { FC, memo } from 'react';
+import { ChangeEvent, FC, memo, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
   Button,
   Spinner,
   VStack,
   Text,
+  HStack,
+  Input,
 } from '@chakra-ui/react';
-import { useOtpQrcodeUrl } from 'hooks/api';
+import { useOtpAuthActivate } from 'hooks/api/auth/useOtoAuthActivate';
 import { useQRCode } from 'next-qrcode';
 
 type Props = {
   isOpen: boolean;
   onCloseModal: () => void;
+  qrcodeUrl: string | null;
 };
 
 export const OtpQrcodeModal: FC<Props> = memo((props) => {
-  const { isOpen, onCloseModal } = props;
+  const { isOpen, onCloseModal, qrcodeUrl } = props;
   const { Canvas } = useQRCode();
-  const { qrcodeUrl } = useOtpQrcodeUrl();
+  const { activateOtpAuth, isLoading } = useOtpAuthActivate();
+  const [token, setToken] = useState('');
+
+  const onChangeToken = (e: ChangeEvent<HTMLInputElement>) => {
+    setToken(e.target.value);
+  };
+
+  const onClickSubmit = async () => {
+    await activateOtpAuth({ oneTimePassword: token });
+    setToken('');
+    onCloseModal();
+  };
 
   return (
     <>
@@ -37,7 +50,7 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
               <Text fontSize="lg" mb={4}>
                 Scan the QR code with Google Authenticator app.
               </Text>
-              {qrcodeUrl === '' ? (
+              {qrcodeUrl === null ? (
                 <Spinner />
               ) : (
                 <Canvas
@@ -54,14 +67,25 @@ export const OtpQrcodeModal: FC<Props> = memo((props) => {
                   }}
                 />
               )}
+              <HStack>
+                <Input
+                  m={4}
+                  placeholder="Token"
+                  value={token}
+                  onChange={onChangeToken}
+                />
+                <Button
+                  bg="teal.300"
+                  color="white"
+                  isLoading={isLoading}
+                  isDisabled={isLoading}
+                  onClick={onClickSubmit}
+                >
+                  submit
+                </Button>
+              </HStack>
             </VStack>
           </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onCloseModal}>
-              Close
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </>
