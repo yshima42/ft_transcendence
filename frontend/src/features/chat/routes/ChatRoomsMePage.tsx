@@ -8,7 +8,7 @@ import { AlertModal } from 'features/chat/components/atoms/AlertModal';
 import { Spinner } from 'features/chat/components/atoms/Spinner';
 import { ChatRoomBox } from 'features/chat/components/organisms/ChatRoomBox';
 
-export const ChatRoomsMe: React.FC = React.memo(() => {
+export const ChatRoomsMePage: React.FC = React.memo(() => {
   const { data, isLoading, isError, error } =
     useGetApi2<ResponseChatRoom[]>('/chat/rooms/me');
   if (isLoading) return <Spinner />;

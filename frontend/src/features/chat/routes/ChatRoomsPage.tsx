@@ -42,7 +42,7 @@ const ChatRoomList: React.FC = React.memo(() => {
   );
 });
 
-export const ChatRooms: React.FC = React.memo(() => {
+export const ChatRoomsPage: React.FC = React.memo(() => {
   return (
     <>
       <ContentLayout title="Chat">

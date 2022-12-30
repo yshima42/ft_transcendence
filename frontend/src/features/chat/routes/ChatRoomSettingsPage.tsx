@@ -19,7 +19,7 @@ type State = {
   roomStatus: ChatRoomStatus;
 };
 
-export const ChatRoomSettings: React.FC = React.memo(() => {
+export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
     autoConnect: false,
   });

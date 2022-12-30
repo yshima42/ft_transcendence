@@ -25,7 +25,7 @@ const schema = yup.object().shape(
 );
 
 // ボタンを押すと、作成したチャットルームに遷移する
-export const CreateChatRooms: React.FC = React.memo(() => {
+export const CreateChatRoomsPage: React.FC = React.memo(() => {
   const {
     register,
     handleSubmit,
