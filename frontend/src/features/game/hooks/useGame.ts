@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import {
@@ -48,6 +49,7 @@ export const useGame = (
   }
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const player1: Player = useMemo(() => ({ id: '', score: 0 }), []);
   const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
@@ -207,6 +209,16 @@ export const useGame = (
         break;
       }
       case GamePhase.Result: {
+        void queryClient.invalidateQueries({
+          queryKey: [
+            [`/game/matches`],
+            ['/game/stats'],
+            [`/users/${player1.id}/game/matches`],
+            [`/users/${player2.id}/game/matches`],
+            [`/users/${player1.id}/game/stats`],
+            [`/users/${player2.id}/game/stats`],
+          ],
+        });
         break;
       }
       case GamePhase.PlayerWaiting: {
