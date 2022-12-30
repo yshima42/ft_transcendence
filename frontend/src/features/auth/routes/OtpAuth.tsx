@@ -8,6 +8,7 @@ import {
   HStack,
   Input,
 } from '@chakra-ui/react';
+import { API_URL } from 'config';
 
 export const OtpAuth: FC = memo(() => {
   const [token, setToken] = useState('');
@@ -34,7 +35,7 @@ export const OtpAuth: FC = memo(() => {
             bg="teal.300"
             color="white"
             as="a"
-            href={`http://localhost:3000/auth/otp/validation?one-time-password=${token}`}
+            href={`${API_URL}/auth/otp/validation?one-time-password=${token}`}
           >
             submit
           </Button>
