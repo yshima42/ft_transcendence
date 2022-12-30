@@ -17,7 +17,7 @@ type Inputs = {
   password: string;
 };
 
-const ChatRoomConfirmationForm: React.FC = React.memo(() => {
+const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
   const location = useLocation();
   const { chatRoomId, chatName, roomStatus } = location.state as State;
   const navigate = useNavigate();
@@ -107,7 +107,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
       */}
       <C.Heading>Join Chat Room</C.Heading>
       <C.Divider my={4} />
-      <ChatRoomConfirmationForm />
+      <ChatRoomConfirmationFormPage />
     </ContentLayout>
   );
 });

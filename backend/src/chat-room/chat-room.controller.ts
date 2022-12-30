@@ -48,8 +48,13 @@ export class ChatRoomController {
   @Get(':chatRoomId')
   async findOne(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
-  ): Promise<ChatRoom> {
-    return await this.chatRoomService.findOne(chatRoomId);
+  ): Promise<Omit<ChatRoom, 'password'>> {
+    const res = await this.chatRoomService.findOne(chatRoomId);
+    // omit password
+    const { password, ...rest } = res;
+    void password; // 使わないとエラーでるのでvoidキャスト的な
+
+    return rest;
   }
 
   // update
@@ -58,12 +63,8 @@ export class ChatRoomController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @Body() updateChatRoomDto: UpdateChatRoomDto,
     @GetUser() user: User
-  ): Promise<ChatRoom> {
-    return await this.chatRoomService.update(
-      chatRoomId,
-      updateChatRoomDto,
-      user.id
-    );
+  ): Promise<void> {
+    await this.chatRoomService.update(chatRoomId, updateChatRoomDto, user.id);
   }
 
   // delete
