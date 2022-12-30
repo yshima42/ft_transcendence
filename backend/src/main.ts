@@ -1,4 +1,5 @@
 import { ValidationPipe, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
@@ -16,11 +17,16 @@ async function bootstrap() {
   Logger.log('info');
   Logger.debug('development environment');
   Logger.verbose('local environment');
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+  const configService = app.get(ConfigService);
+  const frontendUrl = configService.get<string>('FRONTEND_URL') as string;
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:5173'],
+    origin: [`${frontendUrl}`],
   });
+
   app.use(cookieParser());
 
   const config = new DocumentBuilder()

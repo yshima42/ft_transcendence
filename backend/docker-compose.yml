@@ -8,6 +8,7 @@ services:
       POSTGRES_USER: udemy
       POSTGRES_PASSWORD: udemy
       POSTGRES_DB: udemy
+      TZ: Asia/Tokyo
     restart: always
     networks:
       - lesson

@@ -13,6 +13,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBody,
@@ -52,7 +53,8 @@ export class UsersController {
     private readonly fileService: FileService,
     private readonly gameService: GameService,
     private readonly blocksService: BlocksService,
-    private readonly friendRequestService: FriendRequestsService
+    private readonly friendRequestService: FriendRequestsService,
+    private readonly config: ConfigService
   ) {}
 
   @Get('all')
@@ -154,9 +156,10 @@ export class UsersController {
     @UploadedFile(FileService.parseFilePipe()) file: Express.Multer.File
   ): Promise<User> {
     this.fileService.deleteOldFile(file.filename, user);
+    const backendUrl = this.config.get<string>('BACKEND_URL') as string;
 
     const UpdateUserDto = {
-      avatarImageUrl: `http://localhost:3000/users/${user.id}/avatar/${file.filename}`,
+      avatarImageUrl: `${backendUrl}/users/${user.id}/avatar/${file.filename}`,
     };
 
     return await this.usersService.update(user.id, UpdateUserDto);
