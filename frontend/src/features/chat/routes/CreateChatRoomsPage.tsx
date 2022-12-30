@@ -24,8 +24,7 @@ const schema = yup.object().shape(
   [['password', 'password']]
 );
 
-// ボタンを押すと、作成したチャットルームに遷移する
-export const CreateChatRoomsPage: React.FC = React.memo(() => {
+const CreateChatRoomForm: React.FC = React.memo(() => {
   const {
     register,
     handleSubmit,
@@ -44,37 +43,40 @@ export const CreateChatRoomsPage: React.FC = React.memo(() => {
   };
 
   return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <C.FormControl isInvalid={!(errors.name == null)}>
+        <C.FormLabel>Create Chat Room</C.FormLabel>
+        <C.Input placeholder="name" {...register('name')} />
+        <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
+      </C.FormControl>
+      <C.FormControl isInvalid={!(errors.password == null)}>
+        <C.FormLabel>password (optional)</C.FormLabel>
+        <C.Input
+          placeholder="Password"
+          {...register('password')}
+          type="password"
+        />
+        <C.FormErrorMessage>{errors.password?.message}</C.FormErrorMessage>
+      </C.FormControl>
+      <C.Button
+        type="submit"
+        colorScheme="teal"
+        mt={4}
+        isDisabled={isSubmitting}
+      >
+        Create
+      </C.Button>
+    </form>
+  );
+});
+
+// ボタンを押すと、作成したチャットルームに遷移する
+export const CreateChatRoomsPage: React.FC = React.memo(() => {
+  return (
     <>
       <ContentLayout title="Create Chat Room">
-        <C.Box>
-          <C.Heading>Create Chat Room</C.Heading>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <C.FormControl isInvalid={!(errors.name == null)}>
-              <C.FormLabel>Create Chat Room</C.FormLabel>
-              <C.Input placeholder="name" {...register('name')} />
-              <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
-            </C.FormControl>
-            <C.FormControl isInvalid={!(errors.password == null)}>
-              <C.FormLabel>password (optional)</C.FormLabel>
-              <C.Input
-                placeholder="Password"
-                {...register('password')}
-                type="password"
-              />
-              <C.FormErrorMessage>
-                {errors.password?.message}
-              </C.FormErrorMessage>
-            </C.FormControl>
-            <C.Button
-              type="submit"
-              colorScheme="teal"
-              mt={4}
-              isDisabled={isSubmitting}
-            >
-              Create
-            </C.Button>
-          </form>
-        </C.Box>
+        <C.Heading>Create Chat Room</C.Heading>
+        <CreateChatRoomForm />
       </ContentLayout>
     </>
   );
