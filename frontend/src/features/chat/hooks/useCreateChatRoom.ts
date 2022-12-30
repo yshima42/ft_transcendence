@@ -20,13 +20,7 @@ export const useCreateChatRoom = (): {
         password !== '' ? { name, password } : { name }
       );
       const chatRoom = response.data;
-      navigate(`/app/chat/rooms/${chatRoom.id}`, {
-        state: {
-          chatRoomId: chatRoom.id,
-          chatName: chatRoom.name,
-          roomStatus: chatRoom.roomStatus,
-        },
-      });
+      navigate(`/app/chat/rooms/${chatRoom.id}`);
     } catch (e) {
       const error = e as AxiosError;
       // 409

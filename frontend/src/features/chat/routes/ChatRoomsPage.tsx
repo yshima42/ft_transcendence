@@ -1,40 +1,22 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ResponseChatRoom } from 'features/chat/types/chat';
-import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { ChatRoomBox } from 'features/chat/components/organisms/ChatRoomBox';
-
-const ChatRoomList: React.FC = React.memo(() => {
-  const { data } = useGetApi2<ResponseChatRoom[]>('/chat/rooms');
-  const chatRooms = data as ResponseChatRoom[];
-
-  return (
-    <C.List spacing={3} data-testid="chat-room-list">
-      {chatRooms.length === 0 && (
-        <C.Center h="50vh">
-          <C.Text textAlign="center">Chat Room is not found.</C.Text>
-        </C.Center>
-      )}
-      {chatRooms.map((chatRoom) => (
-        <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
-          <C.Link as={Link} to={`${chatRoom.id}/confirmation`}>
-            <ChatRoomBox chatRoom={chatRoom} />
-          </C.Link>
-        </C.ListItem>
-      ))}
-    </C.List>
-  );
-});
+import { ChatRoomList } from 'features/chat/components/organisms/ChatRoomList';
 
 export const ChatRoomsPage: React.FC = React.memo(() => {
+  const chatRoomLinkUrl = (chatRoomId: string) => `${chatRoomId}/confirmation`;
+  const chatRoomEndpoint = '/chat/rooms';
+
   return (
     <>
       <ContentLayout title="Chat">
         <ChatRoomsHeader />
         <C.Divider />
-        <ChatRoomList />
+        <ChatRoomList
+          chatRoomEndpoint={chatRoomEndpoint}
+          chatRoomLinkUrl={chatRoomLinkUrl}
+        />
       </ContentLayout>
     </>
   );

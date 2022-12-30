@@ -9,7 +9,6 @@ import {
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { useSocket } from 'hooks/socket/useSocket';
-import { axios } from 'lib/axios';
 import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
@@ -43,12 +42,12 @@ export const ChatRoomPage: React.FC = React.memo(() => {
 
 const ChatRoomHeader: React.FC<{ chatRoomId: string }> = React.memo(
   ({ chatRoomId }) => {
+    const url = (chatRoomId: string) =>
+      `/app/chat/rooms/${chatRoomId}/settings`;
+
     return (
       <C.Flex justifyContent="flex-end" mb={4}>
-        <C.Link
-          as={ReactRouter.Link}
-          to={`/app/chat/rooms/${chatRoomId}/settings`}
-        >
+        <C.Link as={ReactRouter.Link} to={url(chatRoomId)}>
           <C.Button colorScheme="blue">Settings</C.Button>
         </C.Link>
       </C.Flex>
@@ -102,10 +101,13 @@ const ChatRoomBody: React.FC<{
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
     autoConnect: false,
   });
-  const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
+  const { data } = useGetApi2<ResponseChatMessage[]>(
+    `/chat/rooms/${chatRoomId}/messages`
+  );
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
   // ブロックユーザー
   const { users: blockUsers } = useBlockUsers();
+  const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
 
   React.useEffect(() => {
     socket.emit('join_room_member', chatRoomId);
@@ -138,21 +140,15 @@ const ChatRoomBody: React.FC<{
     };
   }, [chatRoomId, socket]);
 
-  async function getAllChatMessage(): Promise<void> {
-    const res: { data: ResponseChatMessage[] } = await axios.get(
-      `/chat/rooms/${chatRoomId}/messages`
-    );
-    setMessages(res.data);
-  }
-
-  React.useEffect(() => {
-    getAllChatMessage().catch((err) => console.error(err));
-  }, []);
-
   // 更新時の自動スクロール
   React.useEffect(() => {
     scrollBottomRef.current?.scrollIntoView();
   }, [messages]);
+
+  React.useEffect(() => {
+    if (data == null) return;
+    setMessages(data as ResponseChatMessage[]);
+  }, [data]);
 
   return (
     <>
