@@ -318,6 +318,12 @@ for (let i = 0; i < 30; i++) {
 const main = async () => {
   console.log(`Start seeding ...`);
 
+  const userCount = await prisma.user.count();
+  if (userCount > 0) {
+    console.log(`Data exists. Skip seeding`);
+    return;
+  }
+
   await prisma.user.createMany({
     data: userData,
   });
