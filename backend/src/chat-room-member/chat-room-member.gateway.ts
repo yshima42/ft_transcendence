@@ -83,7 +83,7 @@ export class ChatRoomMemberGateway {
     );
     const res = this.server
       .in(updateChatRoomMemberDto.chatRoomId)
-      .emit('changeChatRoomMemberStatusSocket', updatedChatRoomMember); // チャットルーム内の全員に送信(自分含む)
+      .emit('changeChatRoomMemberStatusSocket', updateChatRoomMemberDto); // チャットルーム内の全員に送信(自分含む)
     NestJs.Logger.debug(
       `chat-room-member.gateway changeStatus: ${JSON.stringify(res, null, 2)}`
     );
