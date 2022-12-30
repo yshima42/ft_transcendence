@@ -354,12 +354,12 @@ export class UsersGateway {
     }
   }
 
-  @SubscribeMessage('join_game_monitor_room')
+  @SubscribeMessage('join_monitor_room')
   async sendAllGameRoomIds(
     @ConnectedSocket() socket: Socket
   ): Promise<string[][]> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} join_game_monitor_room`
+      `${socket.id} ${socket.data.userId as string} join_monitor_room`
     );
 
     await socket.join('monitor');
@@ -376,10 +376,10 @@ export class UsersGateway {
     return inGameOutlines;
   }
 
-  @SubscribeMessage('leave_game_monitor_room')
+  @SubscribeMessage('leave_monitor_room')
   async leaveRoomList(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} leave_game_monitor_room`
+      `${socket.id} ${socket.data.userId as string} leave_monitor_room`
     );
 
     await socket.leave('monitor');
