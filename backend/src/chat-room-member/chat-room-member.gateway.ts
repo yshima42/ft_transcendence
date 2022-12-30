@@ -1,6 +1,7 @@
 import * as NestJs from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as WebSocket from '@nestjs/websockets';
+import { ChatRoomMember } from '@prisma/client';
 import { parse } from 'cookie';
 import * as SocketIO from 'socket.io';
 import { ChatRoomMemberService } from './chat-room-member.service';
@@ -24,7 +25,8 @@ export class ChatRoomMemberGateway {
   // ChatRoomに参加したときに呼ばれる
   @WebSocket.SubscribeMessage('join_room_member')
   joinRoom(
-    @WebSocket.MessageBody() chatRoomId: string,
+    @WebSocket.MessageBody(new NestJs.ParseUUIDPipe())
+    chatRoomId: string,
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): void {
     NestJs.Logger.debug(
@@ -37,7 +39,8 @@ export class ChatRoomMemberGateway {
 
   @WebSocket.SubscribeMessage('leave_room_member')
   leaveRoom(
-    @WebSocket.MessageBody() chatRoomId: string,
+    @WebSocket.MessageBody(new NestJs.ParseUUIDPipe())
+    chatRoomId: string,
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): void {
     NestJs.Logger.debug(
@@ -53,38 +56,39 @@ export class ChatRoomMemberGateway {
 
   // ユーザーのステータス変更
   // TODO: 入力のバリデーション ID要素をPipeでチェックしたい。
+  @NestJs.UsePipes(new NestJs.ValidationPipe())
   @WebSocket.SubscribeMessage('changeChatRoomMemberStatusSocket')
   async changeStatus(
     @WebSocket.MessageBody()
-    data: {
-      chatRoomId: string;
-      userId: string;
-      updateChatRoomMemberDto: UpdateChatRoomMemberDto;
-    },
+    updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
-  ): Promise<void> {
-    NestJs.Logger.debug(
-      `chat-room-member.gateway changeStatus: ${JSON.stringify(data, null, 2)}`
+  ): Promise<ChatRoomMember> {
+    NestJs.Logger.verbose(
+      `chat-room-member.gateway changeStatus: ${JSON.stringify(
+        updateChatRoomMemberDto,
+        null,
+        2
+      )}`
     );
     const cookie = client.handshake.headers.cookie;
     if (cookie === undefined) {
       NestJs.Logger.warn('cookie is undefined');
 
-      return;
+      throw new WebSocket.WsException('cookie is undefined');
     }
     const chatLoginUserId = this.getUserIdFromCookie(cookie);
-    await this.chatRoomMemberService.update(
-      data.chatRoomId,
-      data.userId,
-      data.updateChatRoomMemberDto,
+    const updatedChatRoomMember = await this.chatRoomMemberService.update(
+      updateChatRoomMemberDto,
       chatLoginUserId
     );
     const res = this.server
-      .in(data.chatRoomId)
-      .emit('changeChatRoomMemberStatusSocket', data); // チャットルーム内の全員に送信(自分含む)
+      .in(updateChatRoomMemberDto.chatRoomId)
+      .emit('changeChatRoomMemberStatusSocket', updatedChatRoomMember); // チャットルーム内の全員に送信(自分含む)
     NestJs.Logger.debug(
       `chat-room-member.gateway changeStatus: ${JSON.stringify(res, null, 2)}`
     );
+
+    return updatedChatRoomMember;
   }
 
   getUserIdFromCookie(cookie: string): string {

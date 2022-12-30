@@ -54,8 +54,8 @@ export const useChangeChatRoomMemberStatus = (
     }
     socket.emit('changeChatRoomMemberStatusSocket', {
       chatRoomId,
-      userId: memberId,
-      updateChatRoomMemberDto: { memberStatus, undefined },
+      memberId,
+      memberStatus,
     });
   }
 
@@ -66,11 +66,9 @@ export const useChangeChatRoomMemberStatus = (
   ) {
     socket.emit('changeChatRoomMemberStatusSocket', {
       chatRoomId,
-      userId: selectedMemberId,
-      updateChatRoomMemberDto: {
-        memberStatus: selectedMemberStatus,
-        limitTime: selectedLimitTime,
-      },
+      memberId: selectedMemberId,
+      memberStatus: selectedMemberStatus,
+      limitTime: selectedLimitTime,
     });
   }
 

@@ -151,17 +151,14 @@ export class ChatRoomMemberService {
   }
 
   async update(
-    chatRoomId: string,
-    memberId: string,
     updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     chatLoginUserId: string
   ): Promise<ChatRoomMember> {
     Logger.debug(`chat-room-member.service.ts update
-    chatRoomId=${chatRoomId}
-    memberId=${memberId}
     updateChatRoomMemberDto=${JSON.stringify(updateChatRoomMemberDto)}
     chatLoginUserId=${chatLoginUserId}`);
-    const { memberStatus, limitTime } = updateChatRoomMemberDto;
+    const { chatRoomId, memberId, memberStatus, limitTime } =
+      updateChatRoomMemberDto;
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomMember = await this.findOne(chatRoomId, chatLoginUserId);
     // ADMIN -> すべての変更を許可
