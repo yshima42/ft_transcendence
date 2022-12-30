@@ -19,28 +19,31 @@ model Block {
 model ChatMessage {
   id         String   @id @db.Uuid
   content    String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
   chatRoomId String   @db.Uuid
   senderId   String   @db.Uuid
-  ChatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
-  User       User     @relation(fields: [senderId], references: [id])
+  ChatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  User       User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 model ChatRoom {
-  id           String         @id @db.Uuid
-  name         String         @unique
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime
-  ChatMessage  ChatMessage[]
-  ChatRoomUser ChatRoomUser[]
+  id             String           @id @db.Uuid
+  name           String           @unique
+  roomStatus     ChatRoomStatus   @default(PUBLIC)
+  password       String?
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime         @db.Timestamptz(3)
+  ChatMessage    ChatMessage[]
+  ChatRoomMember ChatRoomMember[]
 }
 
-model ChatRoomUser {
-  chatRoomId String         @db.Uuid
-  userId     String         @db.Uuid
-  status     ChatUserStatus
-  ChatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id])
-  User       User           @relation(fields: [userId], references: [id])
+model ChatRoomMember {
+  chatRoomId   String               @db.Uuid
+  userId       String               @db.Uuid
+  memberStatus ChatRoomMemberStatus @default(NORMAL)
+  statusUntil  DateTime?            @db.Timestamptz(3)
+  ChatRoom     ChatRoom             @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  User         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([chatRoomId, userId])
 }
@@ -48,26 +51,26 @@ model ChatRoomUser {
 model Dm {
   id        String   @id @db.Uuid
   content   String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
   dmRoomId  String   @db.Uuid
   senderId  String   @db.Uuid
-  DmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id])
-  User      User     @relation(fields: [senderId], references: [id])
+  DmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 model DmRoom {
-  id         String       @id @db.Uuid
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime
-  Dm         Dm[]
-  DmRoomUser DmRoomUser[]
+  id           String         @id @db.Uuid
+  createdAt    DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime       @db.Timestamptz(3)
+  Dm           Dm[]
+  DmRoomMember DmRoomMember[]
 }
 
-model DmRoomUser {
+model DmRoomMember {
   dmRoomId String @db.Uuid
   userId   String @db.Uuid
-  DmRoom   DmRoom @relation(fields: [dmRoomId], references: [id])
-  User     User   @relation(fields: [userId], references: [id])
+  DmRoom   DmRoom @relation(fields: [dmRoomId], references: [id], onDelete: Cascade)
+  User     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([dmRoomId, userId])
 }
@@ -76,8 +79,8 @@ model FriendRequest {
   creatorId                           String              @db.Uuid
   receiverId                          String              @db.Uuid
   status                              FriendRequestStatus
-  createdAt                           DateTime            @default(now())
-  updatedAt                           DateTime
+  createdAt                           DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt                           DateTime            @db.Timestamptz(3)
   User_FriendRequest_creatorIdToUser  User                @relation("FriendRequest_creatorIdToUser", fields: [creatorId], references: [id])
   User_FriendRequest_receiverIdToUser User                @relation("FriendRequest_receiverIdToUser", fields: [receiverId], references: [id])
 
@@ -90,7 +93,7 @@ model MatchResult {
   playerTwoId                        String   @db.Uuid
   playerOneScore                     Int
   playerTwoScore                     Int
-  finishedAt                         DateTime @default(now())
+  finishedAt                         DateTime @default(now()) @db.Timestamptz(3)
   User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
   User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
 }
@@ -101,14 +104,14 @@ model User {
   avatarImageUrl                               String
   nickname                                     String               @unique
   onlineStatus                                 OnlineStatus         @default(ONLINE)
-  createdAt                                    DateTime             @default(now())
-  updatedAt                                    DateTime
+  createdAt                                    DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt                                    DateTime             @db.Timestamptz(3)
   Block_Block_sourceIdToUser                   Block[]              @relation("Block_sourceIdToUser")
   Block_Block_targetIdToUser                   Block[]              @relation("Block_targetIdToUser")
   ChatMessage                                  ChatMessage[]
-  ChatRoomUser                                 ChatRoomUser[]
+  ChatRoomMember                               ChatRoomMember[]
   Dm                                           Dm[]
-  DmRoomUser                                   DmRoomUser[]
+  DmRoomMember                                 DmRoomMember[]
   FriendRequest_FriendRequest_creatorIdToUser  FriendRequest[]      @relation("FriendRequest_creatorIdToUser")
   FriendRequest_FriendRequest_receiverIdToUser FriendRequest[]      @relation("FriendRequest_receiverIdToUser")
   MatchResult_MatchResult_playerOneIdToUser    MatchResult[]        @relation("MatchResult_playerOneIdToUser")
@@ -121,23 +124,31 @@ model OneTimePasswordAuth {
   isEnabled  Boolean  @default(false)
   qrcodeUrl  String?
   secret     String?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
   User       User     @relation(fields: [authUserId], references: [id])
 }
 
-enum ChatUserStatus {
-  OWNER
-  MEMBER
+enum ChatRoomMemberStatus {
+  ADMIN
+  MODERATOR
+  NORMAL
+  KICKED
+  BANNED
+  MUTED
 }
 
 enum FriendRequestStatus {
   PENDING
   ACCEPTED
-  DECLINED
 }
 
 enum OnlineStatus {
   ONLINE
   OFFLINE
   INGAME
+}
+
+enum ChatRoomStatus {
+  PUBLIC
+  PROTECTED
 }
