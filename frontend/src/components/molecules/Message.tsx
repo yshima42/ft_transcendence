@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 type Props = {
   id: string;
@@ -27,7 +28,13 @@ export const Message: React.FC<Props> = ({
       <C.Text fontSize="xs" color="gray.500">
         {new Date(createdAt).toLocaleString()}
       </C.Text>
-      <C.Avatar size="sm" name={name} src={avatarImageUrl} marginRight={2} />
+      <UserAvatar
+        id={id}
+        size="sm"
+        name={name}
+        src={avatarImageUrl}
+        marginRight={2}
+      />
       <C.Text>{content}</C.Text>
     </C.Box>
   );

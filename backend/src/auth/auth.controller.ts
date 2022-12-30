@@ -10,6 +10,7 @@ import {
   Query,
   Delete,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { CookieOptions } from 'csurf';
@@ -25,7 +26,14 @@ import { FtProfile } from './interfaces/ft-profile.interface';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService
+  ) {
+    this.frontendUrl = this.config.get<string>('FRONTEND_URL') as string;
+  }
+
+  private readonly frontendUrl: string;
 
   readonly cookieOptions: CookieOptions = {
     httpOnly: true,
@@ -41,7 +49,9 @@ export class AuthController {
 
   @Get('login/42/callback')
   @UseGuards(FtOauthGuard)
-  @Redirect('http://localhost:5173/app')
+  // decoratorの中でメンバ変数を使えないので空にしている
+  // 戻り値でオーバーライドされるので問題ない
+  @Redirect()
   async ftOauthCallback(
     @GetFtProfile() ftProfile: FtProfile,
     @Res({ passthrough: true }) res: Response
@@ -62,17 +72,19 @@ export class AuthController {
     console.log(accessToken);
 
     if (isSignUp) {
-      return { url: 'http://localhost:5173/sign-up' };
+      return { url: `${this.frontendUrl}/sign-up` };
     } else if (isOtpAuthEnabled) {
-      return { url: 'http://localhost:5173/otp' };
+      return { url: `${this.frontendUrl}/otp` };
     } else {
-      return { url: 'http://localhost:5173/app' };
+      return { url: `${this.frontendUrl}/app` };
     }
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('login/dummy')
-  @Redirect('http://localhost:5173/app')
+  // decoratorの中でメンバ変数を使えないので空にしている
+  // 戻り値でオーバーライドされるので問題ない
+  @Redirect()
   @ApiOperation({
     summary: 'seedで作ったdummy1~5のaccessTokenを取得(ログイン)',
   })
@@ -98,9 +110,9 @@ export class AuthController {
     res.cookie('accessToken', accessToken, this.cookieOptions);
 
     if (isOtpAuthEnabled) {
-      return { url: 'http://localhost:5173/otp' };
+      return { url: `${this.frontendUrl}/otp` };
     } else {
-      return { url: 'http://localhost:5173/app' };
+      return { url: `${this.frontendUrl}/app` };
     }
   }
 
@@ -197,7 +209,9 @@ export class AuthController {
    */
   @Get('otp/validation')
   @HttpCode(200)
-  @Redirect('http://localhost:5173/app')
+  // decoratorの中でメンバ変数を使えないので空にしている
+  // 戻り値でオーバーライドされるので問題ない
+  @Redirect()
   @UseGuards(JwtAuthGuard)
   async validateOtp(
     @GetUser() user: User,
@@ -209,7 +223,7 @@ export class AuthController {
       user
     );
     if (!isCodeValid) {
-      return { url: 'http://localhost:5173/' };
+      return { url: `${this.frontendUrl}` };
     }
 
     const { accessToken } = await this.authService.generateJwt(
@@ -220,6 +234,6 @@ export class AuthController {
 
     res.cookie('accessToken', accessToken, this.cookieOptions);
 
-    return { url: 'http://localhost:5173/app' };
+    return { url: `${this.frontendUrl}/app` };
   }
 }
