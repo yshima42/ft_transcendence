@@ -17,7 +17,7 @@ type Inputs = {
   password: string;
 };
 
-export const ChatRoomConfirmation: React.FC = React.memo(() => {
+const ChatRoomConfirmationForm: React.FC = React.memo(() => {
   const location = useLocation();
   const { chatRoomId, chatName, roomStatus } = location.state as State;
   const navigate = useNavigate();
@@ -55,6 +55,48 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
   };
 
   return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <C.FormControl isInvalid={errors.password != null}>
+        <C.FormLabel>Chat Room Name</C.FormLabel>
+        <C.Text>{chatName}</C.Text>
+        {roomStatus === ChatRoomStatus.PROTECTED && (
+          <>
+            <C.FormLabel>password</C.FormLabel>
+            <C.Input
+              placeholder="Password"
+              type="password"
+              {...register('password', {
+                required: 'password is required.',
+                minLength: {
+                  value: 8,
+                  message: 'password must be at least 8 characters.',
+                },
+                maxLength: {
+                  value: 128,
+                  message: 'password must be at most 128 characters.',
+                },
+              })}
+            />
+          </>
+        )}
+        {errors.password != null && (
+          <C.FormErrorMessage>{errors.password.message}</C.FormErrorMessage>
+        )}
+        <C.Button
+          type="submit"
+          colorScheme="teal"
+          mt={4}
+          isDisabled={isSubmitting}
+        >
+          Join
+        </C.Button>
+      </C.FormControl>
+    </form>
+  );
+});
+
+export const ChatRoomConfirmation: React.FC = React.memo(() => {
+  return (
     <ContentLayout title="Chat Room Confirmation">
       {/*
         statusがPUBLICの場合、 チャットルームへの参加確認
@@ -63,46 +105,9 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
         チャットルームへの参加は、axiosを使って行う。
         チャットルームのページに遷移する。
       */}
-      <C.Box>
-        <C.Heading>Join Chat Room</C.Heading>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <C.FormControl isInvalid={errors.password != null}>
-            <C.FormLabel>Chat Room Name</C.FormLabel>
-            <C.Text>{chatName}</C.Text>
-            {roomStatus === ChatRoomStatus.PROTECTED && (
-              <>
-                <C.FormLabel>password</C.FormLabel>
-                <C.Input
-                  placeholder="Password"
-                  type="password"
-                  {...register('password', {
-                    required: 'password is required.',
-                    minLength: {
-                      value: 8,
-                      message: 'password must be at least 8 characters.',
-                    },
-                    maxLength: {
-                      value: 128,
-                      message: 'password must be at most 128 characters.',
-                    },
-                  })}
-                />
-              </>
-            )}
-            {errors.password != null && (
-              <C.FormErrorMessage>{errors.password.message}</C.FormErrorMessage>
-            )}
-            <C.Button
-              type="submit"
-              colorScheme="teal"
-              mt={4}
-              isDisabled={isSubmitting}
-            >
-              Join
-            </C.Button>
-          </C.FormControl>
-        </form>
-      </C.Box>
+      <C.Heading>Join Chat Room</C.Heading>
+      <C.Divider my={4} />
+      <ChatRoomConfirmationForm />
     </ContentLayout>
   );
 });
