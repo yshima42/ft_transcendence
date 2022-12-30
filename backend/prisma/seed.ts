@@ -10,6 +10,7 @@ import {
   DmRoomMember,
   Dm,
   MatchResult,
+  OneTimePasswordAuth,
   ChatRoomStatus,
 } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
@@ -55,6 +56,20 @@ idMap.forEach((value, key) => {
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
+  });
+});
+
+/**
+ * user全員のotpAuthのレコードを作成。
+ */
+const otpAuthData: OneTimePasswordAuth[] = [];
+userData.forEach((value) => {
+  otpAuthData.push({
+    authUserId: value.id,
+    isEnabled: false,
+    qrcodeUrl: null,
+    secret: null,
+    createdAt: new Date(),
   });
 });
 
@@ -311,6 +326,9 @@ const main = async () => {
 
   await prisma.user.createMany({
     data: userData,
+  });
+  await prisma.oneTimePasswordAuth.createMany({
+    data: otpAuthData,
   });
   // await prisma.friendRequest.createMany({
   //   data: friendRequestData,
