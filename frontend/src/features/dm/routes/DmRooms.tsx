@@ -1,54 +1,37 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { axios } from 'lib/axios';
+import { useDmRooms } from 'hooks/api/dm/useDmRooms';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 
-type ResponseDmRoom = {
-  id: string;
-  dmRoomUsers: Array<{
-    user: {
-      name: string;
-      avatarImageUrl: string;
-    };
-  }>;
-  dms: Array<{
-    content: string;
-    createdAt: Date;
-  }>;
-};
-
 export const DmRooms: React.FC = React.memo(() => {
-  const [dmRooms, setDmRooms] = React.useState<ResponseDmRoom[]>([]);
-
-  async function getAllDmRoom(): Promise<void> {
-    const res: { data: ResponseDmRoom[] } = await axios.get('/dm/room/me');
-    setDmRooms(res.data);
-  }
-
-  React.useEffect(() => {
-    getAllDmRoom().catch((err) => console.error(err));
-  }, []);
+  const { dmRooms } = useDmRooms();
 
   return (
     <>
       <ContentLayout title="Direct Message">
         <C.List spacing={3}>
+          {dmRooms.length === 0 && (
+            <C.ListItem>
+              <C.Text>DmRoom is not found</C.Text>
+            </C.ListItem>
+          )}
           {dmRooms.map((dmRoom) => (
             <C.ListItem key={dmRoom.id}>
-              <Link to={`${dmRoom.id}`} state={{ id: dmRoom.id }}>
+              <Link to={`${dmRoom.id}`} state={{ dmRoomId: dmRoom.id }}>
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
                     <C.Box>
-                      <C.Text fontSize="sm">
-                        {new Date(dmRoom.dms[0].createdAt).toLocaleString()}
-                      </C.Text>
-                      <C.Heading fontSize="xl">{`${dmRoom.dmRoomUsers[0].user.name}`}</C.Heading>
-                      <C.Avatar
-                        size="md"
-                        name={`${dmRoom.dmRoomUsers[0].user.name}`}
-                        src={`${dmRoom.dmRoomUsers[0].user.avatarImageUrl}`}
-                      />
+                      {/* 投稿がない場合は何も表示しない */}
+                      {dmRoom.dms.length !== 0 && (
+                        <C.Text
+                          fontSize="sm"
+                          data-testid="chat-room-created-at"
+                        >
+                          {new Date(dmRoom.dms[0].createdAt).toLocaleString()}
+                        </C.Text>
+                      )}
+                      <C.Heading fontSize="xl">{`${dmRoom.dmRoomMembers[0].user.name}`}</C.Heading>
                     </C.Box>
                   </C.Flex>
                 </C.Box>

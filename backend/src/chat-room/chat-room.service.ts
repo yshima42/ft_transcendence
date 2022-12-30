@@ -1,5 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ChatRoom } from '@prisma/client';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
+import * as NestJS from '@nestjs/common';
+import { ChatRoom, ChatRoomMemberStatus, ChatRoomStatus } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import * as bcrypt from 'bcrypt';
+import { ChatRoomMemberService } from 'src/chat-room-member/chat-room-member.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
@@ -7,26 +11,73 @@ import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @Injectable()
 export class ChatRoomService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => ChatRoomMemberService))
+    private readonly chatRoomMemberService: ChatRoomMemberService
+  ) {}
 
-  async create(createChatroomDto: CreateChatRoomDto): Promise<ChatRoom> {
-    const { name } = createChatroomDto;
+  async create(
+    createChatroomDto: CreateChatRoomDto,
+    userId: string
+  ): Promise<Omit<ChatRoom, 'password'>> {
+    const { name, password } = createChatroomDto;
+    Logger.debug(`createChatRoom: ${JSON.stringify(createChatroomDto)}`);
 
-    const chatRoom = await this.prisma.chatRoom.create({
-      data: {
-        name,
-      },
-    });
-    Logger.debug(`createChatRoom: ${JSON.stringify(chatRoom)}`);
+    let hashedPassword: string | undefined;
+    if (password !== undefined) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+    try {
+      const chatRoom = await this.prisma.chatRoom.create({
+        data: {
+          name,
+          roomStatus:
+            password === undefined
+              ? ChatRoomStatus.PUBLIC
+              : ChatRoomStatus.PROTECTED,
+          password: hashedPassword,
+          chatRoomMembers: {
+            create: {
+              userId,
+              memberStatus: ChatRoomMemberStatus.ADMIN,
+            },
+          },
+        },
+      });
+      Logger.debug(`createChatRoom: ${JSON.stringify(chatRoom)}`);
 
-    return chatRoom;
+      return chatRoom;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          Logger.warn(`createChatRoom: chatRoom is already exists`);
+          throw new NestJS.HttpException(
+            'ChatRoom is already exists',
+            NestJS.HttpStatus.CONFLICT
+          );
+        }
+      }
+      throw error;
+    }
   }
 
-  async findAll(): Promise<ResponseChatRoom[]> {
+  // 自分が入っていないチャット全部
+  async findAllWithOutMe(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
+      where: {
+        chatRoomMembers: {
+          every: {
+            userId: {
+              not: userId,
+            },
+          },
+        },
+      },
       select: {
         id: true,
         name: true,
+        roomStatus: true,
         chatMessages: {
           select: {
             content: true,
@@ -39,56 +90,179 @@ export class ChatRoomService {
         },
       },
     });
-    Logger.debug(`findAllChatRoom: ${JSON.stringify(chatRooms)}`);
+    Logger.debug(
+      `chat-room.service: findAllWithOutMe: ${JSON.stringify(
+        chatRooms,
+        null,
+        2
+      )}`
+    );
 
     return chatRooms;
   }
 
-  async findOne(id: string): Promise<ChatRoom> {
-    const chatRoom = await this.prisma.chatRoom.findUnique({
+  // 自分が入っているチャット全部 自分のステータスがBANのものは除く
+  async findAllByMe(userId: string): Promise<ResponseChatRoom[]> {
+    const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
-        id,
+        chatRoomMembers: {
+          some: {
+            userId,
+            memberStatus: {
+              not: ChatRoomMemberStatus.BANNED,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        roomStatus: true,
+        chatMessages: {
+          select: {
+            content: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+        },
       },
     });
-    Logger.debug(`findOneChatRoom: ${JSON.stringify(chatRoom)}`);
+    Logger.debug(
+      `chat-room.service: findAllByMe: ${JSON.stringify(chatRooms, null, 2)}`
+    );
 
+    return chatRooms;
+  }
+
+  // findOne
+  async findOne(chatRoomId: string): Promise<ChatRoom> {
+    Logger.debug(`chat-room.service: findOne: ${chatRoomId}`);
+    const chatRoom = await this.prisma.chatRoom.findUnique({
+      where: {
+        id: chatRoomId,
+      },
+    });
     if (chatRoom === null) {
-      Logger.warn(`findOneChatRoom: chatRoom is null`);
-
-      throw new Error('ChatRoom not found');
+      Logger.warn(`findOneChatRoom: chatRoom is not found`);
+      throw new NestJS.HttpException(
+        'ChatRoom is not found',
+        NestJS.HttpStatus.NOT_FOUND
+      );
     }
+    Logger.debug(
+      `chat-room.service: findOne: ${JSON.stringify(chatRoom, null, 2)}`
+    );
 
     return chatRoom;
   }
 
   // update
   async update(
-    id: string,
-    updateChatroomDto: UpdateChatRoomDto
+    chatRoomId: string,
+    updateChatroomDto: UpdateChatRoomDto,
+    userId: string
   ): Promise<ChatRoom> {
-    const { name } = updateChatroomDto;
+    const { password } = updateChatroomDto;
+    Logger.debug(
+      `chat-room.service: update: ${JSON.stringify(updateChatroomDto, null, 2)}`
+    );
+    let hashedPassword: string | undefined;
+    if (password !== undefined) {
+      Logger.debug(`updateChatRoom: password is not undefined`);
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+    // userのチャットでの権限を取得
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    if (chatRoomMember === null) {
+      Logger.warn(
+        `chat-room.service.ts: update: user is not in chatRoom: ${chatRoomId}`
+      );
+
+      throw new NestJS.HttpException(
+        'User is not in chatRoom',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
+    // もしADMINじゃなかったらエラー
+    if (chatRoomMember?.memberStatus !== ChatRoomMemberStatus.ADMIN) {
+      Logger.warn(`chat-room.service: update: user is not admin ${userId}`);
+
+      throw new NestJS.HttpException(
+        'User is not admin',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
 
     const chatRoom = await this.prisma.chatRoom.update({
       where: {
-        id,
+        id: chatRoomId,
       },
       data: {
-        name,
+        password: hashedPassword,
+        roomStatus:
+          password === undefined
+            ? ChatRoomStatus.PUBLIC
+            : ChatRoomStatus.PROTECTED,
       },
     });
-    Logger.debug(`updateChatRoom: ${JSON.stringify(chatRoom)}`);
+    Logger.debug(
+      `chat-room.service: update: ${JSON.stringify(chatRoom, null, 2)}`
+    );
 
     return chatRoom;
   }
 
   // remove
-  async remove(id: string): Promise<ChatRoom> {
+  async remove(chatRoomId: string, memberId: string): Promise<ChatRoom> {
+    Logger.debug(
+      `chat-room.service.ts: removeChatRoom: ${chatRoomId} ${memberId}`
+    );
+    // userのチャットでの権限を取得
+    const loginChatRoomMember = await this.chatRoomMemberService.findOne(
+      chatRoomId,
+      memberId
+    );
+    if (loginChatRoomMember === undefined) {
+      Logger.warn(
+        `chat-room.service.ts: removeChatRoom: user is not in chatRoom`
+      );
+
+      throw new NestJS.HttpException(
+        'User is not in chatRoom',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
+    // もしADMINじゃなかったらエラー
+    if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.ADMIN) {
+      Logger.warn(`chat-room.service.ts: removeChatRoom: user is not admin`);
+
+      throw new NestJS.HttpException(
+        'User is not admin',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
     const chatRoom = await this.prisma.chatRoom.delete({
       where: {
-        id,
+        id: chatRoomId,
       },
     });
-    Logger.debug(`removeChatRoom: ${JSON.stringify(chatRoom)}`);
+    Logger.debug(
+      `chat-room.service.ts: removeChatRoom: ${JSON.stringify(
+        chatRoom,
+        null,
+        2
+      )}`
+    );
 
     return chatRoom;
   }
