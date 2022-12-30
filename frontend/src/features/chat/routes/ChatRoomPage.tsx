@@ -15,7 +15,6 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
 import { AlertModal } from 'features/chat/components/atoms/AlertModal';
-import { Spinner } from 'features/chat/components/atoms/Spinner';
 
 type State = {
   chatRoomId: string;
@@ -27,7 +26,6 @@ export const ChatRoomPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
   const {
     data: chatLoginUserData,
-    isLoading: isLoadingChatLoginUser,
     isError: isErrorChatLoginUser,
     error: errorChatLoginUser,
   } = useGetApi2<ResponseChatRoomMember>(
@@ -36,11 +34,9 @@ export const ChatRoomPage: React.FC = React.memo(() => {
   useGetApi2<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
   const {
     data: chatRoomData,
-    isLoading: isLoadingChatRoom,
     isError: isErrorChatRoom,
     error: errorChatRoom,
   } = useGetApi2<ResponseChatRoomMemberStatus>(`/chat/rooms/${chatRoomId}`);
-  if (isLoadingChatLoginUser || isLoadingChatRoom) return <Spinner />;
   if (isErrorChatLoginUser)
     return <AlertModal error={errorChatLoginUser as Error} />;
   if (isErrorChatRoom) return <AlertModal error={errorChatRoom as Error} />;

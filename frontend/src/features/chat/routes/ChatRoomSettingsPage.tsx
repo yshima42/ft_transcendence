@@ -1,46 +1,59 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomMemberStatus, ChatRoomStatus } from '@prisma/client';
+import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import { useChangeChatRoomMemberStatus } from 'features/chat/hooks/useChangeChatRoomMemberStatus';
 import { useChatLoginUser } from 'features/chat/hooks/useChatLoginUser';
-import { useChatMembers } from 'features/chat/hooks/useChatMembers';
 import { useDeleteChatRoom } from 'features/chat/hooks/useDeleteChatRoom';
 import { useExitChatRoom } from 'features/chat/hooks/useExitChatRoom';
+import {
+  ResponseChatMessage,
+  ResponseChatRoomMember,
+  ResponseChatRoomMemberStatus,
+} from 'features/chat/types/chat';
+import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { useSocket } from 'hooks/socket/useSocket';
-import { useLocation } from 'react-router-dom';
+import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+import { AlertModal } from 'features/chat/components/atoms/AlertModal';
+import { Spinner } from 'features/chat/components/atoms/Spinner';
 import { ChatRoomMemberActionTimeSetModal } from 'features/chat/components/organisms/ChatRoomMemberActionTimeSetModal';
 import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomMemberList';
 import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
-
-type State = {
-  chatRoomId: string;
-  chatName: string;
-  roomStatus: ChatRoomStatus;
-};
 
 export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
     autoConnect: false,
   });
-  const location = useLocation();
-  const { chatRoomId, chatName, roomStatus } = location.state as State;
-  const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
-  const { chatMembers, getChatMembers } = useChatMembers(chatRoomId);
+  const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
+  const {
+    data: chatLoginUserData,
+    isError: isErrorChatLoginUser,
+    error: errorChatLoginUser,
+  } = useGetApi2<ResponseChatRoomMember>(
+    `/chat/rooms/${chatRoomId}/members/me`
+  );
+  useGetApi2<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
+  const {
+    data: chatRoomData,
+    isError: isErrorChatRoom,
+    error: errorChatRoom,
+  } = useGetApi2<ResponseChatRoomMemberStatus>(`/chat/rooms/${chatRoomId}`);
+  const {
+    data: chatMembersData,
+    isError: isErrorChatMembers,
+    error: errorChatMembers,
+    refetch: refetchChatMembers,
+  } = useGetApi2<ResponseChatMessage[]>(`/chat/rooms/${chatRoomId}/members`);
   const { isOpen, onClose, changeChatRoomMemberStatus, setSelectedLimitTime } =
     useChangeChatRoomMemberStatus(chatRoomId, socket);
-
   React.useEffect(() => {
     const fetchDate = async () => {
       try {
-        await getChatLoginUser();
-        await getChatMembers();
+        await refetchChatMembers();
       } catch (err) {
         console.log(err);
       }
     };
-    void fetchDate();
-
     // webSocket
     socket.emit('join_room_member', chatRoomId);
     // webSocketのイベントを受け取る関数を登録
@@ -52,23 +65,32 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
     };
   }, []);
 
+  if (isErrorChatLoginUser)
+    return <AlertModal error={errorChatLoginUser as Error} />;
+  if (isErrorChatRoom) return <AlertModal error={errorChatRoom as Error} />;
+  if (isErrorChatMembers)
+    return <AlertModal error={errorChatMembers as Error} />;
+  const chatLoginUser = chatLoginUserData as ResponseChatRoomMember;
+  const chatMembers = chatMembersData as ResponseChatRoomMember[];
+  const { name: chatName, roomStatus } = chatRoomData as ChatRoom;
+
   return (
     <>
       <ContentLayout title="Chat Room Settings">
-        <C.Accordion allowToggle>
-          {/* ChatRoomMemberListAccordion */}
-          {chatLoginUser !== undefined && chatMembers !== undefined && (
-            <CustomAccordion title="Chat Members">
-              <ChatRoomMemberList
-                chatLoginUser={chatLoginUser}
-                chatMembers={chatMembers}
-                changeChatRoomMemberStatus={changeChatRoomMemberStatus}
-              />
-            </CustomAccordion>
-          )}
-          {/* SecurityAccordion */}
-          {chatLoginUser !== undefined &&
-            chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
+        <React.Suspense fallback={<Spinner />}>
+          <C.Accordion allowToggle>
+            {/* ChatRoomMemberListAccordion */}
+            {
+              <CustomAccordion title="Chat Members">
+                <ChatRoomMemberList
+                  chatLoginUser={chatLoginUser}
+                  chatMembers={chatMembers}
+                  changeChatRoomMemberStatus={changeChatRoomMemberStatus}
+                />
+              </CustomAccordion>
+            }
+            {/* SecurityAccordion */}
+            {chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
               <CustomAccordion title="Security">
                 <SecurityAccordionItem
                   roomStatus={roomStatus}
@@ -77,10 +99,11 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
                 />
               </CustomAccordion>
             )}
-        </C.Accordion>
-        {/* 退出ボタン */}
-        {/* ADMINにはDeleteボタンを表示する */}
-        <LeaveButton chatRoomId={chatRoomId} chatLoginUser={chatLoginUser} />
+          </C.Accordion>
+          {/* 退出ボタン */}
+          {/* ADMINにはDeleteボタンを表示する */}
+          <LeaveButton chatRoomId={chatRoomId} chatLoginUser={chatLoginUser} />
+        </React.Suspense>
       </ContentLayout>
       <ChatRoomMemberActionTimeSetModal
         isOpen={isOpen}

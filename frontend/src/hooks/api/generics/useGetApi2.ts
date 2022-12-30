@@ -10,5 +10,5 @@ export function useGetApi2<ResBody>(
     return result.data;
   };
 
-  return useQuery<ResBody>([endpoint], axiosGet);
+  return useQuery<ResBody>([endpoint], axiosGet, { suspense: true });
 }
