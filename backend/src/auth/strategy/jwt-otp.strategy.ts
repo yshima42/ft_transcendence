@@ -32,11 +32,21 @@ export class JwtOtpStrategy extends PassportStrategy(Strategy, 'jwt-otp') {
     isOtpValid: boolean;
   }): Promise<{ user: User }> {
     const { id, isOtpValid } = payload;
-    const user = await this.prismaService.user.findUnique({ where: { id } });
-    if (user === null) throw new UnauthorizedException();
-    const isOtpAuthEnabled = await this.authService.isOtpAuthEnabled(user.id);
-
-    if (isOtpAuthEnabled && !isOtpValid) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+      include: {
+        oneTimePasswordAuth: {
+          select: {
+            isEnabled: true,
+          },
+        },
+      },
+    });
+    if (
+      user === null ||
+      user.oneTimePasswordAuth === null ||
+      (user.oneTimePasswordAuth.isEnabled && !isOtpValid)
+    ) {
       throw new UnauthorizedException();
     }
 

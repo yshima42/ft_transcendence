@@ -26,8 +26,9 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "OneTimePasswordAuth" (
     "authUserId" UUID NOT NULL,
-    "qrcodeUrl" TEXT NOT NULL,
-    "secret" TEXT NOT NULL,
+    "isEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "qrcodeUrl" TEXT,
+    "secret" TEXT,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "OneTimePasswordAuth_pkey" PRIMARY KEY ("authUserId")
