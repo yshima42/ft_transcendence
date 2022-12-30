@@ -15,7 +15,6 @@ import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { AlertModal } from 'features/chat/components/atoms/AlertModal';
-import { Spinner } from 'features/chat/components/atoms/Spinner';
 import { ChatRoomMemberActionTimeSetModal } from 'features/chat/components/organisms/ChatRoomMemberActionTimeSetModal';
 import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomMemberList';
 import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
@@ -77,33 +76,31 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   return (
     <>
       <ContentLayout title="Chat Room Settings">
-        <React.Suspense fallback={<Spinner />}>
-          <C.Accordion allowToggle>
-            {/* ChatRoomMemberListAccordion */}
-            {
-              <CustomAccordion title="Chat Members">
-                <ChatRoomMemberList
-                  chatLoginUser={chatLoginUser}
-                  chatMembers={chatMembers}
-                  changeChatRoomMemberStatus={changeChatRoomMemberStatus}
-                />
-              </CustomAccordion>
-            }
-            {/* SecurityAccordion */}
-            {chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
-              <CustomAccordion title="Security">
-                <SecurityAccordionItem
-                  roomStatus={roomStatus}
-                  chatRoomId={chatRoomId}
-                  chatName={chatName}
-                />
-              </CustomAccordion>
-            )}
-          </C.Accordion>
-          {/* 退出ボタン */}
-          {/* ADMINにはDeleteボタンを表示する */}
-          <LeaveButton chatRoomId={chatRoomId} chatLoginUser={chatLoginUser} />
-        </React.Suspense>
+        <C.Accordion allowToggle>
+          {/* ChatRoomMemberListAccordion */}
+          {
+            <CustomAccordion title="Chat Members">
+              <ChatRoomMemberList
+                chatLoginUser={chatLoginUser}
+                chatMembers={chatMembers}
+                changeChatRoomMemberStatus={changeChatRoomMemberStatus}
+              />
+            </CustomAccordion>
+          }
+          {/* SecurityAccordion */}
+          {chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
+            <CustomAccordion title="Security">
+              <SecurityAccordionItem
+                roomStatus={roomStatus}
+                chatRoomId={chatRoomId}
+                chatName={chatName}
+              />
+            </CustomAccordion>
+          )}
+        </C.Accordion>
+        {/* 退出ボタン */}
+        {/* ADMINにはDeleteボタンを表示する */}
+        <LeaveButton chatRoomId={chatRoomId} chatLoginUser={chatLoginUser} />
       </ContentLayout>
       <ChatRoomMemberActionTimeSetModal
         isOpen={isOpen}

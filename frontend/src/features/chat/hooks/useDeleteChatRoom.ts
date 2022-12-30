@@ -9,7 +9,7 @@ export const useDeleteChatRoom = (
   const navigate = useNavigate();
   async function deleteChatRoom() {
     await axios.delete(`/chat/rooms/${chatRoomId}`);
-    navigate('/app/chat/me');
+    navigate('/app/chat/rooms/me');
   }
 
   return { deleteChatRoom };
