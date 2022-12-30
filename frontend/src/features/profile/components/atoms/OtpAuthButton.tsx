@@ -1,24 +1,27 @@
 import { FC, memo, useState } from 'react';
 import { Button } from '@chakra-ui/react';
-import { useOtpAuthCreate } from 'hooks/api';
-import { useIsOtpAuthEnabled } from 'hooks/api/auth/useIsOtpAuthEnabled';
-import { useOtpAuthDelete } from 'hooks/api/auth/useOtpAuthDelete';
+import { useOtpAuthQrcodeCreate } from 'hooks/api';
+import { useOtpAuth } from 'hooks/api/auth/useOtpAuth';
+import { useOtpAuthInactivate } from 'hooks/api/auth/useOtpAuthInactivate';
 import { OtpQrcodeModal } from '../organisms/OtpQrcodeModal';
 
 export const OtpAuthButton: FC = memo(() => {
-  const { isOtpAuthEnabled } = useIsOtpAuthEnabled();
-  const { createOtpAuth } = useOtpAuthCreate();
-  const { deleteOtpAuth } = useOtpAuthDelete();
+  const { isEnabled: isOtpAuthEnabled, qrcodeUrl } = useOtpAuth();
+  const { createOtpAuthQrcodeUrl, isLoading: isLoadingCreate } =
+    useOtpAuthQrcodeCreate();
+  const { inactivateOtpAuth, isLoading: isLoadingInactivate } =
+    useOtpAuthInactivate();
+
   const [showFlag, setShowFlag] = useState(false);
 
-  const onClickInactivate = async () => {
-    await deleteOtpAuth();
-    setShowFlag(false);
+  const onClickInactive = async () => {
+    await createOtpAuthQrcodeUrl({});
+    setShowFlag(true);
   };
 
-  const onClickActivate = async () => {
-    await createOtpAuth({});
-    setShowFlag(true);
+  const onClickActive = async () => {
+    await inactivateOtpAuth({});
+    setShowFlag(false);
   };
 
   const onCloseModal = () => {
@@ -27,21 +30,33 @@ export const OtpAuthButton: FC = memo(() => {
 
   return (
     <>
-      {isOtpAuthEnabled ? (
+      {!isOtpAuthEnabled ? (
+        <Button
+          size="xs"
+          fontSize="xs"
+          bg="red.200"
+          isDisabled={isLoadingCreate}
+          onClick={onClickInactive}
+        >
+          inactive
+        </Button>
+      ) : (
         <Button
           size="xs"
           fontSize="xs"
           bg="green.200"
-          onClick={onClickInactivate}
+          isDisabled={isLoadingInactivate}
+          onClick={onClickActive}
         >
           active
         </Button>
-      ) : (
-        <Button size="xs" fontSize="xs" bg="red.200" onClick={onClickActivate}>
-          inactive
-        </Button>
       )}
-      <OtpQrcodeModal isOpen={showFlag} onCloseModal={onCloseModal} />
+
+      <OtpQrcodeModal
+        isOpen={showFlag}
+        onCloseModal={onCloseModal}
+        qrcodeUrl={qrcodeUrl}
+      />
     </>
   );
 });
