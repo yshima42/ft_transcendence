@@ -107,15 +107,21 @@ export const ChatRoom: React.FC = React.memo(() => {
         {/* メッセージ送信フォーム  loginUserがMUTEDのときは送信できないようにする */}
         {chatLoginUser == null ? null : chatLoginUser.memberStatus ===
           ChatRoomMemberStatus.MUTED ? (
-          <C.Alert status="warning" mb={4}>
-            <C.AlertIcon />
-            You are muted.
-          </C.Alert>
+          <ChatRoomMutedAlert />
         ) : (
           <MessageSendForm sendMessage={sendMessage} />
         )}
       </ContentLayout>
     </>
+  );
+});
+
+const ChatRoomMutedAlert: React.FC = React.memo(() => {
+  return (
+    <C.Alert status="warning" mb={4}>
+      <C.AlertIcon />
+      You are muted.
+    </C.Alert>
   );
 });
 
