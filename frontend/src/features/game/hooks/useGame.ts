@@ -187,7 +187,9 @@ export const useGame = (
   useEffect(() => {
     switch (gamePhase) {
       case GamePhase.SocketConnecting: {
-        if (connected) setGamePhase(GamePhase.Joining);
+        if (connected) {
+          setGamePhase(GamePhase.Joining);
+        }
         break;
       }
       case GamePhase.Joining: {
