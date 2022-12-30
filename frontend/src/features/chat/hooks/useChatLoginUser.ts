@@ -7,7 +7,7 @@ export const useChatLoginUser = (
   chatRoomId: string
 ): {
   chatLoginUser: ResponseChatRoomMember | undefined;
-  getChatLoginUser: () => Promise<ResponseChatRoomMember | undefined>;
+  getChatLoginUser: () => Promise<void>;
 } => {
   const navigate = useNavigate();
   const [chatLoginUser, setChatLoginUser] =
@@ -25,7 +25,7 @@ export const useChatLoginUser = (
       }
       setChatLoginUser(res.data);
 
-      return res.data;
+      return;
     } catch (e) {
       navigate('/app/chat/me');
     }

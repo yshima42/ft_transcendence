@@ -4,72 +4,15 @@ import { ResponseChatRoom } from 'features/chat/types/chat';
 import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-
-const CreateChatRoomButton: React.FC = React.memo(() => (
-  <C.Button
-    colorScheme="blue"
-    as={Link}
-    to="create"
-    data-testid="create-chat-room"
-  >
-    Create Chat Room
-  </C.Button>
-));
-
-const ChatRoomBox: React.FC<{ chatRoom: ResponseChatRoom }> = React.memo(
-  ({ chatRoom }) => (
-    <C.Box p={5} shadow="md" borderWidth="1px">
-      {/* 投稿がない場合は何も表示しない */}
-      {chatRoom.chatMessages.length !== 0 && (
-        <C.Text fontSize="sm" data-testid="chat-room-created-at">
-          {new Date(chatRoom.chatMessages[0].createdAt).toLocaleString()}
-        </C.Text>
-      )}
-      <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
-      {/* PROTECTED の場合 */}
-      {chatRoom.roomStatus === 'PROTECTED' && (
-        <C.Badge colorScheme="red" data-testid="chat-room-room-status">
-          PROTECTED
-        </C.Badge>
-      )}
-    </C.Box>
-  )
-);
-
-const AlertModal: React.FC<{ error: Error }> = React.memo(({ error }) => {
-  const [isOpen, setIsOpen] = React.useState(true);
-  const onClose = () => setIsOpen(false);
-
-  return (
-    <C.Modal isOpen={isOpen} onClose={onClose} isCentered>
-      <C.ModalOverlay />
-      <C.ModalContent>
-        <C.ModalHeader>エラー</C.ModalHeader>
-        <C.ModalCloseButton />
-        <C.ModalBody>{error.message}</C.ModalBody>
-        <C.ModalFooter>
-          <C.Button colorScheme="blue" mr={3} onClick={onClose}>
-            閉じる
-          </C.Button>
-        </C.ModalFooter>
-      </C.ModalContent>
-    </C.Modal>
-  );
-});
+import { AlertModal } from 'features/chat/components/atoms/AlertModal';
+import { Spinner } from 'features/chat/components/atoms/Spinner';
+import { ChatRoomBox } from 'features/chat/components/organisms/ChatRoomBox';
 
 const ChatRoomList: React.FC = React.memo(() => {
   const { data, isLoading, isError, error } =
     useGetApi2<ResponseChatRoom[]>('/chat/rooms');
-  if (isLoading) {
-    return (
-      <C.Center h="50vh">
-        <C.Spinner />
-      </C.Center>
-    );
-  }
-  if (isError) {
-    return <AlertModal error={error as Error} />;
-  }
+  if (isLoading) return <Spinner />;
+  if (isError) return <AlertModal error={error as Error} />;
 
   const chatRooms = data as ResponseChatRoom[];
 
@@ -99,12 +42,6 @@ const ChatRoomList: React.FC = React.memo(() => {
   );
 });
 
-const ChatRoomsHeader: React.FC = React.memo(() => (
-  <C.Flex justifyContent="flex-end" mb={4}>
-    <CreateChatRoomButton />
-  </C.Flex>
-));
-
 export const ChatRooms: React.FC = React.memo(() => {
   return (
     <>
@@ -116,3 +53,16 @@ export const ChatRooms: React.FC = React.memo(() => {
     </>
   );
 });
+
+const ChatRoomsHeader: React.FC = React.memo(() => (
+  <C.Flex justifyContent="flex-end" mb={4}>
+    <C.Button
+      colorScheme="blue"
+      as={Link}
+      to="create"
+      data-testid="create-chat-room"
+    >
+      Create Chat Room
+    </C.Button>
+  </C.Flex>
+));
