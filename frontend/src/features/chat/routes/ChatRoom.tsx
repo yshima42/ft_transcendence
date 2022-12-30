@@ -6,7 +6,7 @@ import { ResponseChatMessage } from 'features/chat/types/chat';
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';
-import { useLocation, Link } from 'react-router-dom';
+import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -21,7 +21,7 @@ export const ChatRoom: React.FC = React.memo(() => {
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
     autoConnect: false,
   });
-  const location = useLocation();
+  const location = ReactRouter.useLocation();
   const { chatRoomId, chatName, roomStatus } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
   const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
@@ -82,7 +82,7 @@ export const ChatRoom: React.FC = React.memo(() => {
         {/* チャットの設定ボタン */}
         <C.Flex justifyContent="flex-end" mb={4}>
           <C.Link
-            as={Link}
+            as={ReactRouter.Link}
             to={`/app/chat/rooms/${chatRoomId}/settings`}
             state={{ chatRoomId, chatName, roomStatus }}
           >
