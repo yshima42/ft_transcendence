@@ -99,13 +99,17 @@ const ChatRoomList: React.FC = React.memo(() => {
   );
 });
 
+const ChatRoomsHeader: React.FC = React.memo(() => (
+  <C.Flex justifyContent="flex-end" mb={4}>
+    <CreateChatRoomButton />
+  </C.Flex>
+));
+
 export const ChatRooms: React.FC = React.memo(() => {
   return (
     <>
       <ContentLayout title="Chat">
-        <C.Flex justifyContent="flex-end" mb={4}>
-          <CreateChatRoomButton />
-        </C.Flex>
+        <ChatRoomsHeader />
         <C.Divider />
         <ChatRoomList />
       </ContentLayout>
