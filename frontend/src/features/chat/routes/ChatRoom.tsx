@@ -22,7 +22,7 @@ export const ChatRoom: React.FC = React.memo(() => {
     autoConnect: false,
   });
   const location = ReactRouter.useLocation();
-  const { chatRoomId, chatName, roomStatus } = location.state as State;
+  const { chatRoomId, chatName } = location.state as State;
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
   const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
@@ -80,15 +80,7 @@ export const ChatRoom: React.FC = React.memo(() => {
     <>
       <ContentLayout title={chatName}>
         {/* チャットの設定ボタン */}
-        <C.Flex justifyContent="flex-end" mb={4}>
-          <C.Link
-            as={ReactRouter.Link}
-            to={`/app/chat/rooms/${chatRoomId}/settings`}
-            state={{ chatRoomId, chatName, roomStatus }}
-          >
-            <C.Button colorScheme="blue">Settings</C.Button>
-          </C.Link>
-        </C.Flex>
+        <ChatRoomHeader />
         <C.Divider />
         <C.Flex
           flexDir="column"
@@ -124,5 +116,22 @@ export const ChatRoom: React.FC = React.memo(() => {
         )}
       </ContentLayout>
     </>
+  );
+});
+
+const ChatRoomHeader: React.FC = React.memo(() => {
+  const location = ReactRouter.useLocation();
+  const { chatRoomId, chatName, roomStatus } = location.state as State;
+
+  return (
+    <C.Flex justifyContent="flex-end" mb={4}>
+      <C.Link
+        as={ReactRouter.Link}
+        to={`/app/chat/rooms/${chatRoomId}/settings`}
+        state={{ chatRoomId, chatName, roomStatus }}
+      >
+        <C.Button colorScheme="blue">Settings</C.Button>
+      </C.Link>
+    </C.Flex>
   );
 });
