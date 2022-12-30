@@ -221,6 +221,7 @@ export class UsersGateway {
     const gameInfo = {
       player1: { id: player1.id, score: player1.score },
       player2: { id: player2.id, score: player2.score },
+      isPlayer,
       isLeftSide: true,
       readyCountDownNum: gameRoom.readyCountDownNum,
       nextGamePhase: GamePhase.ConfirmWaiting,
