@@ -2,7 +2,10 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatRoomMemberStatus } from '@prisma/client';
 import { useChatLoginUser } from 'features/chat/hooks/useChatLoginUser';
-import { ResponseChatMessage } from 'features/chat/types/chat';
+import {
+  ResponseChatMessage,
+  ResponseChatRoomMember,
+} from 'features/chat/types/chat';
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';
@@ -57,14 +60,6 @@ export const ChatRoom: React.FC = React.memo(() => {
     );
     setMessages(res.data);
   }
-  // 送信ボタンを押したときの処理
-  function sendMessage(content: string): void {
-    if (chatLoginUser == null) return;
-    socket.emit('send_message', {
-      createChatMessageDto: { content },
-      chatRoomId,
-    });
-  }
 
   React.useEffect(() => {
     getAllChatMessage().catch((err) => console.error(err));
@@ -104,24 +99,11 @@ export const ChatRoom: React.FC = React.memo(() => {
           <div ref={scrollBottomRef} />
         </C.Flex>
         <C.Divider />
-        {/* メッセージ送信フォーム  loginUserがMUTEDのときは送信できないようにする */}
-        {chatLoginUser == null ? null : chatLoginUser.memberStatus ===
-          ChatRoomMemberStatus.MUTED ? (
-          <ChatRoomMutedAlert />
-        ) : (
-          <MessageSendForm sendMessage={sendMessage} />
+        {chatLoginUser != null && (
+          <ChatRoomFooter chatLoginUser={chatLoginUser} />
         )}
       </ContentLayout>
     </>
-  );
-});
-
-const ChatRoomMutedAlert: React.FC = React.memo(() => {
-  return (
-    <C.Alert status="warning" mb={4}>
-      <C.AlertIcon />
-      You are muted.
-    </C.Alert>
   );
 });
 
@@ -141,3 +123,41 @@ const ChatRoomHeader: React.FC = React.memo(() => {
     </C.Flex>
   );
 });
+
+const ChatRoomMutedAlert: React.FC = React.memo(() => {
+  return (
+    <C.Alert status="warning" mb={4}>
+      <C.AlertIcon />
+      You are muted.
+    </C.Alert>
+  );
+});
+
+const ChatRoomFooter: React.FC<{ chatLoginUser: ResponseChatRoomMember }> =
+  React.memo(({ chatLoginUser }) => {
+    const location = ReactRouter.useLocation();
+    const { chatRoomId } = location.state as State;
+    const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
+      autoConnect: false,
+    });
+
+    // 送信ボタンを押したときの処理
+    function sendMessage(content: string): void {
+      if (chatLoginUser == null) return;
+      socket.emit('send_message', {
+        createChatMessageDto: { content },
+        chatRoomId,
+      });
+    }
+
+    return (
+      <>
+        {/* メッセージ送信フォーム  loginUserがMUTEDのときは送信できないようにする */}
+        {chatLoginUser.memberStatus === ChatRoomMemberStatus.MUTED ? (
+          <ChatRoomMutedAlert />
+        ) : (
+          <MessageSendForm sendMessage={sendMessage} />
+        )}
+      </>
+    );
+  });
