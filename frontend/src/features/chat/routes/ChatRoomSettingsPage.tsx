@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import { useChangeChatRoomMemberStatus } from 'features/chat/hooks/useChangeChatRoomMemberStatus';
-import { useChatLoginUser } from 'features/chat/hooks/useChatLoginUser';
 import { useDeleteChatRoom } from 'features/chat/hooks/useDeleteChatRoom';
 import { useExitChatRoom } from 'features/chat/hooks/useExitChatRoom';
 import {
@@ -14,7 +13,6 @@ import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-import { AlertModal } from 'features/chat/components/atoms/AlertModal';
 import { ChatRoomMemberActionTimeSetModal } from 'features/chat/components/organisms/ChatRoomMemberActionTimeSetModal';
 import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomMemberList';
 import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
@@ -24,25 +22,16 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
     autoConnect: false,
   });
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
-  const {
-    data: chatLoginUserData,
-    isError: isErrorChatLoginUser,
-    error: errorChatLoginUser,
-  } = useGetApi2<ResponseChatRoomMember>(
+  const { data: chatLoginUserData } = useGetApi2<ResponseChatRoomMember>(
     `/chat/rooms/${chatRoomId}/members/me`
   );
   useGetApi2<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
-  const {
-    data: chatRoomData,
-    isError: isErrorChatRoom,
-    error: errorChatRoom,
-  } = useGetApi2<ResponseChatRoomMemberStatus>(`/chat/rooms/${chatRoomId}`);
-  const {
-    data: chatMembersData,
-    isError: isErrorChatMembers,
-    error: errorChatMembers,
-    refetch: refetchChatMembers,
-  } = useGetApi2<ResponseChatMessage[]>(`/chat/rooms/${chatRoomId}/members`);
+  const { data: chatRoomData } = useGetApi2<ResponseChatRoomMemberStatus>(
+    `/chat/rooms/${chatRoomId}`
+  );
+  const { data: chatMembersData, refetch: refetchChatMembers } = useGetApi2<
+    ResponseChatMessage[]
+  >(`/chat/rooms/${chatRoomId}/members`);
   const { isOpen, onClose, changeChatRoomMemberStatus, setSelectedLimitTime } =
     useChangeChatRoomMemberStatus(chatRoomId, socket);
   React.useEffect(() => {
@@ -63,12 +52,6 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
       socket.off('changeChatRoomMemberStatusSocket', fetchDate);
     };
   }, []);
-
-  if (isErrorChatLoginUser)
-    return <AlertModal error={errorChatLoginUser as Error} />;
-  if (isErrorChatRoom) return <AlertModal error={errorChatRoom as Error} />;
-  if (isErrorChatMembers)
-    return <AlertModal error={errorChatMembers as Error} />;
   const chatLoginUser = chatLoginUserData as ResponseChatRoomMember;
   const chatMembers = chatMembersData as ResponseChatRoomMember[];
   const { name: chatName, roomStatus } = chatRoomData as ChatRoom;
@@ -78,15 +61,13 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
       <ContentLayout title="Chat Room Settings">
         <C.Accordion allowToggle>
           {/* ChatRoomMemberListAccordion */}
-          {
-            <CustomAccordion title="Chat Members">
-              <ChatRoomMemberList
-                chatLoginUser={chatLoginUser}
-                chatMembers={chatMembers}
-                changeChatRoomMemberStatus={changeChatRoomMemberStatus}
-              />
-            </CustomAccordion>
-          }
+          <CustomAccordion title="Chat Members">
+            <ChatRoomMemberList
+              chatLoginUser={chatLoginUser}
+              chatMembers={chatMembers}
+              changeChatRoomMemberStatus={changeChatRoomMemberStatus}
+            />
+          </CustomAccordion>
           {/* SecurityAccordion */}
           {chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
             <CustomAccordion title="Security">
@@ -134,23 +115,22 @@ const CustomAccordion: React.FC<{
 
 const LeaveButton: React.FC<{
   chatRoomId: string;
-  chatLoginUser: ReturnType<typeof useChatLoginUser>['chatLoginUser'];
+  chatLoginUser: ResponseChatRoomMember;
 }> = React.memo(({ chatRoomId, chatLoginUser }) => {
   const { exitChatRoom } = useExitChatRoom(chatRoomId);
   const { deleteChatRoom } = useDeleteChatRoom(chatRoomId);
 
   return (
     <>
-      {chatLoginUser !== undefined &&
-        (chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN ? (
-          <C.Button colorScheme="red" onClick={exitChatRoom}>
-            Exit
-          </C.Button>
-        ) : (
-          <C.Button colorScheme="red" onClick={deleteChatRoom}>
-            Delete
-          </C.Button>
-        ))}
+      {chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN ? (
+        <C.Button colorScheme="red" onClick={exitChatRoom}>
+          Exit
+        </C.Button>
+      ) : (
+        <C.Button colorScheme="red" onClick={deleteChatRoom}>
+          Delete
+        </C.Button>
+      )}
     </>
   );
 });

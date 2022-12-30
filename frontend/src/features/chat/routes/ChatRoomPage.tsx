@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomStatus, ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
+import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import {
   ResponseChatMessage,
   ResponseChatRoomMember,
@@ -14,33 +14,16 @@ import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
-import { AlertModal } from 'features/chat/components/atoms/AlertModal';
-
-type State = {
-  chatRoomId: string;
-  chatName: string;
-  roomStatus: ChatRoomStatus;
-};
 
 export const ChatRoomPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
-  const {
-    data: chatLoginUserData,
-    isError: isErrorChatLoginUser,
-    error: errorChatLoginUser,
-  } = useGetApi2<ResponseChatRoomMember>(
+  const { data: chatLoginUserData } = useGetApi2<ResponseChatRoomMember>(
     `/chat/rooms/${chatRoomId}/members/me`
   );
   useGetApi2<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
-  const {
-    data: chatRoomData,
-    isError: isErrorChatRoom,
-    error: errorChatRoom,
-  } = useGetApi2<ResponseChatRoomMemberStatus>(`/chat/rooms/${chatRoomId}`);
-  if (isErrorChatLoginUser)
-    return <AlertModal error={errorChatLoginUser as Error} />;
-  if (isErrorChatRoom) return <AlertModal error={errorChatRoom as Error} />;
-
+  const { data: chatRoomData } = useGetApi2<ResponseChatRoomMemberStatus>(
+    `/chat/rooms/${chatRoomId}`
+  );
   const chatLoginUser = chatLoginUserData as ResponseChatRoomMember;
   const { name: chatName } = chatRoomData as ChatRoom;
 
@@ -48,7 +31,7 @@ export const ChatRoomPage: React.FC = React.memo(() => {
     <>
       <ContentLayout title={chatName}>
         {/* チャットの設定ボタン */}
-        <ChatRoomHeader />
+        <ChatRoomHeader chatRoomId={chatRoomId} />
         <C.Divider />
         <ChatRoomBody chatLoginUser={chatLoginUser} chatRoomId={chatRoomId} />
         <C.Divider />
@@ -58,22 +41,20 @@ export const ChatRoomPage: React.FC = React.memo(() => {
   );
 });
 
-const ChatRoomHeader: React.FC = React.memo(() => {
-  const location = ReactRouter.useLocation();
-  const { chatRoomId, chatName, roomStatus } = location.state as State;
-
-  return (
-    <C.Flex justifyContent="flex-end" mb={4}>
-      <C.Link
-        as={ReactRouter.Link}
-        to={`/app/chat/rooms/${chatRoomId}/settings`}
-        state={{ chatRoomId, chatName, roomStatus }}
-      >
-        <C.Button colorScheme="blue">Settings</C.Button>
-      </C.Link>
-    </C.Flex>
-  );
-});
+const ChatRoomHeader: React.FC<{ chatRoomId: string }> = React.memo(
+  ({ chatRoomId }) => {
+    return (
+      <C.Flex justifyContent="flex-end" mb={4}>
+        <C.Link
+          as={ReactRouter.Link}
+          to={`/app/chat/rooms/${chatRoomId}/settings`}
+        >
+          <C.Button colorScheme="blue">Settings</C.Button>
+        </C.Link>
+      </C.Flex>
+    );
+  }
+);
 
 const ChatRoomMutedAlert: React.FC = React.memo(() => {
   return (
