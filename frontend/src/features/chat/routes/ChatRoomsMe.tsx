@@ -1,27 +1,31 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ResponseChatRoom } from 'features/chat/types/chat';
-import { axios } from 'lib/axios';
+import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { Link } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+import { AlertModal } from 'features/chat/components/atoms/AlertModal';
+import { Spinner } from 'features/chat/components/atoms/Spinner';
+import { ChatRoomBox } from 'features/chat/components/organisms/ChatRoomBox';
 
 export const ChatRoomsMe: React.FC = React.memo(() => {
-  const [chatRooms, setChatRooms] = React.useState<ResponseChatRoom[]>([]);
+  const { data, isLoading, isError, error } =
+    useGetApi2<ResponseChatRoom[]>('/chat/rooms/me');
+  if (isLoading) return <Spinner />;
+  if (isError) return <AlertModal error={error as Error} />;
 
-  async function getAllChatRoom(): Promise<void> {
-    const res: { data: ResponseChatRoom[] } = await axios.get('/chat/rooms/me');
-    setChatRooms(res.data);
-  }
-
-  React.useEffect(() => {
-    getAllChatRoom().catch((err) => console.error(err));
-  }, []);
+  const chatRooms = data as ResponseChatRoom[];
 
   return (
     <>
       <ContentLayout title="My Chat">
         <C.Divider />
         <C.List spacing={3} data-testid="chat-room-list">
+          {chatRooms.length === 0 && (
+            <C.Center h="50vh">
+              <C.Text textAlign="center">Chat Room is not found.</C.Text>
+            </C.Center>
+          )}
           {chatRooms.map((chatRoom) => (
             <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
               <C.Link
@@ -33,31 +37,7 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
                   roomStatus: chatRoom.roomStatus,
                 }}
               >
-                <C.Box p={5} shadow="md" borderWidth="1px">
-                  <C.Flex>
-                    <C.Box>
-                      <C.Text fontSize="sm">
-                        {/* 投稿がない場合は何も表示しない */}
-                        {chatRoom.chatMessages.length !== 0 ? (
-                          new Date(
-                            chatRoom.chatMessages[0].createdAt
-                          ).toLocaleString()
-                        ) : (
-                          <></>
-                        )}
-                      </C.Text>
-                      <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
-                      {/* PROTECTED */}
-                      <C.Text fontSize="sm">
-                        {chatRoom.roomStatus === 'PROTECTED' ? (
-                          <C.Badge colorScheme="red">PROTECTED</C.Badge>
-                        ) : (
-                          <></>
-                        )}
-                      </C.Text>
-                    </C.Box>
-                  </C.Flex>
-                </C.Box>
+                <ChatRoomBox chatRoom={chatRoom} />
               </C.Link>
             </C.ListItem>
           ))}
