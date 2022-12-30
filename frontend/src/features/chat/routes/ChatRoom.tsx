@@ -21,55 +21,9 @@ type State = {
 };
 
 export const ChatRoom: React.FC = React.memo(() => {
-  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
-    autoConnect: false,
-  });
   const location = ReactRouter.useLocation();
   const { chatRoomId, chatName } = location.state as State;
-  const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
   const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
-  const scrollBottomRef = React.useRef<HTMLDivElement>(null);
-
-  // ブロックユーザー
-  const { users: blockUsers } = useBlockUsers();
-
-  React.useEffect(() => {
-    socket.emit('join_room_member', chatRoomId);
-    socket.on('receive_message', (message: ResponseChatMessage) => {
-      // メッセージを受け取ったときに実行される関数を登録
-      if (blockUsers.some((user) => user.id === message.sender.id)) return;
-      setMessages((prev) => {
-        return [...prev, message];
-      });
-    });
-    // webSocketのイベントを受け取る関数を登録
-    socket.on('changeChatRoomMemberStatusSocket', () => {
-      getChatLoginUser().catch((err) => console.log(err));
-    });
-
-    return () => {
-      // コンポーネントの寿命が切れるときに実行される
-      socket.emit('leave_room_member', chatRoomId);
-      socket.off();
-    };
-  }, [chatRoomId, socket]);
-
-  async function getAllChatMessage(): Promise<void> {
-    const res: { data: ResponseChatMessage[] } = await axios.get(
-      `/chat/rooms/${chatRoomId}/messages`
-    );
-    setMessages(res.data);
-  }
-
-  React.useEffect(() => {
-    getAllChatMessage().catch((err) => console.error(err));
-    getChatLoginUser().catch((err) => console.error(err));
-  }, []);
-
-  // 更新時の自動スクロール
-  React.useEffect(() => {
-    scrollBottomRef.current?.scrollIntoView();
-  }, [messages]);
 
   return (
     <>
@@ -77,27 +31,7 @@ export const ChatRoom: React.FC = React.memo(() => {
         {/* チャットの設定ボタン */}
         <ChatRoomHeader />
         <C.Divider />
-        <C.Flex
-          flexDir="column"
-          alignItems="flex-start"
-          padding={4}
-          overflowY="auto"
-          overflowX="hidden"
-          height="70vh"
-        >
-          {/* ブロックユーザーのメッセージは表示しない */}
-          {messages.map((message) => (
-            <Message
-              key={message.id}
-              id={message.id}
-              content={message.content}
-              createdAt={message.createdAt}
-              name={message.sender.name}
-              avatarImageUrl={message.sender.avatarImageUrl}
-            />
-          ))}
-          <div ref={scrollBottomRef} />
-        </C.Flex>
+        <ChatRoomBody getChatLoginUser={getChatLoginUser} />
         <C.Divider />
         {chatLoginUser != null && (
           <ChatRoomFooter chatLoginUser={chatLoginUser} />
@@ -158,6 +92,84 @@ const ChatRoomFooter: React.FC<{ chatLoginUser: ResponseChatRoomMember }> =
         ) : (
           <MessageSendForm sendMessage={sendMessage} />
         )}
+      </>
+    );
+  });
+
+const ChatRoomBody: React.FC<{ getChatLoginUser: () => Promise<void> }> =
+  React.memo(({ getChatLoginUser }) => {
+    const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
+      autoConnect: false,
+    });
+    const location = ReactRouter.useLocation();
+    const { chatRoomId } = location.state as State;
+    const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
+    const scrollBottomRef = React.useRef<HTMLDivElement>(null);
+
+    // ブロックユーザー
+    const { users: blockUsers } = useBlockUsers();
+
+    React.useEffect(() => {
+      socket.emit('join_room_member', chatRoomId);
+      socket.on('receive_message', (message: ResponseChatMessage) => {
+        // メッセージを受け取ったときに実行される関数を登録
+        if (blockUsers.some((user) => user.id === message.sender.id)) return;
+        setMessages((prev) => {
+          return [...prev, message];
+        });
+      });
+      // webSocketのイベントを受け取る関数を登録
+      socket.on('changeChatRoomMemberStatusSocket', () => {
+        getChatLoginUser().catch((err) => console.log(err));
+      });
+
+      return () => {
+        // コンポーネントの寿命が切れるときに実行される
+        socket.emit('leave_room_member', chatRoomId);
+        socket.off();
+      };
+    }, [chatRoomId, socket]);
+
+    async function getAllChatMessage(): Promise<void> {
+      const res: { data: ResponseChatMessage[] } = await axios.get(
+        `/chat/rooms/${chatRoomId}/messages`
+      );
+      setMessages(res.data);
+    }
+
+    React.useEffect(() => {
+      getAllChatMessage().catch((err) => console.error(err));
+      getChatLoginUser().catch((err) => console.error(err));
+    }, []);
+
+    // 更新時の自動スクロール
+    React.useEffect(() => {
+      scrollBottomRef.current?.scrollIntoView();
+    }, [messages]);
+
+    return (
+      <>
+        <C.Flex
+          flexDir="column"
+          alignItems="flex-start"
+          padding={4}
+          overflowY="auto"
+          overflowX="hidden"
+          height="70vh"
+        >
+          {/* ブロックユーザーのメッセージは表示しない */}
+          {messages.map((message) => (
+            <Message
+              key={message.id}
+              id={message.id}
+              content={message.content}
+              createdAt={message.createdAt}
+              name={message.sender.name}
+              avatarImageUrl={message.sender.avatarImageUrl}
+            />
+          ))}
+          <div ref={scrollBottomRef} />
+        </C.Flex>
       </>
     );
   });
