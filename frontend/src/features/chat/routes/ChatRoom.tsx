@@ -1,18 +1,21 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatRoomMemberStatus } from '@prisma/client';
-import { useChatLoginUser } from 'features/chat/hooks/useChatLoginUser';
 import {
   ResponseChatMessage,
   ResponseChatRoomMember,
+  ResponseChatRoomMemberStatus,
 } from 'features/chat/types/chat';
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
+import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { useSocket } from 'hooks/socket/useSocket';
 import { axios } from 'lib/axios';
 import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
+import { AlertModal } from 'features/chat/components/atoms/AlertModal';
+import { Spinner } from 'features/chat/components/atoms/Spinner';
 
 type State = {
   chatRoomId: string;
@@ -23,7 +26,12 @@ type State = {
 export const ChatRoom: React.FC = React.memo(() => {
   const location = ReactRouter.useLocation();
   const { chatRoomId, chatName } = location.state as State;
-  const { chatLoginUser, getChatLoginUser } = useChatLoginUser(chatRoomId);
+  const { data, isLoading, isError, error } =
+    useGetApi2<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
+  if (isLoading) return <Spinner />;
+  if (isError) return <AlertModal error={error as Error} />;
+
+  const chatLoginUser = data as ResponseChatRoomMember;
 
   return (
     <>
@@ -31,11 +39,9 @@ export const ChatRoom: React.FC = React.memo(() => {
         {/* チャットの設定ボタン */}
         <ChatRoomHeader />
         <C.Divider />
-        <ChatRoomBody getChatLoginUser={getChatLoginUser} />
+        <ChatRoomBody chatLoginUser={chatLoginUser} />
         <C.Divider />
-        {chatLoginUser != null && (
-          <ChatRoomFooter chatLoginUser={chatLoginUser} />
-        )}
+        <ChatRoomFooter chatLoginUser={chatLoginUser} />
       </ContentLayout>
     </>
   );
@@ -79,8 +85,8 @@ const ChatRoomFooter: React.FC<{ chatLoginUser: ResponseChatRoomMember }> =
     function sendMessage(content: string): void {
       if (chatLoginUser == null) return;
       socket.emit('send_message', {
-        createChatMessageDto: { content },
         chatRoomId,
+        content,
       });
     }
 
@@ -96,16 +102,16 @@ const ChatRoomFooter: React.FC<{ chatLoginUser: ResponseChatRoomMember }> =
     );
   });
 
-const ChatRoomBody: React.FC<{ getChatLoginUser: () => Promise<void> }> =
-  React.memo(({ getChatLoginUser }) => {
+const ChatRoomBody: React.FC<{ chatLoginUser: ResponseChatRoomMember }> =
+  React.memo(({ chatLoginUser }) => {
+    const navigate = ReactRouter.useNavigate();
+    const chatRoomId = ReactRouter.useParams<{ chatRoomId: string }>()
+      .chatRoomId as string;
     const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
       autoConnect: false,
     });
-    const location = ReactRouter.useLocation();
-    const { chatRoomId } = location.state as State;
     const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
     const scrollBottomRef = React.useRef<HTMLDivElement>(null);
-
     // ブロックユーザー
     const { users: blockUsers } = useBlockUsers();
 
@@ -119,9 +125,19 @@ const ChatRoomBody: React.FC<{ getChatLoginUser: () => Promise<void> }> =
         });
       });
       // webSocketのイベントを受け取る関数を登録
-      socket.on('changeChatRoomMemberStatusSocket', () => {
-        getChatLoginUser().catch((err) => console.log(err));
-      });
+      socket.on(
+        'changeChatRoomMemberStatusSocket',
+        (responseChatRoomMemberStatus: ResponseChatRoomMemberStatus) => {
+          if (responseChatRoomMemberStatus == null) return;
+          if (
+            responseChatRoomMemberStatus.memberId === chatLoginUser.user.id &&
+            (responseChatRoomMemberStatus.memberStatus === 'BANNED' ||
+              responseChatRoomMemberStatus.memberStatus === 'KICKED')
+          ) {
+            navigate('/app/chat/rooms/me');
+          }
+        }
+      );
 
       return () => {
         // コンポーネントの寿命が切れるときに実行される
@@ -139,7 +155,6 @@ const ChatRoomBody: React.FC<{ getChatLoginUser: () => Promise<void> }> =
 
     React.useEffect(() => {
       getAllChatMessage().catch((err) => console.error(err));
-      getChatLoginUser().catch((err) => console.error(err));
     }, []);
 
     // 更新時の自動スクロール

@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -27,36 +27,34 @@ export class ChatMessageGateway {
   @WebSocketServer()
   server!: Server;
 
+  @NestJs.UsePipes(new NestJs.ValidationPipe())
   @SubscribeMessage('send_message')
   async handleMessage(
     @MessageBody()
-    data: {
-      createChatMessageDto: CreateChatMessageDto;
-      chatRoomId: string;
-    },
+    createChatMessageDto: CreateChatMessageDto,
     @ConnectedSocket() client: Socket
   ): Promise<void> {
     const cookie = client.handshake.headers.cookie;
     if (cookie === undefined) {
-      Logger.warn('cookie is undefined');
+      NestJs.Logger.warn('cookie is undefined');
 
       return;
     }
     const chatLoginUserId = this.getUserIdFromCookie(cookie);
-    const { createChatMessageDto, chatRoomId } = data;
     const newMessage = await this.chatMessageService.create(
       createChatMessageDto,
-      chatRoomId,
       chatLoginUserId
     );
-    Logger.debug(
+    NestJs.Logger.debug(
       `chat-message.gateway.ts: handleMessage: ${JSON.stringify(
         newMessage,
         null,
         2
       )}`
     );
-    this.server.in(chatRoomId).emit('receive_message', newMessage);
+    this.server
+      .in(createChatMessageDto.chatRoomId)
+      .emit('receive_message', newMessage);
   }
 
   getUserIdFromCookie(cookie: string): string {

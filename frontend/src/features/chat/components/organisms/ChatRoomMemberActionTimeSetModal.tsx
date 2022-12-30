@@ -1,12 +1,12 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { Limit } from 'features/chat/types/chat';
+import { LimitTime } from 'features/chat/types/chat';
 
-const limitList: Limit[] = ['1m', '1h', '1d', '1w', '1M', 'forever'];
+const limitList: LimitTime[] = ['1m', '1h', '1d', '1w', '1M', 'forever'];
 
 type Props = {
   isOpen: boolean;
-  onClick: (limit: Limit) => void;
+  onClick: (limit: LimitTime) => void;
   onClose: () => void;
 };
 

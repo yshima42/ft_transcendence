@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChatRoomMemberStatus } from '@prisma/client';
-import { Limit } from 'features/chat/types/chat';
+import { LimitTime } from 'features/chat/types/chat';
 import { Socket } from 'socket.io-client';
 
 export const useChangeChatRoomMemberStatus = (
@@ -13,9 +13,11 @@ export const useChangeChatRoomMemberStatus = (
   ) => void;
   isOpen: boolean;
   onClose: () => void;
-  setSelectedLimitTime: React.Dispatch<React.SetStateAction<Limit | undefined>>;
+  setSelectedLimitTime: React.Dispatch<
+    React.SetStateAction<LimitTime | undefined>
+  >;
 } => {
-  const [selectedLimitTime, setSelectedLimitTime] = React.useState<Limit>();
+  const [selectedLimitTime, setSelectedLimitTime] = React.useState<LimitTime>();
   const [selectedMemberStatus, setSelectedMemberStatus] =
     React.useState<ChatRoomMemberStatus>();
   const [selectedMemberId, setSelectedMemberId] = React.useState<string>();
@@ -29,7 +31,7 @@ export const useChangeChatRoomMemberStatus = (
     selectLimitTime(
       selectedMemberId,
       selectedMemberStatus,
-      selectedLimitTime as Limit
+      selectedLimitTime as LimitTime
     );
     setIsOpen(false);
     setSelectedMemberId(undefined);
@@ -62,7 +64,7 @@ export const useChangeChatRoomMemberStatus = (
   function selectLimitTime(
     selectedMemberId: string,
     selectedMemberStatus: ChatRoomMemberStatus,
-    selectedLimitTime: Limit
+    selectedLimitTime: LimitTime
   ) {
     socket.emit('changeChatRoomMemberStatusSocket', {
       chatRoomId,
