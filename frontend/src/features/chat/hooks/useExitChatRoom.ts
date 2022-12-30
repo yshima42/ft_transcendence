@@ -9,7 +9,7 @@ export const useExitChatRoom = (
   const navigate = useNavigate();
   async function exitChatRoom() {
     await axios.delete(`/chat/rooms/${chatRoomId}/members/me`);
-    navigate('/app/chat/me');
+    navigate('/app/chat/rooms/me');
   }
 
   return { exitChatRoom };
