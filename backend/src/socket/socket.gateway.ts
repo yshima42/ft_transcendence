@@ -104,6 +104,14 @@ export class UsersGateway {
   async randomMatch(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(`${socket.id} ${socket.data.userId as string} random_match`);
 
+    const { userId } = socket.data as { userId: string };
+    const gameRoomId = this.userIdToGameRoomId.get(userId);
+    if (gameRoomId !== undefined) {
+      socket.emit('go_game_room', gameRoomId);
+
+      return;
+    }
+
     const matchingSockets = await this.server.in('matching').fetchSockets();
     // 1人目の場合2人目ユーザーを待つ
     if (matchingSockets.length === 0) {
@@ -111,7 +119,6 @@ export class UsersGateway {
 
       return;
     }
-    const { userId } = socket.data as { userId: string };
     const { userId: waitUserId } = matchingSockets[0].data as {
       userId: string;
     };
