@@ -22,18 +22,20 @@ export class ChatRoomMemberService {
     private readonly chatRoomService: ChatRoomService
   ) {}
 
+  private readonly logger = new Logger('ChatRoomMemberService');
+  private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
+
   async create(
     chatRoomId: string,
     createChatRoomMemberDto: CreateChatRoomMemberDto,
     chatLoginUserId: string
   ): Promise<ChatRoomMember> {
-    Logger.debug(
-      `chat-room-member.service create chatRoomId=${chatRoomId} createChatRoomMemberDto=${JSON.stringify(
+    this.logger.debug(
+      `create: ${this.json({
+        chatRoomId,
         createChatRoomMemberDto,
-        null,
-        2
-      )}
-      chatLoginUserId=${chatLoginUserId}`
+        chatLoginUserId,
+      })}`
     );
     const enteredPassword = createChatRoomMemberDto.chatRoomPassword;
     // chatRoomのステータスを取得
@@ -57,12 +59,14 @@ export class ChatRoomMemberService {
         chatRoom.password
       );
       if (!isPasswordMatch) {
-        NestJs.Logger.warn(
-          `chat-room-member.service create password is incorrect
-          chatRoomId=${chatRoomId}
-          chatRoomPassword=${enteredPassword}
-          chatRoom.password=${chatRoom.password}`
+        this.logger.warn(
+          `create: ${this.json({
+            chatRoomId,
+            createChatRoomMemberDto,
+            chatLoginUserId,
+          })}`
         );
+
         throw new NestJs.HttpException(
           'Password is incorrect',
           NestJs.HttpStatus.UNAUTHORIZED
@@ -117,11 +121,13 @@ export class ChatRoomMemberService {
     chatRoomId: string,
     ChatLoginUserId: string
   ): Promise<ResponseChatRoomMember> {
-    Logger.debug(
-      `findOne
-      chatRoomId=${chatRoomId}
-      ChatLoginUserId=${ChatLoginUserId}`
+    this.logger.debug(
+      `findOne: ${this.json({
+        chatRoomId,
+        ChatLoginUserId,
+      })}`
     );
+
     const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
       where: {
         chatRoomId_userId: {
@@ -154,9 +160,12 @@ export class ChatRoomMemberService {
     updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     chatLoginUserId: string
   ): Promise<ChatRoomMember> {
-    Logger.debug(`chat-room-member.service.ts update
-    updateChatRoomMemberDto=${JSON.stringify(updateChatRoomMemberDto)}
-    chatLoginUserId=${chatLoginUserId}`);
+    this.logger.debug(
+      `update: ${this.json({
+        updateChatRoomMemberDto,
+        chatLoginUserId,
+      })}`
+    );
     const { chatRoomId, memberId, memberStatus, limitTime } =
       updateChatRoomMemberDto;
     // loginUserIdのchatRoomでのステータスを取得
@@ -214,16 +223,13 @@ export class ChatRoomMemberService {
       }
 
       default: {
-        Logger.debug(
-          `chat-room-member.service.ts update default
-          chatRoomId=${chatRoomId}
-          memberId=${memberId}
-          updateChatRoomMemberDto=${JSON.stringify(
-            updateChatRoomMemberDto,
-            null,
-            2
-          )}
-          chatLoginUserId=${chatLoginUserId}`
+        this.logger.debug(
+          `update: ${this.json({
+            chatRoomId,
+            memberId,
+            memberStatus,
+            limitTime,
+          })}`
         );
 
         let limitDate: Date | null = null;
@@ -254,18 +260,10 @@ export class ChatRoomMemberService {
             statusUntil: limitDate,
           },
         });
-
-        Logger.debug(
-          `chat-room-member.service.ts update default res
-          chatRoomId=${chatRoomId}
-          memberId=${memberId}
-          updateChatRoomMemberDto=${JSON.stringify(
-            updateChatRoomMemberDto,
-            null,
-            2
-          )}
-          chatLoginUserId=${chatLoginUserId}
-          res=${JSON.stringify(res, null, 2)}`
+        this.logger.debug(
+          `update: ${this.json({
+            res,
+          })}`
         );
 
         return res;
@@ -274,7 +272,12 @@ export class ChatRoomMemberService {
   }
 
   async remove(chatRoomId: string, memberId: string): Promise<ChatRoomMember> {
-    Logger.debug(`remove chatRoomId: ${chatRoomId}, memberId: ${memberId}`);
+    this.logger.debug(
+      `remove: ${this.json({
+        chatRoomId,
+        memberId,
+      })}`
+    );
     const chatRoomMember = await this.findOne(chatRoomId, memberId);
     // ADMINは退出できない
     if (chatRoomMember.memberStatus === ChatRoomMemberStatus.ADMIN) {
@@ -294,7 +297,11 @@ export class ChatRoomMemberService {
         },
       });
     } catch (e) {
-      Logger.warn(e);
+      this.logger.error(
+        `remove: ${this.json({
+          e,
+        })}`
+      );
       throw new NestJs.HttpException(
         'ChatRoomMember not found',
         NestJs.HttpStatus.NOT_FOUND
@@ -305,7 +312,7 @@ export class ChatRoomMemberService {
   // 1分ごとに時限性のあるステータスをチェックする
   @Schedule.Cron('0 * * * * *')
   handleCron(): void {
-    Logger.debug(`chat-room-member.service.ts handleCron`);
+    this.logger.debug(`handleCron`);
     this.prisma.chatRoomMember
       .findMany({
         where: {
@@ -330,19 +337,19 @@ export class ChatRoomMemberService {
               },
             })
             .finally(() => {
-              Logger.debug(
-                `handleCron
-                  chatRoomId=${chatRoomMember.chatRoomId}
-                  userId=${chatRoomMember.userId}`
+              this.logger.debug(
+                `handleCron: ${this.json({
+                  chatRoomMember,
+                })}`
               );
             })
-            .catch((e) => {
-              Logger.warn(e);
+            .catch((e: Error) => {
+              this.logger.error(`handleCron: ${this.json({ e })}`);
             });
         });
       })
-      .catch((e) => {
-        Logger.warn(e);
+      .catch((e: Error) => {
+        this.logger.error(`handleCron: ${this.json({ e })}`);
       });
   }
 }
