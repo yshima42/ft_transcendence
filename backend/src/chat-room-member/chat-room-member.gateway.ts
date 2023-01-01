@@ -22,6 +22,9 @@ export class ChatRoomMemberGateway {
   @WebSocket.WebSocketServer()
   private readonly server!: SocketIO.Server;
 
+  private readonly logger = new NestJs.Logger('ChatRoomMemberGateway');
+  private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
+
   // ChatRoomに参加したときに呼ばれる
   @WebSocket.SubscribeMessage('join_room_member')
   joinRoom(
@@ -29,8 +32,8 @@ export class ChatRoomMemberGateway {
     chatRoomId: string,
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): void {
-    NestJs.Logger.debug(
-      `chat-room-member.gateway joinRoom: ${JSON.stringify(chatRoomId)}`
+    this.logger.debug(
+      `joinRoom: ${this.json(chatRoomId)} ${this.json(client.id)}`
     );
     // 新メンバーが入ってきたときにも、全員に通知するためにchangeChatRoomMemberStatusSocketを叩いています
     this.server.to(chatRoomId).emit('changeChatRoomMemberStatusSocket');
@@ -43,12 +46,8 @@ export class ChatRoomMemberGateway {
     chatRoomId: string,
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): void {
-    NestJs.Logger.debug(
-      `chat-room-member.gateway leaveRoom: ${JSON.stringify(
-        chatRoomId,
-        null,
-        2
-      )}`
+    this.logger.debug(
+      `leaveRoom: ${this.json(chatRoomId)} ${this.json(client.id)}`
     );
     this.server.to(chatRoomId).emit('changeChatRoomMemberStatusSocket');
     void client.leave(chatRoomId);
@@ -63,11 +62,9 @@ export class ChatRoomMemberGateway {
     updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): Promise<ChatRoomMember> {
-    NestJs.Logger.verbose(
-      `chat-room-member.gateway changeStatus: ${JSON.stringify(
-        updateChatRoomMemberDto,
-        null,
-        2
+    this.logger.debug(
+      `changeStatus: ${this.json(updateChatRoomMemberDto)} ${this.json(
+        client.id
       )}`
     );
     const cookie = client.handshake.headers.cookie;
@@ -84,9 +81,7 @@ export class ChatRoomMemberGateway {
     const res = this.server
       .in(updateChatRoomMemberDto.chatRoomId)
       .emit('changeChatRoomMemberStatusSocket', updateChatRoomMemberDto); // チャットルーム内の全員に送信(自分含む)
-    NestJs.Logger.debug(
-      `chat-room-member.gateway changeStatus: ${JSON.stringify(res, null, 2)}`
-    );
+    this.logger.debug(`changeStatus: ${this.json(res)}`);
 
     return updatedChatRoomMember;
   }
