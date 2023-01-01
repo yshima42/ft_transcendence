@@ -14,7 +14,7 @@ export const OnlineUsersContext = createContext<string[]>([]);
 
 const OnlineUsersProvider: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useProfile();
-  const socket = useSocket(WS_BASE_URL, { autoConnect: false });
+  const socket = useSocket(WS_BASE_URL);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const didLogRef = useRef(false);
 
