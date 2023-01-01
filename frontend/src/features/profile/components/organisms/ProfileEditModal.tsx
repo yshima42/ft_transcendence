@@ -126,6 +126,8 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     Nickname
                   </FormLabel>
                   <Input
+                    type="text"
+                    maxLength={50}
                     id="nickname"
                     name="nickname"
                     // 参考サイト調べるとvalueの記述あるけど、なぜ必要かわからない。
