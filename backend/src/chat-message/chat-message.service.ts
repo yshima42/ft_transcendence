@@ -6,6 +6,8 @@ import { CreateChatMessageDto } from './dto/create-chat-message.dto';
 @Injectable()
 export class ChatMessageService {
   constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger('ChatMessageService');
+  private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
 
   async create(
     createChatMessageDto: CreateChatMessageDto,
@@ -30,8 +32,8 @@ export class ChatMessageService {
         },
       },
     });
-    Logger.debug(
-      `chat-message.service.ts: ${JSON.stringify(chatMessage, null, 2)}`
+    this.logger.debug(
+      `create: ${this.json({ chatMessage, createChatMessageDto, senderId })}`
     );
 
     return chatMessage;
@@ -68,8 +70,8 @@ export class ChatMessageService {
         },
       },
     });
-    Logger.debug(
-      `chat-message.service.ts: ${JSON.stringify(chatMessage, null, 2)}`
+    this.logger.debug(
+      `findAllNotBlocked: ${this.json({ chatMessage, chatRoomId, userId })}`
     );
 
     return chatMessage;
