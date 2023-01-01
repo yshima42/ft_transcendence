@@ -7,9 +7,12 @@ export const useDeleteChatRoom = (
   deleteChatRoom: () => Promise<void>;
 } => {
   const navigate = useNavigate();
+  const endpoint = (chatRoomId: string) => `/chat/rooms/${chatRoomId}`;
+  const navigateUrl = '/app/chat/rooms/me';
+
   async function deleteChatRoom() {
-    await axios.delete(`/chat/rooms/${chatRoomId}`);
-    navigate('/app/chat/rooms/me');
+    await axios.delete(endpoint(chatRoomId));
+    navigate(navigateUrl);
   }
 
   return { deleteChatRoom };
