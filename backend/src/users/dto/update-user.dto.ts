@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { OnlineStatus } from '@prisma/client';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -13,6 +13,7 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
+  @Length(1, 50)
   @ApiProperty({
     default: 'patrash',
   })
