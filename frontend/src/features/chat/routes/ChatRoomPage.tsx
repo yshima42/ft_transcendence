@@ -106,11 +106,9 @@ const ChatRoomBody: React.FC<{
   socket: Socket;
 }> = React.memo(({ chatLoginUser, chatRoomId, socket }) => {
   const navigate = ReactRouter.useNavigate();
-  const { data } = useGetApi2<ResponseChatMessage[]>(
-    `/chat/rooms/${chatRoomId}/messages`
-  );
+  const endpoint = `/chat/rooms/${chatRoomId}/messages`;
+  const { data } = useGetApi2<ResponseChatMessage[]>(endpoint);
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
-  // ブロックユーザー
   const { users: blockUsers } = useBlockUsers();
   const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
 

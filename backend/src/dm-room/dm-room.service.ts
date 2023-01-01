@@ -28,7 +28,7 @@ export class DmRoomService {
     );
     if (isUserBlocked) {
       throw new HttpException(
-        'you cannot create dm room with block relation',
+        'you cannot open dm room with block relation',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -105,6 +105,7 @@ export class DmRoomService {
           select: {
             user: {
               select: {
+                id: true,
                 name: true,
                 avatarImageUrl: true,
               },
