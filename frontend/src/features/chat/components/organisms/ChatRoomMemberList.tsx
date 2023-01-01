@@ -1,36 +1,78 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
-import { ResponseChatRoomMember } from 'features/chat/types/chat';
+import { useChangeChatRoomMemberStatus } from 'features/chat/hooks/useChangeChatRoomMemberStatus';
+import {
+  ResponseChatMessage,
+  ResponseChatRoomMember,
+} from 'features/chat/types/chat';
+import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
+import { useSocket } from 'hooks/socket/useSocket';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import {
   ChangeChatRoomMemberStatusButtons,
   changeChatRoomMemberStatusButtonTexts,
 } from 'features/chat/components/atoms/ChangeChatRoomMemberStatusButtons';
+import { ChatRoomMemberActionTimeSetModal } from 'features/chat/components/organisms/ChatRoomMemberActionTimeSetModal';
 
 type Props = {
+  chatRoomId: string;
   chatLoginUser: ResponseChatRoomMember;
-  chatMembers: ResponseChatRoomMember[];
-  changeChatRoomMemberStatus: (
-    memberId: string,
-    memberStatus: ChatRoomMemberStatus,
-    chatLoginUser: ResponseChatRoomMember
-  ) => void;
 };
 
 export const ChatRoomMemberList: React.FC<Props> = React.memo(
-  ({ chatLoginUser, chatMembers, changeChatRoomMemberStatus }) => {
+  ({ chatRoomId, chatLoginUser }) => {
+    const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
+    const {
+      isOpen,
+      onClose,
+      changeChatRoomMemberStatus,
+      setSelectedLimitTime,
+    } = useChangeChatRoomMemberStatus(chatRoomId, socket);
+    const { data: chatMembersData, refetch: refetchChatMembers } = useGetApi2<
+      ResponseChatMessage[]
+    >(`/chat/rooms/${chatRoomId}/members`);
+    React.useEffect(() => {
+      const fetchDate = async () => {
+        try {
+          await refetchChatMembers();
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      // webSocket
+      socket.emit('join_room_member', chatRoomId);
+      // webSocketのイベントを受け取る関数を登録
+      socket.on('changeChatRoomMemberStatusSocket', fetchDate);
+
+      return () => {
+        socket.emit('leave_room_member', chatRoomId);
+        socket.off('changeChatRoomMemberStatusSocket', fetchDate);
+      };
+    }, []);
+    const chatMembers = chatMembersData as ResponseChatRoomMember[];
+
     return (
-      <C.List spacing={3}>
-        {chatMembers.map((member) => (
-          <ChatRoomMemberListItem
-            key={member.user.id}
-            member={member}
-            chatLoginUser={chatLoginUser}
-            changeChatRoomMemberStatus={changeChatRoomMemberStatus}
-          />
-        ))}
-      </C.List>
+      <>
+        <C.List spacing={3}>
+          {chatMembers.map((member) => (
+            <ChatRoomMemberListItem
+              key={member.user.id}
+              member={member}
+              chatLoginUser={chatLoginUser}
+              changeChatRoomMemberStatus={changeChatRoomMemberStatus}
+            />
+          ))}
+        </C.List>
+        <ChatRoomMemberActionTimeSetModal
+          isOpen={isOpen}
+          onClose={onClose}
+          onClick={(limitTime) => {
+            setSelectedLimitTime(limitTime);
+            onClose();
+          }}
+        />
+      </>
     );
   }
 );
