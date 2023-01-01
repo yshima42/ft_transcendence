@@ -10,6 +10,7 @@ import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
+import { Socket } from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -23,6 +24,7 @@ export const ChatRoomPage: React.FC = React.memo(() => {
   const { data: chatRoomData } = useGetApi2<ResponseChatRoomMemberStatus>(
     `/chat/rooms/${chatRoomId}`
   );
+  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
   const chatLoginUser = chatLoginUserData as ResponseChatRoomMember;
   const { name: chatName } = chatRoomData as ChatRoom;
 
@@ -32,9 +34,17 @@ export const ChatRoomPage: React.FC = React.memo(() => {
         {/* チャットの設定ボタン */}
         <ChatRoomHeader chatRoomId={chatRoomId} />
         <C.Divider />
-        <ChatRoomBody chatLoginUser={chatLoginUser} chatRoomId={chatRoomId} />
+        <ChatRoomBody
+          chatLoginUser={chatLoginUser}
+          chatRoomId={chatRoomId}
+          socket={socket}
+        />
         <C.Divider />
-        <ChatRoomFooter chatLoginUser={chatLoginUser} chatRoomId={chatRoomId} />
+        <ChatRoomFooter
+          chatLoginUser={chatLoginUser}
+          chatRoomId={chatRoomId}
+          socket={socket}
+        />
       </ContentLayout>
     </>
   );
@@ -67,11 +77,8 @@ const ChatRoomMutedAlert: React.FC = React.memo(() => {
 const ChatRoomFooter: React.FC<{
   chatLoginUser: ResponseChatRoomMember;
   chatRoomId: string;
-}> = React.memo(({ chatLoginUser, chatRoomId }) => {
-  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
-    autoConnect: false,
-  });
-
+  socket: Socket;
+}> = React.memo(({ chatLoginUser, chatRoomId, socket }) => {
   // 送信ボタンを押したときの処理
   function sendMessage(content: string): void {
     if (chatLoginUser == null) return;
@@ -96,11 +103,9 @@ const ChatRoomFooter: React.FC<{
 const ChatRoomBody: React.FC<{
   chatLoginUser: ResponseChatRoomMember;
   chatRoomId: string;
-}> = React.memo(({ chatLoginUser, chatRoomId }) => {
+  socket: Socket;
+}> = React.memo(({ chatLoginUser, chatRoomId, socket }) => {
   const navigate = ReactRouter.useNavigate();
-  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
-    autoConnect: false,
-  });
   const { data } = useGetApi2<ResponseChatMessage[]>(
     `/chat/rooms/${chatRoomId}/messages`
   );

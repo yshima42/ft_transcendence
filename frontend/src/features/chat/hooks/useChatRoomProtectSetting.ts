@@ -14,24 +14,26 @@ export const useChatRoomProtectSetting = (): {
   publicChatRoom: ReactHookForm.SubmitHandler<Omit<Inputs, 'password'>>;
 } => {
   const navigate = useNavigate();
+  const url = (chatRoomId: string) => `/chat/rooms/${chatRoomId}`;
+
   const protectChatRoom: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
     const { password, chatRoomId } = data;
 
-    await axios.patch(`/chat/rooms/${chatRoomId}`, {
+    await axios.patch(url(chatRoomId), {
       password,
       roomStatus: ChatRoomStatus.PROTECTED,
     });
-    navigate(`/app/chat/rooms/${chatRoomId}`);
+    navigate(url(chatRoomId));
   };
 
   const publicChatRoom: ReactHookForm.SubmitHandler<
     Omit<Inputs, 'password'>
   > = async (data) => {
     const { chatRoomId } = data;
-    await axios.patch(`/chat/rooms/${chatRoomId}`, {
+    await axios.patch(url(chatRoomId), {
       roomStatus: ChatRoomStatus.PUBLIC,
     });
-    navigate(`/app/chat/rooms/${chatRoomId}`);
+    navigate(url(chatRoomId));
   };
 
   return {

@@ -18,9 +18,7 @@ import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomM
 import { SecurityAccordionItem } from 'features/chat/components/organisms/SecurityAccordionItem';
 
 export const ChatRoomSettingsPage: React.FC = React.memo(() => {
-  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL, {
-    autoConnect: false,
-  });
+  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
   const { data: chatLoginUserData } = useGetApi2<ResponseChatRoomMember>(
     `/chat/rooms/${chatRoomId}/members/me`

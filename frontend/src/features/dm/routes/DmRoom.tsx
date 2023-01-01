@@ -19,10 +19,7 @@ export const DmRoom: React.FC = React.memo(() => {
   const { dmRoomId } = location.state as State;
   const { savedDms } = useSavedDms(dmRoomId);
   const [messages, setMessages] = React.useState<ResponseDm[]>(savedDms);
-  const socket = useSocket(import.meta.env.VITE_WS_DM_URL, {
-    autoConnect: false,
-  });
-
+  const socket = useSocket(import.meta.env.VITE_WS_DM_URL);
   React.useEffect(() => {
     socket.emit('join_dm_room', dmRoomId);
     socket.on('receive_message', (payload: ResponseDm) => {
