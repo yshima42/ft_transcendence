@@ -2,12 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
 import { useChangeChatRoomMemberStatus } from 'features/chat/hooks/useChangeChatRoomMemberStatus';
-import {
-  ResponseChatMessage,
-  ResponseChatRoomMember,
-} from 'features/chat/types/chat';
-import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
-import { useSocket } from 'hooks/socket/useSocket';
+import { ResponseChatRoomMember } from 'features/chat/types/chat';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import {
   ChangeChatRoomMemberStatusButtons,
@@ -22,35 +17,13 @@ type Props = {
 
 export const ChatRoomMemberList: React.FC<Props> = React.memo(
   ({ chatRoomId, chatLoginUser }) => {
-    const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
     const {
       isOpen,
       onClose,
       changeChatRoomMemberStatus,
       setSelectedLimitTime,
-    } = useChangeChatRoomMemberStatus(chatRoomId, socket);
-    const { data: chatMembersData, refetch: refetchChatMembers } = useGetApi2<
-      ResponseChatMessage[]
-    >(`/chat/rooms/${chatRoomId}/members`);
-    React.useEffect(() => {
-      const fetchDate = async () => {
-        try {
-          await refetchChatMembers();
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      // webSocket
-      socket.emit('join_room_member', chatRoomId);
-      // webSocketのイベントを受け取る関数を登録
-      socket.on('changeChatRoomMemberStatusSocket', fetchDate);
-
-      return () => {
-        socket.emit('leave_room_member', chatRoomId);
-        socket.off('changeChatRoomMemberStatusSocket', fetchDate);
-      };
-    }, []);
-    const chatMembers = chatMembersData as ResponseChatRoomMember[];
+      chatMembers,
+    } = useChangeChatRoomMemberStatus(chatRoomId);
 
     return (
       <>

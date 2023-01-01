@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { ChatRoomMemberStatus } from '@prisma/client';
-import { LimitTime } from 'features/chat/types/chat';
-import { Socket } from 'socket.io-client';
+import { LimitTime ,
+  ResponseChatMessage,
+  ResponseChatRoomMember,
+} from 'features/chat/types/chat';
+import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
+import { useSocket } from 'hooks/socket/useSocket';
 
 export const useChangeChatRoomMemberStatus = (
-  chatRoomId: string,
-  socket: Socket
+  chatRoomId: string
 ): {
   changeChatRoomMemberStatus: (
     memberId: string,
@@ -16,13 +19,20 @@ export const useChangeChatRoomMemberStatus = (
   setSelectedLimitTime: React.Dispatch<
     React.SetStateAction<LimitTime | undefined>
   >;
+  chatMembers: ResponseChatRoomMember[];
 } => {
+  const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
   const [selectedLimitTime, setSelectedLimitTime] = React.useState<LimitTime>();
   const [selectedMemberStatus, setSelectedMemberStatus] =
     React.useState<ChatRoomMemberStatus>();
   const [selectedMemberId, setSelectedMemberId] = React.useState<string>();
   const [isOpen, setIsOpen] = React.useState(false);
   const onClose = () => setIsOpen(false);
+  const { data: chatMembersData, refetch: refetchChatMembers } = useGetApi2<
+    ResponseChatMessage[]
+  >(`/chat/rooms/${chatRoomId}/members`);
+
+  const chatMembers = chatMembersData as ResponseChatRoomMember[];
 
   React.useEffect(() => {
     if (selectedMemberId === undefined || selectedMemberStatus === undefined) {
@@ -38,6 +48,25 @@ export const useChangeChatRoomMemberStatus = (
     setSelectedMemberStatus(undefined);
     setSelectedLimitTime(undefined);
   }, [selectedLimitTime]);
+
+  React.useEffect(() => {
+    const fetchDate = async () => {
+      try {
+        await refetchChatMembers();
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    // webSocket
+    socket.emit('join_room_member', chatRoomId);
+    // webSocketのイベントを受け取る関数を登録
+    socket.on('changeChatRoomMemberStatusSocket', fetchDate);
+
+    return () => {
+      socket.emit('leave_room_member', chatRoomId);
+      socket.off('changeChatRoomMemberStatusSocket', fetchDate);
+    };
+  }, []);
 
   function changeChatRoomMemberStatus(
     memberId: string,
@@ -79,5 +108,6 @@ export const useChangeChatRoomMemberStatus = (
     isOpen,
     onClose,
     setSelectedLimitTime,
+    chatMembers,
   };
 };
