@@ -28,6 +28,9 @@ export const Message: React.FC<Props> = ({
       <C.Text fontSize="xs" color="gray.500">
         {new Date(createdAt).toLocaleString()}
       </C.Text>
+      <C.Text fontSize="sm" fontWeight="bold">
+        {name}
+      </C.Text>
       <UserAvatar
         id={id}
         size="sm"
