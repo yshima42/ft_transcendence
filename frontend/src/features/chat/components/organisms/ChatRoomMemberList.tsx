@@ -58,14 +58,13 @@ const ChatRoomMemberListItem: React.FC<{
         <C.Spacer />
         <C.Flex>
           <C.Text mr={5}>{member.memberStatus}</C.Text>
-          {chatLoginUser?.user.id === member.user.id && (
+          {chatLoginUser.user.id === member.user.id && (
             <C.Flex>
               <C.Text mr={5}>me</C.Text>
             </C.Flex>
           )}
           {/* userがLoginUserでない、かつ、(LoginUserがADMIN または MODERATOR) かつ、userがNORMALのとき */}
-          {chatLoginUser !== undefined &&
-            chatLoginUser.user.id !== member.user.id &&
+          {chatLoginUser.user.id !== member.user.id &&
             member.memberStatus === ChatRoomMemberStatus.NORMAL &&
             (chatLoginUser.memberStatus === ChatRoomMemberStatus.MODERATOR ||
               chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN) && (
@@ -79,8 +78,7 @@ const ChatRoomMemberListItem: React.FC<{
               </C.Flex>
             )}
           {/* memberがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
-          {chatLoginUser !== undefined &&
-            chatLoginUser.user.id !== member.user.id &&
+          {chatLoginUser.user.id !== member.user.id &&
             chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN &&
             member.memberStatus !== ChatRoomMemberStatus.ADMIN &&
             member.memberStatus !== ChatRoomMemberStatus.NORMAL && (
@@ -102,8 +100,7 @@ const ChatRoomMemberListItem: React.FC<{
                 </C.Button>
               </C.Flex>
             )}
-          {chatLoginUser !== undefined &&
-            chatLoginUser.user.id !== member.user.id &&
+          {chatLoginUser.user.id !== member.user.id &&
             chatLoginUser.memberStatus === ChatRoomMemberStatus.MODERATOR &&
             member.memberStatus !== ChatRoomMemberStatus.MODERATOR &&
             member.memberStatus !== ChatRoomMemberStatus.ADMIN &&
