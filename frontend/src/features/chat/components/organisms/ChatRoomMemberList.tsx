@@ -1,11 +1,14 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { ChatRoomMemberStatus } from '@prisma/client';
 import {
   ResponseChatMessage,
   ResponseChatRoomMember,
+  ResponseChatRoomMemberStatus,
 } from 'features/chat/types/chat';
 import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
 import { useSocket } from 'hooks/socket/useSocket';
+import * as ReactRouter from 'react-router-dom';
 import * as SocketIOClient from 'socket.io-client';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { ChangeChatRoomMemberStatusButtons } from 'features/chat/components/atoms/ChangeChatRoomMemberStatusButtons';
@@ -21,6 +24,8 @@ export const ChatRoomMemberList: React.FC<Props> = React.memo(
     const { data: chatMembersData, refetch: refetchChatMembers } = useGetApi2<
       ResponseChatMessage[]
     >(`/chat/rooms/${chatRoomId}/members`);
+    const navigate = ReactRouter.useNavigate();
+
     React.useEffect(() => {
       const fetchDate = async () => {
         try {
@@ -32,7 +37,31 @@ export const ChatRoomMemberList: React.FC<Props> = React.memo(
       // webSocket
       socket.emit('join_room_member', chatRoomId);
       // webSocketのイベントを受け取る関数を登録
-      socket.on('changeChatRoomMemberStatusSocket', fetchDate);
+      socket.on(
+        'changeChatRoomMemberStatusSocket',
+        (responseChatRoomMemberStatus: ResponseChatRoomMemberStatus) => {
+          if (responseChatRoomMemberStatus === undefined) {
+            return;
+          }
+          if (responseChatRoomMemberStatus.memberId === chatLoginUser.user.id) {
+            if (
+              responseChatRoomMemberStatus.memberStatus ===
+                ChatRoomMemberStatus.KICKED ||
+              responseChatRoomMemberStatus.memberStatus ===
+                ChatRoomMemberStatus.BANNED
+            ) {
+              navigate('/app/chat/rooms/me');
+            }
+            window.location.reload();
+          } else if (
+            responseChatRoomMemberStatus.memberStatus ===
+            ChatRoomMemberStatus.ADMIN
+          ) {
+            window.location.reload();
+          }
+          fetchDate().catch((err) => console.log(err));
+        }
+      );
 
       return () => {
         socket.emit('leave_room_member', chatRoomId);
@@ -66,7 +95,7 @@ const ChatRoomMemberListItem: React.FC<{
   member: ResponseChatRoomMember;
   chatLoginUser: ResponseChatRoomMember;
   socket: SocketIOClient.Socket;
-}> = React.memo(({ chatRoomId, member, chatLoginUser, socket }) => {
+}> = ({ chatRoomId, member, chatLoginUser, socket }) => {
   return (
     <C.ListItem key={member.user.id}>
       <C.Flex>
@@ -88,10 +117,10 @@ const ChatRoomMemberListItem: React.FC<{
           chatRoomId={chatRoomId}
           memberId={member.user.id}
           memberStatus={member.memberStatus}
-          chatLoginUserStatus={chatLoginUser.memberStatus}
+          chatLoginUser={chatLoginUser}
           socket={socket}
         />
       </C.Flex>
     </C.ListItem>
   );
-});
+};
