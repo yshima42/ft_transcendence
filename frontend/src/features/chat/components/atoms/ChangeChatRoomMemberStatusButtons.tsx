@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
-import { LimitTime } from 'features/chat/types/chat';
+import { LimitTime, ResponseChatRoomMember } from 'features/chat/types/chat';
 import * as SocketIOClient from 'socket.io-client';
 
 const limitList: LimitTime[] = ['1m', '1h', '1d', '1w', '1M', 'forever'];
@@ -10,7 +10,7 @@ type Props = {
   chatRoomId: string;
   memberId: string;
   memberStatus: ChatRoomMemberStatus;
-  chatLoginUserStatus: ChatRoomMemberStatus;
+  chatLoginUser: ResponseChatRoomMember;
   socket: SocketIOClient.Socket;
 };
 
@@ -26,7 +26,16 @@ export const changeChatRoomMemberStatusButtonTexts: {
 };
 
 export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
-  ({ chatRoomId, memberId, memberStatus, chatLoginUserStatus, socket }) => {
+  ({ chatRoomId, memberId, memberStatus, chatLoginUser, socket }) => {
+    if (
+      chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN &&
+      chatLoginUser.memberStatus !== ChatRoomMemberStatus.MODERATOR
+    ) {
+      return null;
+    }
+    if (memberId === chatLoginUser.user.id) {
+      return null;
+    }
     let common: Array<{
       memberStatus: ChatRoomMemberStatus;
       label: string;
@@ -48,7 +57,7 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
         hasLimitTime: true,
       },
     ];
-    if (chatLoginUserStatus === ChatRoomMemberStatus.ADMIN) {
+    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN) {
       switch (memberStatus) {
         case ChatRoomMemberStatus.ADMIN:
           return null;
@@ -91,7 +100,7 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
           ];
           break;
       }
-    } else if (chatLoginUserStatus === ChatRoomMemberStatus.MODERATOR) {
+    } else if (chatLoginUser.memberStatus === ChatRoomMemberStatus.MODERATOR) {
       switch (memberStatus) {
         case ChatRoomMemberStatus.ADMIN:
           return null;
