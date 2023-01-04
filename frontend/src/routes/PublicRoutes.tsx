@@ -1,8 +1,5 @@
 import { Suspense } from 'react';
-import { useToast } from '@chakra-ui/react';
-import { isAxiosError } from 'axios';
-import { ErrorBoundary } from 'react-error-boundary';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { CenterSpinner } from 'components/atoms/spinner/CenterSpinner';
 import { MainLayout } from 'components/environments/MainLayout/MainLayout';
 import { Login } from 'features/auth/routes/Login';
@@ -23,34 +20,13 @@ import { Matching } from 'features/game/components/Matching';
 import { Games } from 'features/game/routes/Games';
 import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
+import { ErrorProvider } from 'providers/ErrorProvider';
 import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
-  const navigate = useNavigate();
-  const toast = useToast();
-
-  const onError = (error: Error) => {
-    if (isAxiosError(error) && error.response?.status === 401) {
-      toast({
-        title: 'Error',
-        description: 'Authentication failed.',
-        status: 'error',
-        position: 'top',
-        duration: 3000,
-        isClosable: true,
-      });
-      navigate('/');
-    } else {
-      navigate('/error');
-    }
-  };
-
   return (
     // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
-    <ErrorBoundary
-      fallback={<CenterSpinner h="100vh" color="red.500" />}
-      onError={onError}
-    >
+    <ErrorProvider>
       <Suspense fallback={<CenterSpinner h="100vh" />}>
         <OnlineUsersProvider>
           <MainLayout>
@@ -60,7 +36,7 @@ const App = () => {
           </MainLayout>
         </OnlineUsersProvider>
       </Suspense>
-    </ErrorBoundary>
+    </ErrorProvider>
   );
 };
 
