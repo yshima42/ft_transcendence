@@ -161,16 +161,16 @@ export const useGame = (
         ballY: number;
       }) => {
         [paddle1.x, paddle1.y] = [
-          message.paddle1X * (canvasSize.width / BACKEND_CANVAS_WIDTH),
-          message.paddle1Y * (canvasSize.width / BACKEND_CANVAS_WIDTH),
+          message.paddle1X * canvasSize.ratio,
+          message.paddle1Y * canvasSize.ratio,
         ];
         [paddle2.x, paddle2.y] = [
-          message.paddle2X * (canvasSize.width / BACKEND_CANVAS_WIDTH),
-          message.paddle2Y * (canvasSize.width / BACKEND_CANVAS_WIDTH),
+          message.paddle2X * canvasSize.ratio,
+          message.paddle2Y * canvasSize.ratio,
         ];
         [ball.x, ball.y] = [
-          message.ballX * (canvasSize.width / BACKEND_CANVAS_WIDTH),
-          message.ballY * (canvasSize.width / BACKEND_CANVAS_WIDTH),
+          message.ballX * canvasSize.ratio,
+          message.ballY * canvasSize.ratio,
         ];
       }
     );
