@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useToast } from '@chakra-ui/react';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { usePostApi } from '../generics/usePostApi';
 
 export interface ValidateOtpAuthReqBody {
@@ -22,32 +22,24 @@ export type ValidateOtpAuth = UseMutateAsyncFunction<
 export const useOtpAuthValidate = (): {
   validateOtpAuth: ValidateOtpAuth;
   isLoading: boolean;
-  isError: boolean;
   isSuccess: boolean;
 } => {
   const {
     mutateAsync: validateOtpAuth,
     isLoading,
-    isError,
     isSuccess,
-    failureReason,
+    isError,
+    error,
   } = usePostApi<ValidateOtpAuthReqBody, ValidateOtpAuthResBody>(
     '/auth/otp/validation'
   );
 
-  const toast = useToast();
+  const { customToast } = useCustomToast();
   useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(failureReason)) {
-      toast({
-        title: 'Error',
-        description: failureReason.response?.data.message,
-        status: 'error',
-        position: 'top',
-        duration: 3000,
-        isClosable: true,
-      });
+    if (isError && isAxiosError<{ message: string }>(error)) {
+      customToast({ description: error.response?.data.message });
     }
-  }, [isError, toast, failureReason]);
+  }, [isError, error, customToast]);
 
-  return { validateOtpAuth, isLoading, isError, isSuccess };
+  return { validateOtpAuth, isLoading, isSuccess };
 };
