@@ -34,8 +34,8 @@ model User {
   avatarImageUrl String
   nickname       String       @unique
   onlineStatus   OnlineStatus @default(ONLINE)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
 
   oneTimePasswordAuth OneTimePasswordAuth?
   creator             FriendRequest[]      @relation("creator")
@@ -45,10 +45,10 @@ model User {
   playerOne           MatchResult[]        @relation("playerOne")
   playerTwo           MatchResult[]        @relation("playerTwo")
 
-  chatMessages ChatMessage[]  @relation("messageSender") // ユーザーが送信したチャットメッセージ
-  dms          Dm[]           @relation("dmSender") // ユーザーが送信したDMメッセージ
-  ChatRoomUser ChatRoomUser[] // ユーザーが参加しているチャットルーム
-  DmRoomUser   DmRoomUser[] // ユーザーが参加しているDMルーム
+  chatMessages   ChatMessage[]    @relation("messageSender") // ユーザーが送信したチャットメッセージ
+  dms            Dm[]             @relation("dmSender") // ユーザーが送信したDMメッセージ
+  ChatRoomMember ChatRoomMember[] // ユーザーが参加しているチャットルーム
+  DmRoomMember   DmRoomMember[] // ユーザーが参加しているDMルーム
 }
 
 enum OnlineStatus {
@@ -60,9 +60,10 @@ enum OnlineStatus {
 model OneTimePasswordAuth {
   authUser   User     @relation(fields: [authUserId], references: [id])
   authUserId String   @id @db.Uuid
-  qrcodeUrl  String
-  secret     String
-  createdAt  DateTime @default(now())
+  isEnabled  Boolean  @default(false)
+  qrcodeUrl  String?
+  secret     String?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
 }
 
 model FriendRequest {
@@ -71,8 +72,8 @@ model FriendRequest {
   receiver   User                @relation("receiver", fields: [receiverId], references: [id])
   receiverId String              @db.Uuid
   status     FriendRequestStatus
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
+  createdAt  DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime            @updatedAt @db.Timestamptz(3)
 
   @@id([creatorId, receiverId])
 }
@@ -80,7 +81,6 @@ model FriendRequest {
 enum FriendRequestStatus {
   PENDING
   ACCEPTED
-  DECLINED
 }
 
 model Block {
@@ -100,34 +100,37 @@ model MatchResult {
   playerTwoId    String   @db.Uuid
   playerOneScore Int
   playerTwoScore Int
-  finishedAt     DateTime @default(now())
+  finishedAt     DateTime @default(now()) @db.Timestamptz(3)
 }
 
 model ChatMessage {
   id         String   @id @default(uuid()) @db.Uuid
   content    String
-  createdAt  DateTime @default(now())
-  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id]) // 属するチャットルーム
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade) // 属するチャットルーム
   chatRoomId String   @db.Uuid
-  sender     User     @relation("messageSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
+  sender     User     @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade) // 送信者
   senderId   String   @db.Uuid
 }
 
 model ChatRoom {
-  id            String         @id @default(uuid()) @db.Uuid
-  name          String         @unique
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  chatMessages  ChatMessage[] // チャットルームに属するメッセージ
-  chatRoomUsers ChatRoomUser[] // チャットルームに属するユーザー
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String           @unique
+  roomStatus      ChatRoomStatus   @default(PUBLIC)
+  password        String?
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime         @updatedAt @db.Timestamptz(3)
+  chatMessages    ChatMessage[]
+  chatRoomMembers ChatRoomMember[] // チャットルームに属するユーザー
 }
 
-model ChatRoomUser {
-  chatRoom   ChatRoom       @relation(fields: [chatRoomId], references: [id]) // 参加しているチャットルーム
-  chatRoomId String         @db.Uuid
-  user       User           @relation(fields: [userId], references: [id]) // チャットの参加者
-  userId     String         @db.Uuid
-  status     ChatUserStatus // チャットの参加者のステータス
+model ChatRoomMember {
+  chatRoom     ChatRoom             @relation(fields: [chatRoomId], references: [id], onDelete: Cascade) // 参加しているチャットルーム
+  chatRoomId   String               @db.Uuid
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade) // 参加しているユーザー
+  userId       String               @db.Uuid
+  memberStatus ChatRoomMemberStatus @default(NORMAL)
+  statusUntil  DateTime?            @db.Timestamptz(3)
 
   @@id([chatRoomId, userId])
 }
@@ -135,31 +138,40 @@ model ChatRoomUser {
 model Dm {
   id        String   @id @default(uuid()) @db.Uuid
   content   String
-  createdAt DateTime @default(now())
-  dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id]) // 属するDMルーム
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  dmRoom    DmRoom   @relation(fields: [dmRoomId], references: [id], onDelete: Cascade) // 属するDMルーム dmRoomIdが削除されたら、このDmも削除される
   dmRoomId  String   @db.Uuid
-  sender    User     @relation("dmSender", fields: [senderId], references: [id]) // メッセージに属するユーザー
+  sender    User     @relation("dmSender", fields: [senderId], references: [id], onDelete: Cascade) // DMに属するユーザー
   senderId  String   @db.Uuid
 }
 
 model DmRoom {
-  id          String       @id @default(uuid()) @db.Uuid
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  dms         Dm[] // DMルームに属するメッセージ
-  dmRoomUsers DmRoomUser[] // チャットルームに属するユーザー
+  id            String         @id @default(uuid()) @db.Uuid
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @updatedAt @db.Timestamptz(3)
+  dms           Dm[] // DMルームに属するメッセージ
+  dmRoomMembers DmRoomMember[] // チャットルームに属するユーザー
 }
 
-model DmRoomUser {
-  dmRoom   DmRoom @relation(fields: [dmRoomId], references: [id]) // 参加しているチャットルーム
+model DmRoomMember {
+  dmRoom   DmRoom @relation(fields: [dmRoomId], references: [id], onDelete: Cascade) // 参加しているDMルーム
   dmRoomId String @db.Uuid
-  user     User   @relation(fields: [userId], references: [id]) // チャットの参加者
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade) // DMルームの参加者
   userId   String @db.Uuid
 
   @@id([dmRoomId, userId])
 }
 
-enum ChatUserStatus {
-  OWNER
-  MEMBER
+enum ChatRoomMemberStatus {
+  ADMIN // チャットルームのオーナー
+  MODERATOR // チャットルームのサブオーナー
+  NORMAL // チャットルームのメンバー
+  KICKED // チャットルームからキックされた
+  BANNED // チャットルームからBANされた
+  MUTED // チャットルームからミュートされた
+}
+
+enum ChatRoomStatus {
+  PUBLIC
+  PROTECTED
 }

@@ -41,4 +41,3 @@ prisma/dbml
 prisma/docs
 prisma/generated
 prisma/erd.md
-*.sql
