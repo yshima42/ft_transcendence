@@ -98,8 +98,6 @@ export const publicRoutes = [
       { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
       { path: 'inviting', element: <Inviting /> },
-      { path: 'dm', element: <DmRooms /> },
-      { path: 'dm/:id', element: <DmRoom /> },
       { path: 'dm/rooms', element: <DmRooms /> },
       { path: 'dm/rooms/:chatRoomId', element: <DmRoom /> },
       { path: 'profile', element: <Profile /> },
