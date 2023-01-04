@@ -1,14 +1,13 @@
 import { memo, FC } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, ButtonProps } from '@chakra-ui/react';
 import { useFriendRequestAccept } from 'hooks/api';
 
-type Props = {
+type Props = ButtonProps & {
   targetId: string;
-  size?: string;
 };
 
 export const AcceptButton: FC<Props> = memo((props) => {
-  const { targetId, size = 'sm' } = props;
+  const { targetId, ...buttonProps } = props;
   const { acceptFriendRequest, isLoading, isSuccess } =
     useFriendRequestAccept(targetId);
 
@@ -18,9 +17,10 @@ export const AcceptButton: FC<Props> = memo((props) => {
 
   return (
     <Button
-      size={size}
+      size="sm"
       isDisabled={isLoading || isSuccess}
       onClick={onClickAccept}
+      {...buttonProps}
     >
       Accept
     </Button>
