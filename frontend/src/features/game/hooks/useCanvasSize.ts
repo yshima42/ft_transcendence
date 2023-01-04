@@ -13,12 +13,22 @@ export const useCanvasSize = (): {
       ratio: 0,
     };
   }, []);
+
   useLayoutEffect(() => {
     const updateSize = (): void => {
       const padding = 300;
-      canvasSize.width = window.innerWidth - padding;
-      canvasSize.height = window.innerHeight - padding;
-      canvasSize.ratio = (window.innerWidth - padding) / BACKEND_CANVAS_WIDTH;
+      const minimumWidth = 300;
+
+      // window.innerWidthに合わせてcanvasのサイズを変更する
+      // ただし、最小値はminimumWidth
+      // window.innerHeightに合わせてcanvasのサイズ変更は未実装
+      if (window.innerWidth > padding + minimumWidth) {
+        canvasSize.width = window.innerWidth - padding;
+      } else {
+        canvasSize.width = minimumWidth;
+      }
+      canvasSize.height = canvasSize.width - padding;
+      canvasSize.ratio = canvasSize.width / BACKEND_CANVAS_WIDTH;
     };
 
     window.addEventListener('resize', updateSize);

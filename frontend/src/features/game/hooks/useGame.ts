@@ -67,6 +67,13 @@ export const useGame = (
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    // ゲームオブジェクトのサイズの設定
+    paddle1.height = PADDLE_HEIGHT * canvasSize.ratio;
+    paddle1.width = PADDLE_WIDTH * canvasSize.ratio;
+    paddle2.height = PADDLE_HEIGHT * canvasSize.ratio;
+    paddle2.width = PADDLE_WIDTH * canvasSize.ratio;
+    ball.size = BALL_SIZE * canvasSize.ratio;
+
     // ゲームオブジェクトの表示
     paddle1.draw(ctx);
     paddle2.draw(ctx);
@@ -187,11 +194,6 @@ export const useGame = (
           message.ballX * canvasSize.ratio,
           message.ballY * canvasSize.ratio,
         ];
-        paddle1.height = PADDLE_HEIGHT * canvasSize.ratio;
-        paddle1.width = PADDLE_WIDTH * canvasSize.ratio;
-        paddle2.height = PADDLE_HEIGHT * canvasSize.ratio;
-        paddle2.width = PADDLE_WIDTH * canvasSize.ratio;
-        ball.size = BALL_SIZE * canvasSize.ratio;
       }
     );
 
