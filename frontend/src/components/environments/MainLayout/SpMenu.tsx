@@ -24,7 +24,7 @@ type Props = {
 
 export const SpMenu: FC<Props> = memo((props) => {
   const { items } = props;
-  const { logout } = useLogout();
+  const { logout, isLoading } = useLogout();
 
   const navigate = useNavigate();
 
@@ -54,7 +54,11 @@ export const SpMenu: FC<Props> = memo((props) => {
           <Link to="/app/profile">
             <MenuItem icon={<InfoOutlineIcon />}>Profile</MenuItem>
           </Link>
-          <MenuItem icon={<ArrowForwardIcon />} onClick={onClickLogout}>
+          <MenuItem
+            icon={<ArrowForwardIcon />}
+            onClick={onClickLogout}
+            isDisabled={isLoading}
+          >
             Logout
           </MenuItem>
         </MenuList>

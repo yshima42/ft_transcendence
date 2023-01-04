@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 export const UserNavigation: FC = memo(() => {
-  const { logout } = useLogout();
+  const { logout, isLoading } = useLogout();
   const { user } = useProfile();
 
   const navigate = useNavigate();
@@ -24,7 +24,13 @@ export const UserNavigation: FC = memo(() => {
             {user.nickname}
           </Heading>
         </Link>
-        <Button size="xs" rounded="lg" onClick={onClickLogout} color="gray">
+        <Button
+          size="xs"
+          rounded="lg"
+          onClick={onClickLogout}
+          color="gray"
+          isDisabled={isLoading}
+        >
           Logout
         </Button>
       </Flex>
