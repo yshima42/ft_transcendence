@@ -15,8 +15,8 @@ export const useCanvas = (
 
     // Our draw came here
     const render = () => {
-      canvas.width = size[0] - 300;
-      canvas.height = (size[0] - 300) / 2;
+      canvas.width = size[0];
+      canvas.height = size[0] / 2;
       frameCount++;
       draw(context, frameCount);
       animationFrameId = window.requestAnimationFrame(render);
