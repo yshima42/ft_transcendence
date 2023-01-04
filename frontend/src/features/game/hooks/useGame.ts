@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import {
@@ -41,6 +42,7 @@ export const useGame = (
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
+  const [isPlayer, setIsPlayer] = useState(true);
 
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
@@ -48,6 +50,7 @@ export const useGame = (
   }
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const player1: Player = useMemo(() => ({ id: '', score: 0 }), []);
   const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
@@ -116,6 +119,7 @@ export const useGame = (
       (message: {
         player1: { id: string; score: number };
         player2: { id: string; score: number };
+        isPlayer: boolean;
         isLeftSide: boolean;
         readyCountDownNum: number;
         nextGamePhase: GamePhase;
@@ -125,6 +129,7 @@ export const useGame = (
         player2.id = message.player2.id;
         player1.score = message.player1.score;
         player2.score = message.player2.score;
+        setIsPlayer(message.isPlayer);
         userCommand.isLeftSide = message.isLeftSide;
         setReadyCountDownNum(message.readyCountDownNum);
         setGamePhase(message.nextGamePhase);
@@ -182,11 +187,12 @@ export const useGame = (
   useEffect(() => {
     switch (gamePhase) {
       case GamePhase.SocketConnecting: {
-        if (connected) setGamePhase(GamePhase.Joining);
+        if (connected) {
+          setGamePhase(GamePhase.Joining);
+        }
         break;
       }
       case GamePhase.Joining: {
-        console.log('[GamePhase] Joining');
         socket.emit('join_game_room', { roomId });
         break;
       }
@@ -207,6 +213,16 @@ export const useGame = (
         break;
       }
       case GamePhase.Result: {
+        const invalidQueryKeys = [
+          [`/users/${player1.id}/game/matches`],
+          [`/users/${player2.id}/game/matches`],
+          [`/users/${player1.id}/game/stats`],
+          [`/users/${player2.id}/game/stats`],
+        ];
+        if (isPlayer) {
+          invalidQueryKeys.push([`/game/matches`], ['/game/stats']);
+        }
+        void queryClient.invalidateQueries({ queryKey: invalidQueryKeys });
         break;
       }
       case GamePhase.PlayerWaiting: {
@@ -221,7 +237,7 @@ export const useGame = (
       document.removeEventListener('keydown', keyDownEvent, false);
       document.removeEventListener('keyup', keyUpEvent, false);
     };
-  }, [gamePhase, socket, roomId, connected, keyDownEvent, keyUpEvent]);
+  }, [gamePhase, socket, roomId, connected, isPlayer, queryClient]);
 
   return { gamePhase, setGamePhase, draw, player1, player2, readyCountDownNum };
 };

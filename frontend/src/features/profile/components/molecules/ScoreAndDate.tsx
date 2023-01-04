@@ -24,7 +24,10 @@ export const ScoreAndDate: FC<Props> = memo((props) => {
           {score}
         </Text>
         <Text h="8px" fontSize="4px">
-          {`${year}/${month}/${day} ${hour}:${minute}`}
+          {`${year}/${month}/${day}`}
+        </Text>
+        <Text h="8px" fontSize="4px">
+          {`${hour}:${minute < 10 ? '0' + minute.toString() : minute} `}
         </Text>
       </VStack>
     </Box>
