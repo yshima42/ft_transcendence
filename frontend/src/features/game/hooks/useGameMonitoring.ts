@@ -21,20 +21,16 @@ export const useGameMonitoring = (): {
   useEffect(() => {
     if (!connected) return;
 
-    socket.emit(
-      'join_game_monitor_room',
-      (inGameOutlines: Array<string[3]>) => {
-        console.log('[Socket Event] join_game_monitor_room');
-        inGameOutlines.forEach((inGameOutline) =>
-          inGameOutlineMap.set(inGameOutline[0], {
-            roomId: inGameOutline[0],
-            player1Id: inGameOutline[1],
-            player2Id: inGameOutline[2],
-          })
-        );
-        setInGameOutlines(Array.from(inGameOutlineMap.values()));
-      }
-    );
+    socket.emit('join_monitor_room', (inGameOutlines: Array<string[3]>) => {
+      inGameOutlines.forEach((inGameOutline) =>
+        inGameOutlineMap.set(inGameOutline[0], {
+          roomId: inGameOutline[0],
+          player1Id: inGameOutline[1],
+          player2Id: inGameOutline[2],
+        })
+      );
+      setInGameOutlines(Array.from(inGameOutlineMap.values()));
+    });
 
     socket.on('game_room_created', (createdRoomOutline: string[3]) => {
       console.log('[Socket Event] game_room_created');
@@ -55,7 +51,7 @@ export const useGameMonitoring = (): {
     return () => {
       if (!connected) return;
 
-      socket.emit('leave_game_monitor_room');
+      socket.emit('leave_monitor_room');
       socket.off('game_room_created');
       socket.off('game_room_deleted');
     };

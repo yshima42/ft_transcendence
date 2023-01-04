@@ -2,11 +2,11 @@ import { useContext } from 'react';
 import { Presence, SocketContext } from 'providers/SocketProvider';
 
 export const useUserPresence = (friendId: string): { presence: Presence } => {
-  const data = useContext(SocketContext);
-  if (data === undefined) {
+  const socketContext = useContext(SocketContext);
+  if (socketContext === undefined) {
     throw new Error('GameSocket undefined');
   }
-  const { userIdToPresenceMap } = data;
+  const { userIdToPresenceMap } = socketContext;
 
   // 冗長だけど下のやり方うまく行かなかったので一旦こちらで
   const presence = userIdToPresenceMap.has(friendId)

@@ -225,9 +225,6 @@ export class GameRoom {
     // setIntervalを止める処理
     clearInterval(this.interval);
     this.deleteGameRoom(this);
-    this.server
-      .in([roomId, `watch_${roomId}`])
-      .emit('update_game_phase', GamePhase.Result);
 
     // データベースへスコアの保存
     const muchResult: CreateMatchResultDto = {
@@ -237,6 +234,10 @@ export class GameRoom {
       playerTwoScore: this.player2.score,
     };
     await this.gameService.addMatchResult(muchResult);
+
+    this.server
+      .in([roomId, `watch_${roomId}`])
+      .emit('update_game_phase', GamePhase.Result);
   }
 
   // TODO: disconnect処理を実行
