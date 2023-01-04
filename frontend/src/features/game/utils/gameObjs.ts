@@ -58,3 +58,23 @@ export class Paddle {
     this.y = y;
   };
 }
+
+export class Score {
+  x: number;
+  y: number;
+  size: number;
+
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.size = 0;
+  }
+
+  draw = (ctx: CanvasRenderingContext2D): void => {
+    ctx.fillStyle = BALL_COLOR;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.closePath();
+  };
+}

@@ -73,9 +73,18 @@ export const useGame = (
     ball.draw(ctx);
 
     // スコアの表示
-    ctx.font = '48px serif';
-    ctx.fillText(player1.score.toString(), 20, 50);
-    ctx.fillText(player2.score.toString(), BACKEND_CANVAS_WIDTH - 40, 50);
+    const fontSize = 48 * canvasSize.ratio;
+    ctx.font = `${fontSize}px serif`;
+    ctx.fillText(
+      player1.score.toString(),
+      20 * canvasSize.ratio,
+      50 * canvasSize.ratio
+    );
+    ctx.fillText(
+      player2.score.toString(),
+      (BACKEND_CANVAS_WIDTH - 40) * canvasSize.ratio,
+      50 * canvasSize.ratio
+    );
   }, []);
 
   const userCommand = useMemo(
