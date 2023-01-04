@@ -1,11 +1,21 @@
 import { useLayoutEffect, useMemo } from 'react';
 
-export const useCanvasSize = (): number[] => {
-  const size = useMemo(() => [0, 0], []);
+export const useCanvasSize = (): {
+  width: number;
+  height: number;
+  ratio: number;
+} => {
+  const canvasSize = useMemo(() => {
+    return {
+      width: 0,
+      height: 0,
+      ratio: 0,
+    };
+  }, []);
   useLayoutEffect(() => {
     const updateSize = (): void => {
-      size[0] = window.innerWidth - 300;
-      size[1] = window.innerHeight - 300;
+      canvasSize.width = window.innerWidth - 300;
+      canvasSize.height = window.innerHeight - 300;
     };
 
     window.addEventListener('resize', updateSize);
@@ -14,5 +24,5 @@ export const useCanvasSize = (): number[] => {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  return size;
+  return canvasSize;
 };

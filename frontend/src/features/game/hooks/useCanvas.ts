@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 
 export const useCanvas = (
   draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void,
-  size: number[]
+  canvasSize: { width: number; height: number; ratio: number }
 ): React.RefObject<HTMLCanvasElement> => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -15,8 +15,8 @@ export const useCanvas = (
 
     // Our draw came here
     const render = () => {
-      canvas.width = size[0];
-      canvas.height = size[0] / 2;
+      canvas.width = canvasSize.width;
+      canvas.height = canvasSize.width / 2;
       frameCount++;
       draw(context, frameCount);
       animationFrameId = window.requestAnimationFrame(render);
