@@ -9,13 +9,13 @@ type Props = {
   draw: (ctx: CanvasRenderingContext2D) => void;
   player1: Player;
   player2: Player;
-  size: number[];
+  canvasSize: { width: number; height: number; ratio: number };
 };
 
 export const PongGame: FC<Props> = memo((props) => {
-  const { draw, player1, player2, size } = props;
+  const { draw, player1, player2, canvasSize } = props;
 
-  const canvasRef = useCanvas(draw, size);
+  const canvasRef = useCanvas(draw, canvasSize);
   const { user: user1 } = useProfile(player1.id);
   const { user: user2 } = useProfile(player2.id);
   // const { canvasWidth, canvasHeight } = useCanvasSize();

@@ -19,7 +19,7 @@ export const Game: FC = memo(() => {
     player1,
     player2,
     readyCountDownNum,
-    size,
+    canvasSize,
   } = useGame(roomId ?? '');
 
   const gamePage = useMemo(() => {
@@ -47,7 +47,7 @@ export const Game: FC = memo(() => {
             draw={draw}
             player1={player1}
             player2={player2}
-            size={size}
+            canvasSize={canvasSize}
           />
         );
       case GamePhase.Result:

@@ -32,7 +32,7 @@ export const useGame = (
   player1: Player;
   player2: Player;
   readyCountDownNum: number;
-  size: number[];
+  canvasSize: { width: number; height: number; ratio: number };
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
@@ -50,7 +50,7 @@ export const useGame = (
   const paddle2 = useMemo(() => new Paddle(), []);
   const ball = useMemo(() => new Ball(), []);
   // const { canvasWidth } = useCanvasSize();
-  const size = useCanvasSize();
+  const canvasSize = useCanvasSize();
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     // canvas背景の設定
@@ -156,16 +156,16 @@ export const useGame = (
         ballY: number;
       }) => {
         [paddle1.x, paddle1.y] = [
-          message.paddle1X * (size[0] / BACKEND_CANVAS_WIDTH),
-          message.paddle1Y * (size[0] / BACKEND_CANVAS_WIDTH),
+          message.paddle1X * (canvasSize.width / BACKEND_CANVAS_WIDTH),
+          message.paddle1Y * (canvasSize.width / BACKEND_CANVAS_WIDTH),
         ];
         [paddle2.x, paddle2.y] = [
-          message.paddle2X * (size[0] / BACKEND_CANVAS_WIDTH),
-          message.paddle2Y * (size[0] / BACKEND_CANVAS_WIDTH),
+          message.paddle2X * (canvasSize.width / BACKEND_CANVAS_WIDTH),
+          message.paddle2Y * (canvasSize.width / BACKEND_CANVAS_WIDTH),
         ];
         [ball.x, ball.y] = [
-          message.ballX * (size[0] / BACKEND_CANVAS_WIDTH),
-          message.ballY * (size[0] / BACKEND_CANVAS_WIDTH),
+          message.ballX * (canvasSize.width / BACKEND_CANVAS_WIDTH),
+          message.ballY * (canvasSize.width / BACKEND_CANVAS_WIDTH),
         ];
       }
     );
@@ -233,6 +233,6 @@ export const useGame = (
     player1,
     player2,
     readyCountDownNum,
-    size,
+    canvasSize,
   };
 };
