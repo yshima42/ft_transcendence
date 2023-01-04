@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useEffect } from 'react';
+import { FC, PropsWithChildren, useCallback, useEffect } from 'react';
 import { ToastId, ToastProps } from '@chakra-ui/react';
 import { isAxiosError } from 'axios';
 import { useCustomToast } from 'hooks/utils/useCustomToast';
@@ -26,16 +26,19 @@ export const ErrorProvider: FC<Props> = (props) => {
   const navigate = useNavigate();
   const id: ToastId = 'unauthorized';
 
-  const onError = (error: Error) => {
-    if (isAxiosError(error) && error.response?.status === 401) {
-      if (!customToast.isActive(id)) {
-        customToast({ id, description: 'Authentication failed.' });
+  const onError = useCallback(
+    (error: Error) => {
+      if (isAxiosError(error) && error.response?.status === 401) {
+        if (!customToast.isActive(id)) {
+          customToast({ id, description: 'Authentication failed.' });
+        }
+        navigate('/');
+      } else {
+        customToast({ description: error.message });
       }
-      navigate('/');
-    } else {
-      customToast({ description: error.message });
-    }
-  };
+    },
+    [customToast, navigate]
+  );
 
   return (
     <ErrorBoundary fallback={<UnexpectedError />} onError={onError}>
