@@ -3,14 +3,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import {
-  BALL_START_X,
-  BALL_START_Y,
-  BG_COLOR,
   CANVAS_WIDTH,
-  PADDLE_START_POS,
+  BALL_SIZE,
+  BG_COLOR,
+  PADDLE_HEIGHT,
   PADDLE_WIDTH,
 } from '../utils/gameConfig';
 import { Ball, Paddle } from '../utils/gameObjs';
+import { useCanvasSize } from './useCanvasSize';
 
 export enum GamePhase {
   SocketConnecting = 0,
@@ -39,6 +39,7 @@ export const useGame = (
   player1: Player;
   player2: Player;
   readyCountDownNum: number;
+  canvasSize: { width: number; height: number; ratio: number };
 } => {
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
@@ -54,12 +55,11 @@ export const useGame = (
 
   const player1: Player = useMemo(() => ({ id: '', score: 0 }), []);
   const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
-  const paddle1 = useMemo(() => new Paddle(0, PADDLE_START_POS), []);
-  const paddle2 = useMemo(
-    () => new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS),
-    []
-  );
-  const ball = useMemo(() => new Ball(BALL_START_X, BALL_START_Y), []);
+  const paddle1 = useMemo(() => new Paddle(), []);
+  const paddle2 = useMemo(() => new Paddle(), []);
+  const ball = useMemo(() => new Ball(), []);
+  // const { canvasWidth } = useCanvasSize();
+  const canvasSize = useCanvasSize();
 
   const draw = useCallback((ctx: CanvasRenderingContext2D) => {
     // canvas背景の設定
@@ -67,15 +67,31 @@ export const useGame = (
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    // ゲームオブジェクトのサイズの設定
+    paddle1.height = PADDLE_HEIGHT * canvasSize.ratio;
+    paddle1.width = PADDLE_WIDTH * canvasSize.ratio;
+    paddle2.height = PADDLE_HEIGHT * canvasSize.ratio;
+    paddle2.width = PADDLE_WIDTH * canvasSize.ratio;
+    ball.size = BALL_SIZE * canvasSize.ratio;
+
     // ゲームオブジェクトの表示
     paddle1.draw(ctx);
     paddle2.draw(ctx);
     ball.draw(ctx);
 
     // スコアの表示
-    ctx.font = '48px serif';
-    ctx.fillText(player1.score.toString(), 20, 50);
-    ctx.fillText(player2.score.toString(), 960, 50);
+    const fontSize = 48 * canvasSize.ratio;
+    ctx.font = `${fontSize}px serif`;
+    ctx.fillText(
+      player1.score.toString(),
+      20 * canvasSize.ratio,
+      50 * canvasSize.ratio
+    );
+    ctx.fillText(
+      player2.score.toString(),
+      (CANVAS_WIDTH - 40) * canvasSize.ratio,
+      50 * canvasSize.ratio
+    );
   }, []);
 
   const userCommand = useMemo(
@@ -166,9 +182,18 @@ export const useGame = (
         ballX: number;
         ballY: number;
       }) => {
-        [paddle1.x, paddle1.y] = [message.paddle1X, message.paddle1Y];
-        [paddle2.x, paddle2.y] = [message.paddle2X, message.paddle2Y];
-        [ball.x, ball.y] = [message.ballX, message.ballY];
+        [paddle1.x, paddle1.y] = [
+          message.paddle1X * canvasSize.ratio,
+          message.paddle1Y * canvasSize.ratio,
+        ];
+        [paddle2.x, paddle2.y] = [
+          message.paddle2X * canvasSize.ratio,
+          message.paddle2Y * canvasSize.ratio,
+        ];
+        [ball.x, ball.y] = [
+          message.ballX * canvasSize.ratio,
+          message.ballY * canvasSize.ratio,
+        ];
       }
     );
 
@@ -239,5 +264,13 @@ export const useGame = (
     };
   }, [gamePhase, socket, roomId, connected, isPlayer, queryClient]);
 
-  return { gamePhase, setGamePhase, draw, player1, player2, readyCountDownNum };
+  return {
+    gamePhase,
+    setGamePhase,
+    draw,
+    player1,
+    player2,
+    readyCountDownNum,
+    canvasSize,
+  };
 };
