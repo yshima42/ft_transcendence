@@ -71,9 +71,7 @@ export class UsersGateway {
 
     const userIdSockets = await this.server.in(userId).fetchSockets();
     if (userIdSockets.length === 0) {
-      socket.broadcast.emit('user_disconnected', userId);
-      this.userIdToPresence.delete(userId);
-      this.userIdToGameRoomId.delete(userId);
+      this.deletePresence(userId);
     }
 
     // debug用
@@ -89,17 +87,8 @@ export class UsersGateway {
     const reconnected = this.userIdToPresence.has(userId);
     // TODO: ここをthis.updatePresenceにまとめられないか
     if (!reconnected) {
-      socket.broadcast.emit('update_presence', [
-        userId,
-        this.userIdToPresence.get(userId),
-      ]);
-      socket.broadcast.emit('update_game_room_id', [
-        userId,
-        this.userIdToGameRoomId.get(userId),
-      ]);
+      this.addPresence(userId);
     }
-    this.userIdToPresence.set(userId, Presence.ONLINE);
-    this.userIdToGameRoomId.set(userId, '');
 
     // debug用
     Logger.debug('handshake: ' + socket.id);
@@ -115,6 +104,14 @@ export class UsersGateway {
   async randomMatch(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(`${socket.id} ${socket.data.userId as string} random_match`);
 
+    const { userId } = socket.data as { userId: string };
+    const gameRoomId = this.userIdToGameRoomId.get(userId);
+    if (gameRoomId !== undefined) {
+      socket.emit('go_game_room', gameRoomId);
+
+      return;
+    }
+
     const matchingSockets = await this.server.in('matching').fetchSockets();
     // 1人目の場合2人目ユーザーを待つ
     if (matchingSockets.length === 0) {
@@ -122,7 +119,6 @@ export class UsersGateway {
 
       return;
     }
-    const { userId } = socket.data as { userId: string };
     const { userId: waitUserId } = matchingSockets[0].data as {
       userId: string;
     };
@@ -225,6 +221,7 @@ export class UsersGateway {
     const gameInfo = {
       player1: { id: player1.id, score: player1.score },
       player2: { id: player2.id, score: player2.score },
+      isPlayer,
       isLeftSide: true,
       readyCountDownNum: gameRoom.readyCountDownNum,
       nextGamePhase: GamePhase.ConfirmWaiting,
@@ -358,12 +355,12 @@ export class UsersGateway {
     }
   }
 
-  @SubscribeMessage('join_game_monitor_room')
+  @SubscribeMessage('join_monitor_room')
   async sendAllGameRoomIds(
     @ConnectedSocket() socket: Socket
   ): Promise<string[][]> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} join_game_monitor_room`
+      `${socket.id} ${socket.data.userId as string} join_monitor_room`
     );
 
     await socket.join('monitor');
@@ -380,10 +377,10 @@ export class UsersGateway {
     return inGameOutlines;
   }
 
-  @SubscribeMessage('leave_game_monitor_room')
+  @SubscribeMessage('leave_monitor_room')
   async leaveRoomList(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} leave_game_monitor_room`
+      `${socket.id} ${socket.data.userId as string} leave_monitor_room`
     );
 
     await socket.leave('monitor');
@@ -405,9 +402,9 @@ export class UsersGateway {
     this.gameRooms.set(gameRoom.id, gameRoom);
 
     this.updatePresence(player1.id, Presence.INGAME);
-    this.updateGameRoomId(player1.id, gameRoom.id);
+    this.addGameRoomId(player1.id, gameRoom.id);
     this.updatePresence(player2.id, Presence.INGAME);
-    this.updateGameRoomId(player2.id, gameRoom.id);
+    this.addGameRoomId(player2.id, gameRoom.id);
     this.server
       .to('monitor')
       .emit('game_room_created', [gameRoom.id, player1.id, player2.id]);
@@ -421,24 +418,47 @@ export class UsersGateway {
     this.gameRooms.delete(roomId);
     this.updatePresence(player1.id, Presence.ONLINE);
     this.updatePresence(player2.id, Presence.ONLINE);
-    this.updateGameRoomId(player1.id, '');
-    this.updateGameRoomId(player2.id, '');
+    this.deleteGameRoomId(player1.id);
+    this.deleteGameRoomId(player2.id);
     this.server.to('monitor').emit('game_room_deleted', roomId);
   }
 
-  updatePresence(userId: string, presence: Presence): void {
+  addPresence(userId: string): void {
+    const isInGame = this.userIdToGameRoomId.has(userId);
+    const presence = isInGame ? Presence.INGAME : Presence.ONLINE;
     this.userIdToPresence.set(userId, presence);
-    this.server.emit('update_presence', [
+    this.server.emit('set_presence', [
       userId,
       this.userIdToPresence.get(userId),
     ]);
   }
 
-  updateGameRoomId(userId: string, gameRoomId: string): void {
+  updatePresence(userId: string, presence: Presence): void {
+    const isOnline = this.userIdToPresence.has(userId);
+    if (isOnline) {
+      this.userIdToPresence.set(userId, presence);
+      this.server.emit('set_presence', [
+        userId,
+        this.userIdToPresence.get(userId),
+      ]);
+    }
+  }
+
+  deletePresence(userId: string): void {
+    this.userIdToPresence.delete(userId);
+    this.server.emit('delete_presence', userId);
+  }
+
+  addGameRoomId(userId: string, gameRoomId: string): void {
     this.userIdToGameRoomId.set(userId, gameRoomId);
-    this.server.emit('update_game_room_id', [
+    this.server.emit('set_game_room_id', [
       userId,
       this.userIdToGameRoomId.get(userId),
     ]);
+  }
+
+  deleteGameRoomId(userId: string): void {
+    this.userIdToGameRoomId.delete(userId);
+    this.server.emit('delete_game_room_id', userId);
   }
 }
