@@ -1,6 +1,6 @@
 // TODO: バックエンドと共通にする
-export const BACKEND_CANVAS_WIDTH = 780;
-export const BACKEND_CANVAS_HEIGHT = 540;
+export const CANVAS_WIDTH = 780;
+export const CANVAS_HEIGHT = 540;
 export const BALL_SIZE = 12;
 export const PADDLE_WIDTH = 20;
 export const PADDLE_HEIGHT = 100;

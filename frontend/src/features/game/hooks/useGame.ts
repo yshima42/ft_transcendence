@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import {
-  BACKEND_CANVAS_WIDTH,
+  CANVAS_WIDTH,
   BALL_SIZE,
   BG_COLOR,
   PADDLE_HEIGHT,
@@ -89,7 +89,7 @@ export const useGame = (
     );
     ctx.fillText(
       player2.score.toString(),
-      (BACKEND_CANVAS_WIDTH - 40) * canvasSize.ratio,
+      (CANVAS_WIDTH - 40) * canvasSize.ratio,
       50 * canvasSize.ratio
     );
   }, []);

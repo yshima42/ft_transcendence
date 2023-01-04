@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo } from 'react';
-import { BACKEND_CANVAS_WIDTH } from '../utils/gameConfig';
+import { CANVAS_WIDTH } from '../utils/gameConfig';
 
 export const useCanvasSize = (): {
   width: number;
@@ -28,7 +28,7 @@ export const useCanvasSize = (): {
         canvasSize.width = minimumWidth;
       }
       canvasSize.height = canvasSize.width - padding;
-      canvasSize.ratio = canvasSize.width / BACKEND_CANVAS_WIDTH;
+      canvasSize.ratio = canvasSize.width / CANVAS_WIDTH;
     };
 
     window.addEventListener('resize', updateSize);
