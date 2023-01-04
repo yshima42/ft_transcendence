@@ -23,7 +23,7 @@ export const useAvatarUpload = (): {
   isSuccess: boolean;
 } => {
   const {
-    postFunc: uploadAvatar,
+    mutateAsync: uploadAvatar,
     isLoading,
     isSuccess,
   } = usePostFileApi<AvatarUploadResBody>('/users/me/avatar', [

@@ -26,7 +26,7 @@ export const useOtpAuthValidate = (): {
   isSuccess: boolean;
 } => {
   const {
-    postFunc: validateOtpAuth,
+    mutateAsync: validateOtpAuth,
     isLoading,
     isError,
     isSuccess,

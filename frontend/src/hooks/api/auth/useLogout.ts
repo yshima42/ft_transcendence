@@ -20,7 +20,7 @@ export const useLogout = (): {
   isSuccess: boolean;
 } => {
   const {
-    postFunc: logout,
+    mutateAsync: logout,
     isLoading,
     isSuccess,
   } = usePostApi<LogoutReqBody, LogoutResBody>('/auth/logout');

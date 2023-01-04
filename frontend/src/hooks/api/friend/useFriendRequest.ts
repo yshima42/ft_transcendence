@@ -25,7 +25,7 @@ export const useFriendRequest = (
   isSuccess: boolean;
 } => {
   const {
-    postFunc: requestFriend,
+    mutateAsync: requestFriend,
     isLoading,
     isSuccess,
   } = usePostApi<FriendRequestReqBody, FriendRequestResBody>(

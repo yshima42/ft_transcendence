@@ -29,7 +29,7 @@ export const useProfileEdit = (): {
   failureReason: unknown;
 } => {
   const {
-    postFunc: editProfile,
+    mutateAsync: editProfile,
     isLoading,
     isError,
     isSuccess,

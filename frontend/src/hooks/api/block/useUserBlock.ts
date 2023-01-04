@@ -25,7 +25,7 @@ export const useUserBlock = (
   isSuccess: boolean;
 } => {
   const {
-    postFunc: blockUser,
+    mutateAsync: blockUser,
     isLoading,
     isSuccess,
   } = usePostApi<UserBlockReqBody, UserBlockResBody>(`/users/me/blocks`, [

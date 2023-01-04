@@ -21,7 +21,7 @@ export const useOtpAuthQrcodeCreate = (): {
   isSuccess: boolean;
 } => {
   const {
-    postFunc: createOtpAuthQrcodeUrl,
+    mutateAsync: createOtpAuthQrcodeUrl,
     isLoading,
     isSuccess,
   } = usePostApi<CreateOtpAuthQrcodeUrlReqBody, CreateOtpAuthQrcodeUrlResBody>(

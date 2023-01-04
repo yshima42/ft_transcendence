@@ -22,7 +22,7 @@ export const useDummyLogin = (): {
   isSuccess: boolean;
 } => {
   const {
-    postFunc: dummyLogin,
+    mutateAsync: dummyLogin,
     isLoading,
     isSuccess,
   } = usePostApi<DummyLoginReqBody, DummyLoginResBody>('/auth/login/dummy');

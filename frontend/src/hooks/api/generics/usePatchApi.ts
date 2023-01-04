@@ -1,21 +1,17 @@
 import {
   QueryKey,
-  UseMutateAsyncFunction,
   useMutation,
+  UseMutationResult,
   useQueryClient,
+  UseMutationOptions,
 } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
 export function usePatchApi<ReqBody, ResBody>(
   endpoint: string,
-  queryKeys?: QueryKey[]
-): {
-  patchFunc: UseMutateAsyncFunction<ResBody, unknown, ReqBody, unknown>;
-  isLoading: boolean;
-  isError: boolean;
-  isSuccess: boolean;
-  failureReason: unknown;
-} {
+  queryKeys?: QueryKey[],
+  useMutationOptions?: UseMutationOptions<ResBody, unknown, ReqBody, unknown>
+): UseMutationResult<ResBody, unknown, ReqBody, unknown> {
   const axiosPatch = async (reqBody: ReqBody) => {
     const result = await axios.patch<ResBody>(endpoint, reqBody);
 
@@ -24,13 +20,7 @@ export function usePatchApi<ReqBody, ResBody>(
 
   const queryClient = useQueryClient();
 
-  const {
-    mutateAsync: patchFunc,
-    isLoading,
-    isError,
-    isSuccess,
-    failureReason,
-  } = useMutation(axiosPatch, {
+  const useMutationResult = useMutation(axiosPatch, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
@@ -38,7 +28,8 @@ export function usePatchApi<ReqBody, ResBody>(
         });
       }
     },
+    ...useMutationOptions,
   });
 
-  return { patchFunc, isLoading, isError, isSuccess, failureReason };
+  return useMutationResult;
 }
