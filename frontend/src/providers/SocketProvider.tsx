@@ -3,7 +3,6 @@ import {
   FC,
   PropsWithChildren,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -32,10 +31,12 @@ export const SocketContext = createContext<
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const socket = useSocket(WS_BASE_URL, { autoConnect: false });
-  const [, setUserIdToPresence] = useState<Array<[string, Presence]>>([]);
-  const userIdToPresenceMap = useMemo(() => new Map<string, Presence>(), []);
-  const [, setUserIdToGameRoomId] = useState<Array<[string, string]>>([]);
-  const userIdToGameRoomIdMap = useMemo(() => new Map<string, string>(), []);
+  const [userIdToPresenceMap, setUserIdToPresenceMap] = useState(
+    new Map<string, Presence>()
+  );
+  const [userIdToGameRoomIdMap, setUserIdToGameRoomIdMap] = useState(
+    new Map<string, string>()
+  );
   const [connected, setConnected] = useState(false);
   const didLogRef = useRef(false);
   const navigate = useNavigate();
@@ -55,47 +56,40 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
             userIdToPresence: Array<[string, Presence]>;
             userIdToGameRoomId: Array<[string, string]>;
           }) => {
-            setUserIdToPresence(message.userIdToPresence);
-            message.userIdToPresence.forEach((eachUserIdToPresence) => {
-              userIdToPresenceMap.set(...eachUserIdToPresence);
-            });
-            setUserIdToGameRoomId(message.userIdToGameRoomId);
-            message.userIdToGameRoomId.forEach((eachUserIdToGameRoomId) => {
-              userIdToGameRoomIdMap.set(...eachUserIdToGameRoomId);
-            });
+            setUserIdToPresenceMap(
+              new Map<string, Presence>(message.userIdToPresence)
+            );
+            setUserIdToGameRoomIdMap(
+              new Map<string, string>(message.userIdToGameRoomId)
+            );
           }
         );
       }
     });
 
     // TODO: update_presenceとupdate_game_room_idをまとめるかどうか検討
-    socket.on('update_presence', (userIdToPresence: [string, Presence]) => {
+    socket.on('set_presence', (userIdToPresence: [string, Presence]) => {
       console.log('User update presence message received');
-      setUserIdToPresence((prev) => [...prev, userIdToPresence]);
       userIdToPresenceMap.set(...userIdToPresence);
+      setUserIdToPresenceMap(new Map<string, Presence>(userIdToPresenceMap));
     });
 
-    socket.on('update_game_room_id', (userIdToGameRoomId: [string, string]) => {
-      console.log('User update gameRoomId message received');
-      setUserIdToGameRoomId((prev) => [...prev, userIdToGameRoomId]);
-      userIdToGameRoomIdMap.set(...userIdToGameRoomId);
-    });
-
-    socket.on('user_disconnected', (userId: string) => {
-      console.info('User disconnected message received');
-      setUserIdToPresence((prev) =>
-        prev.filter(
-          (userIdToPresencePair) => userIdToPresencePair[0] !== userId
-        )
-      );
+    socket.on('delete_presence', (userId: string) => {
+      console.info('User delete presence message received');
       userIdToPresenceMap.delete(userId);
+      setUserIdToPresenceMap(new Map<string, Presence>(userIdToPresenceMap));
+    });
 
-      setUserIdToGameRoomId((prev) =>
-        prev.filter(
-          (userIdToGameRoomIdPair) => userIdToGameRoomIdPair[0] !== userId
-        )
-      );
+    socket.on('set_game_room_id', (userIdToGameRoomId: [string, string]) => {
+      console.log('User update gameRoomId message received');
+      userIdToGameRoomIdMap.set(...userIdToGameRoomId);
+      setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
+    });
+
+    socket.on('delete_game_room_id', (userId: string) => {
+      console.log('User delete gameRoomId message received');
       userIdToGameRoomIdMap.delete(userId);
+      setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
     });
 
     socket.on(
@@ -109,9 +103,10 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
     return () => {
       socket.off('connect_established');
-      socket.off('update_presence');
-      socket.off('update_game_room_id');
-      socket.off('user_disconnected');
+      socket.off('set_presence');
+      socket.off('delete_presence');
+      socket.off('set_game_room_id');
+      socket.off('delete_game_room_id');
       socket.off('receive_invitation');
     };
   }, [socket]);
