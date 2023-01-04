@@ -1,43 +1,80 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoom } from '@prisma/client';
-import { axios } from 'lib/axios';
-import { useNavigate } from 'react-router-dom';
+import { yupResolver } from '@hookform/resolvers/yup';
+import {
+  useCreateChatRoom,
+  ChatRoomCreateFormValues,
+} from 'features/chat/hooks/useCreateChatRoom';
+import * as RHF from 'react-hook-form';
+import * as yup from 'yup';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+
+const schema = yup.object().shape(
+  {
+    // nameスペースはだめ
+    name: yup.string().trim().required('name is required').max(50),
+    password: yup
+      .string()
+      .optional()
+      .when('password', {
+        is: (value: string) => value?.length > 0,
+        then: (rule) => rule.min(8).max(128),
+      }),
+  },
+  [['password', 'password']]
+);
 
 // ボタンを押すと、作成したチャットルームに遷移する
 export const CreateChatRooms: React.FC = React.memo(() => {
-  const [name, setName] = React.useState('');
-  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = RHF.useForm<ChatRoomCreateFormValues>({
+    resolver: yupResolver(schema),
+  });
+  const { CreateChatRoom } = useCreateChatRoom();
 
-  async function CreateChatRooms() {
-    const res = await axios.post('/chat/room', { name });
-    const chatRoom = res.data as ChatRoom;
-    // 作成したチャットルームに遷移する
-    navigate(`/app/chat/${chatRoom.id}`, { state: { id: chatRoom.id } });
-  }
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const onSubmit = async (values: ChatRoomCreateFormValues) => {
+    setIsSubmitting(true);
+    await CreateChatRoom(values);
+    setIsSubmitting(false);
+  };
 
   return (
     <>
       <ContentLayout title="Create Chat Room">
-        <C.Flex justifyContent="center" alignItems="center" h="100vh">
-          <C.Box p={5} shadow="md" borderWidth="1px">
-            <C.Flex>
-              <C.Box>
-                <C.Text fontSize="sm">Create Chat Room</C.Text>
-                <C.Heading fontSize="xl">{`Chat Room Name`}</C.Heading>
-                <C.Input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <C.Button colorScheme="blue" onClick={CreateChatRooms}>
-                  Create
-                </C.Button>
-              </C.Box>
-            </C.Flex>
-          </C.Box>
-        </C.Flex>
+        <C.Box>
+          <C.Heading>Create Chat Room</C.Heading>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <C.FormControl isInvalid={!(errors.name == null)}>
+              <C.FormLabel>Create Chat Room</C.FormLabel>
+              <C.Input placeholder="name" {...register('name')} />
+              <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
+            </C.FormControl>
+            <C.FormControl isInvalid={!(errors.password == null)}>
+              <C.FormLabel>password (optional)</C.FormLabel>
+              <C.Input
+                placeholder="Password"
+                {...register('password')}
+                type="password"
+              />
+              <C.FormErrorMessage>
+                {errors.password?.message}
+              </C.FormErrorMessage>
+            </C.FormControl>
+            <C.Button
+              type="submit"
+              colorScheme="teal"
+              mt={4}
+              isDisabled={isSubmitting}
+            >
+              Create
+            </C.Button>
+          </form>
+        </C.Box>
       </ContentLayout>
     </>
   );
