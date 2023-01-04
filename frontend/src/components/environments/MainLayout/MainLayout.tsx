@@ -56,8 +56,9 @@ export const MainLayout: FC<MainProps> = memo((props) => {
 
   return (
     <Flex>
-      {isGamePage && <SpMenu items={navigation} />}
-      {!isGamePage && (
+      {isGamePage ? (
+        <SpMenu items={navigation} />
+      ) : (
         <>
           <Box display={{ base: 'none', md: 'flex' }}>
             <WebSidebarMenu items={navigation} />
