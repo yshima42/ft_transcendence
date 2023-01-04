@@ -21,7 +21,7 @@ export const useFriendUnregister = (
   isSuccess: boolean;
 } => {
   const {
-    deleteFunc: unregisterFriend,
+    mutateAsync: unregisterFriend,
     isLoading,
     isSuccess,
   } = useDeleteApi<FriendUnregisterResBody>(`/users/me/friends/${userId}`);

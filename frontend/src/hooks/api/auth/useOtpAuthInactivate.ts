@@ -25,7 +25,7 @@ export const useOtpAuthInactivate = (): {
   isSuccess: boolean;
 } => {
   const {
-    patchFunc: inactivateOtpAuth,
+    mutateAsync: inactivateOtpAuth,
     isLoading,
     isError,
     isSuccess,

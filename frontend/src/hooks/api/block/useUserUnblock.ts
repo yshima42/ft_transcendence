@@ -21,7 +21,7 @@ export const useUserUnblock = (
   isSuccess: boolean;
 } => {
   const {
-    deleteFunc: unblockUser,
+    mutateAsync: unblockUser,
     isLoading,
     isSuccess,
   } = useDeleteApi<UnblockUserResBody>(`/users/me/blocks/${targetId}`, [

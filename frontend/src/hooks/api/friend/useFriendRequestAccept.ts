@@ -25,7 +25,7 @@ export const useFriendRequestAccept = (
   isSuccess: boolean;
 } => {
   const {
-    patchFunc: acceptFriendRequest,
+    mutateAsync: acceptFriendRequest,
     isLoading,
     isSuccess,
   } = usePatchApi<FriendRequestAcceptReqBody, FriendRequestAcceptResBody>(

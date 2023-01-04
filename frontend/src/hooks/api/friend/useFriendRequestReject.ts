@@ -21,7 +21,7 @@ export const useFriendRequestReject = (
   isSuccess: boolean;
 } => {
   const {
-    deleteFunc: rejectFriendRequest,
+    mutateAsync: rejectFriendRequest,
     isLoading,
     isSuccess,
   } = useDeleteApi<FriendRequestRejectResBody>(
