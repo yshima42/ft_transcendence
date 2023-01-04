@@ -15,9 +15,10 @@ export const useCanvasSize = (): {
   }, []);
   useLayoutEffect(() => {
     const updateSize = (): void => {
-      canvasSize.width = window.innerWidth - 300;
-      canvasSize.height = window.innerHeight - 300;
-      canvasSize.ratio = (window.innerWidth - 300) / BACKEND_CANVAS_WIDTH;
+      const padding = 300;
+      canvasSize.width = window.innerWidth - padding;
+      canvasSize.height = window.innerHeight - padding;
+      canvasSize.ratio = (window.innerWidth - padding) / BACKEND_CANVAS_WIDTH;
     };
 
     window.addEventListener('resize', updateSize);

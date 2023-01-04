@@ -2,7 +2,13 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
-import { BACKEND_CANVAS_WIDTH, BG_COLOR } from '../utils/gameConfig';
+import {
+  BACKEND_CANVAS_WIDTH,
+  BALL_SIZE,
+  BG_COLOR,
+  PADDLE_HEIGHT,
+  PADDLE_WIDTH,
+} from '../utils/gameConfig';
 import { Ball, Paddle } from '../utils/gameObjs';
 import { useCanvasSize } from './useCanvasSize';
 
@@ -172,6 +178,11 @@ export const useGame = (
           message.ballX * canvasSize.ratio,
           message.ballY * canvasSize.ratio,
         ];
+        paddle1.height = PADDLE_HEIGHT * canvasSize.ratio;
+        paddle1.width = PADDLE_WIDTH * canvasSize.ratio;
+        paddle2.height = PADDLE_HEIGHT * canvasSize.ratio;
+        paddle2.width = PADDLE_WIDTH * canvasSize.ratio;
+        ball.size = BALL_SIZE * canvasSize.ratio;
       }
     );
 
