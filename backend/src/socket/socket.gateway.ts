@@ -279,25 +279,11 @@ export class UsersGateway {
       this.server
         .in(`watch_${roomId}`)
         .emit('update_game_phase', GamePhase.Watch);
-    }
-  }
-
-  @SubscribeMessage('connect_pong')
-  connectPong(@ConnectedSocket() socket: Socket): void {
-    Logger.debug(`${socket.id} ${socket.data.userId as string} connect_pong`);
-
-    const { roomId } = socket.data as { roomId: string };
-    const gameRoom = this.gameRooms.get(roomId);
-    if (gameRoom === undefined) {
-      socket.emit('game_room_error', 'Invalid game room.');
-
-      return;
-    }
-
-    // １回のみ動かす
-    if (!gameRoom.isInGame) {
-      gameRoom.isInGame = true;
-      gameRoom.gameStart(socket, roomId);
+      // 1回のみ動かす
+      if (!gameRoom.isInGame) {
+        gameRoom.isInGame = true;
+        gameRoom.gameStart(socket, roomId);
+      }
     }
   }
 
