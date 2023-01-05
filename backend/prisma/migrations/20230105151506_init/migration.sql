@@ -8,7 +8,7 @@ CREATE TYPE "FriendRequestStatus" AS ENUM ('PENDING', 'ACCEPTED');
 CREATE TYPE "ChatRoomMemberStatus" AS ENUM ('ADMIN', 'MODERATOR', 'NORMAL', 'KICKED', 'BANNED', 'MUTED');
 
 -- CreateEnum
-CREATE TYPE "ChatRoomStatus" AS ENUM ('PUBLIC', 'PROTECTED');
+CREATE TYPE "ChatRoomStatus" AS ENUM ('PUBLIC', 'PRIVATE', 'PROTECTED');
 
 -- CreateTable
 CREATE TABLE "User" (
