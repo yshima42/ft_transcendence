@@ -1,5 +1,6 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 import {
@@ -52,6 +53,7 @@ export const useGame = (
   const { socket, connected } = socketContext;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { customToast } = useCustomToast();
 
   const player1: Player = useMemo(() => ({ id: '', score: 0 }), []);
   const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
@@ -122,12 +124,8 @@ export const useGame = (
   // socket イベント
   useEffect(() => {
     socket.on('game_room_error', (message: string) => {
-      // state は、useToastCheck に合わせる。
-      navigate('/app', {
-        state: {
-          toastProps: { description: message, status: 'error' },
-        },
-      });
+      customToast({ description: message });
+      navigate('/app');
     });
 
     socket.on(
