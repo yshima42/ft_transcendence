@@ -36,7 +36,7 @@ export const useGameObjs = (
 
   const keyDownEvent = useCallback(
     (e: KeyboardEvent) => {
-      // 押したままでも発火するため、1回のみ発火。
+      // 押したままでも発火するため、1回のみemit。
       if (userCommand.down || userCommand.up) {
         return;
       }

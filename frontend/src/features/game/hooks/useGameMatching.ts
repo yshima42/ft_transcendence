@@ -9,7 +9,6 @@ export enum MatchState {
   Matched = 3,
 }
 
-// ここでuseRefを使ってsocketのconnect処理ができたら理想
 export const useGameMatching = (): {
   matchState: MatchState;
   setMatchState: React.Dispatch<React.SetStateAction<MatchState>>;
@@ -38,6 +37,7 @@ export const useGameMatching = (): {
     };
   }, [socket, matchState, navigate]);
 
+  // 各state のロジック
   useEffect(() => {
     switch (matchState) {
       case MatchState.SocketConnecting: {
@@ -47,12 +47,10 @@ export const useGameMatching = (): {
         break;
       }
       case MatchState.Matching: {
-        console.log('[MatchState] Matching');
         socket.emit('join_matching_room');
         break;
       }
       case MatchState.MatchingCancel: {
-        console.log('[MatchState] MatchingCancel');
         socket.emit('leave_matching_room');
         navigate('/app');
         break;
