@@ -173,7 +173,7 @@ const ChatRoomMemberButtonWithLimitTime: React.FC<{
       <C.PopoverContent>
         <C.PopoverArrow />
         <C.PopoverCloseButton />
-        <C.PopoverHeader>Choose ban time</C.PopoverHeader>
+        <C.PopoverHeader>Choose a limit time</C.PopoverHeader>
         <C.PopoverBody>
           {limitList.map((limitTime) => (
             <C.Button key={limitTime} onClick={() => handleClick(limitTime)}>
