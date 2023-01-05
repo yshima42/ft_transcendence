@@ -1,7 +1,7 @@
 import * as ReactQuery from '@tanstack/react-query';
 import { axios } from 'lib/axios';
 
-export function useDeleteApi2<ResBody>(
+export function useDeleteApiReset<ResBody>(
   endpoint: string,
   queryKeys?: ReactQuery.QueryKey[]
 ): ReturnType<typeof ReactQuery.useMutation> {

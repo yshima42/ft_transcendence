@@ -1,5 +1,5 @@
 import * as ReactQuery from '@tanstack/react-query';
-import { useDeleteApi2 } from 'hooks/api/generics/useDeleteApi2';
+import { useDeleteApiReset } from 'hooks/api/generics/useDeleteApiReset';
 import { useNavigate } from 'react-router-dom';
 
 const useLeaveChatRoomSub = (
@@ -12,7 +12,7 @@ const useLeaveChatRoomSub = (
   const navigateUrl = '/app/chat/rooms/me';
   const queryKeys: ReactQuery.QueryKey[] = [['/chat/rooms/me']];
 
-  const { mutate } = useDeleteApi2(endpoint(chatRoomId), queryKeys);
+  const { mutate } = useDeleteApiReset(endpoint(chatRoomId), queryKeys);
 
   function leaveChatRoom() {
     mutate({}, { onSuccess: () => navigate(navigateUrl) });
