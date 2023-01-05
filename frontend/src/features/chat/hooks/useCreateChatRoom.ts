@@ -15,7 +15,7 @@ export const useCreateChatRoom = (): {
 } => {
   const navigate = useNavigate();
   const endpoint = '/chat/rooms';
-  const queryKeys: ReactQuery.QueryKey[] = [['chat/rooms']];
+  const queryKeys: ReactQuery.QueryKey[] = [[endpoint]];
   const { mutate, isLoading } = usePostApi2<ChatRoomCreateFormValues, ChatRoom>(
     endpoint,
     queryKeys
