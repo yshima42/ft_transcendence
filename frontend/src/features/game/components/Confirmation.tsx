@@ -1,15 +1,14 @@
 import { memo, FC } from 'react';
 import { Box, Divider, Flex, Heading, Stack, Text } from '@chakra-ui/react';
 import { PrimaryButton } from 'components/atoms/button/PrimaryButton';
-import { GamePhase } from '../hooks/useGame';
 
 type Props = {
-  setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
+  setNextGamePhase: () => void;
   readyCountDownNum: number;
 };
 
 export const Confirmation: FC<Props> = memo((props) => {
-  const { setGamePhase, readyCountDownNum } = props;
+  const { setNextGamePhase, readyCountDownNum } = props;
 
   return (
     <Flex align="center" justify="center" height="40vh">
@@ -20,9 +19,7 @@ export const Confirmation: FC<Props> = memo((props) => {
         <Text textAlign="center">{readyCountDownNum}</Text>
         <Divider />
         <Stack spacing={4} py={4} px={10} align="center">
-          <PrimaryButton onClick={() => setGamePhase(GamePhase.Confirming)}>
-            Yes
-          </PrimaryButton>
+          <PrimaryButton onClick={setNextGamePhase}>Yes</PrimaryButton>
         </Stack>
       </Box>
     </Flex>
