@@ -68,10 +68,6 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
               type="password"
               {...register('password', {
                 required: 'password is required.',
-                minLength: {
-                  value: 8,
-                  message: 'password must be at least 8 characters.',
-                },
                 maxLength: {
                   value: 128,
                   message: 'password must be at most 128 characters.',

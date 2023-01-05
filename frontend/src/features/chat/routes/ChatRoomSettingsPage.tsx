@@ -60,15 +60,17 @@ const CustomAccordion: React.FC<{
   children: React.ReactNode;
 }> = React.memo(({ title, children }) => {
   return (
-    <C.AccordionItem>
-      <C.AccordionButton>
-        <C.Box flex="1" textAlign="left">
-          {title}
-        </C.Box>
-        <C.AccordionIcon />
-      </C.AccordionButton>
-      <C.AccordionPanel pb={4}>{children}</C.AccordionPanel>
-    </C.AccordionItem>
+    <>
+      <C.AccordionItem>
+        <C.AccordionButton>
+          <C.Box flex="1" textAlign="left">
+            {title}
+          </C.Box>
+          <C.AccordionIcon />
+        </C.AccordionButton>
+        <C.AccordionPanel pb={4}>{children}</C.AccordionPanel>
+      </C.AccordionItem>
+    </>
   );
 });
 

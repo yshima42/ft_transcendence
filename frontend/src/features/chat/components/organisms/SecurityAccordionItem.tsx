@@ -65,13 +65,9 @@ export const SecurityAccordionItem: React.FC<Props> = React.memo(
                   placeholder="Password"
                   {...register('password', {
                     required: 'password is required',
-                    minLength: {
-                      value: 8,
-                      message: 'password is at least 8 characters',
-                    },
                     maxLength: {
                       value: 128,
-                      message: 'password is at most 128 characters',
+                      message: 'password is too long (max 128 characters)',
                     },
                   })}
                 />
