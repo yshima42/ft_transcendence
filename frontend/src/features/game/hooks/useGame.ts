@@ -162,7 +162,6 @@ export const useGame = (
         break;
       }
       case GamePhase.InGame: {
-        socket.emit('connect_pong');
         document.addEventListener('keydown', keyDownEvent, false);
         document.addEventListener('keyup', keyUpEvent, false);
         break;
