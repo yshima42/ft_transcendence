@@ -2,8 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatRoom } from '@prisma/client';
 import { AxiosError } from 'axios';
-import { ResponseChatRoomMemberStatus } from 'features/chat/types/chat';
-import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
+import { useGetApi } from 'hooks/api/generics/useGetApi';
 import { axios } from 'lib/axios';
 import * as ReactHookForm from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -16,9 +15,7 @@ type Inputs = {
 
 const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
-  const { data: chatRoomData } = useGetApi2<ResponseChatRoomMemberStatus>(
-    `/chat/rooms/${chatRoomId}`
-  );
+  const { data: chatRoom } = useGetApi<ChatRoom>(`/chat/rooms/${chatRoomId}`);
   const navigate = useNavigate();
   const {
     handleSubmit,
@@ -26,7 +23,7 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
     formState: { errors },
   } = ReactHookForm.useForm<Inputs>();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const { name: chatName, roomStatus } = chatRoomData as ChatRoom;
+  const { name: chatName, roomStatus } = chatRoom;
 
   // axiosを使って、チャットルームに参加する処理を行う。
   // その後、チャットルームのページに遷移する。
