@@ -1,19 +1,18 @@
 import { memo, FC } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, ButtonProps } from '@chakra-ui/react';
 
 import { Link } from 'react-router-dom';
 
-type Props = {
+type Props = ButtonProps & {
   gameRoomId: string;
-  size?: string;
 };
 
 export const WatchButton: FC<Props> = memo((props) => {
-  const { gameRoomId, size = 'sm' } = props;
+  const { gameRoomId, ...buttonProps } = props;
 
   return (
     <Link to={`/app/games/${gameRoomId}`}>
-      <Button mr={2} size={size}>
+      <Button mr={2} size="sm" {...buttonProps}>
         Watch
       </Button>
     </Link>
