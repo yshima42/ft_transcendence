@@ -57,3 +57,13 @@ export class Paddle {
     this.y = y;
   };
 }
+
+export class Player {
+  id: string;
+  score: number;
+
+  constructor() {
+    this.id = '';
+    this.score = 0;
+  }
+}

@@ -1,17 +1,10 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
-import {
-  CANVAS_WIDTH,
-  BALL_SIZE,
-  BG_COLOR,
-  PADDLE_HEIGHT,
-  PADDLE_WIDTH,
-} from '../utils/gameConfig';
-import { Ball, Paddle } from '../utils/gameObjs';
-import { useCanvasSize } from './useCanvasSize';
+import { Player } from '../utils/gameObjs';
+import { useGameObjs } from './useGameObjs';
 
 export enum GamePhase {
   SocketConnecting = 0,
@@ -25,101 +18,42 @@ export enum GamePhase {
   Watch = 8,
 }
 
-export type Player = {
-  id: string;
-  score: number;
-};
-
-// ここでuseRefを使ってsocketのconnect処理ができたら理想
 export const useGame = (
   roomId: string
 ): {
   gamePhase: GamePhase;
   setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
-  draw: (ctx: CanvasRenderingContext2D) => void;
   player1: Player;
   player2: Player;
   readyCountDownNum: number;
+  draw: (ctx: CanvasRenderingContext2D) => void;
   canvasSize: { width: number; height: number; ratio: number };
 } => {
-  const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
-  const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
-  const [isPlayer, setIsPlayer] = useState(true);
-
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
   }
   const { socket, connected } = socketContext;
+
+  const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
+  const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
+  const [isPlayer, setIsPlayer] = useState(true);
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { customToast } = useCustomToast();
-
-  const player1: Player = useMemo(() => ({ id: '', score: 0 }), []);
-  const player2: Player = useMemo(() => ({ id: '', score: 0 }), []);
-  const paddle1 = useMemo(() => new Paddle(), []);
-  const paddle2 = useMemo(() => new Paddle(), []);
-  const ball = useMemo(() => new Ball(), []);
-  // const { canvasWidth } = useCanvasSize();
-  const canvasSize = useCanvasSize();
-
-  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
-    // canvas背景の設定
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    // ゲームオブジェクトのサイズの設定
-    paddle1.height = PADDLE_HEIGHT * canvasSize.ratio;
-    paddle1.width = PADDLE_WIDTH * canvasSize.ratio;
-    paddle2.height = PADDLE_HEIGHT * canvasSize.ratio;
-    paddle2.width = PADDLE_WIDTH * canvasSize.ratio;
-    ball.size = BALL_SIZE * canvasSize.ratio;
-
-    // ゲームオブジェクトの表示
-    paddle1.draw(ctx);
-    paddle2.draw(ctx);
-    ball.draw(ctx);
-
-    // スコアの表示
-    const fontSize = 48 * canvasSize.ratio;
-    ctx.font = `${fontSize}px serif`;
-    ctx.fillText(
-      player1.score.toString(),
-      20 * canvasSize.ratio,
-      50 * canvasSize.ratio
-    );
-    ctx.fillText(
-      player2.score.toString(),
-      (CANVAS_WIDTH - 40) * canvasSize.ratio,
-      50 * canvasSize.ratio
-    );
-  }, []);
-
-  const userCommand = useMemo(
-    () => ({ up: false, down: false, isLeftSide: true }),
-    []
-  );
-
-  const keyDownEvent = useCallback((e: KeyboardEvent) => {
-    if (userCommand.down || userCommand.up) {
-      return;
-    }
-    if (e.key === 'Down' || e.key === 'ArrowDown') {
-      userCommand.down = true;
-    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      userCommand.up = true;
-    }
-    socket.emit('user_command', { userCommand });
-  }, []);
-
-  const keyUpEvent = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Down' || e.key === 'ArrowDown') {
-      userCommand.down = false;
-    } else if (e.key === 'Up' || e.key === 'ArrowUp') {
-      userCommand.up = false;
-    }
-  }, []);
+  const {
+    player1,
+    player2,
+    userCommand,
+    paddle1,
+    paddle2,
+    ball,
+    canvasSize,
+    keyDownEvent,
+    keyUpEvent,
+    draw,
+  } = useGameObjs(socket);
 
   // socket イベント
   useEffect(() => {
@@ -160,7 +94,6 @@ export const useGame = (
       setGamePhase(nextGamePhase);
     });
 
-    // ゲーム中のスコア受け取り
     socket.on(
       'update_score',
       (message: { player1Score: number; player2Score: number }) => {
@@ -169,7 +102,6 @@ export const useGame = (
       }
     );
 
-    // ゲームで表示するオブジェクトのポジション受け取り
     socket.on(
       'update_position',
       (message: {
@@ -206,7 +138,7 @@ export const useGame = (
     };
   }, [socket, navigate]);
 
-  // 各ページのLogic
+  // 各フェーズのLogic
   useEffect(() => {
     switch (gamePhase) {
       case GamePhase.SocketConnecting: {
@@ -248,6 +180,7 @@ export const useGame = (
         void queryClient.invalidateQueries({ queryKey: invalidQueryKeys });
         break;
       }
+      // 観戦者用
       case GamePhase.PlayerWaiting: {
         break;
       }
@@ -265,10 +198,10 @@ export const useGame = (
   return {
     gamePhase,
     setGamePhase,
-    draw,
     player1,
     player2,
     readyCountDownNum,
+    draw,
     canvasSize,
   };
 };
