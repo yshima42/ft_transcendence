@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
-import { useDeleteChatRoom } from 'features/chat/hooks/useDeleteChatRoom';
-import { useExitChatRoom } from 'features/chat/hooks/useExitChatRoom';
+import { useLeaveChatRoom } from 'features/chat/hooks/useLeaveChatRoom';
 import {
   ResponseChatRoomMember,
   ResponseChatRoomMemberStatus,
@@ -77,8 +76,7 @@ const LeaveButton: React.FC<{
   chatRoomId: string;
   chatLoginUser: ResponseChatRoomMember;
 }> = React.memo(({ chatRoomId, chatLoginUser }) => {
-  const { exitChatRoom } = useExitChatRoom(chatRoomId);
-  const { deleteChatRoom } = useDeleteChatRoom(chatRoomId);
+  const { exitChatRoom, deleteChatRoom } = useLeaveChatRoom(chatRoomId);
 
   return (
     <>
