@@ -26,8 +26,12 @@ export const useGame = (
   player1: Player;
   player2: Player;
   readyCountDownNum: number;
-  draw: (ctx: CanvasRenderingContext2D) => void;
-  canvasSize: { width: number; height: number; ratio: number };
+  canvas: {
+    width: number;
+    height: number;
+    ratio: number;
+    draw: (ctx: CanvasRenderingContext2D) => void;
+  };
 } => {
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
@@ -49,10 +53,9 @@ export const useGame = (
     paddle1,
     paddle2,
     ball,
-    canvasSize,
+    canvas,
     keyDownEvent,
     keyUpEvent,
-    draw,
   } = useGameObjs(socket);
 
   // socket イベント
@@ -113,16 +116,16 @@ export const useGame = (
         ballY: number;
       }) => {
         [paddle1.x, paddle1.y] = [
-          message.paddle1X * canvasSize.ratio,
-          message.paddle1Y * canvasSize.ratio,
+          message.paddle1X * canvas.ratio,
+          message.paddle1Y * canvas.ratio,
         ];
         [paddle2.x, paddle2.y] = [
-          message.paddle2X * canvasSize.ratio,
-          message.paddle2Y * canvasSize.ratio,
+          message.paddle2X * canvas.ratio,
+          message.paddle2Y * canvas.ratio,
         ];
         [ball.x, ball.y] = [
-          message.ballX * canvasSize.ratio,
-          message.ballY * canvasSize.ratio,
+          message.ballX * canvas.ratio,
+          message.ballY * canvas.ratio,
         ];
       }
     );
@@ -200,7 +203,6 @@ export const useGame = (
     player1,
     player2,
     readyCountDownNum,
-    draw,
-    canvasSize,
+    canvas,
   };
 };

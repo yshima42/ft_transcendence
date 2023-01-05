@@ -8,14 +8,18 @@ import { AvatarWithNickname } from './AvatarWithNickname';
 type Props = {
   player1: Player;
   player2: Player;
-  draw: (ctx: CanvasRenderingContext2D) => void;
-  canvasSize: { width: number; height: number; ratio: number };
+  canvas: {
+    width: number;
+    height: number;
+    ratio: number;
+    draw: (ctx: CanvasRenderingContext2D) => void;
+  };
 };
 
 export const PongGame: FC<Props> = memo((props) => {
-  const { player1, player2, draw, canvasSize } = props;
+  const { player1, player2, canvas } = props;
 
-  const canvasRef = useCanvas(draw, canvasSize);
+  const canvasRef = useCanvas(canvas);
   const { user: user1 } = useProfile(player1.id);
   const { user: user2 } = useProfile(player2.id);
 

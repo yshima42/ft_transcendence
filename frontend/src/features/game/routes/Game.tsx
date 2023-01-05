@@ -18,8 +18,7 @@ export const Game: FC = memo(() => {
     player1,
     player2,
     readyCountDownNum,
-    draw,
-    canvasSize,
+    canvas,
   } = useGame(roomId ?? '');
 
   const gamePage = useMemo(() => {
@@ -42,26 +41,11 @@ export const Game: FC = memo(() => {
         return <PlayerWaiting readyCountDownNum={readyCountDownNum} />;
       case GamePhase.InGame:
       case GamePhase.Watch:
-        return (
-          <PongGame
-            player1={player1}
-            player2={player2}
-            draw={draw}
-            canvasSize={canvasSize}
-          />
-        );
+        return <PongGame player1={player1} player2={player2} canvas={canvas} />;
       case GamePhase.Result:
         return <Result player1={player1} player2={player2} />;
     }
-  }, [
-    gamePhase,
-    setGamePhase,
-    player1,
-    player2,
-    readyCountDownNum,
-    draw,
-    canvasSize,
-  ]);
+  }, [gamePhase, setGamePhase, player1, player2, readyCountDownNum, canvas]);
 
   return (
     <ContentLayout title="">

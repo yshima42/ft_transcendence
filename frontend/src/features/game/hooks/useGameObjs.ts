@@ -18,10 +18,14 @@ export const useGameObjs = (
   paddle2: Paddle;
   ball: Ball;
   userCommand: { up: boolean; down: boolean; isLeftSide: boolean };
-  canvasSize: { width: number; height: number; ratio: number };
+  canvas: {
+    width: number;
+    height: number;
+    ratio: number;
+    draw: (ctx: CanvasRenderingContext2D) => void;
+  };
   keyDownEvent: (e: KeyboardEvent) => void;
   keyUpEvent: (e: KeyboardEvent) => void;
-  draw: (ctx: CanvasRenderingContext2D) => void;
 } => {
   const player1: Player = useMemo(() => new Player(), []);
   const player2: Player = useMemo(() => new Player(), []);
@@ -32,7 +36,46 @@ export const useGameObjs = (
     () => ({ up: false, down: false, isLeftSide: true }),
     []
   );
-  const canvasSize = useMemo(() => ({ width: 0, height: 0, ratio: 0 }), []);
+  const canvas = useMemo(
+    () => ({
+      width: 0,
+      height: 0,
+      ratio: 0,
+      draw: (ctx: CanvasRenderingContext2D) => {
+        // canvas背景の設定
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.fillStyle = BG_COLOR;
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        // ゲームオブジェクトのサイズの設定
+        paddle1.height = PADDLE_HEIGHT * canvas.ratio;
+        paddle1.width = PADDLE_WIDTH * canvas.ratio;
+        paddle2.height = PADDLE_HEIGHT * canvas.ratio;
+        paddle2.width = PADDLE_WIDTH * canvas.ratio;
+        ball.size = BALL_SIZE * canvas.ratio;
+
+        // ゲームオブジェクトの表示
+        paddle1.draw(ctx);
+        paddle2.draw(ctx);
+        ball.draw(ctx);
+
+        // スコアの表示
+        const fontSize = 48 * canvas.ratio;
+        ctx.font = `${fontSize}px serif`;
+        ctx.fillText(
+          player1.score.toString(),
+          20 * canvas.ratio,
+          50 * canvas.ratio
+        );
+        ctx.fillText(
+          player2.score.toString(),
+          (CANVAS_WIDTH - 40) * canvas.ratio,
+          50 * canvas.ratio
+        );
+      },
+    }),
+    []
+  );
 
   const keyDownEvent = useCallback(
     (e: KeyboardEvent) => {
@@ -61,39 +104,6 @@ export const useGameObjs = (
     [userCommand]
   );
 
-  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
-    // canvas背景の設定
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    // ゲームオブジェクトのサイズの設定
-    paddle1.height = PADDLE_HEIGHT * canvasSize.ratio;
-    paddle1.width = PADDLE_WIDTH * canvasSize.ratio;
-    paddle2.height = PADDLE_HEIGHT * canvasSize.ratio;
-    paddle2.width = PADDLE_WIDTH * canvasSize.ratio;
-    ball.size = BALL_SIZE * canvasSize.ratio;
-
-    // ゲームオブジェクトの表示
-    paddle1.draw(ctx);
-    paddle2.draw(ctx);
-    ball.draw(ctx);
-
-    // スコアの表示
-    const fontSize = 48 * canvasSize.ratio;
-    ctx.font = `${fontSize}px serif`;
-    ctx.fillText(
-      player1.score.toString(),
-      20 * canvasSize.ratio,
-      50 * canvasSize.ratio
-    );
-    ctx.fillText(
-      player2.score.toString(),
-      (CANVAS_WIDTH - 40) * canvasSize.ratio,
-      50 * canvasSize.ratio
-    );
-  }, []);
-
   // レスポンシブ対応の処理
   useLayoutEffect(() => {
     const updateSize = (): void => {
@@ -104,19 +114,19 @@ export const useGameObjs = (
       // ただし、最小値はminimumWidth
       // window.innerHeightに合わせてcanvasのサイズ変更は未実装
       if (window.innerWidth > padding + minimumWidth) {
-        canvasSize.width = window.innerWidth - padding;
+        canvas.width = window.innerWidth - padding;
       } else {
-        canvasSize.width = minimumWidth;
+        canvas.width = minimumWidth;
       }
-      canvasSize.height = canvasSize.width - padding;
-      canvasSize.ratio = canvasSize.width / CANVAS_WIDTH;
+      canvas.height = canvas.width - padding;
+      canvas.ratio = canvas.width / CANVAS_WIDTH;
     };
 
     window.addEventListener('resize', updateSize);
     updateSize();
 
     return () => window.removeEventListener('resize', updateSize);
-  }, [canvasSize]);
+  }, [canvas]);
 
   return {
     player1,
@@ -125,9 +135,8 @@ export const useGameObjs = (
     paddle2,
     ball,
     userCommand,
-    canvasSize,
+    canvas,
     keyDownEvent,
     keyUpEvent,
-    draw,
   };
 };
