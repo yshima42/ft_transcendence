@@ -13,7 +13,7 @@ import {
   HStack,
   Input,
 } from '@chakra-ui/react';
-import { useOtpAuthActivate } from 'hooks/api/auth/useOtoAuthActivate';
+import { useOtpAuthActivate } from 'hooks/api/auth/useOtpAuthActivate';
 import { useQRCode } from 'next-qrcode';
 
 type Props = {

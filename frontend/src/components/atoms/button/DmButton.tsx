@@ -1,16 +1,15 @@
 import { memo, FC } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, ButtonProps } from '@chakra-ui/react';
 import { axios } from 'lib/axios';
 import { useNavigate } from 'react-router-dom';
 
-type Props = {
+type Props = ButtonProps & {
   targetId: string;
-  size?: string;
 };
 
 export const DmButton: FC<Props> = memo((props) => {
   const navigate = useNavigate();
-  const { targetId, size = 'sm' } = props;
+  const { targetId, ...buttonProps } = props;
 
   const onClickDm = async () => {
     const res = await axios.post(`/dm/rooms/${targetId}`);
@@ -20,7 +19,7 @@ export const DmButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button size={size} onClick={onClickDm}>
+    <Button size="sm" onClick={onClickDm} {...buttonProps}>
       DM
     </Button>
   );

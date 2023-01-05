@@ -1,7 +1,8 @@
 import {
   QueryKey,
-  UseMutateAsyncFunction,
   useMutation,
+  UseMutationOptions,
+  UseMutationResult,
   useQueryClient,
 } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
@@ -12,14 +13,14 @@ export interface FileReqBody {
 
 export function usePostFileApi<ResBody>(
   endpoint: string,
-  queryKeys?: QueryKey[]
-): {
-  postFunc: UseMutateAsyncFunction<ResBody, unknown, FileReqBody, unknown>;
-  isLoading: boolean;
-  isError: boolean;
-  isSuccess: boolean;
-  failureReason: unknown;
-} {
+  queryKeys?: QueryKey[],
+  useMutationOptions?: UseMutationOptions<
+    ResBody,
+    unknown,
+    FileReqBody,
+    unknown
+  >
+): UseMutationResult<ResBody, unknown, FileReqBody, unknown> {
   const axiosPost = async (reqBody: FileReqBody) => {
     const formData = new FormData();
     formData.append('file', reqBody.file);
@@ -31,13 +32,7 @@ export function usePostFileApi<ResBody>(
 
   const queryClient = useQueryClient();
 
-  const {
-    mutateAsync: postFunc,
-    isLoading,
-    isError,
-    isSuccess,
-    failureReason,
-  } = useMutation(axiosPost, {
+  const useMutationResult = useMutation(axiosPost, {
     onSuccess: () => {
       if (queryKeys !== undefined) {
         queryKeys.forEach((queryKey) => {
@@ -45,7 +40,8 @@ export function usePostFileApi<ResBody>(
         });
       }
     },
+    ...useMutationOptions,
   });
 
-  return { postFunc, isLoading, isError, isSuccess, failureReason };
+  return useMutationResult;
 }

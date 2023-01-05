@@ -57,15 +57,6 @@ export class UsersController {
     private readonly config: ConfigService
   ) {}
 
-  @Get('all')
-  @ApiOperation({
-    summary: '自分以外のユーザー情報を取得',
-  })
-  @ApiOkResponse({ type: UserEntity, isArray: true })
-  async findAll(@GetUser() user: User): Promise<User[]> {
-    return await this.usersService.findAll(user);
-  }
-
   @Get('me/profile')
   @ApiOperation({
     summary: '自分のユーザー情報取得',

@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 export const UserNavigation: FC = memo(() => {
-  const { logout } = useLogout();
+  const { logout, isLoading } = useLogout();
   const { user } = useProfile();
 
   const navigate = useNavigate();
@@ -31,6 +31,7 @@ export const UserNavigation: FC = memo(() => {
           color="gray"
           maxW={90}
           minW={90}
+          isDisabled={isLoading}
         >
           Logout
         </Button>

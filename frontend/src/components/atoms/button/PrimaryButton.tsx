@@ -1,32 +1,19 @@
-import { memo, FC, ReactNode } from 'react';
-import { Button } from '@chakra-ui/react';
+import { memo, FC, PropsWithChildren } from 'react';
+import { Button, ButtonProps } from '@chakra-ui/react';
 
-type Props = {
-  bg?: string;
-  children: ReactNode;
-  disabled?: boolean;
-  loading?: boolean;
-  onClick: VoidFunction;
-};
+type Props = ButtonProps & PropsWithChildren;
 
-/* my={10} bg="teal.300" color="white" */
 export const PrimaryButton: FC<Props> = memo((props) => {
-  const {
-    children,
-    bg = 'teal.300',
-    disabled = false,
-    loading = false,
-    onClick,
-  } = props;
+  const { children, ...buttonProps } = props;
 
   return (
     <Button
-      bg={bg}
+      bg="teal.300"
       color="white"
-      onClick={onClick}
       _hover={{ opacity: 0.8 }}
-      disabled={disabled || loading}
-      isLoading={loading}
+      disabled={false}
+      isLoading={false}
+      {...buttonProps}
     >
       {children}
     </Button>

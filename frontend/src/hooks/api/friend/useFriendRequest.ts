@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { User } from '@prisma/client';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { usePostApi } from '../generics/usePostApi';
 
 export interface FriendRequestReqBody {
@@ -25,9 +28,11 @@ export const useFriendRequest = (
   isSuccess: boolean;
 } => {
   const {
-    postFunc: requestFriend,
+    mutateAsync: requestFriend,
     isLoading,
     isSuccess,
+    isError,
+    error,
   } = usePostApi<FriendRequestReqBody, FriendRequestResBody>(
     `/users/me/friend-requests`,
     [
@@ -36,6 +41,13 @@ export const useFriendRequest = (
       [`/users/me/friend-relations/${targetId}`],
     ]
   );
+
+  const { customToast } = useCustomToast();
+  useEffect(() => {
+    if (isError && isAxiosError<{ message: string }>(error)) {
+      customToast({ description: error.response?.data.message });
+    }
+  }, [isError, error, customToast]);
 
   return { requestFriend, isLoading, isSuccess };
 };

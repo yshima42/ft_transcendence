@@ -74,11 +74,29 @@ userData.forEach((value) => {
 });
 
 /**
- * dummy1がcreatorとなって、dummy2~29まで
- * friend requestを作成する。ACCEPTED, PENDINGのいずれか。
+ * dummy1がcreatorとなって、dummy2, 3 とフレンドになる。
+ * (オンラインステータス確認のため)
  */
 const friendRequestData: FriendRequest[] = [];
-for (let i = 2; i < 30; i++) {
+const creatorId = idMap.get('dummy1');
+for (let i = 2; i < 4; i++) {
+  const receiverId = idMap.get('dummy' + i.toString());
+  if (creatorId !== undefined && receiverId !== undefined) {
+    friendRequestData.push({
+      creatorId,
+      receiverId,
+      status: 'ACCEPTED',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+}
+
+/**
+ * dummy1がcreatorとなって、dummy4~29まで
+ * friend requestを作成する。ACCEPTED, PENDINGのいずれか。
+ */
+for (let i = 4; i < 30; i++) {
   const creatorId = idMap.get('dummy1');
   const receiverId = idMap.get('dummy' + i.toString());
   if (
@@ -321,6 +339,7 @@ const main = async () => {
   const userCount = await prisma.user.count();
   if (userCount > 0) {
     console.log(`Data exists. Skip seeding`);
+
     return;
   }
 
@@ -330,12 +349,12 @@ const main = async () => {
   await prisma.oneTimePasswordAuth.createMany({
     data: otpAuthData,
   });
-  // await prisma.friendRequest.createMany({
-  //   data: friendRequestData,
-  // });
-  // await prisma.block.createMany({
-  //   data: blockData,
-  // });
+  await prisma.friendRequest.createMany({
+    data: friendRequestData,
+  });
+  await prisma.block.createMany({
+    data: blockData,
+  });
   await prisma.chatRoom.createMany({
     data: chatRooms,
   });

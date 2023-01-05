@@ -8,14 +8,6 @@ import { UserDto } from './dto/user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(user: User): Promise<User[]> {
-    const users = await this.prisma.user.findMany({
-      where: { id: { not: user.id } },
-    });
-
-    return users;
-  }
-
   findMe(user: User): User {
     return user;
   }
