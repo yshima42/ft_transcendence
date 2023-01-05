@@ -10,15 +10,14 @@ import {
   RadioGroup,
   Stack,
 } from '@chakra-ui/react';
-import { InviteState } from '../hooks/useGameInviting';
 
 type Props = {
-  setInviteState: React.Dispatch<React.SetStateAction<InviteState>>;
+  setNextInviteState: () => void;
   setBallSpeed: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const GamePreference: FC<Props> = memo((props) => {
-  const { setInviteState, setBallSpeed } = props;
+  const { setNextInviteState, setBallSpeed } = props;
 
   const [value, setValue] = useState('2');
 
@@ -34,7 +33,7 @@ export const GamePreference: FC<Props> = memo((props) => {
         setBallSpeed(12);
         break;
     }
-    setInviteState(InviteState.Inviting);
+    setNextInviteState();
   };
 
   return (

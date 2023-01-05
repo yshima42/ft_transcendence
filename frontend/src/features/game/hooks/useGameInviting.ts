@@ -49,17 +49,16 @@ export const useGameInvitation = (): {
     };
   }, [socket, inviteState, navigate]);
 
+  // 各state のロジック
   useEffect(() => {
     switch (inviteState) {
       case InviteState.SocketConnecting: {
         if (connected) {
-          console.log('[InviteState] connected');
           setInviteState(InviteState.GamePreference);
         }
         break;
       }
       case InviteState.Inviting: {
-        console.log('[InviteState] Inviting');
         if (opponentId !== undefined) {
           socket.emit('invitation_match', {
             opponentId,
@@ -69,7 +68,6 @@ export const useGameInvitation = (): {
         break;
       }
       case InviteState.InvitingCancel: {
-        console.log('[InviteState] InvitationCancel');
         customToast({
           title: 'Declined',
           description: 'Your Invitation was declined',

@@ -39,7 +39,7 @@ export const Inviting: FC = memo(() => {
       case InviteState.GamePreference:
         return (
           <GamePreference
-            setInviteState={setInviteState}
+            setNextInviteState={() => setInviteState(InviteState.Inviting)}
             setBallSpeed={setBallSpeed}
           />
         );
