@@ -100,9 +100,11 @@ export class UsersGateway {
   }
 
   // Game関連
-  @SubscribeMessage('random_match')
+  @SubscribeMessage('join_matching_room')
   async randomMatch(@ConnectedSocket() socket: Socket): Promise<void> {
-    Logger.debug(`${socket.id} ${socket.data.userId as string} random_match`);
+    Logger.debug(
+      `${socket.id} ${socket.data.userId as string} join_matching_room`
+    );
 
     const { userId } = socket.data as { userId: string };
     const gameRoomId = this.userIdToGameRoomId.get(userId);
@@ -137,10 +139,10 @@ export class UsersGateway {
     socket.emit('go_game_room', gameRoom.id);
   }
 
-  @SubscribeMessage('matching_cancel')
+  @SubscribeMessage('leave_matching_room')
   async cancelMatching(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} matching_cancel`
+      `${socket.id} ${socket.data.userId as string} leave_matching_room`
     );
 
     await socket.leave('matching');
