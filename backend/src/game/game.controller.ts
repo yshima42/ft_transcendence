@@ -1,14 +1,8 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import {
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
-import { MatchResult, User } from '@prisma/client';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
-import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import { GameStatsEntity } from './entities/game-stats.entity';
 import { MatchResultEntity } from './entities/match-result.entity';
 import { GameService } from './game.service';
@@ -22,15 +16,6 @@ import {
 @UseGuards(JwtOtpAuthGuard)
 export class GameController {
   constructor(private readonly gameService: GameService) {}
-
-  @Post('matches')
-  @ApiOperation({ summary: 'ゲーム結果を送信' })
-  @ApiCreatedResponse({ type: MatchResultEntity })
-  async addMatchResult(
-    @Body() createMatchResultDto: CreateMatchResultDto
-  ): Promise<MatchResult> {
-    return await this.gameService.addMatchResult(createMatchResultDto);
-  }
 
   @Get('matches')
   @ApiOperation({ summary: 'ゲーム結果を取得' })
