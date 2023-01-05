@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import * as ReactQuery from '@tanstack/react-query';
 import { ResponseDm } from 'features/dm/types/dm';
 import { useProfile } from 'hooks/api';
 import { useBlockRelation } from 'hooks/api/block/useBlockRelation';
@@ -25,14 +26,21 @@ export const DmRoom: React.FC = React.memo(() => {
   const socket = useSocket(import.meta.env.VITE_WS_DM_URL);
   const endpoint = `/dm/rooms/${dmRoomId}/messages`;
   const { data } = useGetApi2<ResponseDm[]>(endpoint);
-  const [messages, setMessages] = React.useState<ResponseDm[]>([]);
+  const messages = data as ResponseDm[];
+  const queryClient = ReactQuery.useQueryClient();
 
   React.useEffect(() => {
     socket.emit('join_dm_room', dmRoomId);
-    socket.on('receive_message', (messages: ResponseDm) => {
-      setMessages((prev) => {
-        return [...prev, messages];
-      });
+    socket.on('receive_message', (message: ResponseDm) => {
+      const queryKey = [endpoint];
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: ResponseDm[] | undefined) => {
+          if (oldData == null) return [message];
+
+          return [...oldData, message];
+        }
+      );
     });
 
     return () => {
@@ -44,11 +52,6 @@ export const DmRoom: React.FC = React.memo(() => {
   React.useEffect(() => {
     scrollBottomRef.current?.scrollIntoView();
   }, [messages]);
-
-  React.useEffect(() => {
-    if (data == null) return;
-    setMessages(data as ResponseDm[]);
-  }, [data]);
 
   return (
     <>
