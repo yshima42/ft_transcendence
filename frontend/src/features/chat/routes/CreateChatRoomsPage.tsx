@@ -1,69 +1,55 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { yupResolver } from '@hookform/resolvers/yup';
 import {
   useCreateChatRoom,
   ChatRoomCreateFormValues,
 } from 'features/chat/hooks/useCreateChatRoom';
 import * as RHF from 'react-hook-form';
-import * as yup from 'yup';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
-
-const schema = yup.object().shape(
-  {
-    // nameスペースはだめ
-    name: yup.string().trim().required('name is required').max(50),
-    password: yup
-      .string()
-      .optional()
-      .when('password', {
-        is: (value: string) => value?.length > 0,
-        then: (rule) => rule.min(8).max(128),
-      }),
-  },
-  [['password', 'password']]
-);
 
 const CreateChatRoomForm: React.FC = React.memo(() => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = RHF.useForm<ChatRoomCreateFormValues>({
-    resolver: yupResolver(schema),
-  });
-  const { CreateChatRoom } = useCreateChatRoom();
+  } = RHF.useForm<ChatRoomCreateFormValues>();
+  const { CreateChatRoom, isLoading } = useCreateChatRoom();
 
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-
-  const onSubmit = async (values: ChatRoomCreateFormValues) => {
-    setIsSubmitting(true);
-    await CreateChatRoom(values);
-    setIsSubmitting(false);
+  const onSubmit = (values: ChatRoomCreateFormValues) => {
+    CreateChatRoom(values);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <C.FormControl isInvalid={!(errors.name == null)}>
-        <C.FormLabel>Create Chat Room</C.FormLabel>
-        <C.Input placeholder="name" {...register('name')} />
+        <C.FormLabel>name</C.FormLabel>
+        <C.Input
+          placeholder="name"
+          {...register('name', {
+            required: 'name is required',
+            maxLength: {
+              value: 50,
+              message: 'name is too long (max 50 characters)',
+            },
+          })}
+        />
         <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
       </C.FormControl>
       <C.FormControl isInvalid={!(errors.password == null)}>
         <C.FormLabel>password (optional)</C.FormLabel>
         <C.Input
           placeholder="Password"
-          {...register('password')}
+          {...register('password', {
+            maxLength: {
+              value: 128,
+              message: 'password is too long (max 128 characters)',
+            },
+          })}
           type="password"
         />
         <C.FormErrorMessage>{errors.password?.message}</C.FormErrorMessage>
       </C.FormControl>
-      <C.Button
-        type="submit"
-        colorScheme="teal"
-        mt={4}
-        isDisabled={isSubmitting}
-      >
+      <C.Button type="submit" colorScheme="teal" mt={4} isDisabled={isLoading}>
         Create
       </C.Button>
     </form>

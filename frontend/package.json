@@ -42,8 +42,7 @@
     "react-hook-form": "^7.41.2",
     "react-icons": "^4.7.1",
     "react-router-dom": "^6.6.1",
-    "socket.io-client": "^4.5.4",
-    "yup": "^0.32.11"
+    "socket.io-client": "^4.5.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.7",

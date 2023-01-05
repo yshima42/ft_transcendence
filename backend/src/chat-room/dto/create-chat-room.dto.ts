@@ -9,7 +9,7 @@ export class CreateChatRoomDto {
 
   @CV.IsString()
   @CV.IsOptional()
-  @CV.Length(8, 128)
+  @CV.MaxLength(128)
   password?: string;
 
   @CV.IsOptional()
