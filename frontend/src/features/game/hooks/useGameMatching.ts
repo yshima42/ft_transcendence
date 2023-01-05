@@ -32,7 +32,7 @@ export const useGameMatching = (): {
 
     return () => {
       if (matchState === MatchState.Matching) {
-        socket.emit('matching_cancel');
+        socket.emit('leave_matching_room');
       }
       socket.off('go_game_room');
     };
@@ -48,12 +48,12 @@ export const useGameMatching = (): {
       }
       case MatchState.Matching: {
         console.log('[MatchState] Matching');
-        socket.emit('random_match');
+        socket.emit('join_matching_room');
         break;
       }
       case MatchState.MatchingCancel: {
         console.log('[MatchState] MatchingCancel');
-        socket.emit('matching_cancel');
+        socket.emit('leave_matching_room');
         navigate('/app');
         break;
       }
