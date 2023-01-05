@@ -3,6 +3,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import theme from '../theme/theme';
+import { ErrorProvider } from './ErrorProvider';
 
 type Props = {
   children: React.ReactNode;
@@ -22,7 +23,9 @@ export const AppProvider: FC<Props> = memo((props) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={theme}>
-        <BrowserRouter>{children}</BrowserRouter>
+        <BrowserRouter>
+          <ErrorProvider>{children}</ErrorProvider>
+        </BrowserRouter>
       </ChakraProvider>
     </QueryClientProvider>
   );
