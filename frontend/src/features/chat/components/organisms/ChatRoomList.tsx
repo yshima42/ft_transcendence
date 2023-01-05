@@ -21,7 +21,9 @@ const ChatRoomBox: React.FC<{ chatRoom: ResponseChatRoom }> = React.memo(
           PROTECTED
         </C.Badge>
       )}
-      {/* PRIVATE の場合 */}
+      {/* PRIVATE の場合
+        TODO: なぜかベタ打ちでしか動かない。調査は後回し
+      */}
       {chatRoom.roomStatus === 'PRIVATE' && (
         <C.Badge colorScheme="blue" data-testid="chat-room-room-status">
           PRIVATE
