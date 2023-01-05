@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
+import * as ReactQuery from '@tanstack/react-query';
 import {
   ResponseChatMessage,
   ResponseChatRoomMember,
@@ -110,16 +111,23 @@ const ChatRoomBody: React.FC<{
   const { data } = useGetApi2<ResponseChatMessage[]>(endpoint);
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
   const { users: blockUsers } = useBlockUsers();
-  const [messages, setMessages] = React.useState<ResponseChatMessage[]>([]);
+  const queryClient = ReactQuery.useQueryClient();
+  const messages = data as ResponseChatMessage[];
 
   React.useEffect(() => {
     socket.emit('join_room_member', chatRoomId);
     socket.on('receive_message', (message: ResponseChatMessage) => {
       // メッセージを受け取ったときに実行される関数を登録
       if (blockUsers.some((user) => user.id === message.sender.id)) return;
-      setMessages((prev) => {
-        return [...prev, message];
-      });
+      const queryKey = [endpoint];
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: ResponseChatMessage[] | undefined) => {
+          if (oldData == null) return [message];
+
+          return [...oldData, message];
+        }
+      );
     });
     // webSocketのイベントを受け取る関数を登録
     socket.on(
@@ -147,11 +155,6 @@ const ChatRoomBody: React.FC<{
   React.useEffect(() => {
     scrollBottomRef.current?.scrollIntoView();
   }, [messages]);
-
-  React.useEffect(() => {
-    if (data == null) return;
-    setMessages(data as ResponseChatMessage[]);
-  }, [data]);
 
   return (
     <>
