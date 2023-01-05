@@ -20,23 +20,20 @@ import { Matching } from 'features/game/components/Matching';
 import { Games } from 'features/game/routes/Games';
 import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
-import { ErrorProvider } from 'providers/ErrorProvider';
 import OnlineUsersProvider from 'providers/OnlineUsersProvider';
 
 const App = () => {
   return (
     // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
-    <ErrorProvider>
-      <Suspense fallback={<CenterSpinner h="100vh" />}>
-        <OnlineUsersProvider>
-          <MainLayout>
-            <Suspense fallback={<CenterSpinner h="100vh" />}>
-              <Outlet />
-            </Suspense>
-          </MainLayout>
-        </OnlineUsersProvider>
-      </Suspense>
-    </ErrorProvider>
+    <Suspense fallback={<CenterSpinner h="100vh" />}>
+      <OnlineUsersProvider>
+        <MainLayout>
+          <Suspense fallback={<CenterSpinner h="100vh" />}>
+            <Outlet />
+          </Suspense>
+        </MainLayout>
+      </OnlineUsersProvider>
+    </Suspense>
   );
 };
 
