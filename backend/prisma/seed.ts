@@ -10,6 +10,7 @@ import {
   DmRoomMember,
   Dm,
   MatchResult,
+  OneTimePasswordAuth,
   ChatRoomStatus,
 } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
@@ -59,11 +60,43 @@ idMap.forEach((value, key) => {
 });
 
 /**
- * dummy1がcreatorとなって、dummy2~29まで
- * friend requestを作成する。ACCEPTED, PENDINGのいずれか。
+ * user全員のotpAuthのレコードを作成。
+ */
+const otpAuthData: OneTimePasswordAuth[] = [];
+userData.forEach((value) => {
+  otpAuthData.push({
+    authUserId: value.id,
+    isEnabled: false,
+    qrcodeUrl: null,
+    secret: null,
+    createdAt: new Date(),
+  });
+});
+
+/**
+ * dummy1がcreatorとなって、dummy2, 3 とフレンドになる。
+ * (オンラインステータス確認のため)
  */
 const friendRequestData: FriendRequest[] = [];
-for (let i = 2; i < 30; i++) {
+const creatorId = idMap.get('dummy1');
+for (let i = 2; i < 4; i++) {
+  const receiverId = idMap.get('dummy' + i.toString());
+  if (creatorId !== undefined && receiverId !== undefined) {
+    friendRequestData.push({
+      creatorId,
+      receiverId,
+      status: 'ACCEPTED',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+}
+
+/**
+ * dummy1がcreatorとなって、dummy4~29まで
+ * friend requestを作成する。ACCEPTED, PENDINGのいずれか。
+ */
+for (let i = 4; i < 30; i++) {
   const creatorId = idMap.get('dummy1');
   const receiverId = idMap.get('dummy' + i.toString());
   if (
@@ -303,15 +336,25 @@ for (let i = 0; i < 30; i++) {
 const main = async () => {
   console.log(`Start seeding ...`);
 
+  const userCount = await prisma.user.count();
+  if (userCount > 0) {
+    console.log(`Data exists. Skip seeding`);
+
+    return;
+  }
+
   await prisma.user.createMany({
     data: userData,
   });
-  // await prisma.friendRequest.createMany({
-  //   data: friendRequestData,
-  // });
-  // await prisma.block.createMany({
-  //   data: blockData,
-  // });
+  await prisma.oneTimePasswordAuth.createMany({
+    data: otpAuthData,
+  });
+  await prisma.friendRequest.createMany({
+    data: friendRequestData,
+  });
+  await prisma.block.createMany({
+    data: blockData,
+  });
   await prisma.chatRoom.createMany({
     data: chatRooms,
   });

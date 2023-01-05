@@ -60,8 +60,9 @@ enum OnlineStatus {
 model OneTimePasswordAuth {
   authUser   User     @relation(fields: [authUserId], references: [id])
   authUserId String   @id @db.Uuid
-  qrcodeUrl  String
-  secret     String
+  isEnabled  Boolean  @default(false)
+  qrcodeUrl  String?
+  secret     String?
   createdAt  DateTime @default(now()) @db.Timestamptz(3)
 }
 

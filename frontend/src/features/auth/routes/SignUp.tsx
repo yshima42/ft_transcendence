@@ -91,8 +91,6 @@ export const SignUp: FC = memo(() => {
                   </Text>
                   <Spacer />
                   <Button onClick={onClickFileSelect}>ファイル選択</Button>
-                  {/* デフォルトのファイル選択 */}
-                  {/* <Input type="file" accept="image/*" onChange={onFileInputChange} /> */}
                 </VStack>
               </Box>
             </HStack>
@@ -114,13 +112,7 @@ export const SignUp: FC = memo(() => {
               <FormLabel htmlFor="nickname" fontSize="lg">
                 Nickname
               </FormLabel>
-              <Input
-                id="nickname"
-                name="nickname"
-                // 参考サイト調べるとvalueの記述あるけど、なぜ必要かわからない。
-                // value={profileFormData?.nickname}
-                onChange={onProfileChange}
-              />
+              <Input id="nickname" name="nickname" onChange={onProfileChange} />
             </HStack>
           </Box>
 
