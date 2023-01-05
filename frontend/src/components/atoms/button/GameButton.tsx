@@ -1,20 +1,19 @@
 import { memo, FC } from 'react';
-import { Button } from '@chakra-ui/react';
+import { Button, ButtonProps } from '@chakra-ui/react';
 
-type Props = {
+type Props = ButtonProps & {
   targetId: string;
-  size?: string;
 };
 
 export const GameButton: FC<Props> = memo((props) => {
-  const { targetId, size = 'sm' } = props;
+  const { targetId, ...buttonProps } = props;
 
   const onClickGame = () => {
     alert(`Game with ${targetId}`);
   };
 
   return (
-    <Button size={size} onClick={onClickGame}>
+    <Button size="sm" onClick={onClickGame} {...buttonProps}>
       Game
     </Button>
   );

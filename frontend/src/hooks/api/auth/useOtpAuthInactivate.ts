@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useToast } from '@chakra-ui/react';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { usePatchApi } from '../generics/usePatchApi';
 import { OneTimePasswordAuthResponse } from './useOtpAuth';
 
@@ -21,33 +21,25 @@ export type InactivateOtpAuth = UseMutateAsyncFunction<
 export const useOtpAuthInactivate = (): {
   inactivateOtpAuth: InactivateOtpAuth;
   isLoading: boolean;
-  isError: boolean;
   isSuccess: boolean;
 } => {
   const {
-    patchFunc: inactivateOtpAuth,
+    mutateAsync: inactivateOtpAuth,
     isLoading,
-    isError,
     isSuccess,
-    failureReason,
+    isError,
+    error,
   } = usePatchApi<InactivateOtpAuthReqBody, InactivateOtpAuthResBody>(
     `/auth/otp/off`,
     [['/auth/otp']]
   );
 
-  const toast = useToast();
+  const { customToast } = useCustomToast();
   useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(failureReason)) {
-      toast({
-        title: 'Error',
-        description: failureReason.response?.data.message,
-        status: 'error',
-        position: 'top',
-        duration: 3000,
-        isClosable: true,
-      });
+    if (isError && isAxiosError<{ message: string }>(error)) {
+      customToast({ description: error.response?.data.message });
     }
-  }, [isError, toast, failureReason]);
+  }, [isError, error, customToast]);
 
-  return { inactivateOtpAuth, isLoading, isError, isSuccess };
+  return { inactivateOtpAuth, isLoading, isSuccess };
 };

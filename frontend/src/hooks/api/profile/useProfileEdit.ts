@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useToast } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { usePostApi } from '../generics/usePostApi';
 
 export interface ProfileFormData {
@@ -24,34 +24,25 @@ export type EditProfile = UseMutateAsyncFunction<
 export const useProfileEdit = (): {
   editProfile: EditProfile;
   isLoading: boolean;
-  isError: boolean;
   isSuccess: boolean;
-  failureReason: unknown;
 } => {
   const {
-    postFunc: editProfile,
+    mutateAsync: editProfile,
     isLoading,
-    isError,
     isSuccess,
-    failureReason,
+    isError,
+    error,
   } = usePostApi<ProfileFormData, ProfileEditResBody>(`/users/me/profile`, [
     ['/users/me/profile'],
     ['/game/matches'],
   ]);
 
-  const toast = useToast();
+  const { customToast } = useCustomToast();
   useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(failureReason)) {
-      toast({
-        title: 'Error',
-        description: failureReason.response?.data.message,
-        status: 'error',
-        position: 'top',
-        duration: 3000,
-        isClosable: true,
-      });
+    if (isError && isAxiosError<{ message: string }>(error)) {
+      customToast({ description: error.response?.data.message });
     }
-  }, [isError, toast, failureReason]);
+  }, [isError, error, customToast]);
 
-  return { editProfile, isLoading, isError, isSuccess, failureReason };
+  return { editProfile, isLoading, isSuccess };
 };

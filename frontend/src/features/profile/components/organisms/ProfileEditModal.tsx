@@ -46,6 +46,7 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
     if (avatarFormData !== undefined) {
       await uploadAvatar(avatarFormData);
     }
+    onClose();
   };
 
   const onProfileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -102,8 +103,6 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                       </Text>
                       <Spacer />
                       <Button onClick={onClickFileSelect}>ファイル選択</Button>
-                      {/* デフォルトのファイル選択 */}
-                      {/* <Input type="file" accept="image/*" onChange={onFileInputChange} /> */}
                     </VStack>
                   </Box>
                 </HStack>
@@ -128,8 +127,6 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                   <Input
                     id="nickname"
                     name="nickname"
-                    // 参考サイト調べるとvalueの記述あるけど、なぜ必要かわからない。
-                    // value={profileFormData?.nickname}
                     onChange={onProfileChange}
                   />
                 </HStack>
@@ -141,7 +138,6 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                 type="submit"
                 isLoading={isLoading1 || isLoading2}
                 isDisabled={isLoading1 || isLoading2}
-                onClick={onClose}
               >
                 Save
               </Button>
