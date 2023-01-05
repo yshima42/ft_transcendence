@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { ChatRoomStatus } from '@prisma/client';
 import { ResponseChatRoom } from 'features/chat/types/chat';
 import { useGetApi } from 'hooks/api/generics/useGetApi';
 import { Link } from 'react-router-dom';
@@ -15,9 +16,15 @@ const ChatRoomBox: React.FC<{ chatRoom: ResponseChatRoom }> = React.memo(
       )}
       <C.Heading fontSize="xl">{`${chatRoom.name}`}</C.Heading>
       {/* PROTECTED の場合 */}
-      {chatRoom.roomStatus === 'PROTECTED' && (
+      {chatRoom.roomStatus === ChatRoomStatus.PROTECTED && (
         <C.Badge colorScheme="red" data-testid="chat-room-room-status">
           PROTECTED
+        </C.Badge>
+      )}
+      {/* PRIVATE の場合 */}
+      {chatRoom.roomStatus === 'PRIVATE' && (
+        <C.Badge colorScheme="blue" data-testid="chat-room-room-status">
+          PRIVATE
         </C.Badge>
       )}
     </C.Box>

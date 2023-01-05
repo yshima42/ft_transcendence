@@ -1,6 +1,13 @@
-import { PickType, PartialType } from '@nestjs/mapped-types';
-import { CreateChatRoomDto } from './create-chat-room.dto';
+import { ChatRoomStatus } from '@prisma/client';
+import * as CV from 'class-validator';
 
-export class UpdateChatRoomDto extends PartialType(
-  PickType(CreateChatRoomDto, ['password', 'roomStatus'] as const)
-) {}
+export class UpdateChatRoomDto {
+  @CV.IsNotEmpty()
+  @CV.IsEnum(ChatRoomStatus)
+  roomStatus!: ChatRoomStatus;
+
+  @CV.IsString()
+  @CV.IsOptional()
+  @CV.MaxLength(128)
+  password?: string;
+}

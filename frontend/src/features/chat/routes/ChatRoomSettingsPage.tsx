@@ -16,11 +16,16 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   );
   useGetApi<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
   const { data: chatRoom } = useGetApi<ChatRoom>(`/chat/rooms/${chatRoomId}`);
-  const { name: chatName, roomStatus } = chatRoom;
+  const { roomStatus } = chatRoom;
 
   return (
     <>
       <ContentLayout title="Chat Room Settings">
+        {/* 招待リンク表示 */}
+        <C.Box>
+          <C.Text>Invite Link</C.Text>
+          <C.Text>{`http://localhost:5173/app/chat/rooms/${chatRoomId}/confirmation`}</C.Text>
+        </C.Box>
         <C.Accordion allowToggle>
           {/* ChatRoomMemberListAccordion */}
           <CustomAccordion title="Chat Members">
@@ -35,7 +40,6 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
               <SecurityAccordionItem
                 roomStatus={roomStatus}
                 chatRoomId={chatRoomId}
-                chatName={chatName}
               />
             </CustomAccordion>
           )}
