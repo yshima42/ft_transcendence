@@ -7,18 +7,19 @@ import * as ReactHookForm from 'react-hook-form';
 type Props = {
   roomStatus: ChatRoomStatus;
   chatRoomId: string;
-  chatName: string;
 };
 
 type Inputs = {
   password: string;
-  chatRoomId: string;
-  chatName: string;
 };
 
 export const SecurityAccordionItem: React.FC<Props> = React.memo(
-  ({ roomStatus, chatRoomId, chatName }) => {
-    const { protectChatRoom, publicChatRoom } = useChatRoomProtectSetting();
+  ({ roomStatus, chatRoomId }) => {
+    const {
+      changeChatRoomStatusProtect,
+      changeChatRoomStatusPublic,
+      changeChatRoomStatusPrivate,
+    } = useChatRoomProtectSetting(chatRoomId);
     const {
       register,
       handleSubmit,
@@ -27,39 +28,36 @@ export const SecurityAccordionItem: React.FC<Props> = React.memo(
 
     return (
       <>
-        {/*
-        PROTECTEDのとき パスワードの解除
-        PUBLICのとき パスワード
-        */}
-        {roomStatus === ChatRoomStatus.PROTECTED && (
-          <C.Flex>
-            <C.Text mr={5}>Password</C.Text>
-            <C.Spacer />
-            <C.Flex>
-              <form onSubmit={handleSubmit(publicChatRoom)}>
-                <C.Input
-                  type="hidden"
-                  value={chatRoomId}
-                  {...register('chatRoomId')}
-                />
-                <C.Input
-                  type="hidden"
-                  value={chatName}
-                  {...register('chatName')}
-                />
-                <C.Button type="submit" colorScheme="blue" mr={5}>
-                  Unlock
-                </C.Button>
-              </form>
-            </C.Flex>
-          </C.Flex>
-        )}
-        {roomStatus === ChatRoomStatus.PUBLIC && (
-          <C.Flex>
-            <C.Text mr={5}>Password</C.Text>
-            <C.Spacer />
-            <C.Flex>
-              <form onSubmit={handleSubmit(protectChatRoom)}>
+        <C.Button
+          colorScheme="blue"
+          onClick={changeChatRoomStatusPublic}
+          isDisabled={roomStatus === ChatRoomStatus.PUBLIC}
+        >
+          Public
+        </C.Button>
+        <C.Button
+          colorScheme="blue"
+          onClick={changeChatRoomStatusPrivate}
+          isDisabled={roomStatus === 'PRIVATE'}
+        >
+          Private
+        </C.Button>
+        <C.Popover>
+          <C.PopoverTrigger>
+            <C.Button
+              colorScheme="blue"
+              isDisabled={roomStatus === ChatRoomStatus.PROTECTED}
+            >
+              Protect
+            </C.Button>
+          </C.PopoverTrigger>
+          <C.PopoverContent>
+            <C.PopoverArrow />
+            <C.PopoverCloseButton />
+            <C.PopoverHeader>Protect</C.PopoverHeader>
+            <C.PopoverBody>
+              <C.Text>Set a password</C.Text>
+              <form onSubmit={handleSubmit(changeChatRoomStatusProtect)}>
                 <C.Input
                   type="password"
                   placeholder="Password"
@@ -71,26 +69,16 @@ export const SecurityAccordionItem: React.FC<Props> = React.memo(
                     },
                   })}
                 />
-                <C.Input
-                  type="hidden"
-                  value={chatRoomId}
-                  {...register('chatRoomId')}
-                />
-                <C.Input
-                  type="hidden"
-                  value={chatName}
-                  {...register('chatName')}
-                />
                 {errors.password != null && (
                   <C.Text color="red.500">{errors.password.message}</C.Text>
                 )}
                 <C.Button type="submit" colorScheme="blue" mr={5}>
-                  Lock
+                  Protect
                 </C.Button>
               </form>
-            </C.Flex>
-          </C.Flex>
-        )}
+            </C.PopoverBody>
+          </C.PopoverContent>
+        </C.Popover>
       </>
     );
   }

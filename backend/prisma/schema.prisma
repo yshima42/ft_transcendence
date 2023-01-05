@@ -173,5 +173,6 @@ enum ChatRoomMemberStatus {
 
 enum ChatRoomStatus {
   PUBLIC
+  PRIVATE
   PROTECTED
 }

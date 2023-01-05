@@ -1,44 +1,56 @@
 import { ChatRoomStatus } from '@prisma/client';
-import { axios } from 'lib/axios';
+import * as ReactQuery from '@tanstack/react-query';
+import { usePatchApi } from 'hooks/api/generics/usePatchApi';
 import * as ReactHookForm from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 type Inputs = {
-  password: string;
-  chatRoomId: string;
-  chatName: string;
+  roomStatus: ChatRoomStatus;
+  password?: string | undefined;
 };
 
-export const useChatRoomProtectSetting = (): {
-  protectChatRoom: ReactHookForm.SubmitHandler<Inputs>;
-  publicChatRoom: ReactHookForm.SubmitHandler<Omit<Inputs, 'password'>>;
+export const useChatRoomProtectSetting = (
+  chatRoomId: string
+): {
+  changeChatRoomStatusProtect: (
+    data: ReactHookForm.UseFormReturn<Inputs>['getValues']
+  ) => void;
+  changeChatRoomStatusPublic: () => void;
+  changeChatRoomStatusPrivate: () => void;
 } => {
   const navigate = useNavigate();
-  const endpoint = (chatRoomId: string) => `/chat/rooms/${chatRoomId}`;
-  const url = (chatRoomId: string) => `/app/chat/rooms/${chatRoomId}`;
+  const endpoint = `/chat/rooms/${chatRoomId}`;
+  const url = `/app/chat/rooms/${chatRoomId}`;
+  const queryKeys: ReactQuery.QueryKey[] = [['/chat/rooms']];
+  const { mutate } = usePatchApi<Inputs, Promise<void>>(endpoint, queryKeys);
 
-  const protectChatRoom: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
-    const { password, chatRoomId } = data;
-
-    await axios.patch(endpoint(chatRoomId), {
-      password,
+  const changeChatRoomStatusProtect = (data: { password: string }) => {
+    const inputs: Inputs = {
       roomStatus: ChatRoomStatus.PROTECTED,
-    });
-    navigate(url(chatRoomId));
+      password: data.password,
+    };
+    mutate(inputs, { onSuccess: () => navigate(url) });
   };
 
-  const publicChatRoom: ReactHookForm.SubmitHandler<
-    Omit<Inputs, 'password'>
-  > = async (data) => {
-    const { chatRoomId } = data;
-    await axios.patch(endpoint(chatRoomId), {
+  const changeChatRoomStatusPublic = () => {
+    const inputs: Inputs = {
       roomStatus: ChatRoomStatus.PUBLIC,
-    });
-    navigate(url(chatRoomId));
+      password: undefined,
+    };
+    mutate(inputs, { onSuccess: () => navigate(url) });
+  };
+
+  const changeChatRoomStatusPrivate = () => {
+    const inputs: Inputs = {
+      roomStatus: 'PRIVATE',
+      password: undefined,
+    };
+    mutate(inputs, { onSuccess: () => navigate(url) });
   };
 
   return {
-    protectChatRoom,
-    publicChatRoom,
+    changeChatRoomStatusProtect,
+    changeChatRoomStatusPublic,
+    changeChatRoomStatusPrivate,
   };
 };

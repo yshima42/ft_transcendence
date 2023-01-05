@@ -69,11 +69,17 @@ export class ChatRoomService {
   async findAllWithOutMe(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
+        // roomStatus is not ChatRoomStatus.PRIVATE
         chatRoomMembers: {
           every: {
             userId: {
               not: userId,
             },
+          },
+        },
+        AND: {
+          roomStatus: {
+            not: ChatRoomStatus.PRIVATE,
           },
         },
       },
@@ -199,10 +205,7 @@ export class ChatRoomService {
       },
       data: {
         password: hashedPassword,
-        roomStatus:
-          password === undefined
-            ? ChatRoomStatus.PUBLIC
-            : ChatRoomStatus.PROTECTED,
+        roomStatus: updateChatroomDto.roomStatus,
       },
     });
     this.logger.debug(`update: ${this.json({ chatRoom })}`);

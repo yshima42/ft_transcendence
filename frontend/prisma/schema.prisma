@@ -150,5 +150,6 @@ enum OnlineStatus {
 
 enum ChatRoomStatus {
   PUBLIC
+  PRIVATE
   PROTECTED
 }
