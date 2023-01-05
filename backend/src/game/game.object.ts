@@ -1,4 +1,4 @@
-import { Socket, Server } from 'socket.io';
+import { Server } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import {
   BALL_SIZE,
@@ -155,23 +155,21 @@ export class GameRoom {
     this.ball.y = BALL_START_Y;
   }
 
-  gameStart(socket: Socket, roomId: string): void {
+  gameStart(roomId: string): void {
     this.countDownUntilGameRestart();
 
     this.interval = setInterval(() => {
-      // ゲームロジック
       this.gameLogic(roomId);
-
-      // フレームごとのBall、Paddleポジションの送信
       this.updatePosition(roomId);
 
-      // フレームレート60で計算(1000÷60fps=16.67)、負荷が高い場合は数字をあげる(フレームレート30の場合33をセット)
+      // フレームレート60で計算(1000÷60fps=16.67)、負荷が高い場合は数字をあげる
+      // (フレームレート30の場合33をセット)
     }, 17);
   }
 
+  // 1フレームごとのロジック処理
   gameLogic(roomId: string): void {
     if (!this.isBallStop) {
-      // フレームごとのボールポジションの移動
       this.ball.x += this.ball.dx;
       this.ball.y += this.ball.dy;
     }
@@ -222,11 +220,9 @@ export class GameRoom {
 
   async doneGame(roomId: string): Promise<void> {
     this.isFinished = true;
-    // setIntervalを止める処理
     clearInterval(this.interval);
     this.deleteGameRoom(this);
 
-    // データベースへスコアの保存
     const muchResult: CreateMatchResultDto = {
       playerOneId: this.player1.id,
       playerTwoId: this.player2.id,
@@ -240,7 +236,7 @@ export class GameRoom {
       .emit('update_game_phase', GamePhase.Result);
   }
 
-  // TODO: disconnect処理を実行
+  // 1フレームごとにクライアントに送信。
   updatePosition(roomId: string): void {
     this.server.in([roomId, `watch_${roomId}`]).emit('update_position', {
       paddle1X: this.paddle1.x,
@@ -259,6 +255,7 @@ export class GameRoom {
     });
   }
 
+  // ユーザーの操作を受け取って位置を更新。送信はしない。
   handleInput(
     roomId: string,
     userCommands: { up: boolean; down: boolean; isLeftSide: boolean }
