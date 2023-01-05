@@ -326,35 +326,6 @@ export class UsersGateway {
     await this.leaveGameRoom(socket);
   }
 
-  async leaveGameRoom(socket: Socket): Promise<void> {
-    const { userId, roomId } = socket.data as {
-      userId: string;
-      roomId: string | undefined;
-    };
-    if (roomId === undefined) {
-      return;
-    }
-    socket.data.roomId = undefined;
-    const gameRoom = this.gameRooms.get(roomId);
-    if (gameRoom === undefined) {
-      return;
-    }
-    const { player1, player2 } = gameRoom;
-    const isPlayer = player1.id === userId || player2.id === userId;
-    await (isPlayer ? socket.leave(roomId) : socket.leave(`watch_${roomId}`));
-    const gameRoomSockets = await this.server.in(roomId).fetchSockets();
-    if (gameRoomSockets.length === 0) {
-      // 両プレイヤーゲームルームを抜けたら無効試合
-      if (!gameRoom.isFinished) {
-        this.server
-          .in(`watch_${roomId}`)
-          .emit('game_room_error', 'Both players disconnected.');
-        clearInterval(gameRoom.interval);
-        this.deleteGameRoom(gameRoom);
-      }
-    }
-  }
-
   @SubscribeMessage('join_monitor_room')
   async sendAllGameRoomIds(
     @ConnectedSocket() socket: Socket
@@ -384,6 +355,35 @@ export class UsersGateway {
     );
 
     await socket.leave('monitor');
+  }
+
+  async leaveGameRoom(socket: Socket): Promise<void> {
+    const { userId, roomId } = socket.data as {
+      userId: string;
+      roomId: string | undefined;
+    };
+    if (roomId === undefined) {
+      return;
+    }
+    socket.data.roomId = undefined;
+    const gameRoom = this.gameRooms.get(roomId);
+    if (gameRoom === undefined) {
+      return;
+    }
+    const { player1, player2 } = gameRoom;
+    const isPlayer = player1.id === userId || player2.id === userId;
+    await (isPlayer ? socket.leave(roomId) : socket.leave(`watch_${roomId}`));
+    const gameRoomSockets = await this.server.in(roomId).fetchSockets();
+    if (gameRoomSockets.length === 0) {
+      // 両プレイヤーゲームルームを抜けたら無効試合
+      if (!gameRoom.isFinished) {
+        this.server
+          .in(`watch_${roomId}`)
+          .emit('game_room_error', 'Both players disconnected.');
+        clearInterval(gameRoom.interval);
+        this.deleteGameRoom(gameRoom);
+      }
+    }
   }
 
   createGameRoom(
