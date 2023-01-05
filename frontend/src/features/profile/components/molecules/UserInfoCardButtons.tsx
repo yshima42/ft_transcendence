@@ -8,7 +8,7 @@ import { OtpAuthButton } from '../atoms/OtpAuthButton';
 import { ProfileEditButton } from '../atoms/ProfileEditButton';
 import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
-import { GameAndWatchButton } from './GameAndWatchButton';
+import { GameAndWatchButton } from './GameOrWatchButton';
 
 type Props = {
   user: User;
