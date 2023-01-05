@@ -3,7 +3,7 @@ import { Grid } from '@chakra-ui/react';
 import { useFriends } from 'hooks/api';
 import { DmButton } from 'components/atoms/button/DmButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
-import { GameAndWatchButton } from 'features/profile/components/molecules/GameAndWatchButton';
+import { GameAndWatchButton } from 'features/profile/components/molecules/GameOrWatchButton';
 
 export const FriendsList: FC = () => {
   const { users } = useFriends();
