@@ -40,7 +40,6 @@ export class UsersGateway {
   @WebSocketServer()
   private readonly server!: Server;
 
-  // オンラインステータス関連
   async handleConnection(@ConnectedSocket() socket: Socket): Promise<void> {
     const cookie: string | undefined = socket.handshake.headers.cookie;
     if (cookie === undefined) {
@@ -74,7 +73,6 @@ export class UsersGateway {
       this.deletePresence(userId);
     }
 
-    // debug用
     Logger.debug('disconnected: ' + socket.id);
   }
 
@@ -85,12 +83,10 @@ export class UsersGateway {
   } {
     const { userId } = socket.data as { userId: string };
     const reconnected = this.userIdToPresence.has(userId);
-    // TODO: ここをthis.updatePresenceにまとめられないか
     if (!reconnected) {
       this.addPresence(userId);
     }
 
-    // debug用
     Logger.debug('handshake: ' + socket.id);
 
     return {
@@ -99,7 +95,6 @@ export class UsersGateway {
     };
   }
 
-  // Game関連
   @SubscribeMessage('join_matching_room')
   async randomMatch(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
@@ -132,7 +127,6 @@ export class UsersGateway {
 
     const player1 = new Player(waitUserId, true);
     const player2 = new Player(userId, false);
-    // 2人揃ったらマッチルーム作る
     const gameRoom = this.createGameRoom(player1, player2, BALL_SPEED);
     this.server.to('matching').emit('go_game_room', gameRoom.id);
     this.server.socketsLeave('matching');
@@ -198,7 +192,6 @@ export class UsersGateway {
     await this.leaveGameRoom(socket);
   }
 
-  // room関連;
   @SubscribeMessage('join_game_room')
   async joinRoom(
     @MessageBody() message: { roomId: string },
@@ -282,11 +275,12 @@ export class UsersGateway {
       // 1回のみ動かす
       if (!gameRoom.isInGame) {
         gameRoom.isInGame = true;
-        gameRoom.gameStart(socket, roomId);
+        gameRoom.gameStart(roomId);
       }
     }
   }
 
+  // キー入力されたときに呼ばれる。
   @SubscribeMessage('user_command')
   handleUserCommands(
     @MessageBody()

@@ -67,7 +67,6 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     });
 
-    // TODO: update_presenceとupdate_game_room_idをまとめるかどうか検討
     socket.on('set_presence', (userIdToPresence: [string, Presence]) => {
       console.log('User update presence message received');
       userIdToPresenceMap.set(...userIdToPresence);
