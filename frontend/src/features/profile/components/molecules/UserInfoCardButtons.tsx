@@ -8,7 +8,7 @@ import { OtpAuthButton } from '../atoms/OtpAuthButton';
 import { ProfileEditButton } from '../atoms/ProfileEditButton';
 import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
-import { GameAndWatchButton } from './GameOrWatchButton';
+import { GameOrWatchButton } from './GameOrWatchButton';
 
 type Props = {
   user: User;
@@ -36,7 +36,7 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
         <>
           {!isUserBlocked && (
             <HStack>
-              <GameAndWatchButton targetId={user.id} />
+              <GameOrWatchButton targetId={user.id} />
               <DmButton targetId={user.id} />
             </HStack>
           )}
