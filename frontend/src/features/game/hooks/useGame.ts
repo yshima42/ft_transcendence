@@ -115,18 +115,9 @@ export const useGame = (
         ballX: number;
         ballY: number;
       }) => {
-        [paddle1.x, paddle1.y] = [
-          message.paddle1X * canvas.ratio,
-          message.paddle1Y * canvas.ratio,
-        ];
-        [paddle2.x, paddle2.y] = [
-          message.paddle2X * canvas.ratio,
-          message.paddle2Y * canvas.ratio,
-        ];
-        [ball.x, ball.y] = [
-          message.ballX * canvas.ratio,
-          message.ballY * canvas.ratio,
-        ];
+        [paddle1.x, paddle1.y] = [message.paddle1X, message.paddle1Y];
+        [paddle2.x, paddle2.y] = [message.paddle2X, message.paddle2Y];
+        [ball.x, ball.y] = [message.ballX, message.ballY];
       }
     );
 

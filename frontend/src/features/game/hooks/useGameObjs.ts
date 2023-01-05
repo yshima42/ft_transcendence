@@ -1,12 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo } from 'react';
 import { Socket } from 'socket.io-client';
-import {
-  BALL_SIZE,
-  BG_COLOR,
-  CANVAS_WIDTH,
-  PADDLE_HEIGHT,
-  PADDLE_WIDTH,
-} from '../utils/gameConfig';
+import { BG_COLOR, CANVAS_WIDTH } from '../utils/gameConfig';
 import { Ball, Paddle, Player } from '../utils/gameObjs';
 
 export const useGameObjs = (
@@ -47,31 +41,11 @@ export const useGameObjs = (
         ctx.fillStyle = BG_COLOR;
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-        // ゲームオブジェクトのサイズの設定
-        paddle1.height = PADDLE_HEIGHT * canvas.ratio;
-        paddle1.width = PADDLE_WIDTH * canvas.ratio;
-        paddle2.height = PADDLE_HEIGHT * canvas.ratio;
-        paddle2.width = PADDLE_WIDTH * canvas.ratio;
-        ball.size = BALL_SIZE * canvas.ratio;
-
-        // ゲームオブジェクトの表示
-        paddle1.draw(ctx);
-        paddle2.draw(ctx);
-        ball.draw(ctx);
-
-        // スコアの表示
-        const fontSize = 48 * canvas.ratio;
-        ctx.font = `${fontSize}px serif`;
-        ctx.fillText(
-          player1.score.toString(),
-          20 * canvas.ratio,
-          50 * canvas.ratio
-        );
-        ctx.fillText(
-          player2.score.toString(),
-          (CANVAS_WIDTH - 40) * canvas.ratio,
-          50 * canvas.ratio
-        );
+        paddle1.draw(ctx, canvas.ratio);
+        paddle2.draw(ctx, canvas.ratio);
+        ball.draw(ctx, canvas.ratio);
+        player1.drawScore(ctx, canvas.ratio, true);
+        player2.drawScore(ctx, canvas.ratio, false);
       },
     }),
     []
