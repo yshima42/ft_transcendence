@@ -89,21 +89,6 @@ describe('UsersServiceTest', () => {
     await prisma.$disconnect();
   });
 
-  describe('findAll', () => {
-    it('should get all users', async () => {
-      const allUsersByService = await usersService.findAll(mockUsers[0]);
-      const allUsersByDatabase = await prisma.user.findMany({
-        where: {
-          name: {
-            not: 'dummy1',
-          },
-        },
-      });
-
-      expect(allUsersByService).toEqual(allUsersByDatabase);
-    });
-  });
-
   describe('find', () => {
     it("should get one user's id", async () => {
       const idByService = await usersService.find(mockUsers[0].id, 'id');

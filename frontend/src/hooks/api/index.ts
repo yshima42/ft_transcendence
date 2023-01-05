@@ -1,7 +1,6 @@
 // auth
-export * from './auth/useDummyLogin';
 export * from './auth/useLogout';
-export * from './auth/useOtoAuthActivate';
+export * from './auth/useOtpAuthActivate';
 export * from './auth/useOtpAuth';
 export * from './auth/useOtpAuthInactivate';
 export * from './auth/useOtpAuthValidate';

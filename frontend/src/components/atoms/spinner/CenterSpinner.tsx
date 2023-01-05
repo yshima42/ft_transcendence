@@ -1,19 +1,23 @@
 import { FC, memo } from 'react';
-import { Center, Spinner } from '@chakra-ui/react';
+import { Center, Spinner, SpinnerProps } from '@chakra-ui/react';
 
-type Props = {
+type Props = SpinnerProps & {
   h?: string;
   w?: string;
-  color?: string;
 };
 
 // 100% は親要素に対しての割合。100vh は画面いっぱい。
 export const CenterSpinner: FC<Props> = memo((props) => {
-  const { h = '100%', w = '100%', color = 'blue.500' } = props;
+  const { h = '100%', w = '100%', ...spinnerProps } = props;
 
   return (
     <Center h={h} w={w}>
-      <Spinner emptyColor="gray.200" color={color} size="xl" />
+      <Spinner
+        color="blue.500"
+        emptyColor="gray.200"
+        size="xl"
+        {...spinnerProps}
+      />
     </Center>
   );
 });
