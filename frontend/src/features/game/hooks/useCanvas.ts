@@ -24,7 +24,7 @@ export const useCanvas = (
     render();
 
     return () => window.cancelAnimationFrame(animationFrameId);
-  }, [draw]);
+  }, [draw, canvasSize.width]);
 
   return canvasRef;
 };
