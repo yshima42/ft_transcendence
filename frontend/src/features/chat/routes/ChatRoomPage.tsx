@@ -8,7 +8,7 @@ import {
   ResponseChatRoomMemberStatus,
 } from 'features/chat/types/chat';
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
-import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
+import { useGetApi } from 'hooks/api/generics/useGetApi';
 import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
 import { Socket } from 'socket.io-client';
@@ -18,16 +18,13 @@ import { MessageSendForm } from 'components/molecules/MessageSendForm';
 
 export const ChatRoomPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
-  const { data: chatLoginUserData } = useGetApi2<ResponseChatRoomMember>(
+  const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
     `/chat/rooms/${chatRoomId}/members/me`
   );
-  useGetApi2<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
-  const { data: chatRoomData } = useGetApi2<ResponseChatRoomMemberStatus>(
-    `/chat/rooms/${chatRoomId}`
-  );
+  useGetApi<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
+  const { data: chatRoom } = useGetApi<ChatRoom>(`/chat/rooms/${chatRoomId}`);
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
-  const chatLoginUser = chatLoginUserData as ResponseChatRoomMember;
-  const { name: chatName } = chatRoomData as ChatRoom;
+  const { name: chatName } = chatRoom;
 
   return (
     <>
@@ -108,11 +105,10 @@ const ChatRoomBody: React.FC<{
 }> = React.memo(({ chatLoginUser, chatRoomId, socket }) => {
   const navigate = ReactRouter.useNavigate();
   const endpoint = `/chat/rooms/${chatRoomId}/messages`;
-  const { data } = useGetApi2<ResponseChatMessage[]>(endpoint);
+  const { data: messages } = useGetApi<ResponseChatMessage[]>(endpoint);
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
   const { users: blockUsers } = useBlockUsers();
   const queryClient = ReactQuery.useQueryClient();
-  const messages = data as ResponseChatMessage[];
 
   React.useEffect(() => {
     socket.emit('join_room_member', chatRoomId);

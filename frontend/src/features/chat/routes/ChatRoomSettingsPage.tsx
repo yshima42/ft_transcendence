@@ -2,11 +2,8 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import { useLeaveChatRoom } from 'features/chat/hooks/useLeaveChatRoom';
-import {
-  ResponseChatRoomMember,
-  ResponseChatRoomMemberStatus,
-} from 'features/chat/types/chat';
-import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
+import { ResponseChatRoomMember } from 'features/chat/types/chat';
+import { useGetApi } from 'hooks/api/generics/useGetApi';
 import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomMemberList';
@@ -14,15 +11,12 @@ import { SecurityAccordionItem } from 'features/chat/components/organisms/Securi
 
 export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
-  const { data: chatLoginUserData } = useGetApi2<ResponseChatRoomMember>(
+  const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
     `/chat/rooms/${chatRoomId}/members/me`
   );
-  useGetApi2<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
-  const { data: chatRoomData } = useGetApi2<ResponseChatRoomMemberStatus>(
-    `/chat/rooms/${chatRoomId}`
-  );
-  const { name: chatName, roomStatus } = chatRoomData as ChatRoom;
-  const chatLoginUser = chatLoginUserData as ResponseChatRoomMember;
+  useGetApi<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
+  const { data: chatRoom } = useGetApi<ChatRoom>(`/chat/rooms/${chatRoomId}`);
+  const { name: chatName, roomStatus } = chatRoom;
 
   return (
     <>

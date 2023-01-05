@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ResponseChatRoom } from 'features/chat/types/chat';
-import { useGetApi2 } from 'hooks/api/generics/useGetApi2';
+import { useGetApi } from 'hooks/api/generics/useGetApi';
 import { Link } from 'react-router-dom';
 
 const ChatRoomBox: React.FC<{ chatRoom: ResponseChatRoom }> = React.memo(
@@ -41,8 +41,7 @@ export const ChatRoomList: React.FC<{
   chatRoomEndpoint: string;
   chatRoomLinkUrl: (chatRoomId: string) => string;
 }> = React.memo(({ chatRoomEndpoint, chatRoomLinkUrl }) => {
-  const { data } = useGetApi2<ResponseChatRoom[]>(chatRoomEndpoint);
-  const chatRooms = data as ResponseChatRoom[];
+  const { data: chatRooms } = useGetApi<ResponseChatRoom[]>(chatRoomEndpoint);
 
   return (
     <C.List spacing={3} data-testid="chat-room-list">
