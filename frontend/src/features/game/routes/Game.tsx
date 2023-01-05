@@ -30,7 +30,7 @@ export const Game: FC = memo(() => {
       case GamePhase.ConfirmWaiting:
         return (
           <Confirmation
-            setGamePhase={setGamePhase}
+            setNextGamePhase={() => setGamePhase(GamePhase.Confirming)}
             readyCountDownNum={readyCountDownNum}
           />
         );
