@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { SocketContext } from 'providers/SocketProvider';
 
 export interface GameOutline {
@@ -15,7 +15,9 @@ export const useGameMonitoring = (): {
     throw new Error('SocketContext undefined');
   }
   const { socket, connected } = socketContext;
-  const inGameOutlineMap = new Map<string, GameOutline>();
+  // roomId の被りを防ぐため Map を使う
+  const inGameOutlineMap = useMemo(() => new Map<string, GameOutline>(), []);
+  // Games コンポーネントでmap 関数を使うために配列に変換
   const [inGameOutlines, setInGameOutlines] = useState<GameOutline[]>([]);
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export const useGameMonitoring = (): {
       socket.off('game_room_created');
       socket.off('game_room_deleted');
     };
-  }, [socket, connected]);
+  }, [socket, connected, inGameOutlineMap]);
 
   return { inGameOutlines };
 };

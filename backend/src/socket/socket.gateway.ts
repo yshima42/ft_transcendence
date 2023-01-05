@@ -100,9 +100,11 @@ export class UsersGateway {
   }
 
   // Game関連
-  @SubscribeMessage('random_match')
+  @SubscribeMessage('join_matching_room')
   async randomMatch(@ConnectedSocket() socket: Socket): Promise<void> {
-    Logger.debug(`${socket.id} ${socket.data.userId as string} random_match`);
+    Logger.debug(
+      `${socket.id} ${socket.data.userId as string} join_matching_room`
+    );
 
     const { userId } = socket.data as { userId: string };
     const gameRoomId = this.userIdToGameRoomId.get(userId);
@@ -137,10 +139,10 @@ export class UsersGateway {
     socket.emit('go_game_room', gameRoom.id);
   }
 
-  @SubscribeMessage('matching_cancel')
+  @SubscribeMessage('leave_matching_room')
   async cancelMatching(@ConnectedSocket() socket: Socket): Promise<void> {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} matching_cancel`
+      `${socket.id} ${socket.data.userId as string} leave_matching_room`
     );
 
     await socket.leave('matching');
@@ -277,25 +279,11 @@ export class UsersGateway {
       this.server
         .in(`watch_${roomId}`)
         .emit('update_game_phase', GamePhase.Watch);
-    }
-  }
-
-  @SubscribeMessage('connect_pong')
-  connectPong(@ConnectedSocket() socket: Socket): void {
-    Logger.debug(`${socket.id} ${socket.data.userId as string} connect_pong`);
-
-    const { roomId } = socket.data as { roomId: string };
-    const gameRoom = this.gameRooms.get(roomId);
-    if (gameRoom === undefined) {
-      socket.emit('game_room_error', 'Invalid game room.');
-
-      return;
-    }
-
-    // １回のみ動かす
-    if (!gameRoom.isInGame) {
-      gameRoom.isInGame = true;
-      gameRoom.gameStart(socket, roomId);
+      // 1回のみ動かす
+      if (!gameRoom.isInGame) {
+        gameRoom.isInGame = true;
+        gameRoom.gameStart(socket, roomId);
+      }
     }
   }
 
@@ -324,35 +312,6 @@ export class UsersGateway {
     );
 
     await this.leaveGameRoom(socket);
-  }
-
-  async leaveGameRoom(socket: Socket): Promise<void> {
-    const { userId, roomId } = socket.data as {
-      userId: string;
-      roomId: string | undefined;
-    };
-    if (roomId === undefined) {
-      return;
-    }
-    socket.data.roomId = undefined;
-    const gameRoom = this.gameRooms.get(roomId);
-    if (gameRoom === undefined) {
-      return;
-    }
-    const { player1, player2 } = gameRoom;
-    const isPlayer = player1.id === userId || player2.id === userId;
-    await (isPlayer ? socket.leave(roomId) : socket.leave(`watch_${roomId}`));
-    const gameRoomSockets = await this.server.in(roomId).fetchSockets();
-    if (gameRoomSockets.length === 0) {
-      // 両プレイヤーゲームルームを抜けたら無効試合
-      if (!gameRoom.isFinished) {
-        this.server
-          .in(`watch_${roomId}`)
-          .emit('game_room_error', 'Both players disconnected.');
-        clearInterval(gameRoom.interval);
-        this.deleteGameRoom(gameRoom);
-      }
-    }
   }
 
   @SubscribeMessage('join_monitor_room')
@@ -384,6 +343,35 @@ export class UsersGateway {
     );
 
     await socket.leave('monitor');
+  }
+
+  async leaveGameRoom(socket: Socket): Promise<void> {
+    const { userId, roomId } = socket.data as {
+      userId: string;
+      roomId: string | undefined;
+    };
+    if (roomId === undefined) {
+      return;
+    }
+    socket.data.roomId = undefined;
+    const gameRoom = this.gameRooms.get(roomId);
+    if (gameRoom === undefined) {
+      return;
+    }
+    const { player1, player2 } = gameRoom;
+    const isPlayer = player1.id === userId || player2.id === userId;
+    await (isPlayer ? socket.leave(roomId) : socket.leave(`watch_${roomId}`));
+    const gameRoomSockets = await this.server.in(roomId).fetchSockets();
+    if (gameRoomSockets.length === 0) {
+      // 両プレイヤーゲームルームを抜けたら無効試合
+      if (!gameRoom.isFinished) {
+        this.server
+          .in(`watch_${roomId}`)
+          .emit('game_room_error', 'Both players disconnected.');
+        clearInterval(gameRoom.interval);
+        this.deleteGameRoom(gameRoom);
+      }
+    }
   }
 
   createGameRoom(

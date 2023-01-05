@@ -10,7 +10,7 @@ type Props = {
 };
 
 // targetIdがオンラインなら対戦申し込み(Game)ボタン、ゲーム中なら観戦(Watch)ボタン、オフラインなら何も表示しない
-export const GameAndWatchButton: FC<Props> = memo((props) => {
+export const GameOrWatchButton: FC<Props> = memo((props) => {
   const { targetId } = props;
   const { presence } = useUserPresence(targetId);
   const { gameRoomId } = useGameRoomId(targetId);

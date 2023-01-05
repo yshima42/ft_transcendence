@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
 import { useNavigate } from 'react-router-dom';
-import { Player } from '../hooks/useGame';
+import { Player } from '../utils/gameObjs';
 import { AvatarWithNickname } from './AvatarWithNickname';
 
 type Props = {
