@@ -2,11 +2,8 @@ import { Block } from '@prisma/client';
 import {
   UseMutateAsyncFunction,
   UseMutationResult,
-  useQueryClient,
 } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
-import { useCustomToast } from 'hooks/utils/useCustomToast';
-import { usePostApi } from '../generics/usePostApi';
+import { usePostApiWithErrorToast } from '../generics/usePostApi';
 
 export interface UserBlockReqBody {
   targetId: string;
@@ -31,28 +28,11 @@ export const useUserBlock = (
 > & {
   blockUser: BlockUser;
 } => {
-  const queryClient = useQueryClient();
-  const { customToast } = useCustomToast();
-
-  const { mutateAsync: blockUser, ...useMutationResult } = usePostApi<
-    UserBlockReqBody,
-    UserBlockResBody
-  >(`/users/me/blocks`, {
-    onSuccess: () => {
-      const queryKeys = [
-        ['/users/me/blocks'],
-        [`/users/me/block-relations/${targetId}`],
-      ];
-      queryKeys.forEach((queryKey) => {
-        void queryClient.invalidateQueries({ queryKey });
-      });
-    },
-    onError: (error) => {
-      if (isAxiosError<{ message: string }>(error)) {
-        customToast({ description: error.response?.data.message });
-      }
-    },
-  });
+  const { mutateAsync: blockUser, ...useMutationResult } =
+    usePostApiWithErrorToast<UserBlockReqBody, UserBlockResBody>(
+      `/users/me/blocks`,
+      [['/users/me/blocks'], [`/users/me/block-relations/${targetId}`]]
+    );
 
   return { blockUser, ...useMutationResult };
 };

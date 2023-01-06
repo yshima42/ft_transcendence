@@ -2,11 +2,8 @@ import { User } from '@prisma/client';
 import {
   UseMutateAsyncFunction,
   UseMutationResult,
-  useQueryClient,
 } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
-import { useCustomToast } from 'hooks/utils/useCustomToast';
-import { usePostApi } from '../generics/usePostApi';
+import { usePostApiWithErrorToast } from '../generics/usePostApi';
 
 export interface FriendRequestReqBody {
   receiverId: string;
@@ -36,29 +33,15 @@ export const useFriendRequest = (
 > & {
   requestFriend: RequestFriend;
 } => {
-  const queryClient = useQueryClient();
-  const { customToast } = useCustomToast();
-
-  const { mutateAsync: requestFriend, ...useMutationResult } = usePostApi<
-    FriendRequestReqBody,
-    FriendRequestResBody
-  >(`/users/me/friend-requests`, {
-    onSuccess: () => {
-      const queryKeys = [
+  const { mutateAsync: requestFriend, ...useMutationResult } =
+    usePostApiWithErrorToast<FriendRequestReqBody, FriendRequestResBody>(
+      `/users/me/friend-requests`,
+      [
         ['/users/me/requestable-users'],
         ['/users/me/friend-requests/outgoing'],
         [`/users/me/friend-relations/${targetId}`],
-      ];
-      queryKeys.forEach((queryKey) => {
-        void queryClient.invalidateQueries({ queryKey });
-      });
-    },
-    onError: (error) => {
-      if (isAxiosError<{ message: string }>(error)) {
-        customToast({ description: error.response?.data.message });
-      }
-    },
-  });
+      ]
+    );
 
   return { requestFriend, ...useMutationResult };
 };
