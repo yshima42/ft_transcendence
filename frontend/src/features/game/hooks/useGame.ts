@@ -37,7 +37,7 @@ export const useGame = (
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
   }
-  const { socket, connected } = socketContext;
+  const { socket, isConnected } = socketContext;
 
   const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
   const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
@@ -136,7 +136,7 @@ export const useGame = (
   useEffect(() => {
     switch (gamePhase) {
       case GamePhase.SocketConnecting: {
-        if (connected) {
+        if (isConnected) {
           setGamePhase(GamePhase.Joining);
         }
         break;
@@ -186,7 +186,7 @@ export const useGame = (
       document.removeEventListener('keydown', keyDownEvent, false);
       document.removeEventListener('keyup', keyUpEvent, false);
     };
-  }, [gamePhase, socket, roomId, connected, isPlayer, queryClient]);
+  }, [gamePhase, socket, roomId, isConnected, isPlayer, queryClient]);
 
   return {
     gamePhase,

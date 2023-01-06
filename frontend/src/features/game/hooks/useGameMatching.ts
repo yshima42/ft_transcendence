@@ -18,7 +18,7 @@ export const useGameMatching = (): {
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
   }
-  const { socket, connected } = socketContext;
+  const { socket, isConnected } = socketContext;
   const navigate = useNavigate();
 
   // socket イベント
@@ -41,7 +41,7 @@ export const useGameMatching = (): {
   useEffect(() => {
     switch (matchState) {
       case MatchState.SocketConnecting: {
-        if (connected) {
+        if (isConnected) {
           setMatchState(MatchState.Matching);
         }
         break;
@@ -56,7 +56,7 @@ export const useGameMatching = (): {
         break;
       }
     }
-  }, [matchState, socket, navigate, connected]);
+  }, [matchState, socket, navigate, isConnected]);
 
   return { matchState, setMatchState };
 };

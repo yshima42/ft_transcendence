@@ -22,7 +22,7 @@ export const useGameInvitation = (): {
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
   }
-  const { socket, connected } = socketContext;
+  const { socket, isConnected } = socketContext;
   const navigate = useNavigate();
   const [opponentId, setOpponentId] = useState('');
   const [ballSpeed, setBallSpeed] = useState(0);
@@ -53,7 +53,7 @@ export const useGameInvitation = (): {
   useEffect(() => {
     switch (inviteState) {
       case InviteState.SocketConnecting: {
-        if (connected) {
+        if (isConnected) {
           setInviteState(InviteState.GamePreference);
         }
         break;
@@ -77,7 +77,7 @@ export const useGameInvitation = (): {
         break;
       }
     }
-  }, [inviteState, socket, navigate, connected]);
+  }, [inviteState, socket, navigate, isConnected]);
 
   return {
     inviteState,
