@@ -193,6 +193,7 @@ export class UsersGateway {
     if (gameRoom !== undefined) {
       this.server.to(gameRoom.player1.id).emit('player2_decline_invitation');
     }
+    socket.data.roomId = message.roomId;
     await this.leaveGameRoom(socket);
   }
 
