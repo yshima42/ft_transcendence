@@ -1,16 +1,12 @@
 import {
-  QueryKey,
   useMutation,
   UseMutationOptions,
   UseMutationResult,
-  useQueryClient,
 } from '@tanstack/react-query';
 import { axios } from '../../../lib/axios';
 
-// 返り値のpostFunc を使う際は、await すること。
 export function usePostApi<ReqBody, ResBody>(
   endpoint: string,
-  queryKeys?: QueryKey[],
   useMutationOptions?: UseMutationOptions<ResBody, unknown, ReqBody, unknown>
 ): UseMutationResult<ResBody, unknown, ReqBody, unknown> {
   const axiosPost = async (reqBody: ReqBody) => {
@@ -19,18 +15,5 @@ export function usePostApi<ReqBody, ResBody>(
     return result.data;
   };
 
-  const queryClient = useQueryClient();
-
-  const useMutationResult = useMutation(axiosPost, {
-    onSuccess: () => {
-      if (queryKeys !== undefined) {
-        queryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries({ queryKey });
-        });
-      }
-    },
-    ...useMutationOptions,
-  });
-
-  return useMutationResult;
+  return useMutation(axiosPost, useMutationOptions);
 }
