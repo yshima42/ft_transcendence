@@ -170,7 +170,9 @@ export const useGame = (
         if (isPlayer) {
           invalidQueryKeys.push([`/game/matches`], ['/game/stats']);
         }
-        void queryClient.invalidateQueries({ queryKey: invalidQueryKeys });
+        invalidQueryKeys.forEach((queryKey) => {
+          void queryClient.invalidateQueries({ queryKey });
+        });
         break;
       }
       // 観戦者用
