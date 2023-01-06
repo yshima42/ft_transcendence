@@ -11,6 +11,7 @@ import {
   PADDLE_SPEED,
   PADDLE_START_POS,
   PADDLE_WIDTH,
+  READY_COUNTDOWN_NUM,
   SCORE_TO_WIN,
 } from './config/game-config';
 import { CreateMatchResultDto } from './dto/create-match-result.dto';
@@ -124,7 +125,7 @@ export class GameRoom {
   }
 
   countDownUntilPlayerReady(): void {
-    this.readyCountDownNum = 10;
+    this.readyCountDownNum = READY_COUNTDOWN_NUM;
     this.server
       .in([this.id, `watch_${this.id}`])
       .emit('update_ready_count_down_num', this.readyCountDownNum);
