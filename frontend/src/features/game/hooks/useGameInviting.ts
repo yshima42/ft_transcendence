@@ -8,7 +8,8 @@ export enum InviteState {
   GamePreference = 1,
   Inviting = 2,
   InvitingCancel = 3,
-  Matched = 4,
+  InvitingDeclined = 4,
+  Matched = 5,
 }
 
 export const useGameInvitation = (): {
@@ -38,7 +39,7 @@ export const useGameInvitation = (): {
 
     socket.on('player2_decline_invitation', () => {
       console.log('[Socket Event] go_game_room_by_invitation');
-      setInviteState(InviteState.InvitingCancel);
+      setInviteState(InviteState.InvitingDeclined);
     });
 
     return () => {
@@ -65,12 +66,21 @@ export const useGameInvitation = (): {
         break;
       }
       case InviteState.InvitingCancel: {
+        if (opponentId !== undefined) {
+          socket.emit('cancel_invitation', {
+            opponentId,
+          });
+        }
+        navigate(-1);
+        break;
+      }
+      case InviteState.InvitingDeclined: {
         customToast({
           title: 'Declined',
           description: 'Your Invitation was declined',
           status: 'warning',
         });
-        navigate('/app');
+        navigate(-1);
         break;
       }
     }

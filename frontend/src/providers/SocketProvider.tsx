@@ -100,6 +100,10 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     );
 
+    socket.on('player1_cancel_invitation', () => {
+      onClose();
+    });
+
     return () => {
       socket.off('connect_established');
       socket.off('set_presence');
@@ -107,6 +111,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       socket.off('set_game_room_id');
       socket.off('delete_game_room_id');
       socket.off('receive_invitation');
+      socket.off('player1_cancel_invitation');
     };
   }, [socket]);
 

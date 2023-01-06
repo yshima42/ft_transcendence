@@ -156,9 +156,6 @@ export class UsersGateway {
     );
 
     const { userId } = socket.data as { userId: string };
-    // const player1 = new Player(userId, true);
-    // const player2 = new Player(message.opponentId, false);
-    // const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
     this.server.to(message.opponentId).emit('receive_invitation', {
       challengerId: userId,
       ballSpeed: message.ballSpeed,
@@ -200,6 +197,18 @@ export class UsersGateway {
     this.server.to(message.challengerId).emit('player2_decline_invitation');
 
     await this.leaveGameRoom(socket);
+  }
+
+  @SubscribeMessage('cancel_invitation')
+  cancel_invitation(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { opponentId: string }
+  ): void {
+    Logger.debug(
+      `${socket.id} ${socket.data.userId as string} cancel_invitation`
+    );
+
+    this.server.to(message.opponentId).emit('player1_cancel_invitation');
   }
 
   @SubscribeMessage('join_game_room')
