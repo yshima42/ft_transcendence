@@ -55,9 +55,9 @@ export const GamePreference: FC<Props> = memo((props) => {
         <Center>
           <RadioGroup onChange={setValue} value={value}>
             <Stack direction="row">
-              <Radio value="1">Slow</Radio>
-              <Radio value="2">Normal</Radio>
-              <Radio value="3">Fast</Radio>
+              <Radio value={BallSpeed.SLOW}>Slow</Radio>
+              <Radio value={BallSpeed.NORMAL}>Normal</Radio>
+              <Radio value={BallSpeed.FAST}>Fast</Radio>
             </Stack>
           </RadioGroup>
         </Center>
