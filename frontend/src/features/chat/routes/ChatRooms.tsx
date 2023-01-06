@@ -16,6 +16,7 @@ export const ChatRooms: React.FC = React.memo(() => {
             as={Link}
             to="create"
             data-testid="create-chat-room"
+            data-test="create-chat-room"
           >
             Create Chat Room
           </C.Button>

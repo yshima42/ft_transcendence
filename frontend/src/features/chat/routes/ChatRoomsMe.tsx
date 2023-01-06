@@ -23,7 +23,11 @@ export const ChatRoomsMe: React.FC = React.memo(() => {
         <C.Divider />
         <C.List spacing={3} data-testid="chat-room-list">
           {chatRooms.map((chatRoom) => (
-            <C.ListItem key={chatRoom.id} data-testid="chat-room-id">
+            <C.ListItem
+              key={chatRoom.id}
+              data-testid="chat-room-id"
+              data-test={`${chatRoom.name}`}
+            >
               <C.Link
                 as={Link}
                 to={`/app/chat/rooms/${chatRoom.id}`}

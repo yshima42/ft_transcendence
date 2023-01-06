@@ -51,7 +51,11 @@ export const CreateChatRooms: React.FC = React.memo(() => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <C.FormControl isInvalid={!(errors.name == null)}>
               <C.FormLabel>Create Chat Room</C.FormLabel>
-              <C.Input placeholder="name" {...register('name')} />
+              <C.Input
+                placeholder="name"
+                {...register('name')}
+                data-test="input-chat-room-name"
+              />
               <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
             </C.FormControl>
             <C.FormControl isInvalid={!(errors.password == null)}>
@@ -70,6 +74,7 @@ export const CreateChatRooms: React.FC = React.memo(() => {
               colorScheme="teal"
               mt={4}
               isDisabled={isSubmitting}
+              data-test="chat-room-create-button"
             >
               Create
             </C.Button>

@@ -86,7 +86,9 @@ export const ChatRoom: React.FC = React.memo(() => {
             to={`/app/chat/rooms/${chatRoomId}/settings`}
             state={{ chatRoomId, chatName, roomStatus }}
           >
-            <C.Button colorScheme="blue">Settings</C.Button>
+            <C.Button colorScheme="blue" data-test="chat-room-settings-button">
+              Settings
+            </C.Button>
           </C.Link>
         </C.Flex>
         <C.Divider />

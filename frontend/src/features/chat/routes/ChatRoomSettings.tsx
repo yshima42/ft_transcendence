@@ -127,7 +127,11 @@ const LeaveButton: React.FC<{
             Exit
           </C.Button>
         ) : (
-          <C.Button colorScheme="red" onClick={deleteChatRoom}>
+          <C.Button
+            colorScheme="red"
+            onClick={deleteChatRoom}
+            data-test="chat-room-delete-button"
+          >
             Delete
           </C.Button>
         ))}
