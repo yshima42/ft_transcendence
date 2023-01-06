@@ -14,14 +14,14 @@ export const useGameMonitoring = (): {
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
   }
-  const { socket, connected } = socketContext;
+  const { socket, isConnected } = socketContext;
   // roomId の被りを防ぐため Map を使う
   const inGameOutlineMap = useMemo(() => new Map<string, GameOutline>(), []);
   // Games コンポーネントでmap 関数を使うために配列に変換
   const [inGameOutlines, setInGameOutlines] = useState<GameOutline[]>([]);
 
   useEffect(() => {
-    if (!connected) return;
+    if (!isConnected) return;
 
     socket.emit('join_monitor_room', (inGameOutlines: Array<string[3]>) => {
       inGameOutlines.forEach((inGameOutline) =>
@@ -51,13 +51,13 @@ export const useGameMonitoring = (): {
     });
 
     return () => {
-      if (!connected) return;
+      if (!isConnected) return;
 
       socket.emit('leave_monitor_room');
       socket.off('game_room_created');
       socket.off('game_room_deleted');
     };
-  }, [socket, connected, inGameOutlineMap]);
+  }, [socket, isConnected, inGameOutlineMap]);
 
   return { inGameOutlines };
 };

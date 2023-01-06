@@ -24,7 +24,7 @@ export const SocketContext = createContext<
       userIdToPresenceMap: Map<string, Presence>;
       userIdToGameRoomIdMap: Map<string, string>;
       socket: Socket;
-      connected: boolean;
+      isConnected: boolean;
     }
   | undefined
 >(undefined);
@@ -37,7 +37,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const [userIdToGameRoomIdMap, setUserIdToGameRoomIdMap] = useState(
     new Map<string, string>()
   );
-  const [connected, setConnected] = useState(false);
+  const [isConnected, setConnected] = useState(false);
   const didLogRef = useRef(false);
   const navigate = useNavigate();
   const [invitationGameRoomId, setInvitationGameRoomId] = useState('');
@@ -128,7 +128,12 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <SocketContext.Provider
-      value={{ userIdToPresenceMap, userIdToGameRoomIdMap, socket, connected }}
+      value={{
+        userIdToPresenceMap,
+        userIdToGameRoomIdMap,
+        socket,
+        isConnected,
+      }}
     >
       {children}
       <InvitationAlert
