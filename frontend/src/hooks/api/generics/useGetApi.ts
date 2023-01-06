@@ -10,20 +10,29 @@ import { axios } from '../../../lib/axios';
 export function useGetApi<ResBody>(
   endpoint: string,
   useQueryOptions?: UseQueryOptions<ResBody, unknown>
-): Omit<UseQueryResult<ResBody, unknown>, 'data'> & { data: ResBody } {
+): UseQueryResult<ResBody, unknown> {
   const axiosGet = async (): Promise<ResBody> => {
     const result = await axios.get<ResBody>(endpoint);
 
     return result.data;
   };
 
-  const { data, ...useQueryResult } = useQuery<ResBody>([endpoint], axiosGet, {
-    ...useQueryOptions,
-  });
+  return useQuery<ResBody>([endpoint], axiosGet, useQueryOptions);
+}
 
-  // TODO: エラーの場合、useQuery内で例外が投げられるので、いつ入るかわかってない。
+// data がundefined になることを想定しない場合、使う。
+export function useCustomGetApi<ResBody>(
+  endpoint: string,
+  useQueryOptions?: UseQueryOptions<ResBody, unknown>
+): Omit<UseQueryResult<ResBody, unknown>, 'data'> & { data: ResBody } {
+  const { data, ...useQueryResult } = useGetApi<ResBody>(
+    endpoint,
+    useQueryOptions
+  );
+
+  // option enabled をfalse にした場合などに、data がundefined になる。
   if (data === undefined) {
-    throw new Error('Error in useGetApi');
+    throw new Error('Error in useCustomGetApi');
   }
 
   return { data, ...useQueryResult };

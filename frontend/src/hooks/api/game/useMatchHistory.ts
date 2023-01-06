@@ -1,5 +1,5 @@
 import { MatchResult, User } from '@prisma/client';
-import { useGetApi } from '../generics/useGetApi';
+import { useCustomGetApi } from '../generics/useGetApi';
 
 // export type MatchResultWithPlayers = Prisma.MatchResultGetPayload<{
 //   include: {
@@ -25,7 +25,8 @@ export const useMatchHistory = (
 ): { matchHistory: MatchResultWithPlayers[] } => {
   const endpoint =
     userId === 'me' ? '/game/matches' : `/users/${userId}/game/matches`;
-  const { data: matchHistory } = useGetApi<MatchResultWithPlayers[]>(endpoint);
+  const { data: matchHistory } =
+    useCustomGetApi<MatchResultWithPlayers[]>(endpoint);
 
   return { matchHistory };
 };
