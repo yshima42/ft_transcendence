@@ -156,43 +156,48 @@ export class UsersGateway {
     );
 
     const { userId } = socket.data as { userId: string };
-    const player1 = new Player(userId, true);
-    const player2 = new Player(message.opponentId, false);
-    const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
-    this.server.to(player2.id).emit('receive_invitation', {
-      roomId: gameRoom.id,
-      challengerId: player1.id,
+    // const player1 = new Player(userId, true);
+    // const player2 = new Player(message.opponentId, false);
+    // const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
+    this.server.to(message.opponentId).emit('receive_invitation', {
+      challengerId: userId,
     });
   }
 
   @SubscribeMessage('accept_invitation')
   accept_invitation(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { roomId: string }
-  ): void {
+    @MessageBody() message: { challengerId: string; ballSpeed: number }
+  ): { roomId: string } {
     Logger.debug(
       `${socket.id} ${socket.data.userId as string} accept_invitation`
     );
-    const gameRoom = this.gameRooms.get(message.roomId);
+    const { userId } = socket.data as { userId: string };
+
+    const player1 = new Player(message.challengerId, true);
+    const player2 = new Player(userId, false);
+    const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
+
     if (gameRoom !== undefined) {
       this.server
         .to(gameRoom.player1.id)
-        .emit('go_game_room_by_invitation', message.roomId);
+        .emit('go_game_room_by_invitation', gameRoom.id);
     }
+
+    return { roomId: gameRoom.id };
   }
 
   @SubscribeMessage('decline_invitation')
   async decline_invitation(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { roomId: string }
+    @MessageBody() message: { challengerId: string }
   ): Promise<void> {
     Logger.debug(
       `${socket.id} ${socket.data.userId as string} decline_invitation`
     );
-    const gameRoom = this.gameRooms.get(message.roomId);
-    if (gameRoom !== undefined) {
-      this.server.to(gameRoom.player1.id).emit('player2_decline_invitation');
-    }
+
+    this.server.to(message.challengerId).emit('player2_decline_invitation');
+
     await this.leaveGameRoom(socket);
   }
 
