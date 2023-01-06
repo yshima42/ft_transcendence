@@ -16,23 +16,25 @@ import { CreateChatRooms } from 'features/chat/routes/CreateChatRooms';
 import { DmRoom } from 'features/dm/routes/DmRoom';
 import { DmRooms } from 'features/dm/routes/DmRooms';
 import { Users } from 'features/friends/routes/Users';
-import { Matching } from 'features/game/components/Matching';
-import { Games } from 'features/game/routes/Games';
+import { Game } from 'features/game/routes/Game';
+import { InGameList } from 'features/game/routes/InGameList';
+import { Inviting } from 'features/game/routes/Inviting';
+import { Matching } from 'features/game/routes/Matching';
 import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
-import OnlineUsersProvider from 'providers/OnlineUsersProvider';
+import SocketProvider from 'providers/SocketProvider';
 
 const App = () => {
   return (
     // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
     <Suspense fallback={<CenterSpinner h="100vh" />}>
-      <OnlineUsersProvider>
+      <SocketProvider>
         <MainLayout>
           <Suspense fallback={<CenterSpinner h="100vh" />}>
             <Outlet />
           </Suspense>
         </MainLayout>
-      </OnlineUsersProvider>
+      </SocketProvider>
     </Suspense>
   );
 };
@@ -64,9 +66,11 @@ export const publicRoutes = [
         path: 'chat/rooms/:chatRoomId/confirmation',
         element: <ChatRoomConfirmation />,
       },
-      { path: 'games', element: <Games /> },
+      { path: 'games', element: <InGameList /> },
+      { path: 'games/:id', element: <Game /> },
       { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
+      { path: 'inviting', element: <Inviting /> },
       { path: 'dm/rooms', element: <DmRooms /> },
       { path: 'dm/rooms/:chatRoomId', element: <DmRoom /> },
       { path: 'profile', element: <Profile /> },
