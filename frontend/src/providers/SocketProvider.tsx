@@ -91,14 +91,10 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
     });
 
-    socket.on(
-      'receive_invitation',
-      (message: { roomId: string; challengerId: string }) => {
-        setChallengerId(message.challengerId);
-        onOpen();
-        setInvitationGameRoomId(message.roomId);
-      }
-    );
+    socket.on('receive_invitation', (message: { challengerId: string }) => {
+      setChallengerId(message.challengerId);
+      onOpen();
+    });
 
     return () => {
       socket.off('connect_established');
@@ -117,13 +113,19 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const onClickAccept = () => {
     onClose();
-    socket.emit('accept_invitation', { roomId: invitationGameRoomId });
-    navigate(`/app/games/${invitationGameRoomId}`);
+    socket.emit(
+      'accept_invitation',
+      { challengerId },
+      (message: { roomId: string }) => {
+        setInvitationGameRoomId(message.roomId);
+        navigate(`/app/games/${invitationGameRoomId}`);
+      }
+    );
   };
 
   const onClickDecline = () => {
     onClose();
-    socket.emit('decline_invitation', { roomId: invitationGameRoomId });
+    socket.emit('decline_invitation', { challengerId });
   };
 
   return (
