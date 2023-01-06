@@ -17,8 +17,10 @@ import { CreateMatchResultDto } from './dto/create-match-result.dto';
 import { GameService } from './game.service';
 
 export enum GamePhase {
+  SocketConnecting = 0,
   Joining = 1,
   ConfirmWaiting = 2,
+  Confirming = 3,
   OpponentWaiting = 4,
   InGame = 5,
   Result = 6,
@@ -256,10 +258,11 @@ export class GameRoom {
   }
 
   // ユーザーの操作を受け取って位置を更新。送信はしない。
-  handleInput(
-    roomId: string,
-    userCommands: { up: boolean; down: boolean; isLeftSide: boolean }
-  ): void {
+  handleInput(userCommands: {
+    up: boolean;
+    down: boolean;
+    isLeftSide: boolean;
+  }): void {
     // player1操作
     if (userCommands.isLeftSide && userCommands.down) {
       this.paddle1.y += PADDLE_SPEED;

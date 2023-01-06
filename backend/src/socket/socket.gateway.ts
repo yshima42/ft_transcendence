@@ -128,8 +128,12 @@ export class UsersGateway {
     const player1 = new Player(waitUserId, true);
     const player2 = new Player(userId, false);
     const gameRoom = this.createGameRoom(player1, player2, BALL_SPEED);
+
+    // matchingルームで待っているPlayer1に対してのemit
     this.server.to('matching').emit('go_game_room', gameRoom.id);
     this.server.socketsLeave('matching');
+
+    // Player2に対してのemit
     socket.emit('go_game_room', gameRoom.id);
   }
 
@@ -296,7 +300,7 @@ export class UsersGateway {
 
       return;
     }
-    gameRoom.handleInput(roomId, message.userCommand);
+    gameRoom.handleInput(message.userCommand);
   }
 
   @SubscribeMessage('leave_game_room')
