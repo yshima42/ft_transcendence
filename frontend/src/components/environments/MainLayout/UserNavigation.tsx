@@ -29,6 +29,8 @@ export const UserNavigation: FC = memo(() => {
           rounded="lg"
           onClick={onClickLogout}
           color="gray"
+          maxW={90}
+          minW={90}
           isDisabled={isLoading}
         >
           Logout
