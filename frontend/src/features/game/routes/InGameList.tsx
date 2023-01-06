@@ -5,17 +5,17 @@ import { GameOutlineCard } from '../components/GameOutlineCard';
 import { useGameMonitoring } from '../hooks/useGameMonitoring';
 
 export const InGameList: FC = memo(() => {
-  const { inGameOutlines } = useGameMonitoring();
+  const { inGameOutlineMap } = useGameMonitoring();
+
+  const gameOutlineCards: JSX.Element[] = [];
+  inGameOutlineMap.forEach((value, key) => {
+    gameOutlineCards.push(<GameOutlineCard key={key} gameOutline={value} />);
+  });
 
   return (
     <ContentLayout title="In-Game List">
       <Flex flexDirection="column" align="center" justify="center" gap="3">
-        {inGameOutlines.map((inGameOutline) => (
-          <GameOutlineCard
-            key={inGameOutline.roomId}
-            gameOutline={inGameOutline}
-          />
-        ))}
+        {gameOutlineCards}
       </Flex>
     </ContentLayout>
   );

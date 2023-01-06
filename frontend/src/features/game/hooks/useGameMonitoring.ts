@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SocketContext } from 'providers/SocketProvider';
 
 export interface GameOutline {
@@ -8,17 +8,16 @@ export interface GameOutline {
 }
 
 export const useGameMonitoring = (): {
-  inGameOutlines: GameOutline[];
+  inGameOutlineMap: Map<string, GameOutline>;
 } => {
   const socketContext = useContext(SocketContext);
   if (socketContext === undefined) {
     throw new Error('SocketContext undefined');
   }
   const { socket, isConnected } = socketContext;
-  // roomId の被りを防ぐため Map を使う
-  const inGameOutlineMap = useMemo(() => new Map<string, GameOutline>(), []);
-  // Games コンポーネントでmap 関数を使うために配列に変換
-  const [inGameOutlines, setInGameOutlines] = useState<GameOutline[]>([]);
+  const [inGameOutlineMap, setInGameOutlineMap] = useState(
+    new Map<string, GameOutline>()
+  );
 
   useEffect(() => {
     if (!isConnected) return;
@@ -31,7 +30,7 @@ export const useGameMonitoring = (): {
           player2Id: inGameOutline[2],
         })
       );
-      setInGameOutlines(Array.from(inGameOutlineMap.values()));
+      setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
     });
 
     socket.on('game_room_created', (createdRoomOutline: string[3]) => {
@@ -41,13 +40,13 @@ export const useGameMonitoring = (): {
         player1Id: createdRoomOutline[1],
         player2Id: createdRoomOutline[2],
       });
-      setInGameOutlines(Array.from(inGameOutlineMap.values()));
+      setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
     });
 
     socket.on('game_room_deleted', (deletedRoomId: string) => {
       console.log('[Socket Event] game_room_deleted');
       inGameOutlineMap.delete(deletedRoomId);
-      setInGameOutlines(Array.from(inGameOutlineMap.values()));
+      setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
     });
 
     return () => {
@@ -57,7 +56,7 @@ export const useGameMonitoring = (): {
       socket.off('game_room_created');
       socket.off('game_room_deleted');
     };
-  }, [socket, isConnected, inGameOutlineMap]);
+  }, [socket, isConnected]);
 
-  return { inGameOutlines };
+  return { inGameOutlineMap };
 };
