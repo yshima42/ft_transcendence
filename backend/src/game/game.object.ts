@@ -162,7 +162,7 @@ export class GameRoom {
 
     this.interval = setInterval(() => {
       this.gameLogic(roomId);
-      this.updatePosition(roomId);
+      this.sendPosition(roomId);
 
       // フレームレート60で計算(1000÷60fps=16.67)、負荷が高い場合は数字をあげる
       // (フレームレート30の場合33をセット)
@@ -239,7 +239,7 @@ export class GameRoom {
   }
 
   // 1フレームごとにクライアントに送信。
-  updatePosition(roomId: string): void {
+  sendPosition(roomId: string): void {
     this.server.in([roomId, `watch_${roomId}`]).emit('update_position', {
       paddle1X: this.paddle1.x,
       paddle1Y: this.paddle1.y,
