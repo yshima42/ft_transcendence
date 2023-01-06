@@ -11,6 +11,12 @@ import {
   Stack,
 } from '@chakra-ui/react';
 
+enum BallSpeed {
+  SLOW = '1',
+  NORMAL = '2',
+  FAST = '3',
+}
+
 type Props = {
   setNextInviteState: () => void;
   setBallSpeed: React.Dispatch<React.SetStateAction<number>>;
@@ -23,14 +29,14 @@ export const GamePreference: FC<Props> = memo((props) => {
 
   const onClickPreferenceOk = () => {
     switch (value) {
-      case '1':
+      case BallSpeed.SLOW:
+        setBallSpeed(4);
+        break;
+      case BallSpeed.NORMAL:
         setBallSpeed(5);
         break;
-      case '2':
-        setBallSpeed(8);
-        break;
-      case '3':
-        setBallSpeed(12);
+      case BallSpeed.FAST:
+        setBallSpeed(7);
         break;
     }
     setNextInviteState();
