@@ -22,23 +22,23 @@ export const useGameMonitoring = (): {
   useEffect(() => {
     if (!isConnected) return;
 
-    socket.emit('join_monitor_room', (inGameOutlines: Array<string[3]>) => {
+    socket.emit('join_monitor_room', (inGameOutlines: GameOutline[]) => {
       inGameOutlines.forEach((inGameOutline) =>
-        inGameOutlineMap.set(inGameOutline[0], {
-          roomId: inGameOutline[0],
-          player1Id: inGameOutline[1],
-          player2Id: inGameOutline[2],
+        inGameOutlineMap.set(inGameOutline.roomId, {
+          roomId: inGameOutline.roomId,
+          player1Id: inGameOutline.player1Id,
+          player2Id: inGameOutline.player2Id,
         })
       );
       setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
     });
 
-    socket.on('game_room_created', (createdRoomOutline: string[3]) => {
+    socket.on('game_room_created', (createdRoomOutline: GameOutline) => {
       console.log('[Socket Event] game_room_created');
-      inGameOutlineMap.set(createdRoomOutline[0], {
-        roomId: createdRoomOutline[0],
-        player1Id: createdRoomOutline[1],
-        player2Id: createdRoomOutline[2],
+      inGameOutlineMap.set(createdRoomOutline.roomId, {
+        roomId: createdRoomOutline.roomId,
+        player1Id: createdRoomOutline.player1Id,
+        player2Id: createdRoomOutline.player2Id,
       });
       setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
     });
