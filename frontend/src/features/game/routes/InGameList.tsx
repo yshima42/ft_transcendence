@@ -4,7 +4,7 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { GameOutlineCard } from '../components/GameOutlineCard';
 import { useGameMonitoring } from '../hooks/useGameMonitoring';
 
-export const Games: FC = memo(() => {
+export const InGameList: FC = memo(() => {
   const { inGameOutlines } = useGameMonitoring();
 
   return (

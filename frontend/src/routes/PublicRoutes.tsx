@@ -17,7 +17,7 @@ import { DmRoom } from 'features/dm/routes/DmRoom';
 import { DmRooms } from 'features/dm/routes/DmRooms';
 import { Users } from 'features/friends/routes/Users';
 import { Game } from 'features/game/routes/Game';
-import { Games } from 'features/game/routes/Games';
+import { InGameList } from 'features/game/routes/InGameList';
 import { Inviting } from 'features/game/routes/Inviting';
 import { Matching } from 'features/game/routes/Matching';
 import { Top } from 'features/game/routes/Top';
@@ -66,7 +66,7 @@ export const publicRoutes = [
         path: 'chat/rooms/:chatRoomId/confirmation',
         element: <ChatRoomConfirmation />,
       },
-      { path: 'games', element: <Games /> },
+      { path: 'games', element: <InGameList /> },
       { path: 'games/:id', element: <Game /> },
       { path: '', element: <Top /> },
       { path: 'matching', element: <Matching /> },
