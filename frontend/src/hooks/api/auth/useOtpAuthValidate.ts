@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import {
+  UseMutateAsyncFunction,
+  UseMutationResult,
+} from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { usePostApi } from '../generics/usePostApi';
@@ -19,27 +21,29 @@ export type ValidateOtpAuth = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useOtpAuthValidate = (): {
+export const useOtpAuthValidate = (): Omit<
+  UseMutationResult<
+    ValidateOtpAuthResBody,
+    unknown,
+    ValidateOtpAuthReqBody,
+    unknown
+  >,
+  'mutateAsync'
+> & {
   validateOtpAuth: ValidateOtpAuth;
-  isLoading: boolean;
-  isSuccess: boolean;
 } => {
-  const {
-    mutateAsync: validateOtpAuth,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-  } = usePostApi<ValidateOtpAuthReqBody, ValidateOtpAuthResBody>(
-    '/auth/otp/validation'
-  );
-
   const { customToast } = useCustomToast();
-  useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(error)) {
-      customToast({ description: error.response?.data.message });
-    }
-  }, [isError, error, customToast]);
 
-  return { validateOtpAuth, isLoading, isSuccess };
+  const { mutateAsync: validateOtpAuth, ...useMutationResult } = usePostApi<
+    ValidateOtpAuthReqBody,
+    ValidateOtpAuthResBody
+  >('/auth/otp/validation', {
+    onError: (error) => {
+      if (isAxiosError<{ message: string }>(error)) {
+        customToast({ description: error.response?.data.message });
+      }
+    },
+  });
+
+  return { validateOtpAuth, ...useMutationResult };
 };
