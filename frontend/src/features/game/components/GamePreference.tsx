@@ -12,9 +12,9 @@ import {
 } from '@chakra-ui/react';
 
 enum BallSpeed {
-  SLOW = '1',
-  NORMAL = '2',
-  FAST = '3',
+  SLOW = 'SLOW',
+  NORMAL = 'NORMAL',
+  FAST = 'FAST',
 }
 
 type Props = {
@@ -25,7 +25,7 @@ type Props = {
 export const GamePreference: FC<Props> = memo((props) => {
   const { setNextInviteState, setBallSpeed } = props;
 
-  const [value, setValue] = useState('2');
+  const [value, setValue] = useState<string>(BallSpeed.NORMAL);
 
   const onClickPreferenceOk = () => {
     switch (value) {
