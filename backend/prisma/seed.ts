@@ -304,6 +304,7 @@ for (let i = 0; i < 30; i++) {
   const playerTwoId = idMap.get('dummy' + (i + 1).toString());
   if (playerOneId !== undefined && playerTwoId !== undefined) {
     const date = new Date();
+    date.setDate(date.getDate() - 1);
     date.setMinutes(date.getMinutes() + i);
     matchResultData.push({
       id: uuidv4(),
@@ -321,6 +322,7 @@ for (let i = 0; i < 30; i++) {
   const playerTwoId = idMap.get('dummy' + (i + 2).toString());
   if (playerOneId !== undefined && playerTwoId !== undefined) {
     const date = new Date();
+    date.setDate(date.getDate() - 1);
     date.setMinutes(date.getMinutes() + i);
     matchResultData.push({
       id: uuidv4(),

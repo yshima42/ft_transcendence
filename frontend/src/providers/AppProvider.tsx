@@ -1,6 +1,7 @@
 import { FC, memo } from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { BrowserRouter } from 'react-router-dom';
 import theme from '../theme/theme';
 import { ErrorProvider } from './ErrorProvider';
@@ -27,6 +28,8 @@ export const AppProvider: FC<Props> = memo((props) => {
           <ErrorProvider>{children}</ErrorProvider>
         </BrowserRouter>
       </ChakraProvider>
+      {/* TODO: https://tanstack.com/query/v4/docs/react/devtools */}
+      <ReactQueryDevtools initialIsOpen={false} position={'bottom-right'} />
     </QueryClientProvider>
   );
 });
