@@ -11,7 +11,7 @@ import {
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
 import { BALL_SPEED } from 'src/game/config/game-config';
-import { GamePhase, GameRoom, Player } from 'src/game/game.object';
+import { GameOutline, GamePhase, GameRoom, Player } from 'src/game/game.object';
 import { GameService } from 'src/game/game.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -315,20 +315,20 @@ export class UsersGateway {
   @SubscribeMessage('join_monitor_room')
   async sendAllGameRoomIds(
     @ConnectedSocket() socket: Socket
-  ): Promise<string[][]> {
+  ): Promise<GameOutline[]> {
     Logger.debug(
       `${socket.id} ${socket.data.userId as string} join_monitor_room`
     );
 
     await socket.join('monitor');
-    const inGameOutlines: string[][] = [];
+    const inGameOutlines: GameOutline[] = [];
     this.gameRooms.forEach((gameRoom) => {
       if (gameRoom.isFinished) return;
-      inGameOutlines.push([
-        gameRoom.id,
-        gameRoom.player1.id,
-        gameRoom.player2.id,
-      ]);
+      inGameOutlines.push({
+        roomId: gameRoom.id,
+        player1Id: gameRoom.player1.id,
+        player2Id: gameRoom.player2.id,
+      });
     });
 
     return inGameOutlines;
@@ -391,9 +391,11 @@ export class UsersGateway {
     this.addGameRoomId(player1.id, gameRoom.id);
     this.updatePresence(player2.id, Presence.INGAME);
     this.addGameRoomId(player2.id, gameRoom.id);
-    this.server
-      .to('monitor')
-      .emit('game_room_created', [gameRoom.id, player1.id, player2.id]);
+    this.server.to('monitor').emit('game_room_created', {
+      roomId: gameRoom.id,
+      player1Id: player1.id,
+      player2Id: player2.id,
+    });
 
     return gameRoom;
   }

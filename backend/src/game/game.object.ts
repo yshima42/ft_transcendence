@@ -29,6 +29,12 @@ export enum GamePhase {
   Watch = 8,
 }
 
+export interface GameOutline {
+  roomId: string;
+  player1Id: string;
+  player2Id: string;
+}
+
 class Ball {
   x: number;
   y: number;
