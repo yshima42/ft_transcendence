@@ -159,6 +159,7 @@ export class UsersGateway {
     const player1 = new Player(userId, true);
     const player2 = new Player(message.opponentId, false);
     const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
+    socket.data.roomId = gameRoom.id;
     this.server.to(player2.id).emit('receive_invitation', {
       roomId: gameRoom.id,
       challengerId: player1.id,
@@ -193,7 +194,15 @@ export class UsersGateway {
     if (gameRoom !== undefined) {
       this.server.to(gameRoom.player1.id).emit('player2_decline_invitation');
     }
-    socket.data.roomId = message.roomId;
+    await this.leaveGameRoom(socket);
+  }
+
+  @SubscribeMessage('cancel_invitation')
+  async cancel_invitation(@ConnectedSocket() socket: Socket): Promise<void> {
+    Logger.debug(
+      `${socket.id} ${socket.data.userId as string} cancel_invitation`
+    );
+
     await this.leaveGameRoom(socket);
   }
 

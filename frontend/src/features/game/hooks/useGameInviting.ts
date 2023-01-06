@@ -68,6 +68,7 @@ export const useGameInvitation = (): {
         break;
       }
       case InviteState.InvitingCancel: {
+        socket.emit('cancel_invitation');
         customToast({
           title: 'Declined',
           description: 'Your Invitation was declined',
