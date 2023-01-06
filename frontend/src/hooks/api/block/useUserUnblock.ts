@@ -1,6 +1,9 @@
-import { useEffect } from 'react';
 import { Block } from '@prisma/client';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import {
+  UseMutateAsyncFunction,
+  UseMutationResult,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useDeleteApi } from '../generics/useDeleteApi';
@@ -18,28 +21,32 @@ export type UnblockUser = UseMutateAsyncFunction<
 
 export const useUserUnblock = (
   targetId: string
-): {
+): Omit<
+  UseMutationResult<UnblockUserResBody, unknown, void, unknown>,
+  'mutateAsync'
+> & {
   unblockUser: UnblockUser;
-  isLoading: boolean;
-  isSuccess: boolean;
 } => {
-  const {
-    mutateAsync: unblockUser,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-  } = useDeleteApi<UnblockUserResBody>(`/users/me/blocks/${targetId}`, [
-    ['/users/me/blocks'],
-    [`/users/me/block-relations/${targetId}`],
-  ]);
-
+  const queryClient = useQueryClient();
   const { customToast } = useCustomToast();
-  useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(error)) {
-      customToast({ description: error.response?.data.message });
-    }
-  }, [isError, error, customToast]);
 
-  return { unblockUser, isLoading, isSuccess };
+  const { mutateAsync: unblockUser, ...useMutationResult } =
+    useDeleteApi<UnblockUserResBody>(`/users/me/blocks/${targetId}`, {
+      onSuccess: () => {
+        const queryKeys = [
+          ['/users/me/blocks'],
+          [`/users/me/block-relations/${targetId}`],
+        ];
+        queryKeys.forEach((queryKey) => {
+          void queryClient.invalidateQueries({ queryKey });
+        });
+      },
+      onError: (error) => {
+        if (isAxiosError<{ message: string }>(error)) {
+          customToast({ description: error.response?.data.message });
+        }
+      },
+    });
+
+  return { unblockUser, ...useMutationResult };
 };
