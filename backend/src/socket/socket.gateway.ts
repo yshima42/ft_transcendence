@@ -161,6 +161,7 @@ export class UsersGateway {
     // const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
     this.server.to(message.opponentId).emit('receive_invitation', {
       challengerId: userId,
+      ballSpeed: message.ballSpeed,
     });
   }
 
