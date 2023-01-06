@@ -2,9 +2,7 @@ import {
   UseMutateAsyncFunction,
   UseMutationResult,
 } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
-import { useCustomToast } from 'hooks/utils/useCustomToast';
-import { usePostApi } from '../generics/usePostApi';
+import { usePostApiWithErrorToast } from '../generics/usePostApi';
 
 export interface ValidateOtpAuthReqBody {
   oneTimePassword: string;
@@ -32,18 +30,10 @@ export const useOtpAuthValidate = (): Omit<
 > & {
   validateOtpAuth: ValidateOtpAuth;
 } => {
-  const { customToast } = useCustomToast();
-
-  const { mutateAsync: validateOtpAuth, ...useMutationResult } = usePostApi<
-    ValidateOtpAuthReqBody,
-    ValidateOtpAuthResBody
-  >('/auth/otp/validation', {
-    onError: (error) => {
-      if (isAxiosError<{ message: string }>(error)) {
-        customToast({ description: error.response?.data.message });
-      }
-    },
-  });
+  const { mutateAsync: validateOtpAuth, ...useMutationResult } =
+    usePostApiWithErrorToast<ValidateOtpAuthReqBody, ValidateOtpAuthResBody>(
+      '/auth/otp/validation'
+    );
 
   return { validateOtpAuth, ...useMutationResult };
 };
