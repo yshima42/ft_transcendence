@@ -41,7 +41,6 @@ export const SpMenu: FC<Props> = memo((props) => {
           aria-label="Options"
           icon={<HamburgerIcon w={6} h={6} />}
           variant="none"
-          display={{ base: 'flex', md: 'none' }}
           position="absolute"
         />
         <MenuList>
@@ -63,12 +62,7 @@ export const SpMenu: FC<Props> = memo((props) => {
           </MenuItem>
         </MenuList>
       </Menu>
-      <Flex
-        display={{ base: 'flex', md: 'none' }}
-        position="absolute"
-        left={8}
-        top={0.5}
-      >
+      <Flex position="absolute" left={8} top={0.5}>
         <LogoButton />
       </Flex>
     </>

@@ -1,28 +1,32 @@
 import { useRef, useEffect } from 'react';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../utils/gameConfig';
 
-export const useCanvas = (
-  draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void
-): React.RefObject<HTMLCanvasElement> => {
+export const useCanvas = (canvas: {
+  width: number;
+  height: number;
+  ratio: number;
+  draw: (ctx: CanvasRenderingContext2D) => void;
+}): React.RefObject<HTMLCanvasElement> => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current as HTMLCanvasElement;
-    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const currentCanvas = canvasRef.current as HTMLCanvasElement;
+    const context = currentCanvas.getContext('2d') as CanvasRenderingContext2D;
 
-    let frameCount = 0;
     let animationFrameId = 0;
 
     // Our draw came here
     const render = () => {
-      frameCount++;
-      draw(context, frameCount);
+      currentCanvas.width = canvas.width;
+      currentCanvas.height = canvas.width * (CANVAS_HEIGHT / CANVAS_WIDTH);
+      canvas.draw(context);
       animationFrameId = window.requestAnimationFrame(render);
     };
 
     render();
 
     return () => window.cancelAnimationFrame(animationFrameId);
-  }, [draw]);
+  }, [canvas]);
 
   return canvasRef;
 };

@@ -1,107 +1,113 @@
-import { useCallback, useEffect, useState } from 'react';
-import { API_URL } from 'config';
-import { useProfile } from 'hooks/api';
-import { io } from 'socket.io-client';
-import {
-  BALL_START_X,
-  BALL_START_Y,
-  BG_COLOR,
-  CANVAS_WIDTH,
-  PADDLE_START_POS,
-  PADDLE_WIDTH,
-} from '../utils/gameConfig';
-import { Ball, Paddle } from '../utils/gameObjs';
-import { userInput } from '../utils/userInput';
+import { useContext, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
+import { useNavigate } from 'react-router-dom';
+import { SocketContext } from 'providers/SocketProvider';
+import { Player } from '../utils/gameObjs';
+import { useGameObjs } from './useGameObjs';
 
 export enum GamePhase {
-  Top = 0,
-  Matching = 1,
-  Confirmation = 2,
-  Waiting = 3,
-  InGame = 4,
-  Result = 5,
+  SocketConnecting = 0,
+  Joining = 1,
+  ConfirmWaiting = 2,
+  Confirming = 3,
+  OpponentWaiting = 4,
+  InGame = 5,
+  Result = 6,
+  PlayerWaiting = 7,
+  Watch = 8,
 }
 
-export type GameResult = {
-  player1Nickname: string;
-  player2Nickname: string;
-  player1Score: number;
-  player2Score: number;
-};
-
-const defaultGameResult: GameResult = {
-  player1Nickname: '',
-  player2Nickname: '',
-  player1Score: 0,
-  player2Score: 0,
-};
-
-// ここでuseRefを使ってsocketのconnect処理ができたら理想
-export const useGame = (): {
+export const useGame = (
+  roomId: string
+): {
   gamePhase: GamePhase;
   setGamePhase: React.Dispatch<React.SetStateAction<GamePhase>>;
-  draw: (ctx: CanvasRenderingContext2D) => void;
-  gameResult: GameResult;
+  player1: Player;
+  player2: Player;
+  readyCountDownNum: number;
+  canvas: {
+    width: number;
+    height: number;
+    ratio: number;
+    draw: (ctx: CanvasRenderingContext2D) => void;
+  };
 } => {
-  const [gamePhase, setGamePhase] = useState(GamePhase.Top);
-  const [roomId, setRoomId] = useState('');
-  const [isLeftSide, setIsLeftSide] = useState(true);
-  const [gameResult, setGameResult] = useState(defaultGameResult);
-  // TODO: socket はとりあえずの仮実装
-  const [socket] = useState(io(API_URL + '/game'));
-  const { user } = useProfile();
+  const socketContext = useContext(SocketContext);
+  if (socketContext === undefined) {
+    throw new Error('SocketContext undefined');
+  }
+  const { socket, isConnected } = socketContext;
 
-  const player1 = new Paddle(0, PADDLE_START_POS);
-  const player2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH, PADDLE_START_POS);
-  const ball = new Ball(BALL_START_X, BALL_START_Y);
+  const [gamePhase, setGamePhase] = useState(GamePhase.SocketConnecting);
+  const [readyCountDownNum, setReadyCountDownNum] = useState<number>(0);
+  const [isPlayer, setIsPlayer] = useState(true);
 
-  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
-    // canvas背景の設定
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    // ゲームオブジェクトの表示
-    player1.draw(ctx);
-    player2.draw(ctx);
-    ball.draw(ctx);
-
-    // スコアの表示
-    ctx.font = '48px serif';
-    ctx.fillText(player1.score.toString(), 20, 50);
-    ctx.fillText(player2.score.toString(), 960, 50);
-  }, []);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { customToast } = useCustomToast();
+  const {
+    player1,
+    player2,
+    userCommand,
+    paddle1,
+    paddle2,
+    ball,
+    canvas,
+    keyDownEvent,
+    keyUpEvent,
+  } = useGameObjs(socket);
 
   // socket イベント
   useEffect(() => {
-    socket.on('go_game_room', (roomId: string, isLeftSide: boolean) => {
-      setRoomId(roomId);
-      setIsLeftSide(isLeftSide);
-
-      socket.emit('join_room', { roomId });
+    socket.on('game_room_error', (message: string) => {
+      customToast({ description: message });
+      navigate('/app');
     });
 
-    socket.on('check_confirmation', () => {
-      setGamePhase(GamePhase.Confirmation);
-    });
-
-    socket.on('start_game', () => {
-      setGamePhase(GamePhase.InGame);
-    });
-
-    // ゲーム中のスコア受け取り
     socket.on(
-      'update_score',
-      (data: { player1Score: number; player2Score: number }) => {
-        player1.score = data.player1Score;
-        player2.score = data.player2Score;
+      'set_game_info',
+      (message: {
+        player1: { id: string; score: number };
+        player2: { id: string; score: number };
+        isPlayer: boolean;
+        isLeftSide: boolean;
+        readyCountDownNum: number;
+        nextGamePhase: GamePhase;
+      }) => {
+        console.log('[Socket Event] set_game_info');
+        player1.id = message.player1.id;
+        player2.id = message.player2.id;
+        player1.score = message.player1.score;
+        player2.score = message.player2.score;
+        setIsPlayer(message.isPlayer);
+        userCommand.isLeftSide = message.isLeftSide;
+        setReadyCountDownNum(message.readyCountDownNum);
+        setGamePhase(message.nextGamePhase);
       }
     );
 
-    // ゲームで表示するオブジェクトのポジション受け取り
+    socket.on('update_ready_count_down_num', (newCountDownNum: number) => {
+      console.log('[Socket Event] update_ready_count_down_num');
+      setReadyCountDownNum(newCountDownNum);
+    });
+
+    socket.on('update_game_phase', (nextGamePhase: GamePhase) => {
+      console.log(`[Socket Event] update_game_phase ${nextGamePhase}`);
+      setGamePhase(nextGamePhase);
+    });
+
     socket.on(
-      'position_update',
-      (data: {
+      'update_score',
+      (message: { player1Score: number; player2Score: number }) => {
+        player1.score = message.player1Score;
+        player2.score = message.player2Score;
+      }
+    );
+
+    socket.on(
+      'update_position',
+      (message: {
         paddle1X: number;
         paddle1Y: number;
         paddle2X: number;
@@ -109,49 +115,87 @@ export const useGame = (): {
         ballX: number;
         ballY: number;
       }) => {
-        player1.pos.x = data.paddle1X;
-        player1.pos.y = data.paddle1Y;
-        player2.pos.x = data.paddle2X;
-        player2.pos.y = data.paddle2Y;
-        ball.pos.x = data.ballX;
-        ball.pos.y = data.ballY;
+        [paddle1.x, paddle1.y] = [message.paddle1X, message.paddle1Y];
+        [paddle2.x, paddle2.y] = [message.paddle2X, message.paddle2Y];
+        [ball.x, ball.y] = [message.ballX, message.ballY];
       }
     );
 
-    socket.on('done_game', (gameResult: GameResult) => {
-      setGameResult(gameResult);
-      setGamePhase(GamePhase.Result);
-    });
-
     return () => {
-      socket.off('go_game_room');
-      socket.off('start_game');
-      socket.off('check_confirmation');
-      socket.off('done_game');
+      socket.emit('leave_game_room');
+      socket.off('game_room_error');
+      socket.off('set_game_info');
+      socket.off('update_ready_count_down_num');
+      socket.off('update_game_phase');
       socket.off('update_score');
-      socket.off('position_update');
+      socket.off('update_position');
     };
-  }, [socket]);
+  }, [socket, navigate]);
 
-  // 各ページのLogic
+  // 各フェーズのLogic
   useEffect(() => {
     switch (gamePhase) {
-      case GamePhase.Matching: {
-        socket.emit('set_user', user);
-        socket.emit('random_match');
+      case GamePhase.SocketConnecting: {
+        if (isConnected) {
+          setGamePhase(GamePhase.Joining);
+        }
         break;
       }
-      case GamePhase.Waiting: {
-        socket.emit('confirm', { roomId });
+      case GamePhase.Joining: {
+        socket.emit('join_game_room', { roomId });
+        break;
+      }
+      case GamePhase.ConfirmWaiting: {
+        break;
+      }
+      case GamePhase.Confirming: {
+        socket.emit('player_confirm');
+        break;
+      }
+      case GamePhase.OpponentWaiting: {
         break;
       }
       case GamePhase.InGame: {
-        socket.emit('connect_pong', { roomId });
-        userInput(socket, roomId, player1, isLeftSide);
+        document.addEventListener('keydown', keyDownEvent, false);
+        document.addEventListener('keyup', keyUpEvent, false);
+        break;
+      }
+      case GamePhase.Result: {
+        const invalidQueryKeys = [
+          [`/users/${player1.id}/game/matches`],
+          [`/users/${player2.id}/game/matches`],
+          [`/users/${player1.id}/game/stats`],
+          [`/users/${player2.id}/game/stats`],
+        ];
+        if (isPlayer) {
+          invalidQueryKeys.push([`/game/matches`], ['/game/stats']);
+        }
+        invalidQueryKeys.forEach((queryKey) => {
+          void queryClient.invalidateQueries({ queryKey });
+        });
+        break;
+      }
+      // 観戦者用
+      case GamePhase.PlayerWaiting: {
+        break;
+      }
+      case GamePhase.Watch: {
         break;
       }
     }
-  }, [gamePhase, user, socket]);
 
-  return { gamePhase, setGamePhase, draw, gameResult };
+    return () => {
+      document.removeEventListener('keydown', keyDownEvent, false);
+      document.removeEventListener('keyup', keyUpEvent, false);
+    };
+  }, [gamePhase, socket, roomId, isConnected, isPlayer, queryClient]);
+
+  return {
+    gamePhase,
+    setGamePhase,
+    player1,
+    player2,
+    readyCountDownNum,
+    canvas,
+  };
 };

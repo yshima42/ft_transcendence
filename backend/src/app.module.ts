@@ -12,6 +12,7 @@ import { FileModule } from './file/file.module';
 import { FriendRequestsModule } from './friend-requests/friend-requests.module';
 import { GameModule } from './game/game.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SocketModule } from './socket/socket.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { UsersModule } from './users/users.module';
     DmModule,
     ChatRoomModule,
     DmRoomModule,
+    SocketModule,
     ChatRoomMemberModule,
     ScheduleModule.forRoot(),
   ],
