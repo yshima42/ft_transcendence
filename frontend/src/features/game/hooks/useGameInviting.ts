@@ -42,9 +42,6 @@ export const useGameInvitation = (): {
     });
 
     return () => {
-      if (inviteState === InviteState.Inviting) {
-        socket.emit('inviting_cancel');
-      }
       socket.off('go_game_room_by_invitation');
     };
   }, [socket, inviteState, navigate]);
