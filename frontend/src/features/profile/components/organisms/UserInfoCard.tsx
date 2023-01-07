@@ -30,7 +30,12 @@ export const UserInfoCard: FC<Props> = memo((props) => {
         size="2xl"
         src={user.avatarImageUrl}
       />
-      <Text fontSize="md" fontWeight="bold" pt="2">
+      <Text
+        fontSize="md"
+        fontWeight="bold"
+        pt="2"
+        data-test={'profile-nickname'}
+      >
         {user.nickname}
       </Text>
       <Text fontSize="xs" color="gray">

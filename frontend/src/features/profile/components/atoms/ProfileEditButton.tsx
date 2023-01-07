@@ -7,7 +7,13 @@ export const ProfileEditButton: FC = memo(() => {
 
   return (
     <>
-      <Button size="xs" fontSize="xs" onClick={onOpen} m={2}>
+      <Button
+        size="xs"
+        fontSize="xs"
+        onClick={onOpen}
+        m={2}
+        data-test={'profile-edit'}
+      >
         Edit
       </Button>
       <ProfileEditModal isOpen={isOpen} onClose={onClose} />
