@@ -2,20 +2,20 @@
 describe('User Settings', function () {
   beforeEach(() => {
     cy.visit('/');
-    cy.getByData('dummy1-login').click();
+    cy.getBySel('dummy1-login').click();
   });
 
   it('Top Page', () => {
     cy.location('pathname').should('eq', '/app');
   });
 
-  it('ユーザーは、ウェブサイトに表示される一意の名前を選択できるようにする必要がある（ニックネーム）', () => {
-    cy.getByData('sidenav-user-avatar').click();
+  it.only('ユーザーは、ウェブサイトに表示される一意の名前を選択できるようにする必要がある（ニックネーム）', () => {
+    cy.getBySel('sidenav-user-avatar').click();
     cy.location('pathname').should('eq', '/app/profile');
-    cy.getByData('profile-edit').click();
-    cy.getByData('profile-edit-nickname-input').clear().type('New Nickname');
-    cy.getByData('profile-edit-submit').click();
-    cy.getByData('profile-nickname').should('contain', 'New Nickname');
+    cy.getBySel('profile-edit').click();
+    cy.getBySelLike('nickname-input').clear().type('New Nickname');
+    cy.getBySelLike('submit').click();
+    cy.getBySel('profile-nickname').should('contain', 'New Nickname');
   });
 
   it.only('ユーザーは、アバターをアップロードすることができる', () => {
@@ -24,17 +24,17 @@ describe('User Settings', function () {
     const uploadFilePath = 'cypress/fixtures/zazen_obousan.png';
     const partOfUploadDirPath = 'avatar/dummy1';
 
-    cy.getByData('sidenav-user-avatar').click();
+    cy.getBySel('sidenav-user-avatar').click();
     cy.location('pathname').should('eq', '/app/profile');
 
-    cy.getByData('profile-edit').click();
-    cy.getByData('profile-edit-file-select').selectFile(uploadFilePath);
-    cy.getByData('profile-edit-submit').click();
+    cy.getBySel('profile-edit').click();
+    cy.getBySelLike('file-select').selectFile(uploadFilePath);
+    cy.getBySelLike('submit').click();
 
     // ファイルがアップロードされているか確認
     // よい方法がわからないので、暫定的なもの
     // srcのパスがデフォルトから変更されているか確認している
-    cy.getByData('profile-user-avatar')
+    cy.getBySel('profile-user-avatar')
       .children('img.chakra-avatar__img')
       .should('have.attr', 'src')
       .and('not.eq', defaultAvatarPath)
