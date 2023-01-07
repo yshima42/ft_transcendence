@@ -90,11 +90,11 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     src={user.avatarImageUrl}
                   />
                   <input
-                    hidden
                     ref={inputRef}
                     type="file"
                     accept="image/*"
                     onChange={onChangeFile}
+                    data-test={'profile-edit-file-select'}
                   />
                   <Box pl={8}>
                     <VStack justify="center" align="center">
