@@ -128,6 +128,7 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     id="nickname"
                     name="nickname"
                     onChange={onProfileChange}
+                    data-test={'profile-edit-nickname-input'}
                   />
                 </HStack>
               </Box>
@@ -138,6 +139,7 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                 type="submit"
                 isLoading={isLoading1 || isLoading2}
                 isDisabled={isLoading1 || isLoading2}
+                data-test={'profile-edit-submit'}
               >
                 Save
               </Button>

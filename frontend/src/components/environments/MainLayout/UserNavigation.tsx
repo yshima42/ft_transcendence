@@ -17,7 +17,12 @@ export const UserNavigation: FC = memo(() => {
 
   return (
     <Flex p="5%" mt={4} align="center">
-      <UserAvatar id={user.id} size="sm" src={user.avatarImageUrl} />
+      <UserAvatar
+        id={user.id}
+        size="sm"
+        src={user.avatarImageUrl}
+        data-test={'sidenav-user-avatar'}
+      />
       <Flex flexDir="column" ml={4}>
         <Link to="/app/profile">
           <Heading as="h3" size="sm">
