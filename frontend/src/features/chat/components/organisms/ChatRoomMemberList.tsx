@@ -27,7 +27,7 @@ export const ChatRoomMemberList: React.FC<Props> = React.memo(
     const navigate = ReactRouter.useNavigate();
 
     React.useEffect(() => {
-      const fetchDate = async () => {
+      const fetchData = async () => {
         try {
           await refetchChatMembers();
         } catch (err) {
@@ -59,13 +59,13 @@ export const ChatRoomMemberList: React.FC<Props> = React.memo(
           ) {
             window.location.reload();
           }
-          fetchDate().catch((err) => console.log(err));
+          fetchData().catch((err) => console.log(err));
         }
       );
 
       return () => {
         socket.emit('leave_room_member', chatRoomId);
-        socket.off('changeChatRoomMemberStatusSocket', fetchDate);
+        socket.off('changeChatRoomMemberStatusSocket', fetchData);
       };
     }, []);
 

@@ -71,7 +71,7 @@ export class ChatGateway {
     );
     this.logger.debug(`newMessage: ${this.json(newMessage)}`);
     this.server
-      .in(createChatMessageDto.chatRoomId)
+      .in(createChatMessageDto.roomId)
       .emit('receive_message', newMessage);
   }
 

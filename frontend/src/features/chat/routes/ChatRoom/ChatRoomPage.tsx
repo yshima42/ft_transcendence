@@ -78,22 +78,13 @@ const ChatRoomFooter: React.FC<{
   chatRoomId: string;
   socket: Socket;
 }> = React.memo(({ chatLoginUser, chatRoomId, socket }) => {
-  // 送信ボタンを押したときの処理
-  function sendMessage(content: string): void {
-    if (chatLoginUser == null) return;
-    socket.emit('send_message', {
-      chatRoomId,
-      content,
-    });
-  }
-
   return (
     <>
       {/* メッセージ送信フォーム  loginUserがMUTEDのときは送信できないようにする */}
       {chatLoginUser.memberStatus === ChatRoomMemberStatus.MUTED ? (
         <ChatRoomMutedAlert />
       ) : (
-        <MessageSendForm sendMessage={sendMessage} />
+        <MessageSendForm roomId={chatRoomId} socket={socket} />
       )}
     </>
   );

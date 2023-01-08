@@ -3,7 +3,7 @@ import * as CV from 'class-validator';
 export class CreateChatMessageDto {
   @CV.IsNotEmpty()
   @CV.IsUUID()
-  chatRoomId!: string;
+  roomId!: string;
 
   @CV.IsNotEmpty()
   @CV.IsString()

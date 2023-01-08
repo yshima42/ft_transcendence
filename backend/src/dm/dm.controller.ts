@@ -17,9 +17,9 @@ export class DmController {
   constructor(private readonly dmService: DmService) {}
 
   @Get()
-  async findDms(
+  async findAllNotBlocked(
     @Param('dmRoomId', new ParseUUIDPipe()) dmRoomId: string
   ): Promise<ResponseDm[]> {
-    return await this.dmService.findDms(dmRoomId);
+    return await this.dmService.findAllNotBlocked(dmRoomId);
   }
 }
