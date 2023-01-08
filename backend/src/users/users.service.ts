@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,7 +23,7 @@ export class UsersService {
       },
     });
     if (user == null) {
-      throw new BadRequestException('invalid userId');
+      throw new NotFoundException('invalid userId');
     }
 
     let userDto: UserDto = {};
