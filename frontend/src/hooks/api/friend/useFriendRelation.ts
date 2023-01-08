@@ -1,4 +1,4 @@
-import { useGetApi } from '../generics/useGetApi';
+import { useGetApiOmitUndefined } from '../generics/useGetApi';
 
 export type FriendRelation = 'NONE' | 'ACCEPTED' | 'PENDING' | 'RECOGNITION';
 
@@ -7,7 +7,7 @@ export const useFriendRelation = (
 ): { friendRelation: FriendRelation } => {
   const {
     data: { friendRelation },
-  } = useGetApi<{ friendRelation: FriendRelation }>(
+  } = useGetApiOmitUndefined<{ friendRelation: FriendRelation }>(
     `/users/me/friend-relations/${targetId}`
   );
 
