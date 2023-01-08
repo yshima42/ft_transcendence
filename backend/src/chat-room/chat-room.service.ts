@@ -66,7 +66,7 @@ export class ChatRoomService {
   }
 
   // 自分が入っていないチャット全部
-  async findAllWithOutMe(userId: string): Promise<ResponseChatRoom[]> {
+  async findJoinableRooms(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
         // roomStatus is not ChatRoomStatus.PRIVATE
@@ -99,13 +99,13 @@ export class ChatRoomService {
         },
       },
     });
-    this.logger.debug(`findAllWithOutMe: ${this.json({ chatRooms, userId })}`);
+    this.logger.debug(`findJoinableRooms: ${this.json({ chatRooms, userId })}`);
 
     return chatRooms;
   }
 
   // 自分が入っているチャット全部 自分のステータスがBANのものは除く
-  async findAllByMe(userId: string): Promise<ResponseChatRoom[]> {
+  async findJoinedRooms(userId: string): Promise<ResponseChatRoom[]> {
     const chatRooms = await this.prisma.chatRoom.findMany({
       where: {
         chatRoomMembers: {
@@ -133,7 +133,7 @@ export class ChatRoomService {
         },
       },
     });
-    this.logger.debug(`findAllByMe: ${this.json({ chatRooms, userId })}`);
+    this.logger.debug(`findJoinedRooms: ${this.json({ chatRooms, userId })}`);
 
     return chatRooms;
   }
