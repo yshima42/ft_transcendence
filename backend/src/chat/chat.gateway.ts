@@ -29,6 +29,34 @@ export class ChatGateway {
   private readonly logger = new NestJs.Logger('ChatGateway');
   private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
 
+  // userIdとclientを紐付ける
+  handleConnection(@WebSocket.ConnectedSocket() client: SocketIO.Socket): void {
+    const cookie = client.handshake.headers.cookie;
+    if (cookie === undefined) {
+      this.logger.warn('cookie is undefined');
+
+      return;
+    }
+    const chatLoginUserId = this.getUserIdFromCookie(cookie);
+    this.logger.debug(`handleConnection: ${chatLoginUserId}`);
+    // clientにuserIdを紐付ける
+    client.data.userId = chatLoginUserId;
+  }
+
+  // userIdとclientの紐付けを解除する
+  handleDisconnect(@WebSocket.ConnectedSocket() client: SocketIO.Socket): void {
+    const cookie = client.handshake.headers.cookie;
+    if (cookie === undefined) {
+      this.logger.warn('cookie is undefined');
+
+      return;
+    }
+    const chatLoginUserId = this.getUserIdFromCookie(cookie);
+    this.logger.debug(`handleDisconnect: ${chatLoginUserId}`);
+    // clientからuserIdを削除する
+    delete client.data.userId;
+  }
+
   @NestJs.UsePipes(new NestJs.ValidationPipe())
   @WebSocket.SubscribeMessage('send_message')
   async handleMessage(

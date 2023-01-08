@@ -76,4 +76,58 @@ export class ChatMessageService {
 
     return chatMessage;
   }
+
+  async findAllNotBlockedLimit(
+    chatRoomId: string,
+    userId: string,
+    limit: number,
+    offset: number
+  ): Promise<ResponseChatMessage[]> {
+    const chatMessage = await this.prisma.chatMessage.findMany({
+      where: {
+        chatRoomId,
+        // 自分がブロックしているユーザーのメッセージは取得しない
+        sender: {
+          blockedBy: {
+            every: {
+              targetId: {
+                equals: userId,
+              },
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            avatarImageUrl: true,
+          },
+        },
+      },
+      // 最新のメッセージから取得する
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: offset,
+    });
+    // 並び替え
+    chatMessage.reverse();
+    this.logger.debug(
+      `findAllNotBlockedLimit: ${this.json({
+        chatMessage,
+        chatRoomId,
+        userId,
+        limit,
+        offset,
+      })}`
+    );
+
+    return chatMessage;
+  }
 }
