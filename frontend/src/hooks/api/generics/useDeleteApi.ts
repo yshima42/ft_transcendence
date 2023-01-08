@@ -26,7 +26,7 @@ export function useDeleteApi<ResBody>(
     onSuccess: () => {
       if (invalidQueryKeys !== undefined) {
         invalidQueryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries({ queryKey });
+          void queryClient.resetQueries({ queryKey });
         });
       }
     },
