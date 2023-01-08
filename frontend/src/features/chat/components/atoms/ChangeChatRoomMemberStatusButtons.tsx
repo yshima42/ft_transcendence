@@ -25,6 +25,18 @@ export const changeChatRoomMemberStatusButtonTexts: {
   MUTED: 'Unmute',
 };
 
+const buttonObject = (
+  memberStatus: ChatRoomMemberStatus,
+  label: string,
+  hasLimitTime: boolean
+) => {
+  return {
+    memberStatus,
+    label,
+    hasLimitTime,
+  };
+};
+
 export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
   ({ chatRoomId, memberId, memberStatus, chatLoginUser, socket }) => {
     if (
@@ -41,21 +53,9 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
       label: string;
       hasLimitTime: boolean;
     }> = [
-      {
-        memberStatus: ChatRoomMemberStatus.KICKED,
-        label: 'Kick',
-        hasLimitTime: false,
-      },
-      {
-        memberStatus: ChatRoomMemberStatus.BANNED,
-        label: 'Ban',
-        hasLimitTime: true,
-      },
-      {
-        memberStatus: ChatRoomMemberStatus.MUTED,
-        label: 'Mute',
-        hasLimitTime: true,
-      },
+      buttonObject(ChatRoomMemberStatus.KICKED, 'Kick', false),
+      buttonObject(ChatRoomMemberStatus.BANNED, 'Ban', true),
+      buttonObject(ChatRoomMemberStatus.MUTED, 'Mute', true),
     ];
     if (chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN) {
       switch (memberStatus) {
@@ -63,40 +63,24 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
           return null;
         case ChatRoomMemberStatus.MODERATOR:
           common.push(
-            {
-              memberStatus: ChatRoomMemberStatus.NORMAL,
-              label: 'Demote',
-              hasLimitTime: false,
-            },
-            {
-              memberStatus: ChatRoomMemberStatus.ADMIN,
-              label: 'Appoint',
-              hasLimitTime: false,
-            }
+            buttonObject(ChatRoomMemberStatus.NORMAL, 'Demote', false),
+            buttonObject(ChatRoomMemberStatus.ADMIN, 'Appoint', false)
           );
           break;
         case ChatRoomMemberStatus.NORMAL:
           common.push(
-            {
-              memberStatus: ChatRoomMemberStatus.MODERATOR,
-              label: 'Promote',
-              hasLimitTime: false,
-            },
-            {
-              memberStatus: ChatRoomMemberStatus.ADMIN,
-              label: 'Appoint',
-              hasLimitTime: false,
-            }
+            buttonObject(ChatRoomMemberStatus.MODERATOR, 'Promote', false),
+            buttonObject(ChatRoomMemberStatus.ADMIN, 'Appoint', false)
           );
           break;
         case ChatRoomMemberStatus.BANNED:
         case ChatRoomMemberStatus.MUTED:
           common = [
-            {
-              memberStatus: ChatRoomMemberStatus.NORMAL,
-              label: changeChatRoomMemberStatusButtonTexts[memberStatus],
-              hasLimitTime: false,
-            },
+            buttonObject(
+              ChatRoomMemberStatus.NORMAL,
+              changeChatRoomMemberStatusButtonTexts[memberStatus],
+              false
+            ),
           ];
           break;
       }
@@ -111,11 +95,11 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
         case ChatRoomMemberStatus.BANNED:
         case ChatRoomMemberStatus.MUTED:
           common = [
-            {
-              memberStatus: ChatRoomMemberStatus.NORMAL,
-              label: changeChatRoomMemberStatusButtonTexts[memberStatus],
-              hasLimitTime: false,
-            },
+            buttonObject(
+              ChatRoomMemberStatus.NORMAL,
+              changeChatRoomMemberStatusButtonTexts[memberStatus],
+              false
+            ),
           ];
           break;
       }

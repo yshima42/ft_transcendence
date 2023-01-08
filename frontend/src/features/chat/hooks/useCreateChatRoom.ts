@@ -1,7 +1,7 @@
 import { ChatRoom } from '@prisma/client';
 import * as ReactQuery from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { usePostApi2 } from 'hooks/api/generics/usePostApi2';
+import { usePostApi } from 'hooks/api/generics/usePostApi';
 import { useNavigate } from 'react-router-dom';
 
 export type ChatRoomCreateFormValues = {
@@ -16,7 +16,7 @@ export const useCreateChatRoom = (): {
   const navigate = useNavigate();
   const endpoint = '/chat/rooms';
   const queryKeys: ReactQuery.QueryKey[] = [[endpoint]];
-  const { mutate, isLoading } = usePostApi2<ChatRoomCreateFormValues, ChatRoom>(
+  const { mutate, isLoading } = usePostApi<ChatRoomCreateFormValues, ChatRoom>(
     endpoint,
     queryKeys
   );
