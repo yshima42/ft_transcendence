@@ -6,7 +6,6 @@ import {
   ChatRoomStatus,
   ChatRoomMember,
 } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
 import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -73,27 +72,34 @@ export class ChatRoomMemberService {
         );
       }
     }
-    try {
-      const res = await this.prisma.chatRoomMember.create({
-        data: {
+    // すでにメンバーの場合はそのまま返す
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
           chatRoomId,
           userId: chatLoginUserId,
-          memberStatus: ChatRoomMemberStatus.NORMAL,
         },
-      });
-
-      return res;
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          throw new NestJs.HttpException(
-            'ChatRoomMember already exists',
-            NestJs.HttpStatus.CONFLICT
-          );
-        }
+      },
+    });
+    if (chatRoomMember !== null) {
+      // Banされている場合はエラー
+      if (chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED) {
+        throw new NestJs.HttpException(
+          'You are banned',
+          NestJs.HttpStatus.UNAUTHORIZED
+        );
       }
-      throw e;
+
+      return chatRoomMember;
     }
+
+    return await this.prisma.chatRoomMember.create({
+      data: {
+        chatRoomId,
+        userId: chatLoginUserId,
+        memberStatus: ChatRoomMemberStatus.NORMAL,
+      },
+    });
   }
 
   async findAll(chatRoomId: string): Promise<ResponseChatRoomMember[]> {

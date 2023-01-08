@@ -1,11 +1,12 @@
-import { ChatRoom } from '@prisma/client';
+import * as React from 'react';
+import { ChatRoom, ChatRoomStatus } from '@prisma/client';
 import * as ReactQuery from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { usePostApi } from 'hooks/api/generics/usePostApi';
+import { usePostApiWithErrorToast } from 'hooks/api/generics/usePostApi';
 import { useNavigate } from 'react-router-dom';
 
 export type ChatRoomCreateFormValues = {
   name: string;
+  roomStatus: ChatRoomStatus;
   password?: string;
 };
 
@@ -15,30 +16,23 @@ export const useCreateChatRoom = (): {
 } => {
   const navigate = useNavigate();
   const endpoint = '/chat/rooms';
+  const chatRoomLink = (chatRoomId: string) => `/app/chat/rooms/${chatRoomId}`;
   const queryKeys: ReactQuery.QueryKey[] = [[endpoint]];
-  const { mutate, isLoading } = usePostApi<ChatRoomCreateFormValues, ChatRoom>(
+  const {
+    status,
+    data: chatRoom,
+    isLoading,
+    mutate,
+  } = usePostApiWithErrorToast<ChatRoomCreateFormValues, ChatRoom>(
     endpoint,
     queryKeys
   );
 
-  function CreateChatRoom(data: ChatRoomCreateFormValues) {
-    if (data.password === '') {
-      data.password = undefined;
+  React.useEffect(() => {
+    if (status === 'success') {
+      navigate(chatRoomLink(chatRoom.id));
     }
+  }, [status]);
 
-    return mutate(data, {
-      onSuccess: (chatRoom) => {
-        navigate(`/app/chat/rooms/${chatRoom.id}`);
-      },
-      onError: (e) => {
-        const error = e as AxiosError;
-        // 409
-        if (error.response?.status === 409) {
-          alert('this name is already used');
-        }
-      },
-    });
-  }
-
-  return { CreateChatRoom, isLoading };
+  return { CreateChatRoom: mutate, isLoading };
 };
