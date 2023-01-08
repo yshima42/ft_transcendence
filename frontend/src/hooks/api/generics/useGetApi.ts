@@ -10,7 +10,7 @@ import { axios } from 'lib/axios';
 export function useGetApi<ResBody>(
   endpoint: string,
   useQueryOptions?: UseQueryOptions<ResBody, unknown>
-): UseQueryResult<ResBody | undefined, unknown> {
+): UseQueryResult<ResBody, unknown> {
   const axiosGet = async (): Promise<ResBody> => {
     const result = await axios.get<ResBody>(endpoint);
 
