@@ -7,7 +7,6 @@ import { ChatRoomMemberService } from 'src/chat-room-member/chat-room-member.ser
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
-import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @Injectable()
 export class ChatRoomService {
@@ -23,7 +22,7 @@ export class ChatRoomService {
   async create(
     createChatroomDto: CreateChatRoomDto,
     userId: string
-  ): Promise<Omit<ChatRoom, 'password'>> {
+  ): Promise<ChatRoom> {
     const { name, password, roomStatus } = createChatroomDto;
     this.logger.debug(`create: ${this.json({ createChatroomDto, userId })}`);
 
@@ -150,62 +149,6 @@ export class ChatRoomService {
       );
     }
     this.logger.debug(`findOne: ${this.json({ chatRoom })}`);
-
-    return chatRoom;
-  }
-
-  // update
-  async update(
-    chatRoomId: string,
-    updateChatroomDto: UpdateChatRoomDto,
-    userId: string
-  ): Promise<ChatRoom> {
-    const { password } = updateChatroomDto;
-    this.logger.debug(
-      `update: ${this.json({ chatRoomId, updateChatroomDto, userId })}`
-    );
-    let hashedPassword: string | undefined;
-    if (password !== undefined) {
-      this.logger.debug(`updateChatRoom: password is not undefined`);
-      hashedPassword = await bcrypt.hash(password, 10);
-    }
-    // userのチャットでの権限を取得
-    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
-      where: {
-        chatRoomId_userId: {
-          chatRoomId,
-          userId,
-        },
-      },
-    });
-    if (chatRoomMember === null) {
-      this.logger.warn(`update: user is not in chatRoom: ${chatRoomId}`);
-
-      throw new NestJS.HttpException(
-        'User is not in chatRoom',
-        NestJS.HttpStatus.NOT_FOUND
-      );
-    }
-    // もしADMINじゃなかったらエラー
-    if (chatRoomMember?.memberStatus !== ChatRoomMemberStatus.ADMIN) {
-      this.logger.warn(`update: user is not admin: ${chatRoomId}`);
-
-      throw new NestJS.HttpException(
-        'User is not admin',
-        NestJS.HttpStatus.FORBIDDEN
-      );
-    }
-
-    const chatRoom = await this.prisma.chatRoom.update({
-      where: {
-        id: chatRoomId,
-      },
-      data: {
-        password: hashedPassword,
-        roomStatus: updateChatroomDto.roomStatus,
-      },
-    });
-    this.logger.debug(`update: ${this.json({ chatRoom })}`);
 
     return chatRoom;
   }
