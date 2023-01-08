@@ -1,7 +1,8 @@
 import { FC, memo } from 'react';
 import { AtSignIcon, ChatIcon, EmailIcon, ViewIcon } from '@chakra-ui/icons';
-import { Flex } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 // import { Header } from 'components/organisms/layout/Header';
+import { useMatch } from 'react-router-dom';
 import { SpMenu } from 'components/environments/MainLayout/SpMenu';
 import { WebSidebarMenu } from 'components/environments/MainLayout/WebSidebarMenu';
 
@@ -51,10 +52,22 @@ export const MainLayout: FC<MainProps> = memo((props) => {
     },
   ].filter(Boolean) as NavigationItem[];
 
+  const isGamePage = Boolean(useMatch('/app/games/:id'));
+
   return (
     <Flex>
-      <WebSidebarMenu items={navigation} />
-      <SpMenu items={navigation} />
+      {isGamePage ? (
+        <SpMenu items={navigation} />
+      ) : (
+        <>
+          <Box display={{ base: 'none', md: 'flex' }}>
+            <WebSidebarMenu items={navigation} />
+          </Box>
+          <Box display={{ base: 'flex', md: 'none' }}>
+            <SpMenu items={navigation} />
+          </Box>
+        </>
+      )}
       {children}
     </Flex>
   );

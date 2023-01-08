@@ -16,3 +16,4 @@ fi
 yarn install
 yarn prisma db pull
 yarn prisma generate
+cp src/features/game/utils/gameConfig.ts ../backend/src/game/config/game-config.ts
