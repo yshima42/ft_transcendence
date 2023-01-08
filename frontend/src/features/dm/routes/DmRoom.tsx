@@ -2,12 +2,10 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import * as ReactQuery from '@tanstack/react-query';
 import { ResponseDm } from 'features/dm/types/dm';
-import { useProfile } from 'hooks/api';
 import { useBlockRelation } from 'hooks/api/block/useBlockRelation';
 import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { useSocket } from 'hooks/socket/useSocket';
 import { useLocation } from 'react-router-dom';
-import * as SocketIOClient from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
@@ -18,7 +16,6 @@ type State = {
 };
 
 export const DmRoom: React.FC = React.memo(() => {
-  const { user } = useProfile();
   const location = useLocation();
   const { dmRoomId, memberId } = location.state as State;
   const { isUserBlocked: isBlocked } = useBlockRelation(memberId);
@@ -83,36 +80,10 @@ export const DmRoom: React.FC = React.memo(() => {
               <div ref={scrollBottomRef} />
             </C.Flex>
             <C.Divider />
-            <DmRoomFooter
-              dmRoomId={dmRoomId}
-              senderId={user.id}
-              socket={socket}
-            />
+            <MessageSendForm roomId={dmRoomId} socket={socket} />
           </>
         )}
       </ContentLayout>
-    </>
-  );
-});
-
-// DmRoomFooter
-const DmRoomFooter: React.FC<{
-  dmRoomId: string;
-  senderId: string;
-  socket: SocketIOClient.Socket;
-}> = React.memo(({ dmRoomId, senderId, socket }) => {
-  // 送信ボタンを押したときの処理
-  function sendMessage(content: string): void {
-    socket.emit('send_message', {
-      content,
-      senderId,
-      dmRoomId,
-    });
-  }
-
-  return (
-    <>
-      <MessageSendForm sendMessage={sendMessage} />
     </>
   );
 });

@@ -19,10 +19,10 @@ export class ChatMessageService {
     createChatMessageDto: CreateChatMessageDto,
     senderId: string
   ): Promise<ResponseChatMessage> {
-    const { chatRoomId, content } = createChatMessageDto;
+    const { roomId, content } = createChatMessageDto;
     // ban || mute しているユーザーはメッセージを送信できない
     const chatRoomMember = await this.chatRoomMemberService.findOne(
-      chatRoomId,
+      roomId,
       senderId
     );
     if (
@@ -39,7 +39,7 @@ export class ChatMessageService {
     const chatMessage = await this.prisma.chatMessage.create({
       data: {
         content,
-        chatRoomId,
+        chatRoomId: roomId,
         senderId,
       },
       select: {
