@@ -12,6 +12,9 @@ export default defineConfig({
       });
     },
     baseUrl: 'http://localhost:5173',
+    env: {
+      backendUrl: 'http://localhost:3000',
+    },
   },
   video: false,
 });
