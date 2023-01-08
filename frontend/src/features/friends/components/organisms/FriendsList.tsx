@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { useFriends } from 'hooks/api';
 import { DmButton } from 'components/atoms/button/DmButton';
-import { GameButton } from 'components/atoms/button/GameButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
+import { GameOrWatchButton } from 'features/profile/components/molecules/GameOrWatchButton';
 
 export const FriendsList: FC = () => {
   const { users } = useFriends();
@@ -27,7 +27,7 @@ export const FriendsList: FC = () => {
           avatarImageUrl={user.avatarImageUrl}
           buttons={
             <>
-              <GameButton targetId={user.id} />
+              <GameOrWatchButton targetId={user.id} />
               <DmButton targetId={user.id} />
             </>
           }
