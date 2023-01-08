@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import * as ReactQuery from '@tanstack/react-query';
+import { useBanRedirect } from 'features/chat/hooks/useBanRedirect';
 import {
   ResponseChatMessage,
   ResponseChatRoomMember,
@@ -15,18 +16,6 @@ import { Socket } from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
-
-// banされている場合は、/app/chat/rooms/meにリダイレクトする
-const useBanRedirect = (chatLoginUser: ResponseChatRoomMember) => {
-  const navigate = ReactRouter.useNavigate();
-  const myChatRoomsLink = '/app/chat/rooms/me';
-
-  React.useEffect(() => {
-    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.BANNED) {
-      navigate(myChatRoomsLink);
-    }
-  }, [chatLoginUser]);
-};
 
 export const ChatRoomPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };

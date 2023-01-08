@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
+import { useBanRedirect } from 'features/chat/hooks/useBanRedirect';
 import { useLeaveChatRoom } from 'features/chat/hooks/useLeaveChatRoom';
 import { ResponseChatRoomMember } from 'features/chat/types/chat';
 import { useGetApi } from 'hooks/api/generics/useGetApi';
@@ -11,12 +12,14 @@ import { SecurityAccordionItem } from 'features/chat/components/organisms/Securi
 
 export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
+  const chatLoginUserEndpoint = `/chat/rooms/${chatRoomId}/members/me`;
+  const chatRomInfoEndpoint = `/chat/rooms/${chatRoomId}`;
+  const chatRoomInviteLink = `http://localhost:5173/app/chat/rooms/${chatRoomId}/confirmation`;
   const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
-    `/chat/rooms/${chatRoomId}/members/me`
+    chatLoginUserEndpoint
   );
-  useGetApi<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
-  const { data: chatRoom } = useGetApi<ChatRoom>(`/chat/rooms/${chatRoomId}`);
-  const { roomStatus } = chatRoom;
+  useBanRedirect(chatLoginUser);
+  const { data: chatRoom } = useGetApi<ChatRoom>(chatRomInfoEndpoint);
 
   return (
     <>
@@ -24,7 +27,7 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
         {/* 招待リンク表示 */}
         <C.Box>
           <C.Text>Invite Link</C.Text>
-          <C.Text>{`http://localhost:5173/app/chat/rooms/${chatRoomId}/confirmation`}</C.Text>
+          <C.Text>{chatRoomInviteLink}</C.Text>
         </C.Box>
         <C.Accordion allowToggle>
           {/* ChatRoomMemberListAccordion */}
@@ -38,7 +41,7 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
           {chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN && (
             <CustomAccordion title="Security">
               <SecurityAccordionItem
-                roomStatus={roomStatus}
+                roomStatus={chatRoom.roomStatus}
                 chatRoomId={chatRoomId}
               />
             </CustomAccordion>
