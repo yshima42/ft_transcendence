@@ -21,11 +21,7 @@ export const UserAvatar: FC<Props> = memo(
 
     return (
       <>
-        <LinkedAvatar
-          link={`/app/users/${id}`}
-          dataTestProp={dataTestProp}
-          {...avatarProps}
-        >
+        <LinkedAvatar id={id} dataTestProp={dataTestProp} {...avatarProps}>
           <AvatarBadge boxSize="1.1em" bg={badgeColor} />
         </LinkedAvatar>
       </>

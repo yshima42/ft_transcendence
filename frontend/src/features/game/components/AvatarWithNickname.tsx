@@ -13,7 +13,7 @@ export const AvatarWithNickname: FC<Props> = memo((props) => {
 
   return (
     <VStack alignItems={'center'}>
-      <LinkedAvatar link={`/app/users/${user.id}`} src={user.avatarImageUrl} />
+      <LinkedAvatar id={user.id} src={user.avatarImageUrl} />
       <LinkedNickname id={user.id} nickname={user.nickname} />
     </VStack>
   );

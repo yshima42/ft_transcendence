@@ -31,6 +31,7 @@ export const FriendsList: FC = () => {
               <DmButton targetId={user.id} />
             </>
           }
+          isFriend={true}
         />
       ))}
     </Grid>
