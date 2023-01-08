@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { ChatRoomStatus, ChatRoom } from '@prisma/client';
+import { ChatRoomStatus, ChatRoom, ChatRoomMemberStatus } from '@prisma/client';
 import { AxiosError } from 'axios';
+import { ResponseChatRoomMember } from 'features/chat/types/chat';
 import { useGetApi } from 'hooks/api/generics/useGetApi';
 import { axios } from 'lib/axios';
 import * as ReactHookForm from 'react-hook-form';
@@ -13,9 +14,35 @@ type Inputs = {
   password: string;
 };
 
+// すでにchatRoomに参加している場合はリダイレクトする
+// banされている場合はリダイレクトする
+const useChatRoomRedirect = (chatRoom: ChatRoom) => {
+  const navigate = useNavigate();
+  const myChatRoomsLink = '/app/chat/rooms/me';
+  const chatRoomLink = `/app/chat/rooms/${chatRoom.id}`;
+  const chatLoginUserEndpoint = `/chat/rooms/${chatRoom.id}/members/me`;
+  const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
+    chatLoginUserEndpoint
+  );
+
+  React.useEffect(() => {
+    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.BANNED) {
+      navigate(myChatRoomsLink);
+
+      return;
+    }
+    // すでに参加している場合は、チャットルームにリダイレクトする
+    navigate(chatRoomLink);
+  }, []);
+};
+
 const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
-  const { data: chatRoom } = useGetApi<ChatRoom>(`/chat/rooms/${chatRoomId}`);
+  const chatRoomInfoEndpoint = `/chat/rooms/${chatRoomId}`;
+  const chatRoomMemberEndpoint = `/chat/rooms/${chatRoomId}/members`;
+  const chatRoomLink = `/app/chat/rooms/${chatRoomId}`;
+  const { data: chatRoom } = useGetApi<ChatRoom>(chatRoomInfoEndpoint);
+  useChatRoomRedirect(chatRoom);
   const navigate = useNavigate();
   const {
     handleSubmit,
@@ -30,7 +57,7 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
   const joinChatRoom: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
     const { password } = data;
     try {
-      await axios.post(`/chat/rooms/${chatRoomId}/members`, {
+      await axios.post(chatRoomMemberEndpoint, {
         chatRoomPassword: password,
       });
     } catch (e) {
@@ -41,7 +68,7 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
 
       return;
     }
-    navigate(`/app/chat/rooms/${chatRoomId}`, {
+    navigate(chatRoomLink, {
       state: { chatRoomId, chatName, roomStatus },
     });
   };

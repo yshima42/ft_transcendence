@@ -146,6 +146,7 @@ export class ChatRoomMemberService {
         memberStatus: true,
       },
     });
+    // TODO: WebSocketでのエラーも考慮するとここでHttpのエラーを投げるべきか検討する必要あり。
     if (chatRoomMember === null) {
       throw new NestJs.HttpException(
         'ChatRoomMember not found',
