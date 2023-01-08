@@ -43,7 +43,7 @@ describe('User Settings', function () {
       .and('have.string', partOfUploadDirPath);
   });
 
-  it.only('統計情報（勝敗、ラダーレベル(勝率)、実績など）がユーザープロフィールに表示される', () => {
+  it('統計情報（勝敗、ラダーレベル(勝率)、実績など）がユーザープロフィールに表示される', () => {
     cy.getBySel('sidenav-user-avatar').click();
     cy.location('pathname').should('eq', '/app/profile');
 
@@ -64,6 +64,19 @@ describe('User Settings', function () {
         'contain',
         `${gameStats.totalWins}/${gameStats.totalMatches}`
       );
+    });
+  });
+
+  it.only('フレンドインターフェースでは、フレンドとその状態（オフライン／オンライン／ゲーム中等）を確認することができる', () => {
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-friends-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    // バッジが表示されているか確認
+    cy.getBySel('users-friends').within(() => {
+      cy.getBySelLike('users-user-avatar').each(($el) => {
+        cy.wrap($el).children('div.chakra-avatar__badge').should('be.visible');
+      });
     });
   });
 });

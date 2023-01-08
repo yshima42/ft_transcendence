@@ -16,7 +16,9 @@ export const Users: FC = memo(() => {
       <Tabs variant="soft-rounded">
         <TabList>
           {tabs.map((tab) => (
-            <Tab key={tab}>{tab}</Tab>
+            <Tab key={tab} data-test={'users-' + tab.toLowerCase() + '-tab'}>
+              {tab}
+            </Tab>
           ))}
         </TabList>
         <Suspense fallback={<CenterSpinner h="80vh" />}>
