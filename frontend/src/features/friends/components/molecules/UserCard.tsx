@@ -1,6 +1,5 @@
 import { FC, memo, ReactNode } from 'react';
-import { Box, Flex, Text, Spacer, Heading } from '@chakra-ui/react';
-import { useGameStats } from 'hooks/api';
+import { Box, Flex, Text, Spacer } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
@@ -14,10 +13,6 @@ type Props = {
 
 export const UserCard: FC<Props> = memo((props) => {
   const { id, username, nickname, avatarImageUrl, buttons } = props;
-
-  const {
-    gameStats: { totalMatches, winRate },
-  } = useGameStats(id);
 
   return (
     <Box p={4} bg="white" borderRadius="md" shadow="md">
@@ -39,25 +34,6 @@ export const UserCard: FC<Props> = memo((props) => {
         </Flex>
         <Spacer />
         {buttons}
-      </Flex>
-      <Flex align="center" mt={4}>
-        <Flex align="center" mr={2}>
-          <Heading size="sm">Win Rate</Heading>
-          <Box ml={4}>
-            <Text fontSize="lg" fontWeight="bold">
-              {winRate}%
-            </Text>
-          </Box>
-        </Flex>
-        <Spacer />
-        <Flex align="center" mr={2}>
-          <Heading size="sm">Total Games</Heading>
-          <Box ml={4}>
-            <Text fontSize="lg" fontWeight="bold">
-              {totalMatches}
-            </Text>
-          </Box>
-        </Flex>
       </Flex>
     </Box>
   );
