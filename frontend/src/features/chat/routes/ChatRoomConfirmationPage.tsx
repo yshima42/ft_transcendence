@@ -3,7 +3,7 @@ import * as C from '@chakra-ui/react';
 import { ChatRoomStatus, ChatRoom, ChatRoomMemberStatus } from '@prisma/client';
 import { AxiosError } from 'axios';
 import { ResponseChatRoomMember } from 'features/chat/types/chat';
-import { useGetApi } from 'hooks/api/generics/useGetApi';
+import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { axios } from 'lib/axios';
 import * as ReactHookForm from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -21,9 +21,8 @@ const useChatRoomRedirect = (chatRoom: ChatRoom) => {
   const myChatRoomsLink = '/app/chat/rooms/me';
   const chatRoomLink = `/app/chat/rooms/${chatRoom.id}`;
   const chatLoginUserEndpoint = `/chat/rooms/${chatRoom.id}/members/me`;
-  const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
-    chatLoginUserEndpoint
-  );
+  const { data: chatLoginUser } =
+    useGetApiOmitUndefined<ResponseChatRoomMember>(chatLoginUserEndpoint);
 
   React.useEffect(() => {
     if (chatLoginUser.memberStatus === ChatRoomMemberStatus.BANNED) {
@@ -41,7 +40,8 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
   const chatRoomInfoEndpoint = `/chat/rooms/${chatRoomId}`;
   const chatRoomMemberEndpoint = `/chat/rooms/${chatRoomId}/members`;
   const chatRoomLink = `/app/chat/rooms/${chatRoomId}`;
-  const { data: chatRoom } = useGetApi<ChatRoom>(chatRoomInfoEndpoint);
+  const { data: chatRoom } =
+    useGetApiOmitUndefined<ChatRoom>(chatRoomInfoEndpoint);
   useChatRoomRedirect(chatRoom);
   const navigate = useNavigate();
   const {

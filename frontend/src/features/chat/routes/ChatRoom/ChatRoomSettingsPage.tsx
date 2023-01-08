@@ -4,7 +4,7 @@ import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import { useBanRedirect } from 'features/chat/hooks/useBanRedirect';
 import { useLeaveChatRoom } from 'features/chat/hooks/useLeaveChatRoom';
 import { ResponseChatRoomMember } from 'features/chat/types/chat';
-import { useGetApi } from 'hooks/api/generics/useGetApi';
+import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomMemberList';
@@ -15,11 +15,11 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   const chatLoginUserEndpoint = `/chat/rooms/${chatRoomId}/members/me`;
   const chatRomInfoEndpoint = `/chat/rooms/${chatRoomId}`;
   const chatRoomInviteLink = `http://localhost:5173/app/chat/rooms/${chatRoomId}/confirmation`;
-  const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
-    chatLoginUserEndpoint
-  );
+  const { data: chatLoginUser } =
+    useGetApiOmitUndefined<ResponseChatRoomMember>(chatLoginUserEndpoint);
   useBanRedirect(chatLoginUser);
-  const { data: chatRoom } = useGetApi<ChatRoom>(chatRomInfoEndpoint);
+  const { data: chatRoom } =
+    useGetApiOmitUndefined<ChatRoom>(chatRomInfoEndpoint);
 
   return (
     <>

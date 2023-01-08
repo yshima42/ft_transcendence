@@ -5,7 +5,7 @@ import {
   ResponseChatRoomMember,
   ResponseChatRoomMemberStatus,
 } from 'features/chat/types/chat';
-import { useGetApi } from 'hooks/api/generics/useGetApi';
+import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
 import * as SocketIOClient from 'socket.io-client';
@@ -20,9 +20,10 @@ type Props = {
 export const ChatRoomMemberList: React.FC<Props> = React.memo(
   ({ chatRoomId, chatLoginUser }) => {
     const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
-    const { data: chatMembers, refetch: refetchChatMembers } = useGetApi<
-      ResponseChatRoomMember[]
-    >(`/chat/rooms/${chatRoomId}/members`);
+    const { data: chatMembers, refetch: refetchChatMembers } =
+      useGetApiOmitUndefined<ResponseChatRoomMember[]>(
+        `/chat/rooms/${chatRoomId}/members`
+      );
     const navigate = ReactRouter.useNavigate();
 
     React.useEffect(() => {
