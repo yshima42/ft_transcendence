@@ -2,6 +2,12 @@
 import { GameStats } from '../../src/hooks/api/game/useGameStats';
 
 describe('User Settings', function () {
+  before(() => {
+    cy.exec(
+      'yarn --cwd ../backend ts-node prisma/seed-cypress-user-account.ts'
+    );
+  });
+
   beforeEach(() => {
     cy.visit('/');
     cy.getBySel('dummy1-login').click();
@@ -67,7 +73,7 @@ describe('User Settings', function () {
     });
   });
 
-  it.only('フレンドインターフェースでは、フレンドとその状態（オフライン／オンライン／ゲーム中等）を確認することができる', () => {
+  it('フレンドインターフェースでは、フレンドとその状態（オフライン／オンライン／ゲーム中等）を確認することができる', () => {
     cy.getBySel('sidenav-users').click();
     cy.getBySel('users-friends-tab').click();
     cy.location('pathname').should('eq', '/app/users');
@@ -78,5 +84,25 @@ describe('User Settings', function () {
         cy.wrap($el).children('div.chakra-avatar__badge').should('be.visible');
       });
     });
+  });
+
+  it.only('他のユーザーをブロックすることができる。', () => {
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-friends-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    const targetNickname = 'nick-dummy-friends1';
+    const targetSelector = 'users-user-avatar-' + targetNickname;
+
+    cy.getBySel('users-friends').within(() => {
+      cy.getBySel(targetSelector).click();
+    });
+    cy.getBySel('block').click();
+    cy.getBySel('unblock').should('be.visible');
+
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-blocked-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+    cy.getBySel(targetSelector).should('be.visible');
   });
 });

@@ -20,6 +20,7 @@ export const UnblockButton: FC<Props> = memo((props) => {
       isDisabled={isLoading || isSuccess}
       onClick={onClickUnblock}
       {...buttonProps}
+      data-test="unblock"
     >
       Unblock
     </Button>

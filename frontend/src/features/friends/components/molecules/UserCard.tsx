@@ -26,14 +26,14 @@ export const UserCard: FC<Props> = memo((props) => {
                 id={id}
                 size="md"
                 src={avatarImageUrl}
-                data-test={'users-user-avatar-' + id}
+                data-test={'users-user-avatar-' + nickname}
               />
             ) : (
               <LinkedAvatar
                 id={id}
                 size="md"
                 src={avatarImageUrl}
-                data-test={'users-user-avatar-' + id}
+                data-test={'users-user-avatar-' + nickname}
               />
             )}
           </Box>
