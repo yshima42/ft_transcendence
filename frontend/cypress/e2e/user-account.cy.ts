@@ -1,4 +1,6 @@
 /* eslint-disable jest/no-focused-tests */
+import { GameStats } from '../../src/hooks/api/game/useGameStats';
+
 describe('User Settings', function () {
   beforeEach(() => {
     cy.visit('/');
@@ -9,7 +11,7 @@ describe('User Settings', function () {
     cy.location('pathname').should('eq', '/app');
   });
 
-  it.only('ユーザーは、ウェブサイトに表示される一意の名前を選択できるようにする必要がある（ニックネーム）', () => {
+  it('ユーザーは、ウェブサイトに表示される一意の名前を選択できるようにする必要がある（ニックネーム）', () => {
     cy.getBySel('sidenav-user-avatar').click();
     cy.location('pathname').should('eq', '/app/profile');
     cy.getBySel('profile-edit').click();
@@ -18,7 +20,7 @@ describe('User Settings', function () {
     cy.getBySel('profile-nickname').should('contain', 'New Nickname');
   });
 
-  it.only('ユーザーは、アバターをアップロードすることができる', () => {
+  it('ユーザーは、アバターをアップロードすることができる', () => {
     const defaultAvatarPath =
       'https://placehold.jp/2b52ee/ffffff/150x150.png?text=dummy1';
     const uploadFilePath = 'cypress/fixtures/zazen_obousan.png';
@@ -39,5 +41,29 @@ describe('User Settings', function () {
       .should('have.attr', 'src')
       .and('not.eq', defaultAvatarPath)
       .and('have.string', partOfUploadDirPath);
+  });
+
+  it.only('統計情報（勝敗、ラダーレベル(勝率)、実績など）がユーザープロフィールに表示される', () => {
+    cy.getBySel('sidenav-user-avatar').click();
+    cy.location('pathname').should('eq', '/app/profile');
+
+    // ゲームの結果（最新5件）が表示されているか確認
+    // バックエンドのデータと一致しているか確認するのは大変なので、
+    // とりあえず、勝敗の文字列が表示されているかだけ確認する
+    cy.getBySelLike('match-result').each(($el) => {
+      cy.wrap($el).contains(/Win!!|Lose.../);
+    });
+
+    // 勝率が表示されているか確認
+    const gameStatsUrl = `${Cypress.env().backendUrl as string}/game/stats`;
+
+    cy.request('GET', gameStatsUrl).then((response) => {
+      const gameStats = response.body as GameStats;
+      cy.getBySelLike('win-rate').should('contain', `${gameStats.winRate}%`);
+      cy.getBySelLike('total-matches').should(
+        'contain',
+        `${gameStats.totalWins}/${gameStats.totalMatches}`
+      );
+    });
   });
 });
