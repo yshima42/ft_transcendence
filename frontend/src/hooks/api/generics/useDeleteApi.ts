@@ -5,11 +5,13 @@ import {
   UseMutationResult,
   useQueryClient,
 } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { axios } from '../../../lib/axios';
 
 export function useDeleteApi<ResBody>(
   endpoint: string,
-  queryKeys?: QueryKey[],
+  invalidQueryKeys?: QueryKey[],
   useMutationOptions?: UseMutationOptions<ResBody, unknown, void, unknown>
 ): UseMutationResult<ResBody, unknown, void, unknown> {
   const axiosDelete = async () => {
@@ -20,16 +22,30 @@ export function useDeleteApi<ResBody>(
 
   const queryClient = useQueryClient();
 
-  const useMutationResult = useMutation(axiosDelete, {
+  return useMutation(axiosDelete, {
     onSuccess: () => {
-      if (queryKeys !== undefined) {
-        queryKeys.forEach((queryKey) => {
-          void queryClient.invalidateQueries({ queryKey });
+      if (invalidQueryKeys !== undefined) {
+        invalidQueryKeys.forEach((queryKey) => {
+          void queryClient.resetQueries({ queryKey });
         });
       }
     },
     ...useMutationOptions,
   });
+}
+export function useDeleteApiWithErrorToast<ResBody>(
+  endpoint: string,
+  invalidQueryKeys?: QueryKey[],
+  useMutationOptions?: UseMutationOptions<ResBody, unknown, void, unknown>
+): UseMutationResult<ResBody, unknown, void, unknown> {
+  const { customToast } = useCustomToast();
 
-  return useMutationResult;
+  return useDeleteApi(endpoint, invalidQueryKeys, {
+    onError: (error) => {
+      if (isAxiosError<{ message: string }>(error)) {
+        customToast({ description: error.response?.data.message });
+      }
+    },
+    ...useMutationOptions,
+  });
 }
