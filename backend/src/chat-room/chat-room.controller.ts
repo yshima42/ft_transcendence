@@ -34,14 +34,14 @@ export class ChatRoomController {
 
   // 自分が入っていないチャット全部
   @Get()
-  async findAllWithOutMe(@GetUser() user: User): Promise<ResponseChatRoom[]> {
-    return await this.chatRoomService.findAllWithOutMe(user.id);
+  async findJoinableRooms(@GetUser() user: User): Promise<ResponseChatRoom[]> {
+    return await this.chatRoomService.findJoinableRooms(user.id);
   }
 
   // 自分が入っているチャット全部
   @Get('me')
-  async findAllByMe(@GetUser() user: User): Promise<ResponseChatRoom[]> {
-    return await this.chatRoomService.findAllByMe(user.id);
+  async findJoinedRooms(@GetUser() user: User): Promise<ResponseChatRoom[]> {
+    return await this.chatRoomService.findJoinedRooms(user.id);
   }
 
   // chatRoomIdで検索
