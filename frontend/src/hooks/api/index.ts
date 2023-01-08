@@ -18,7 +18,6 @@ export * from './friend/useFriendRequest';
 export * from './friend/useFriendRequestAccept';
 export * from './friend/useFriendRequestCancel';
 export * from './friend/useFriendRequestReject';
-export * from './friend/useFriendUnregister';
 export * from './friend/useFriends';
 export * from './friend/useIncomigUsers';
 export * from './friend/useOutGoingUsers';
