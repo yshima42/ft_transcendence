@@ -16,25 +16,28 @@ import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
 
+// banされている場合は、/app/chat/rooms/meにリダイレクトする
+const useBanRedirect = (chatLoginUser: ResponseChatRoomMember) => {
+  const navigate = ReactRouter.useNavigate();
+  const myChatRoomsLink = '/app/chat/rooms/me';
+
+  React.useEffect(() => {
+    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.BANNED) {
+      navigate(myChatRoomsLink);
+    }
+  }, [chatLoginUser]);
+};
+
 export const ChatRoomPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
   const chatLoginUserEndpoint = `/chat/rooms/${chatRoomId}/members/me`;
   const chatRoomInfoEndpoint = `/chat/rooms/${chatRoomId}`;
-  const myChatRoomsLink = '/app/chat/rooms/me';
   const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
     chatLoginUserEndpoint
   );
   const { data: chatRoom } = useGetApi<ChatRoom>(chatRoomInfoEndpoint);
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
-  const navigate = ReactRouter.useNavigate();
-
-  // Banされている場合は、/app/chat/rooms/meにリダイレクトする
-  React.useEffect(() => {
-    if (chatLoginUser == null) return;
-    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.BANNED) {
-      navigate(myChatRoomsLink);
-    }
-  }, [chatLoginUser]);
+  useBanRedirect(chatLoginUser);
 
   return (
     <>
@@ -113,6 +116,7 @@ const ChatRoomBody: React.FC<{
   socket: Socket;
 }> = React.memo(({ chatLoginUser, chatRoomId, socket }) => {
   const navigate = ReactRouter.useNavigate();
+  const myChatRoomsLink = '/app/chat/rooms/me';
   const endpoint = `/chat/rooms/${chatRoomId}/messages`;
   const { data: messages } = useGetApi<ResponseChatMessage[]>(endpoint);
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
@@ -144,7 +148,7 @@ const ChatRoomBody: React.FC<{
           (responseChatRoomMemberStatus.memberStatus === 'BANNED' ||
             responseChatRoomMemberStatus.memberStatus === 'KICKED')
         ) {
-          navigate('/app/chat/rooms/me');
+          navigate(myChatRoomsLink);
         }
       }
     );
