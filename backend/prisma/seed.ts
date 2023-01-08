@@ -237,6 +237,26 @@ for (let i = 0; i < 1; i++) {
   }
 }
 
+// chatMessage
+const chatMessage2: ChatMessage[] = [];
+for (let i = 0; i < 10000; i++) {
+  const id = uuidv4();
+  const content = i + 'a'.repeat(255);
+  const chatRoomId = chatRooms[1].id;
+  const senderId = idMap.get('dummy1');
+  const now = new Date();
+  const createdAt = new Date(now.getTime() + i);
+  if (senderId !== undefined) {
+    chatMessage2.push({
+      id,
+      content,
+      chatRoomId,
+      senderId,
+      createdAt,
+    });
+  }
+}
+
 const dmRooms: DmRoom[] = [];
 for (let i = 0; i < 2; i++) {
   const id = uuidv4();
@@ -349,12 +369,12 @@ const main = async () => {
   await prisma.oneTimePasswordAuth.createMany({
     data: otpAuthData,
   });
-  await prisma.friendRequest.createMany({
-    data: friendRequestData,
-  });
-  await prisma.block.createMany({
-    data: blockData,
-  });
+  // await prisma.friendRequest.createMany({
+  //   data: friendRequestData,
+  // });
+  // await prisma.block.createMany({
+  //   data: blockData,
+  // });
   await prisma.chatRoom.createMany({
     data: chatRooms,
   });
@@ -364,6 +384,9 @@ const main = async () => {
   await prisma.chatMessage.createMany({
     data: chatMessages,
   });
+  // await prisma.chatMessage.createMany({
+  //   data: chatMessage2,
+  // });
   // await prisma.dmRoom.createMany({
   //   data: dmRooms,
   // });
