@@ -1,8 +1,8 @@
 import { User } from '@prisma/client';
-import { useCustomGetApi } from '../generics/useGetApi';
+import { useGetApiOmitUndefined } from '../generics/useGetApi';
 
 export const useBlockUsers = (): { users: User[] } => {
-  const { data: users } = useCustomGetApi<User[]>('/users/me/blocks');
+  const { data: users } = useGetApiOmitUndefined<User[]>('/users/me/blocks');
 
   return { users };
 };

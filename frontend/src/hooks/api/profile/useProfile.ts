@@ -1,8 +1,10 @@
 import { User } from '@prisma/client';
-import { useCustomGetApi } from '../generics/useGetApi';
+import { useGetApiOmitUndefined } from '../generics/useGetApi';
 
 export const useProfile = (userId = 'me'): { user: User } => {
-  const { data: user } = useCustomGetApi<User>(`/users/${userId}/profile`);
+  const { data: user } = useGetApiOmitUndefined<User>(
+    `/users/${userId}/profile`
+  );
 
   return { user };
 };

@@ -21,7 +21,7 @@ export function useGetApi<ResBody>(
 }
 
 // data がundefined になることを想定しない場合、使う。
-export function useCustomGetApi<ResBody>(
+export function useGetApiOmitUndefined<ResBody>(
   endpoint: string,
   useQueryOptions?: UseQueryOptions<ResBody, unknown>
 ): Omit<UseQueryResult<ResBody, unknown>, 'data'> & { data: ResBody } {
@@ -32,7 +32,7 @@ export function useCustomGetApi<ResBody>(
 
   // option enabled をfalse にした場合などに、data がundefined になる。
   if (data === undefined) {
-    throw new Error('Error in useCustomGetApi');
+    throw new Error('Error in useGetApiOmitUndefined');
   }
 
   return { data, ...useQueryResult };
