@@ -18,17 +18,27 @@ import { MessageSendForm } from 'components/molecules/MessageSendForm';
 
 export const ChatRoomPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
+  const chatLoginUserEndpoint = `/chat/rooms/${chatRoomId}/members/me`;
+  const chatRoomInfoEndpoint = `/chat/rooms/${chatRoomId}`;
+  const myChatRoomsLink = '/app/chat/rooms/me';
   const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
-    `/chat/rooms/${chatRoomId}/members/me`
+    chatLoginUserEndpoint
   );
-  useGetApi<ResponseChatRoomMember>(`/chat/rooms/${chatRoomId}/members/me`);
-  const { data: chatRoom } = useGetApi<ChatRoom>(`/chat/rooms/${chatRoomId}`);
+  const { data: chatRoom } = useGetApi<ChatRoom>(chatRoomInfoEndpoint);
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
-  const { name: chatName } = chatRoom;
+  const navigate = ReactRouter.useNavigate();
+
+  // Banされている場合は、/app/chat/rooms/meにリダイレクトする
+  React.useEffect(() => {
+    if (chatLoginUser == null) return;
+    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.BANNED) {
+      navigate(myChatRoomsLink);
+    }
+  }, [chatLoginUser]);
 
   return (
     <>
-      <ContentLayout title={chatName}>
+      <ContentLayout title={chatRoom.name}>
         {/* チャットの設定ボタン */}
         <ChatRoomHeader chatRoomId={chatRoomId} />
         <C.Divider />
@@ -50,12 +60,11 @@ export const ChatRoomPage: React.FC = React.memo(() => {
 
 const ChatRoomHeader: React.FC<{ chatRoomId: string }> = React.memo(
   ({ chatRoomId }) => {
-    const url = (chatRoomId: string) =>
-      `/app/chat/rooms/${chatRoomId}/settings`;
+    const url = `/app/chat/rooms/${chatRoomId}/settings`;
 
     return (
       <C.Flex justifyContent="flex-end" mb={4}>
-        <C.Link as={ReactRouter.Link} to={url(chatRoomId)}>
+        <C.Link as={ReactRouter.Link} to={url}>
           <C.Button colorScheme="blue">Settings</C.Button>
         </C.Link>
       </C.Flex>
