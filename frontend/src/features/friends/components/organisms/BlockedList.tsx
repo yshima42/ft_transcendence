@@ -25,6 +25,7 @@ export const BlockedList: FC = () => {
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}
           buttons={<UnblockButton targetId={user.id} size={'sm'} />}
+          isFriend={false}
         />
       ))}
     </Grid>
