@@ -1,15 +1,17 @@
 import {
-  QueryKey,
   useMutation,
   UseMutationResult,
-  useQueryClient,
   UseMutationOptions,
+  QueryKey,
+  useQueryClient,
 } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { axios } from '../../../lib/axios';
 
 export function usePatchApi<ReqBody, ResBody>(
   endpoint: string,
-  queryKeys?: QueryKey[],
+  invalidQueryKeys?: QueryKey[],
   useMutationOptions?: UseMutationOptions<ResBody, unknown, ReqBody, unknown>
 ): UseMutationResult<ResBody, unknown, ReqBody, unknown> {
   const axiosPatch = async (reqBody: ReqBody) => {
@@ -20,16 +22,31 @@ export function usePatchApi<ReqBody, ResBody>(
 
   const queryClient = useQueryClient();
 
-  const useMutationResult = useMutation(axiosPatch, {
+  return useMutation(axiosPatch, {
     onSuccess: () => {
-      if (queryKeys !== undefined) {
-        queryKeys.forEach((queryKey) => {
+      if (invalidQueryKeys !== undefined) {
+        invalidQueryKeys.forEach((queryKey) => {
           void queryClient.invalidateQueries({ queryKey });
         });
       }
     },
     ...useMutationOptions,
   });
+}
 
-  return useMutationResult;
+export function usePatchApiWithErrorToast<ReqBody, ResBody>(
+  endpoint: string,
+  invalidQueryKeys?: QueryKey[],
+  useMutationOptions?: UseMutationOptions<ResBody, unknown, ReqBody, unknown>
+): UseMutationResult<ResBody, unknown, ReqBody, unknown> {
+  const { customToast } = useCustomToast();
+
+  return usePatchApi(endpoint, invalidQueryKeys, {
+    onError: (error) => {
+      if (isAxiosError<{ message: string }>(error)) {
+        customToast({ description: error.response?.data.message });
+      }
+    },
+    ...useMutationOptions,
+  });
 }

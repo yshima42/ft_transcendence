@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
-import { useCustomToast } from 'hooks/utils/useCustomToast';
-import { usePatchApi } from '../generics/usePatchApi';
+import {
+  UseMutateAsyncFunction,
+  UseMutationResult,
+} from '@tanstack/react-query';
+import { usePatchApiWithErrorToast } from '../generics/usePatchApi';
 import { OneTimePasswordAuthResponse } from './useOtpAuth';
 
 export type InactivateOtpAuthReqBody = Record<string, never>;
@@ -18,28 +18,22 @@ export type InactivateOtpAuth = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useOtpAuthInactivate = (): {
+export const useOtpAuthInactivate = (): Omit<
+  UseMutationResult<
+    InactivateOtpAuthResBody,
+    unknown,
+    InactivateOtpAuthReqBody,
+    unknown
+  >,
+  'mutateAsync'
+> & {
   inactivateOtpAuth: InactivateOtpAuth;
-  isLoading: boolean;
-  isSuccess: boolean;
 } => {
-  const {
-    mutateAsync: inactivateOtpAuth,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-  } = usePatchApi<InactivateOtpAuthReqBody, InactivateOtpAuthResBody>(
-    `/auth/otp/off`,
-    [['/auth/otp']]
-  );
+  const { mutateAsync: inactivateOtpAuth, ...useMutationResult } =
+    usePatchApiWithErrorToast<
+      InactivateOtpAuthReqBody,
+      InactivateOtpAuthResBody
+    >(`/auth/otp/off`, [['/auth/otp']]);
 
-  const { customToast } = useCustomToast();
-  useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(error)) {
-      customToast({ description: error.response?.data.message });
-    }
-  }, [isError, error, customToast]);
-
-  return { inactivateOtpAuth, isLoading, isSuccess };
+  return { inactivateOtpAuth, ...useMutationResult };
 };

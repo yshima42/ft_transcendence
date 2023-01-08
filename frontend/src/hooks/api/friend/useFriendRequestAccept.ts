@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
 import { FriendRequest } from '@prisma/client';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
-import { useCustomToast } from 'hooks/utils/useCustomToast';
-import { usePatchApi } from '../generics/usePatchApi';
+import {
+  UseMutateAsyncFunction,
+  UseMutationResult,
+} from '@tanstack/react-query';
+import { usePatchApiWithErrorToast } from '../generics/usePatchApi';
 
 export interface FriendRequestAcceptReqBody {
   creatorId: string;
@@ -22,32 +22,26 @@ export type AcceptFriendRequest = UseMutateAsyncFunction<
 
 export const useFriendRequestAccept = (
   targetId: string
-): {
+): Omit<
+  UseMutationResult<
+    FriendRequestAcceptResBody,
+    unknown,
+    FriendRequestAcceptReqBody,
+    unknown
+  >,
+  'mutateAsync'
+> & {
   acceptFriendRequest: AcceptFriendRequest;
-  isLoading: boolean;
-  isSuccess: boolean;
 } => {
-  const {
-    mutateAsync: acceptFriendRequest,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-  } = usePatchApi<FriendRequestAcceptReqBody, FriendRequestAcceptResBody>(
-    `/users/me/friend-requests/incoming`,
-    [
+  const { mutateAsync: acceptFriendRequest, ...useMutationResult } =
+    usePatchApiWithErrorToast<
+      FriendRequestAcceptReqBody,
+      FriendRequestAcceptResBody
+    >(`/users/me/friend-requests/incoming`, [
       ['/users/me/friend-requests/incoming'],
       ['/users/me/friends'],
       [`/users/me/friend-relations/${targetId}`],
-    ]
-  );
+    ]);
 
-  const { customToast } = useCustomToast();
-  useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(error)) {
-      customToast({ description: error.response?.data.message });
-    }
-  }, [isError, error, customToast]);
-
-  return { acceptFriendRequest, isLoading, isSuccess };
+  return { acceptFriendRequest, ...useMutationResult };
 };

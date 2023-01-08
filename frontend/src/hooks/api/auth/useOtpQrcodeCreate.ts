@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
-import { useCustomToast } from 'hooks/utils/useCustomToast';
-import { usePostApi } from '../generics/usePostApi';
+import {
+  UseMutateAsyncFunction,
+  UseMutationResult,
+} from '@tanstack/react-query';
+
+import { usePostApiWithErrorToast } from '../generics/usePostApi';
 import { OneTimePasswordAuthResponse } from './useOtpAuth';
 
 export type CreateOtpAuthQrcodeUrlReqBody = Record<string, never>;
@@ -18,28 +19,22 @@ export type CreateOtpAuthQrcodeUrl = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useOtpAuthQrcodeCreate = (): {
+export const useOtpAuthQrcodeCreate = (): Omit<
+  UseMutationResult<
+    CreateOtpAuthQrcodeUrlResBody,
+    unknown,
+    CreateOtpAuthQrcodeUrlReqBody,
+    unknown
+  >,
+  'mutateAsync'
+> & {
   createOtpAuthQrcodeUrl: CreateOtpAuthQrcodeUrl;
-  isLoading: boolean;
-  isSuccess: boolean;
 } => {
-  const {
-    mutateAsync: createOtpAuthQrcodeUrl,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-  } = usePostApi<CreateOtpAuthQrcodeUrlReqBody, CreateOtpAuthQrcodeUrlResBody>(
-    '/auth/otp',
-    [['/auth/otp']]
-  );
+  const { mutateAsync: createOtpAuthQrcodeUrl, ...useMutationResult } =
+    usePostApiWithErrorToast<
+      CreateOtpAuthQrcodeUrlReqBody,
+      CreateOtpAuthQrcodeUrlResBody
+    >('/auth/otp', [['/auth/otp']]);
 
-  const { customToast } = useCustomToast();
-  useEffect(() => {
-    if (isError && isAxiosError<{ message: string }>(error)) {
-      customToast({ description: error.response?.data.message });
-    }
-  }, [isError, error, customToast]);
-
-  return { createOtpAuthQrcodeUrl, isLoading, isSuccess };
+  return { createOtpAuthQrcodeUrl, ...useMutationResult };
 };
