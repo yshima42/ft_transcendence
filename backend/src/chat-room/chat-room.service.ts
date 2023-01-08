@@ -24,7 +24,7 @@ export class ChatRoomService {
     createChatroomDto: CreateChatRoomDto,
     userId: string
   ): Promise<Omit<ChatRoom, 'password'>> {
-    const { name, password } = createChatroomDto;
+    const { name, password, roomStatus } = createChatroomDto;
     this.logger.debug(`create: ${this.json({ createChatroomDto, userId })}`);
 
     let hashedPassword: string | undefined;
@@ -35,10 +35,7 @@ export class ChatRoomService {
       const chatRoom = await this.prisma.chatRoom.create({
         data: {
           name,
-          roomStatus:
-            password === undefined
-              ? ChatRoomStatus.PUBLIC
-              : ChatRoomStatus.PROTECTED,
+          roomStatus,
           password: hashedPassword,
           chatRoomMembers: {
             create: {
