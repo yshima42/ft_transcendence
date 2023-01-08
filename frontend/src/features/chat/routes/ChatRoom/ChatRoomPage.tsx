@@ -9,7 +9,7 @@ import {
   ResponseChatRoomMemberStatus,
 } from 'features/chat/types/chat';
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
-import { useGetApi } from 'hooks/api/generics/useGetApi';
+import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
 import { Socket } from 'socket.io-client';
@@ -21,10 +21,10 @@ export const ChatRoomPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
   const chatLoginUserEndpoint = `/chat/rooms/${chatRoomId}/members/me`;
   const chatRoomInfoEndpoint = `/chat/rooms/${chatRoomId}`;
-  const { data: chatLoginUser } = useGetApi<ResponseChatRoomMember>(
-    chatLoginUserEndpoint
-  );
-  const { data: chatRoom } = useGetApi<ChatRoom>(chatRoomInfoEndpoint);
+  const { data: chatLoginUser } =
+    useGetApiOmitUndefined<ResponseChatRoomMember>(chatLoginUserEndpoint);
+  const { data: chatRoom } =
+    useGetApiOmitUndefined<ChatRoom>(chatRoomInfoEndpoint);
   const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
   useBanRedirect(chatLoginUser);
 
@@ -107,7 +107,8 @@ const ChatRoomBody: React.FC<{
   const navigate = ReactRouter.useNavigate();
   const myChatRoomsLink = '/app/chat/rooms/me';
   const endpoint = `/chat/rooms/${chatRoomId}/messages`;
-  const { data: messages } = useGetApi<ResponseChatMessage[]>(endpoint);
+  const { data: messages } =
+    useGetApiOmitUndefined<ResponseChatMessage[]>(endpoint);
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
   const { users: blockUsers } = useBlockUsers();
   const queryClient = ReactQuery.useQueryClient();

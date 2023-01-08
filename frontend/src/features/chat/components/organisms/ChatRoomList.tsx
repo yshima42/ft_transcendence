@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomStatus } from '@prisma/client';
 import { ResponseChatRoom } from 'features/chat/types/chat';
-import { useGetApi } from 'hooks/api/generics/useGetApi';
+import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { Link } from 'react-router-dom';
 
 const ChatRoomBox: React.FC<{ chatRoom: ResponseChatRoom }> = React.memo(
@@ -50,7 +50,8 @@ export const ChatRoomList: React.FC<{
   chatRoomEndpoint: string;
   chatRoomLinkUrl: (chatRoomId: string) => string;
 }> = React.memo(({ chatRoomEndpoint, chatRoomLinkUrl }) => {
-  const { data: chatRooms } = useGetApi<ResponseChatRoom[]>(chatRoomEndpoint);
+  const { data: chatRooms } =
+    useGetApiOmitUndefined<ResponseChatRoom[]>(chatRoomEndpoint);
 
   return (
     <C.List spacing={3} data-testid="chat-room-list">

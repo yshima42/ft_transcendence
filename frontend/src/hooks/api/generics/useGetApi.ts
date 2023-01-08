@@ -3,14 +3,14 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { axios } from '../../../lib/axios';
+import { axios } from 'lib/axios';
 
 // 使う際は、このhooks自体を<Suspense> で囲むこと。
 // エラーをキャッチしたい場合は、<ErrorBoundary> で囲むこと。
 export function useGetApi<ResBody>(
   endpoint: string,
   useQueryOptions?: UseQueryOptions<ResBody, unknown>
-): UseQueryResult<ResBody, unknown> {
+): UseQueryResult<ResBody | undefined, unknown> {
   const axiosGet = async (): Promise<ResBody> => {
     const result = await axios.get<ResBody>(endpoint);
 
