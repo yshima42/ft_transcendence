@@ -22,9 +22,19 @@ export const UserCard: FC<Props> = memo((props) => {
         <Flex align="center" mr={2}>
           <Box w="60px">
             {isFriend ? (
-              <UserAvatar id={id} size="md" src={avatarImageUrl} />
+              <UserAvatar
+                id={id}
+                size="md"
+                src={avatarImageUrl}
+                data-test={'users-user-avatar-' + id}
+              />
             ) : (
-              <LinkedAvatar id={id} size="md" src={avatarImageUrl} />
+              <LinkedAvatar
+                id={id}
+                size="md"
+                src={avatarImageUrl}
+                data-test={'users-user-avatar-' + id}
+              />
             )}
           </Box>
           <Box>
