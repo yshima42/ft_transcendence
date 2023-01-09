@@ -6,25 +6,22 @@ import { Presence } from 'providers/SocketProvider';
 
 type Props = AvatarProps & {
   id: string;
-  dataTestProp?: string;
 };
 
-export const UserAvatar: FC<Props> = memo(
-  ({ id, dataTestProp, ...avatarProps }: Props) => {
-    const { presence } = useUserPresence(id);
-    const badgeColor =
-      presence === Presence.ONLINE
-        ? 'green.500'
-        : presence === Presence.INGAME
-        ? 'red'
-        : 'gray';
+export const UserAvatar: FC<Props> = memo(({ id, ...avatarProps }: Props) => {
+  const { presence } = useUserPresence(id);
+  const badgeColor =
+    presence === Presence.ONLINE
+      ? 'green.500'
+      : presence === Presence.INGAME
+      ? 'red'
+      : 'gray';
 
-    return (
-      <>
-        <LinkedAvatar id={id} dataTestProp={dataTestProp} {...avatarProps}>
-          <AvatarBadge boxSize="1.1em" bg={badgeColor} />
-        </LinkedAvatar>
-      </>
-    );
-  }
-);
+  return (
+    <>
+      <LinkedAvatar id={id} {...avatarProps}>
+        <AvatarBadge boxSize="1.1em" bg={badgeColor} />
+      </LinkedAvatar>
+    </>
+  );
+});
