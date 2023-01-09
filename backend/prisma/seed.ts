@@ -162,7 +162,7 @@ for (let i = 2; i < 30; i++) {
  * dummy1がdummy2~29をBlockする。
  */
 const blockData: Block[] = [];
-for (let i = 2; i < 30; i++) {
+for (let i = 20; i < 30; i++) {
   const sourceId = idMap.get('dummy1');
   const targetId = idMap.get('dummy' + i.toString());
   if (
@@ -371,12 +371,12 @@ const main = async () => {
   await prisma.oneTimePasswordAuth.createMany({
     data: otpAuthData,
   });
-  // await prisma.friendRequest.createMany({
-  //   data: friendRequestData,
-  // });
-  // await prisma.block.createMany({
-  //   data: blockData,
-  // });
+  await prisma.friendRequest.createMany({
+    data: friendRequestData,
+  });
+  await prisma.block.createMany({
+    data: blockData,
+  });
   await prisma.chatRoom.createMany({
     data: chatRooms,
   });
