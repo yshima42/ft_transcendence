@@ -28,7 +28,9 @@ export const GameOutlineCard: FC<Props> = memo((props) => {
         <Spacer />
         <AvatarWithNickname user={user2} />
         <Spacer />
-        <Button onClick={() => navigate(`/app/games/${gameOutline.roomId}`)}>
+        <Button
+          onClick={() => navigate(`/app/game/rooms/${gameOutline.roomId}`)}
+        >
           {isPlayer ? 'Reconnect' : 'Watch'}
         </Button>
       </Flex>

@@ -46,13 +46,13 @@ export const MainLayout: FC<MainProps> = memo((props) => {
     },
     {
       title: 'Watch',
-      to: 'games',
+      to: 'game/rooms',
       icon: ViewIcon,
       iconComponent: <ViewIcon />,
     },
   ].filter(Boolean) as NavigationItem[];
 
-  const isGamePage = Boolean(useMatch('/app/games/:id'));
+  const isGamePage = Boolean(useMatch('/app/game/rooms/:id'));
 
   return (
     <Flex>

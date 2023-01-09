@@ -14,9 +14,9 @@ export const Top: FC = memo(() => {
     <ContentLayout title="">
       <Center>
         {gameRoomId === undefined ? (
-          <Button onClick={() => navigate('/app/matching')}>Match</Button>
+          <Button onClick={() => navigate('/app/game/matching')}>Match</Button>
         ) : (
-          <Button onClick={() => navigate(`/app/games/${gameRoomId}`)}>
+          <Button onClick={() => navigate(`/app/game/rooms/${gameRoomId}`)}>
             Reconnect
           </Button>
         )}

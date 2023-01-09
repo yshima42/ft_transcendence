@@ -126,7 +126,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       'accept_invitation',
       { challengerId, ballSpeed },
       (message: { roomId: string }) => {
-        navigate(`/app/games/${message.roomId}`);
+        navigate(`/app/game/rooms/${message.roomId}`);
       }
     );
   };
