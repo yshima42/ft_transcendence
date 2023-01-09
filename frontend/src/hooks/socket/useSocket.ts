@@ -1,24 +1,24 @@
-import { useEffect, useRef } from 'react';
-import { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client';
+import * as React from 'react';
+import { io, Socket } from 'socket.io-client';
 
-// 参考: https://www.youtube.com/watch?v=-aTWWl4klYE
-export const useSocket = (
-  uri: string,
-  opts?: Partial<ManagerOptions & SocketOptions> | undefined
-): Socket => {
-  const { current: socket } = useRef(
+// socket.io-clientのsocketを作成するカスタムフック
+export const useSocket = (uri: string): Socket => {
+  // socketを作成する (初回のみ)
+  // autoConnect: false にすることで、socketを作成しただけでは接続しないようにする
+  // transports: ['websocket'] にすることで、websocketのみを使用するようにする
+  const { current: socket } = React.useRef<Socket>(
     io(uri, {
+      autoConnect: false,
       transports: ['websocket'],
-      ...opts,
     })
   );
 
-  useEffect(() => {
+  // socketを破棄する
+  React.useEffect(() => {
     socket.connect();
 
     return () => {
       socket.disconnect();
-      socket.close();
     };
   }, [socket]);
 

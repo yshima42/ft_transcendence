@@ -1,7 +1,7 @@
 import { memo, FC } from 'react';
 import { Box, VStack } from '@chakra-ui/react';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 type Props = {
   nickname: string;
@@ -15,7 +15,7 @@ export const AvatarWithNickname: FC<Props> = memo((props) => {
   return (
     <Box h="90" p={2}>
       <VStack>
-        <UserAvatar id={id} size="md" src={avatarImageUrl} />
+        <LinkedAvatar id={id} size="md" src={avatarImageUrl} />
 
         {/* TODO:ニックネームが長くなるときどう表示するか考える。暫定で省略している */}
         <LinkedNickname id={id} nickname={nickname} maxWidth={20} />

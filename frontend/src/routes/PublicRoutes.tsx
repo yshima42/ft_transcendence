@@ -7,12 +7,12 @@ import { OtpAuth } from 'features/auth/routes/OtpAuth';
 import { Page404 } from 'features/auth/routes/Page404';
 import { SignUp } from 'features/auth/routes/SignUp';
 import { UnexpectedError } from 'features/auth/routes/UnexpectedError';
-import { ChatRoom } from 'features/chat/routes/ChatRoom';
-import { ChatRoomConfirmation } from 'features/chat/routes/ChatRoomConfirmation';
-import { ChatRoomSettings } from 'features/chat/routes/ChatRoomSettings';
-import { ChatRooms } from 'features/chat/routes/ChatRooms';
-import { ChatRoomsMe } from 'features/chat/routes/ChatRoomsMe';
-import { CreateChatRooms } from 'features/chat/routes/CreateChatRooms';
+import { ChatRoomPage } from 'features/chat/routes/ChatRoom/ChatRoomPage';
+import { ChatRoomSettingsPage } from 'features/chat/routes/ChatRoom/ChatRoomSettingsPage';
+import { ChatRoomConfirmation } from 'features/chat/routes/ChatRoomConfirmationPage';
+import { ChatRoomsMePage } from 'features/chat/routes/ChatRoomsMePage';
+import { ChatRoomsPage } from 'features/chat/routes/ChatRoomsPage';
+import { CreateChatRoomsPage } from 'features/chat/routes/CreateChatRoomsPage';
 import { DmRoom } from 'features/dm/routes/DmRoom';
 import { DmRooms } from 'features/dm/routes/DmRooms';
 import { Users } from 'features/friends/routes/Users';
@@ -57,13 +57,13 @@ export const publicRoutes = [
     element: <App />,
     children: [
       { path: 'users', element: <Users /> },
-      { path: 'chat/rooms', element: <ChatRooms /> },
-      { path: 'chat/rooms/me', element: <ChatRoomsMe /> },
-      { path: 'chat/rooms/create', element: <CreateChatRooms /> },
-      { path: 'chat/rooms/:chatRoomId', element: <ChatRoom /> },
+      { path: 'chat/rooms', element: <ChatRoomsPage /> },
+      { path: 'chat/rooms/me', element: <ChatRoomsMePage /> },
+      { path: 'chat/rooms/create', element: <CreateChatRoomsPage /> },
+      { path: 'chat/rooms/:chatRoomId', element: <ChatRoomPage /> },
       {
         path: 'chat/rooms/:chatRoomId/settings',
-        element: <ChatRoomSettings />,
+        element: <ChatRoomSettingsPage />,
       },
       {
         path: 'chat/rooms/:chatRoomId/confirmation',

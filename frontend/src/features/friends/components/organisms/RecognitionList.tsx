@@ -31,6 +31,7 @@ export const RecognitionList: FC = () => {
               <RejectButton targetId={user.id} />
             </>
           }
+          isFriend={false}
         />
       ))}
     </Grid>

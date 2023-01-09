@@ -1,6 +1,5 @@
 import { FC, memo } from 'react';
 import { Text, TextProps } from '@chakra-ui/react';
-import { useIsLoginUser } from 'hooks/api';
 import { Link } from 'react-router-dom';
 
 type Props = TextProps & {
@@ -10,11 +9,9 @@ type Props = TextProps & {
 
 export const LinkedNickname: FC<Props> = memo((props) => {
   const { id, nickname, ...textProps } = props;
-  const { isLoginUser } = useIsLoginUser(id);
-  const link = isLoginUser ? `/app/profile` : `/app/users/${id}`;
 
   return (
-    <Link to={link}>
+    <Link to={`/app/users/${id}`}>
       <Text maxWidth="none" noOfLines={1} {...textProps}>
         {nickname}
       </Text>

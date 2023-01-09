@@ -1,7 +1,7 @@
 import { FC, memo, ReactNode } from 'react';
-import { Box, Flex, Text, Spacer, Heading } from '@chakra-ui/react';
-import { useGameStats } from 'hooks/api';
+import { Box, Flex, Text, Spacer } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 type Props = {
@@ -10,21 +10,32 @@ type Props = {
   nickname: string;
   avatarImageUrl: string;
   buttons?: ReactNode;
+  isFriend: boolean;
 };
 
 export const UserCard: FC<Props> = memo((props) => {
-  const { id, username, nickname, avatarImageUrl, buttons } = props;
-
-  const {
-    gameStats: { totalMatches, winRate },
-  } = useGameStats(id);
+  const { id, username, nickname, avatarImageUrl, buttons, isFriend } = props;
 
   return (
     <Box p={4} bg="white" borderRadius="md" shadow="md">
       <Flex align="center">
         <Flex align="center" mr={2}>
           <Box w="60px">
-            <UserAvatar id={id} size="md" src={avatarImageUrl} />
+            {isFriend ? (
+              <UserAvatar
+                id={id}
+                size="md"
+                src={avatarImageUrl}
+                data-test={'users-user-avatar-' + nickname}
+              />
+            ) : (
+              <LinkedAvatar
+                id={id}
+                size="md"
+                src={avatarImageUrl}
+                data-test={'users-user-avatar-' + nickname}
+              />
+            )}
           </Box>
           <Box>
             <Link to={`/app/users/${id}`}>
@@ -39,25 +50,6 @@ export const UserCard: FC<Props> = memo((props) => {
         </Flex>
         <Spacer />
         {buttons}
-      </Flex>
-      <Flex align="center" mt={4}>
-        <Flex align="center" mr={2}>
-          <Heading size="sm">Win Rate</Heading>
-          <Box ml={4}>
-            <Text fontSize="lg" fontWeight="bold">
-              {winRate}%
-            </Text>
-          </Box>
-        </Flex>
-        <Spacer />
-        <Flex align="center" mr={2}>
-          <Heading size="sm">Total Games</Heading>
-          <Box ml={4}>
-            <Text fontSize="lg" fontWeight="bold">
-              {totalMatches}
-            </Text>
-          </Box>
-        </Flex>
       </Flex>
     </Box>
   );
