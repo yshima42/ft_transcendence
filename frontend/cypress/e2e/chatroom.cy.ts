@@ -1,4 +1,8 @@
 describe('chatroom spec', () => {
+  before(() => {
+    cy.exec('yarn --cwd ../backend prisma migrate reset -f');
+  });
+
   beforeEach(() => {
     cy.visit('/'); // テスト開始前にルートにアクセス
     cy.contains('Admin Test dummy1').click(); // Admin Test dummy1が含まれる要素をクリック
