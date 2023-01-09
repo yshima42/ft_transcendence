@@ -22,25 +22,28 @@ import { Inviting } from 'features/game/routes/Inviting';
 import { Matching } from 'features/game/routes/Matching';
 import { Top } from 'features/game/routes/Top';
 import { Profile } from 'features/profile/routes/Profile';
+import { ErrorProvider } from 'providers/ErrorProvider';
 import SocketProvider from 'providers/SocketProvider';
 
 const App = () => {
   return (
-    // TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。
-    <Suspense fallback={<CenterSpinner h="100vh" />}>
-      <SocketProvider>
-        <MainLayout>
-          <Suspense fallback={<CenterSpinner h="100vh" />}>
-            <Outlet />
-          </Suspense>
-        </MainLayout>
-      </SocketProvider>
-    </Suspense>
+    // AppProvider におくと、うまくいかない。
+    <ErrorProvider>
+      <Suspense fallback={<CenterSpinner h="100vh" />}>
+        {/* TODO:AppProviderファイルに書きたい。認証後にオンライン状態にしたいのでここに書いている。ルーティング周りのリファクタ時に修正する。 */}
+        <SocketProvider>
+          <MainLayout>
+            <Suspense fallback={<CenterSpinner h="100vh" />}>
+              <Outlet />
+            </Suspense>
+          </MainLayout>
+        </SocketProvider>
+      </Suspense>
+    </ErrorProvider>
   );
 };
 
 export const publicRoutes = [
-  // authを入れる場合は
   {
     path: '/',
     element: <Login />,

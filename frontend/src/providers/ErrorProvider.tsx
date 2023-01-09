@@ -3,7 +3,7 @@ import { ToastId } from '@chakra-ui/react';
 import { isAxiosError } from 'axios';
 import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useMatch, useParams } from 'react-router-dom';
 import { UnexpectedError } from 'features/auth/routes/UnexpectedError';
 
 type Props = PropsWithChildren;
@@ -11,27 +11,48 @@ type Props = PropsWithChildren;
 export const ErrorProvider: FC<Props> = (props) => {
   const { children } = props;
 
-  const navigate = useNavigate();
   const { customToast } = useCustomToast();
-  const id: ToastId = 'unauthorized';
+  const { id } = useParams();
+  const isProfilePage = Boolean(useMatch('/app/users/:id'));
 
-  const onError = useCallback(
-    (error: Error) => {
+  const fallbackRender = useCallback(
+    (props: {
+      error: Error;
+      resetErrorBoundary: (...args: unknown[]) => void;
+    }) => {
+      const { error, resetErrorBoundary } = props;
+
       if (isAxiosError(error) && error.response?.status === 401) {
+        const id: ToastId = 'unauthorized';
         if (!customToast.isActive(id)) {
           customToast({ id, description: 'Authentication failed.' });
         }
-        navigate('/');
+        resetErrorBoundary();
+
+        return <Navigate to="/" />;
+      } else if (
+        isProfilePage &&
+        isAxiosError(error) &&
+        error.config?.url === `/users/${id ?? ''}/profile` &&
+        (error.response?.status === 400 || error.response?.status === 404)
+      ) {
+        const id: ToastId = 'not-exist-url';
+        if (!customToast.isActive(id)) {
+          customToast({ id, description: 'Not exist the url.' });
+        }
+        resetErrorBoundary();
+
+        return <Navigate to="/app/users" />;
       } else {
         customToast({ description: error.message });
+
+        return <UnexpectedError />;
       }
     },
-    [customToast, navigate]
+    [customToast, isProfilePage, id]
   );
 
   return (
-    <ErrorBoundary fallback={<UnexpectedError />} onError={onError}>
-      {children}
-    </ErrorBoundary>
+    <ErrorBoundary fallbackRender={fallbackRender}>{children}</ErrorBoundary>
   );
 };
