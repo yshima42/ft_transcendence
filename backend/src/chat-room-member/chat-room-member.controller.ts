@@ -7,7 +7,6 @@ import {
   Delete,
   UseGuards,
   ParseUUIDPipe,
-  Logger,
 } from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { User } from '@prisma/client';
@@ -29,16 +28,6 @@ export class ChatRoomMemberController {
     @Body() createChatRoomMemberDto: CreateChatRoomMemberDto,
     @GetUser() user: User
   ): Promise<void> {
-    Logger.debug(
-      `chat-room-member.controller create
-        chatRoomId=${chatRoomId}
-        createChatRoomMemberDto=${JSON.stringify(
-          createChatRoomMemberDto,
-          null,
-          2
-        )}
-        user=${JSON.stringify(user, null, 2)}`
-    );
     await this.chatRoomMemberService.create(
       chatRoomId,
       createChatRoomMemberDto,
@@ -50,11 +39,6 @@ export class ChatRoomMemberController {
   async findAll(
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
   ): Promise<ResponseChatRoomMember[]> {
-    Logger.debug(
-      `chat-room-member.controller findAll
-        chatRoomId=${chatRoomId}`
-    );
-
     return await this.chatRoomMemberService.findAll(chatRoomId);
   }
 
@@ -64,12 +48,6 @@ export class ChatRoomMemberController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<ResponseChatRoomMember> {
-    Logger.debug(
-      `chat-room-member.controller findMe
-        chatRoomId=${chatRoomId}
-        user=${JSON.stringify(user, null, 2)}`
-    );
-
     return await this.chatRoomMemberService.findOne(chatRoomId, user.id);
   }
 
@@ -79,11 +57,6 @@ export class ChatRoomMemberController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<void> {
-    Logger.debug(
-      `chat-room-member.controller removeMe
-        chatRoomId=${chatRoomId}
-        user=${JSON.stringify(user, null, 2)}`
-    );
     await this.chatRoomMemberService.remove(chatRoomId, user.id);
   }
 }

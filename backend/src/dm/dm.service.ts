@@ -9,14 +9,13 @@ export class DmService {
 
   async create(
     createDmDto: CreateDmDto,
-    senderId: string,
-    dmRoomId: string
+    senderId: string
   ): Promise<ResponseDm> {
     const dm = await this.prisma.dm.create({
       data: {
         content: createDmDto.content,
         senderId,
-        dmRoomId,
+        dmRoomId: createDmDto.roomId,
       },
       select: {
         id: true,
@@ -35,7 +34,7 @@ export class DmService {
     return dm;
   }
 
-  async findDms(dmRoomId: string): Promise<ResponseDm[]> {
+  async findAllNotBlocked(dmRoomId: string): Promise<ResponseDm[]> {
     const dms = await this.prisma.dm.findMany({
       where: {
         dmRoomId,
