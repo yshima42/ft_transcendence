@@ -1,7 +1,8 @@
 import { FC, memo } from 'react';
-import { Button, Flex, Heading } from '@chakra-ui/react';
+import { Button, Flex } from '@chakra-ui/react';
 import { useLogout, useProfile } from 'hooks/api';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 
 export const UserNavigation: FC = memo(() => {
@@ -24,11 +25,7 @@ export const UserNavigation: FC = memo(() => {
         data-test={'sidenav-user-avatar'}
       />
       <Flex flexDir="column" ml={4}>
-        <Link to="/app/profile">
-          <Heading as="h3" size="sm">
-            {user.nickname}
-          </Heading>
-        </Link>
+        <LinkedNickname id={user.id} nickname={user.nickname} size="sm" />
         <Button
           size="xs"
           rounded="lg"

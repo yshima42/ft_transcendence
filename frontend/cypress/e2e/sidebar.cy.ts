@@ -25,12 +25,12 @@ describe('sidebar spec', () => {
 
   it('profile', () => {
     cy.contains('nicknamedummy1').click();
-    cy.url().should('include', '/profile');
+    cy.url().should('include', '/users');
   });
 
   it('avatar', () => {
     cy.get('.chakra-avatar__img').click();
-    cy.url().should('include', '/profile');
+    cy.url().should('include', '/users');
   });
 
   it('logout', () => {
