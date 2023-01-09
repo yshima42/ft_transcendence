@@ -17,6 +17,7 @@ export const FriendsList: FC = () => {
         lg: 'repeat(2, 1fr)',
       }}
       gap={6}
+      data-test={'users-friends'}
     >
       {users.map((user) => (
         <UserCard
@@ -31,6 +32,7 @@ export const FriendsList: FC = () => {
               <DmButton targetId={user.id} />
             </>
           }
+          isFriend={true}
         />
       ))}
     </Grid>

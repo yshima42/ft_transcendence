@@ -25,6 +25,7 @@ export const PendingList: FC = () => {
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}
           buttons={<CancelButton targetId={user.id} />}
+          isFriend={false}
         />
       ))}
     </Grid>
