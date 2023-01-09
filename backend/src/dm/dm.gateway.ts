@@ -1,59 +1,93 @@
-import { Logger } from '@nestjs/common';
-import {
-  ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import * as NestJs from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as WebSocket from '@nestjs/websockets';
+import { parse } from 'cookie';
+import * as SocketIO from 'socket.io';
 import { DmService } from './dm.service';
+import { CreateDmDto } from './dto/create-dm.dto';
 
-@WebSocketGateway({
+@WebSocket.WebSocketGateway({
   cors: {
     origin: '*',
   },
   namespace: 'dm',
 })
 export class DmGateway {
-  constructor(private readonly dmService: DmService) {}
-  @WebSocketServer()
-  server!: Server;
+  constructor(
+    private readonly dmService: DmService,
+    private readonly jwt: JwtService
+  ) {}
 
-  @SubscribeMessage('send_message')
-  async handleMessage(
-    @MessageBody()
-    data: {
-      content: string;
-      senderId: string;
-      dmRoomId: string;
+  @WebSocket.WebSocketServer()
+  server!: SocketIO.Server;
+
+  // Logger関数
+  private readonly logger = new NestJs.Logger('DmGateway');
+  private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
+
+  // userIdとclientを紐付ける
+  handleConnection(@WebSocket.ConnectedSocket() client: SocketIO.Socket): void {
+    const cookie = client.handshake.headers.cookie;
+    if (cookie === undefined) {
+      this.logger.warn('cookie is undefined');
+
+      return;
     }
-  ): Promise<void> {
-    const { content, senderId, dmRoomId } = data;
-    // TODO:エラー処理
-    const newMessage = await this.dmService.create(
-      { content },
-      senderId,
-      dmRoomId
-    );
-    this.server.in(dmRoomId).emit('receive_message', newMessage);
+    const chatLoginUserId = this.getUserIdFromCookie(cookie);
+    this.logger.debug(`handleConnection: ${chatLoginUserId}`);
+    // clientにuserIdを紐付ける
+    client.data.userId = chatLoginUserId;
   }
 
-  @SubscribeMessage('join_dm_room')
+  // userIdとclientの紐付けを解除する
+  handleDisconnect(@WebSocket.ConnectedSocket() client: SocketIO.Socket): void {
+    const cookie = client.handshake.headers.cookie;
+    if (cookie === undefined) {
+      this.logger.warn('cookie is undefined');
+
+      return;
+    }
+    const chatLoginUserId = this.getUserIdFromCookie(cookie);
+    this.logger.debug(`handleDisconnect: ${chatLoginUserId}`);
+    // clientからuserIdを削除する
+    delete client.data.userId;
+  }
+
+  @WebSocket.SubscribeMessage('send_message')
+  async handleMessage(
+    @WebSocket.MessageBody()
+    createDmDto: CreateDmDto,
+    @WebSocket.ConnectedSocket() client: SocketIO.Socket
+  ): Promise<void> {
+    const newMessage = await this.dmService.create(
+      createDmDto,
+      client.data.userId as string
+    );
+    this.server.in(createDmDto.roomId).emit('receive_message', newMessage);
+  }
+
+  @WebSocket.SubscribeMessage('join_dm_room')
   joinRoom(
-    @MessageBody() dmRoomId: string,
-    @ConnectedSocket() client: Socket
+    @WebSocket.MessageBody() dmRoomId: string,
+    @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): void {
-    Logger.debug('joinRoom: ' + JSON.stringify(dmRoomId));
+    this.logger.debug('joinRoom: ' + JSON.stringify(dmRoomId));
     void client.join(dmRoomId);
   }
 
-  @SubscribeMessage('leave_dm_room')
+  @WebSocket.SubscribeMessage('leave_dm_room')
   leaveRoom(
-    @MessageBody() dmRoomId: string,
-    @ConnectedSocket() client: Socket
+    @WebSocket.MessageBody() dmRoomId: string,
+    @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): void {
-    Logger.debug('leaveRoom: ' + JSON.stringify(dmRoomId));
+    this.logger.debug('leaveRoom: ' + JSON.stringify(dmRoomId));
     void client.leave(dmRoomId);
+  }
+
+  getUserIdFromCookie(cookie: string): string {
+    const { accessToken } = parse(cookie);
+    const { id } = this.jwt.decode(accessToken) as { id: string };
+
+    return id;
   }
 }

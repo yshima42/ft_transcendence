@@ -17,22 +17,22 @@ import {
   FormLabel,
   Input,
 } from '@chakra-ui/react';
+import { User } from '@prisma/client';
 import {
   AvatarFormData,
   ProfileFormData,
   useAvatarUpload,
-  useProfile,
   useProfileEdit,
 } from 'hooks/api';
 
 type Props = {
+  user: User;
   isOpen: boolean;
   onClose: () => void;
 };
 
 export const ProfileEditModal: FC<Props> = memo((props) => {
-  const { isOpen, onClose } = props;
-  const { user } = useProfile();
+  const { user, isOpen, onClose } = props;
   const { editProfile, isLoading: isLoading1 } = useProfileEdit();
   const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
   const [profileFormData, setProfileFormData] = useState<ProfileFormData>();
@@ -90,11 +90,11 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     src={user.avatarImageUrl}
                   />
                   <input
-                    hidden
                     ref={inputRef}
                     type="file"
                     accept="image/*"
                     onChange={onChangeFile}
+                    data-test={'profile-edit-file-select'}
                   />
                   <Box pl={8}>
                     <VStack justify="center" align="center">
@@ -125,9 +125,12 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     Nickname
                   </FormLabel>
                   <Input
+                    type="text"
+                    maxLength={50}
                     id="nickname"
                     name="nickname"
                     onChange={onProfileChange}
+                    data-test={'profile-edit-nickname-input'}
                   />
                 </HStack>
               </Box>
@@ -138,6 +141,7 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                 type="submit"
                 isLoading={isLoading1 || isLoading2}
                 isDisabled={isLoading1 || isLoading2}
+                data-test={'profile-edit-submit'}
               >
                 Save
               </Button>

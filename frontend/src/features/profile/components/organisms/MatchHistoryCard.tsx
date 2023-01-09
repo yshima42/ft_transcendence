@@ -23,10 +23,11 @@ export const MatchHistoryCard: FC<Props> = memo((props) => {
           <Box p={2}>
             <Text as="b">Match History</Text>
           </Box>
-          <VStack justify="center">
+          <VStack justify="center" data-test="profile-latest-5matches">
             {latest5Matches.map((match) => (
               <Box key={match.id}>
                 <GameResultCard
+                  matchId={match.id}
                   playerOne={match.playerOne}
                   playerTwo={match.playerTwo}
                   score={`${match.playerOneScore} - ${match.playerTwoScore}`}

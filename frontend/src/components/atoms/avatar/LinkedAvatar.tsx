@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom';
 
 type Props = AvatarProps &
   PropsWithChildren & {
-    link: string;
+    id: string;
   };
 
 export const LinkedAvatar: FC<Props> = memo(
-  ({ children, link, ...avatarProps }: Props) => {
+  ({ children, id, ...avatarProps }: Props) => {
     return (
-      <Link to={link}>
+      <Link to={`/app/users/${id}`}>
         <Avatar {...avatarProps}>{children}</Avatar>
       </Link>
     );

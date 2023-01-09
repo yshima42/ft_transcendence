@@ -1,50 +1,99 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
-import { ResponseChatRoomMember } from 'features/chat/types/chat';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import {
-  ChangeChatRoomMemberStatusButtons,
-  changeChatRoomMemberStatusButtonTexts,
-} from 'features/chat/components/atoms/ChangeChatRoomMemberStatusButtons';
+  ResponseChatRoomMember,
+  ResponseChatRoomMemberStatus,
+} from 'features/chat/types/chat';
+import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
+import { useSocket } from 'hooks/socket/useSocket';
+import * as ReactRouter from 'react-router-dom';
+import * as SocketIOClient from 'socket.io-client';
+import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
+import { ChangeChatRoomMemberStatusButtons } from 'features/chat/components/atoms/ChangeChatRoomMemberStatusButtons';
 
 type Props = {
+  chatRoomId: string;
   chatLoginUser: ResponseChatRoomMember;
-  chatMembers: ResponseChatRoomMember[];
-  changeChatRoomMemberStatus: (
-    memberId: string,
-    memberStatus: ChatRoomMemberStatus,
-    chatLoginUser: ResponseChatRoomMember
-  ) => void;
 };
 
 export const ChatRoomMemberList: React.FC<Props> = React.memo(
-  ({ chatLoginUser, chatMembers, changeChatRoomMemberStatus }) => {
+  ({ chatRoomId, chatLoginUser }) => {
+    const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
+    const { data: chatMembers, refetch: refetchChatMembers } =
+      useGetApiOmitUndefined<ResponseChatRoomMember[]>(
+        `/chat/rooms/${chatRoomId}/members`
+      );
+    const navigate = ReactRouter.useNavigate();
+
+    React.useEffect(() => {
+      const fetchData = async () => {
+        try {
+          await refetchChatMembers();
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      // webSocket
+      socket.emit('join_room_member', chatRoomId);
+      // webSocketのイベントを受け取る関数を登録
+      socket.on(
+        'changeChatRoomMemberStatusSocket',
+        (responseChatRoomMemberStatus: ResponseChatRoomMemberStatus) => {
+          if (responseChatRoomMemberStatus === undefined) {
+            return;
+          }
+          if (responseChatRoomMemberStatus.memberId === chatLoginUser.user.id) {
+            if (
+              responseChatRoomMemberStatus.memberStatus ===
+                ChatRoomMemberStatus.KICKED ||
+              responseChatRoomMemberStatus.memberStatus ===
+                ChatRoomMemberStatus.BANNED
+            ) {
+              navigate('/app/chat/rooms/me');
+            }
+            window.location.reload();
+          } else if (
+            responseChatRoomMemberStatus.memberStatus ===
+            ChatRoomMemberStatus.ADMIN
+          ) {
+            window.location.reload();
+          }
+          fetchData().catch((err) => console.log(err));
+        }
+      );
+
+      return () => {
+        socket.emit('leave_room_member', chatRoomId);
+        socket.off('changeChatRoomMemberStatusSocket', fetchData);
+      };
+    }, []);
+
     return (
-      <C.List spacing={3}>
-        {chatMembers.map((member) => (
-          <ChatRoomMemberListItem
-            key={member.user.id}
-            member={member}
-            chatLoginUser={chatLoginUser}
-            changeChatRoomMemberStatus={changeChatRoomMemberStatus}
-          />
-        ))}
-      </C.List>
+      <>
+        <C.List spacing={3}>
+          {chatMembers.map((member) => (
+            <ChatRoomMemberListItem
+              key={member.user.id}
+              member={member}
+              chatLoginUser={chatLoginUser}
+              chatRoomId={chatRoomId}
+              socket={socket}
+            />
+          ))}
+        </C.List>
+      </>
     );
   }
 );
 
 // ChatRoomMemberListItem
 const ChatRoomMemberListItem: React.FC<{
+  chatRoomId: string;
   member: ResponseChatRoomMember;
   chatLoginUser: ResponseChatRoomMember;
-  changeChatRoomMemberStatus: (
-    memberId: string,
-    memberStatus: ChatRoomMemberStatus,
-    chatLoginUser: ResponseChatRoomMember
-  ) => void;
-}> = React.memo(({ member, chatLoginUser, changeChatRoomMemberStatus }) => {
+  socket: SocketIOClient.Socket;
+}> = ({ chatRoomId, member, chatLoginUser, socket }) => {
   return (
     <C.ListItem key={member.user.id}>
       <C.Flex>
@@ -56,78 +105,20 @@ const ChatRoomMemberListItem: React.FC<{
         ></UserAvatar>
         <C.Text ml={10}>{member.user.nickname}</C.Text>
         <C.Spacer />
-        <C.Flex>
-          <C.Text mr={5}>{member.memberStatus}</C.Text>
-          {chatLoginUser?.user.id === member.user.id && (
-            <C.Flex>
-              <C.Text mr={5}>me</C.Text>
-            </C.Flex>
-          )}
-          {/* userがLoginUserでない、かつ、(LoginUserがADMIN または MODERATOR) かつ、userがNORMALのとき */}
-          {chatLoginUser !== undefined &&
-            chatLoginUser.user.id !== member.user.id &&
-            member.memberStatus === ChatRoomMemberStatus.NORMAL &&
-            (chatLoginUser.memberStatus === ChatRoomMemberStatus.MODERATOR ||
-              chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN) && (
-              <C.Flex>
-                <ChangeChatRoomMemberStatusButtons
-                  userId={member.user.id}
-                  memberStatus={chatLoginUser.memberStatus}
-                  chatLoginUser={chatLoginUser}
-                  changeChatRoomMemberStatus={changeChatRoomMemberStatus}
-                />
-              </C.Flex>
-            )}
-          {/* memberがLoginUserでない、かつ、LoginUserがADMIN かつ、userがNORMALでないとき */}
-          {chatLoginUser !== undefined &&
-            chatLoginUser.user.id !== member.user.id &&
-            chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN &&
-            member.memberStatus !== ChatRoomMemberStatus.ADMIN &&
-            member.memberStatus !== ChatRoomMemberStatus.NORMAL && (
-              <C.Flex>
-                <C.Button
-                  onClick={() =>
-                    changeChatRoomMemberStatus(
-                      member.user.id,
-                      ChatRoomMemberStatus.NORMAL,
-                      chatLoginUser
-                    )
-                  }
-                >
-                  {
-                    changeChatRoomMemberStatusButtonTexts[
-                      member.memberStatus as ChatRoomMemberStatus
-                    ]
-                  }
-                </C.Button>
-              </C.Flex>
-            )}
-          {chatLoginUser !== undefined &&
-            chatLoginUser.user.id !== member.user.id &&
-            chatLoginUser.memberStatus === ChatRoomMemberStatus.MODERATOR &&
-            member.memberStatus !== ChatRoomMemberStatus.MODERATOR &&
-            member.memberStatus !== ChatRoomMemberStatus.ADMIN &&
-            member.memberStatus !== ChatRoomMemberStatus.NORMAL && (
-              <C.Flex>
-                <C.Button
-                  onClick={() =>
-                    changeChatRoomMemberStatus(
-                      member.user.id,
-                      ChatRoomMemberStatus.NORMAL,
-                      chatLoginUser
-                    )
-                  }
-                >
-                  {
-                    changeChatRoomMemberStatusButtonTexts[
-                      member.memberStatus as ChatRoomMemberStatus
-                    ]
-                  }
-                </C.Button>
-              </C.Flex>
-            )}
-        </C.Flex>
+        <C.Text mr={5}>{member.memberStatus}</C.Text>
+        {chatLoginUser.user.id === member.user.id && (
+          <C.Flex>
+            <C.Text mr={5}>me</C.Text>
+          </C.Flex>
+        )}
+        <ChangeChatRoomMemberStatusButtons
+          chatRoomId={chatRoomId}
+          memberId={member.user.id}
+          memberStatus={member.memberStatus}
+          chatLoginUser={chatLoginUser}
+          socket={socket}
+        />
       </C.Flex>
     </C.ListItem>
   );
-});
+};

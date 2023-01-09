@@ -55,8 +55,12 @@ export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
             <Text
               fontSize="2xl"
               fontWeight="bold"
+              data-test={'profile-win-rate'}
             >{`${gameStats.winRate}%`}</Text>
-            <Text fontSize="sm">{`${gameStats.totalWins}/${gameStats.totalMatches}`}</Text>
+            <Text
+              fontSize="sm"
+              data-test={'profile-total-matches'}
+            >{`${gameStats.totalWins}/${gameStats.totalMatches}`}</Text>
           </CircularProgressLabel>
         </CircularProgress>
       </Flex>

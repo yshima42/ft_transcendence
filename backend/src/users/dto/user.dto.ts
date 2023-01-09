@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { OnlineStatus } from '@prisma/client';
-import { IsDate, IsEnum, IsString, IsUUID } from 'class-validator';
+import { IsDate, IsEnum, IsString, IsUUID, Length } from 'class-validator';
 
 export class UserDto {
   @IsUUID()
@@ -14,6 +14,7 @@ export class UserDto {
   updatedAt?: Date;
 
   @IsString()
+  @Length(1, 50)
   @ApiProperty({ default: 'dummy1' })
   name?: string;
 

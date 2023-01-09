@@ -6,7 +6,6 @@ import {
   ChatRoomStatus,
   ChatRoomMember,
 } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
 import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -22,18 +21,20 @@ export class ChatRoomMemberService {
     private readonly chatRoomService: ChatRoomService
   ) {}
 
+  private readonly logger = new Logger('ChatRoomMemberService');
+  private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
+
   async create(
     chatRoomId: string,
     createChatRoomMemberDto: CreateChatRoomMemberDto,
     chatLoginUserId: string
   ): Promise<ChatRoomMember> {
-    Logger.debug(
-      `chat-room-member.service create chatRoomId=${chatRoomId} createChatRoomMemberDto=${JSON.stringify(
+    this.logger.debug(
+      `create: ${this.json({
+        chatRoomId,
         createChatRoomMemberDto,
-        null,
-        2
-      )}
-      chatLoginUserId=${chatLoginUserId}`
+        chatLoginUserId,
+      })}`
     );
     const enteredPassword = createChatRoomMemberDto.chatRoomPassword;
     // chatRoomのステータスを取得
@@ -57,39 +58,48 @@ export class ChatRoomMemberService {
         chatRoom.password
       );
       if (!isPasswordMatch) {
-        NestJs.Logger.warn(
-          `chat-room-member.service create password is incorrect
-          chatRoomId=${chatRoomId}
-          chatRoomPassword=${enteredPassword}
-          chatRoom.password=${chatRoom.password}`
+        this.logger.warn(
+          `create: ${this.json({
+            chatRoomId,
+            createChatRoomMemberDto,
+            chatLoginUserId,
+          })}`
         );
+
         throw new NestJs.HttpException(
           'Password is incorrect',
           NestJs.HttpStatus.UNAUTHORIZED
         );
       }
     }
-    try {
-      const res = await this.prisma.chatRoomMember.create({
-        data: {
+    // すでにメンバーの場合はそのまま返す
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
           chatRoomId,
           userId: chatLoginUserId,
-          memberStatus: ChatRoomMemberStatus.NORMAL,
         },
-      });
-
-      return res;
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          throw new NestJs.HttpException(
-            'ChatRoomMember already exists',
-            NestJs.HttpStatus.CONFLICT
-          );
-        }
+      },
+    });
+    if (chatRoomMember !== null) {
+      // Banされている場合はエラー
+      if (chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED) {
+        throw new NestJs.HttpException(
+          'You are banned',
+          NestJs.HttpStatus.UNAUTHORIZED
+        );
       }
-      throw e;
+
+      return chatRoomMember;
     }
+
+    return await this.prisma.chatRoomMember.create({
+      data: {
+        chatRoomId,
+        userId: chatLoginUserId,
+        memberStatus: ChatRoomMemberStatus.NORMAL,
+      },
+    });
   }
 
   async findAll(chatRoomId: string): Promise<ResponseChatRoomMember[]> {
@@ -117,11 +127,13 @@ export class ChatRoomMemberService {
     chatRoomId: string,
     ChatLoginUserId: string
   ): Promise<ResponseChatRoomMember> {
-    Logger.debug(
-      `findOne
-      chatRoomId=${chatRoomId}
-      ChatLoginUserId=${ChatLoginUserId}`
+    this.logger.debug(
+      `findOne: ${this.json({
+        chatRoomId,
+        ChatLoginUserId,
+      })}`
     );
+
     const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
       where: {
         chatRoomId_userId: {
@@ -140,6 +152,7 @@ export class ChatRoomMemberService {
         memberStatus: true,
       },
     });
+    // TODO: WebSocketでのエラーも考慮するとここでHttpのエラーを投げるべきか検討する必要あり。
     if (chatRoomMember === null) {
       throw new NestJs.HttpException(
         'ChatRoomMember not found',
@@ -151,17 +164,17 @@ export class ChatRoomMemberService {
   }
 
   async update(
-    chatRoomId: string,
-    memberId: string,
     updateChatRoomMemberDto: UpdateChatRoomMemberDto,
     chatLoginUserId: string
   ): Promise<ChatRoomMember> {
-    Logger.debug(`chat-room-member.service.ts update
-    chatRoomId=${chatRoomId}
-    memberId=${memberId}
-    updateChatRoomMemberDto=${JSON.stringify(updateChatRoomMemberDto)}
-    chatLoginUserId=${chatLoginUserId}`);
-    const { memberStatus, limitTime } = updateChatRoomMemberDto;
+    this.logger.debug(
+      `update: ${this.json({
+        updateChatRoomMemberDto,
+        chatLoginUserId,
+      })}`
+    );
+    const { chatRoomId, memberId, memberStatus, limitTime } =
+      updateChatRoomMemberDto;
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomMember = await this.findOne(chatRoomId, chatLoginUserId);
     // ADMIN -> すべての変更を許可
@@ -217,16 +230,13 @@ export class ChatRoomMemberService {
       }
 
       default: {
-        Logger.debug(
-          `chat-room-member.service.ts update default
-          chatRoomId=${chatRoomId}
-          memberId=${memberId}
-          updateChatRoomMemberDto=${JSON.stringify(
-            updateChatRoomMemberDto,
-            null,
-            2
-          )}
-          chatLoginUserId=${chatLoginUserId}`
+        this.logger.debug(
+          `update: ${this.json({
+            chatRoomId,
+            memberId,
+            memberStatus,
+            limitTime,
+          })}`
         );
 
         let limitDate: Date | null = null;
@@ -257,18 +267,10 @@ export class ChatRoomMemberService {
             statusUntil: limitDate,
           },
         });
-
-        Logger.debug(
-          `chat-room-member.service.ts update default res
-          chatRoomId=${chatRoomId}
-          memberId=${memberId}
-          updateChatRoomMemberDto=${JSON.stringify(
-            updateChatRoomMemberDto,
-            null,
-            2
-          )}
-          chatLoginUserId=${chatLoginUserId}
-          res=${JSON.stringify(res, null, 2)}`
+        this.logger.debug(
+          `update: ${this.json({
+            res,
+          })}`
         );
 
         return res;
@@ -277,7 +279,12 @@ export class ChatRoomMemberService {
   }
 
   async remove(chatRoomId: string, memberId: string): Promise<ChatRoomMember> {
-    Logger.debug(`remove chatRoomId: ${chatRoomId}, memberId: ${memberId}`);
+    this.logger.debug(
+      `remove: ${this.json({
+        chatRoomId,
+        memberId,
+      })}`
+    );
     const chatRoomMember = await this.findOne(chatRoomId, memberId);
     // ADMINは退出できない
     if (chatRoomMember.memberStatus === ChatRoomMemberStatus.ADMIN) {
@@ -297,7 +304,11 @@ export class ChatRoomMemberService {
         },
       });
     } catch (e) {
-      Logger.warn(e);
+      this.logger.error(
+        `remove: ${this.json({
+          e,
+        })}`
+      );
       throw new NestJs.HttpException(
         'ChatRoomMember not found',
         NestJs.HttpStatus.NOT_FOUND
@@ -308,7 +319,7 @@ export class ChatRoomMemberService {
   // 1分ごとに時限性のあるステータスをチェックする
   @Schedule.Cron('0 * * * * *')
   handleCron(): void {
-    Logger.debug(`chat-room-member.service.ts handleCron`);
+    this.logger.debug(`handleCron`);
     this.prisma.chatRoomMember
       .findMany({
         where: {
@@ -333,19 +344,19 @@ export class ChatRoomMemberService {
               },
             })
             .finally(() => {
-              Logger.debug(
-                `handleCron
-                  chatRoomId=${chatRoomMember.chatRoomId}
-                  userId=${chatRoomMember.userId}`
+              this.logger.debug(
+                `handleCron: ${this.json({
+                  chatRoomMember,
+                })}`
               );
             })
-            .catch((e) => {
-              Logger.warn(e);
+            .catch((e: Error) => {
+              this.logger.error(`handleCron: ${this.json({ e })}`);
             });
         });
       })
-      .catch((e) => {
-        Logger.warn(e);
+      .catch((e: Error) => {
+        this.logger.error(`handleCron: ${this.json({ e })}`);
       });
   }
 }

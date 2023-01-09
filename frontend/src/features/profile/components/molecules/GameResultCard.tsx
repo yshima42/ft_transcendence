@@ -5,6 +5,7 @@ import { AvatarWithNickname } from './AvatarWithNickname';
 import { ScoreAndDate } from './ScoreAndDate';
 
 type Props = {
+  matchId: string;
   playerOne: User;
   playerTwo: User;
   score: string;
@@ -13,7 +14,7 @@ type Props = {
 };
 
 export const GameResultCard: FC<Props> = memo((props) => {
-  const { playerOne, playerTwo, score, createdAt, win } = props;
+  const { matchId, playerOne, playerTwo, score, createdAt, win } = props;
 
   // TODO:spinnerつける？使うフックを変更し、一時的にspinner表示を削除した
   return (
@@ -33,7 +34,9 @@ export const GameResultCard: FC<Props> = memo((props) => {
           />
           <Box w="50px">
             <Center>
-              <Text as="b">{win ? 'Win!!' : 'Lose...'}</Text>
+              <Text as="b" data-test={'profile-match-result-' + matchId}>
+                {win ? 'Win!!' : 'Lose...'}
+              </Text>
             </Center>
           </Box>
         </HStack>
