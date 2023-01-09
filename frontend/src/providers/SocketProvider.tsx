@@ -40,8 +40,8 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isConnected, setConnected] = useState(false);
   const didLogRef = useRef(false);
   const navigate = useNavigate();
-  const [invitationGameRoomId, setInvitationGameRoomId] = useState('');
   const [challengerId, setChallengerId] = useState('');
+  const [ballSpeed, setBallSpeed] = useState(0);
 
   useEffect(() => {
     socket.on('connect_established', () => {
@@ -93,12 +93,16 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
     socket.on(
       'receive_invitation',
-      (message: { roomId: string; challengerId: string }) => {
+      (message: { challengerId: string; ballSpeed: number }) => {
         setChallengerId(message.challengerId);
+        setBallSpeed(message.ballSpeed);
         onOpen();
-        setInvitationGameRoomId(message.roomId);
       }
     );
+
+    socket.on('player1_cancel_invitation', () => {
+      onClose();
+    });
 
     return () => {
       socket.off('connect_established');
@@ -107,6 +111,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       socket.off('set_game_room_id');
       socket.off('delete_game_room_id');
       socket.off('receive_invitation');
+      socket.off('player1_cancel_invitation');
     };
   }, [socket]);
 
@@ -117,13 +122,18 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const onClickAccept = () => {
     onClose();
-    socket.emit('accept_invitation', { roomId: invitationGameRoomId });
-    navigate(`/app/games/${invitationGameRoomId}`);
+    socket.emit(
+      'accept_invitation',
+      { challengerId, ballSpeed },
+      (message: { roomId: string }) => {
+        navigate(`/app/games/${message.roomId}`);
+      }
+    );
   };
 
   const onClickDecline = () => {
     onClose();
-    socket.emit('decline_invitation', { roomId: invitationGameRoomId });
+    socket.emit('decline_invitation', { challengerId });
   };
 
   return (
