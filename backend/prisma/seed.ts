@@ -162,7 +162,7 @@ for (let i = 2; i < 30; i++) {
  * dummy1がdummy2~29をBlockする。
  */
 const blockData: Block[] = [];
-for (let i = 2; i < 30; i++) {
+for (let i = 20; i < 30; i++) {
   const sourceId = idMap.get('dummy1');
   const targetId = idMap.get('dummy' + i.toString());
   if (
@@ -233,6 +233,26 @@ for (let i = 0; i < 1; i++) {
       chatRoomId,
       senderId,
       createdAt: new Date(),
+    });
+  }
+}
+
+// chatMessage
+const chatMessage2: ChatMessage[] = [];
+for (let i = 0; i < 10000; i++) {
+  const id = uuidv4();
+  const content = i + 'a'.repeat(255);
+  const chatRoomId = chatRooms[1].id;
+  const senderId = idMap.get('dummy1');
+  const now = new Date();
+  const createdAt = new Date(now.getTime() + i);
+  if (senderId !== undefined) {
+    chatMessage2.push({
+      id,
+      content,
+      chatRoomId,
+      senderId,
+      createdAt,
     });
   }
 }
@@ -366,6 +386,9 @@ const main = async () => {
   await prisma.chatMessage.createMany({
     data: chatMessages,
   });
+  // await prisma.chatMessage.createMany({
+  //   data: chatMessage2,
+  // });
   // await prisma.dmRoom.createMany({
   //   data: dmRooms,
   // });

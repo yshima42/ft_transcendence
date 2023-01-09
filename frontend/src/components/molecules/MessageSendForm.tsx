@@ -1,12 +1,20 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import * as SocketIOClient from 'socket.io-client';
 
 type Props = {
-  sendMessage: (content: string) => void;
+  roomId: string;
+  socket: SocketIOClient.Socket;
 };
 
-export const MessageSendForm: React.FC<Props> = ({ sendMessage }) => {
+export const MessageSendForm: React.FC<Props> = ({ roomId, socket }) => {
   const [content, setContent] = React.useState('');
+  function sendMessage(content: string): void {
+    socket.emit('send_message', {
+      roomId,
+      content,
+    });
+  }
 
   return (
     <form
