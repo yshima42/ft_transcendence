@@ -24,6 +24,7 @@ export const RequestableUsersList: FC = () => {
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}
           buttons={<RequestButton targetId={user.id} />}
+          isFriend={false}
         />
       ))}
     </Grid>

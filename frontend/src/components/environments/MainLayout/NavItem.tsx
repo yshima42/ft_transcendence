@@ -23,6 +23,7 @@ export const NavItem: FC<Props> = memo((props) => {
             <MenuButton
               w="100%"
               _hover={{ textDecor: 'none', backgroundColor: '#AEC8CA' }}
+              data-test={'sidenav-' + title.toLowerCase()}
             >
               <Flex>
                 <Icon as={icon} fontSize="xl" color={'gray.700'} />

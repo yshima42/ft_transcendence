@@ -1,6 +1,8 @@
 import { memo, FC } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
 import { User } from '@prisma/client';
+import { useIsFriend } from 'hooks/api';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
 import { UserInfoCardButtons } from '../molecules/UserInfoCardButtons';
 
@@ -11,6 +13,7 @@ type Props = {
 
 export const UserInfoCard: FC<Props> = memo((props) => {
   const { user, isLoginUser } = props;
+  const { isFriend } = useIsFriend(user.id);
 
   return (
     <Flex
@@ -24,13 +27,22 @@ export const UserInfoCard: FC<Props> = memo((props) => {
       direction="column"
       align="center"
     >
-      <UserAvatar
-        id={user.id}
-        name={user.nickname}
-        size="2xl"
-        src={user.avatarImageUrl}
-      />
-      <Text fontSize="md" fontWeight="bold" pt="2">
+      {isFriend || isLoginUser ? (
+        <UserAvatar
+          id={user.id}
+          size="2xl"
+          src={user.avatarImageUrl}
+          data-test="profile-user-avatar"
+        />
+      ) : (
+        <LinkedAvatar id={user.id} size="2xl" src={user.avatarImageUrl} />
+      )}
+      <Text
+        fontSize="md"
+        fontWeight="bold"
+        pt="2"
+        data-test={'profile-nickname'}
+      >
         {user.nickname}
       </Text>
       <Text fontSize="xs" color="gray">
