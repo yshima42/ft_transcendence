@@ -1,8 +1,14 @@
 import { FC, memo } from 'react';
 import { Button, useDisclosure } from '@chakra-ui/react';
+import { User } from '@prisma/client';
 import { ProfileEditModal } from '../organisms/ProfileEditModal';
 
-export const ProfileEditButton: FC = memo(() => {
+type Props = {
+  user: User;
+};
+
+export const ProfileEditButton: FC<Props> = memo((props) => {
+  const { user } = props;
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -16,7 +22,7 @@ export const ProfileEditButton: FC = memo(() => {
       >
         Edit
       </Button>
-      <ProfileEditModal isOpen={isOpen} onClose={onClose} />
+      <ProfileEditModal user={user} isOpen={isOpen} onClose={onClose} />
     </>
   );
 });

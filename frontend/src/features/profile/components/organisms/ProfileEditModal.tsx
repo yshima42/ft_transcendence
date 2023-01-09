@@ -17,22 +17,22 @@ import {
   FormLabel,
   Input,
 } from '@chakra-ui/react';
+import { User } from '@prisma/client';
 import {
   AvatarFormData,
   ProfileFormData,
   useAvatarUpload,
-  useProfile,
   useProfileEdit,
 } from 'hooks/api';
 
 type Props = {
+  user: User;
   isOpen: boolean;
   onClose: () => void;
 };
 
 export const ProfileEditModal: FC<Props> = memo((props) => {
-  const { isOpen, onClose } = props;
-  const { user } = useProfile();
+  const { user, isOpen, onClose } = props;
   const { editProfile, isLoading: isLoading1 } = useProfileEdit();
   const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
   const [profileFormData, setProfileFormData] = useState<ProfileFormData>();
