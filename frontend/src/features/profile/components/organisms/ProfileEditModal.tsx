@@ -125,6 +125,8 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     Nickname
                   </FormLabel>
                   <Input
+                    type="text"
+                    maxLength={50}
                     id="nickname"
                     name="nickname"
                     onChange={onProfileChange}

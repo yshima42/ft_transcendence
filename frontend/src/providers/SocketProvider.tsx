@@ -30,7 +30,7 @@ export const SocketContext = createContext<
 >(undefined);
 
 const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
-  const socket = useSocket(WS_BASE_URL, { autoConnect: false });
+  const socket = useSocket(WS_BASE_URL);
   const [userIdToPresenceMap, setUserIdToPresenceMap] = useState(
     new Map<string, Presence>()
   );

@@ -59,6 +59,7 @@ describe('ChatRoomMemberService', () => {
     }
     const createChatRoomDto: CreateChatRoomDto = {
       name: `test ${uuidv4()}`,
+      roomStatus: T.ChatRoomStatus.PUBLIC,
     };
     const testChatRoom = await chatRoomService.create(
       createChatRoomDto,
@@ -68,6 +69,7 @@ describe('ChatRoomMemberService', () => {
     // create a chat room protected by password
     const createChatRoomDto2: CreateChatRoomDto = {
       name: `test protected ${uuidv4()}`,
+      roomStatus: T.ChatRoomStatus.PROTECTED,
       password: 'password',
     };
     const testChatRoomProtected = await chatRoomService.create(
@@ -221,9 +223,11 @@ describe('ChatRoomMemberService', () => {
     // 一般ユーザーが一般ユーザーを更新できない
     await expect(async () => {
       await chatRoomMemberService.update(
-        chatRoomPublic.id,
-        chatRoomPublicNormal1.userId,
-        { memberStatus: T.ChatRoomMemberStatus.MODERATOR },
+        {
+          chatRoomId: chatRoomPublic.id,
+          memberId: chatRoomPublicNormal1.userId,
+          memberStatus: T.ChatRoomMemberStatus.MODERATOR,
+        },
         chatRoomPublicNormal2.userId
       );
     }).rejects.toThrow(
@@ -232,9 +236,11 @@ describe('ChatRoomMemberService', () => {
     // モデレーターがADMINに更新できない
     await expect(async () => {
       await chatRoomMemberService.update(
-        chatRoomPublic.id,
-        chatRoomPublicAdmin.userId,
-        { memberStatus: T.ChatRoomMemberStatus.ADMIN },
+        {
+          chatRoomId: chatRoomPublic.id,
+          memberId: chatRoomPublicAdmin.userId,
+          memberStatus: T.ChatRoomMemberStatus.ADMIN,
+        },
         chatRoomPublicModerator.userId
       );
     }).rejects.toThrow(
@@ -243,9 +249,11 @@ describe('ChatRoomMemberService', () => {
     // モデレーターがMODERATORに更新できない
     await expect(async () => {
       await chatRoomMemberService.update(
-        chatRoomPublic.id,
-        chatRoomPublicModerator.userId,
-        { memberStatus: T.ChatRoomMemberStatus.MODERATOR },
+        {
+          chatRoomId: chatRoomPublic.id,
+          memberId: chatRoomPublicModerator.userId,
+          memberStatus: T.ChatRoomMemberStatus.MODERATOR,
+        },
         chatRoomPublicModerator.userId
       );
     }).rejects.toThrow(

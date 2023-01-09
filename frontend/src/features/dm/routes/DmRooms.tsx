@@ -12,13 +12,19 @@ export const DmRooms: React.FC = React.memo(() => {
       <ContentLayout title="Direct Message">
         <C.List spacing={3}>
           {dmRooms.length === 0 && (
-            <C.ListItem>
+            <C.Center h="50vh">
               <C.Text>DmRoom is not found</C.Text>
-            </C.ListItem>
+            </C.Center>
           )}
           {dmRooms.map((dmRoom) => (
             <C.ListItem key={dmRoom.id}>
-              <Link to={`${dmRoom.id}`} state={{ dmRoomId: dmRoom.id }}>
+              <Link
+                to={`${dmRoom.id}`}
+                state={{
+                  dmRoomId: dmRoom.id,
+                  memberId: dmRoom.dmRoomMembers[0].user.id,
+                }}
+              >
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
                     <C.Box>

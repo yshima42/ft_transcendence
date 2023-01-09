@@ -1,34 +1,42 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { useProfile } from 'hooks/api';
-import { useSavedDms } from 'hooks/api/dm/useSavedDms';
+import * as ReactQuery from '@tanstack/react-query';
+import { ResponseDm } from 'features/dm/types/dm';
+import { useBlockRelation } from 'hooks/api/block/useBlockRelation';
+import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { useSocket } from 'hooks/socket/useSocket';
 import { useLocation } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+import { Message } from 'components/molecules/Message';
 import { MessageSendForm } from 'components/molecules/MessageSendForm';
-import { DmMessages } from '../components/DmMessages';
-import { ResponseDm } from '../types/dm';
 
 type State = {
   dmRoomId: string;
+  memberId: string;
 };
 
 export const DmRoom: React.FC = React.memo(() => {
-  const { user } = useProfile();
   const location = useLocation();
-  const { dmRoomId } = location.state as State;
-  const { savedDms } = useSavedDms(dmRoomId);
-  const [messages, setMessages] = React.useState<ResponseDm[]>(savedDms);
-  const socket = useSocket(import.meta.env.VITE_WS_DM_URL, {
-    autoConnect: false,
-  });
+  const { dmRoomId, memberId } = location.state as State;
+  const { isUserBlocked: isBlocked } = useBlockRelation(memberId);
+  const scrollBottomRef = React.useRef<HTMLDivElement>(null);
+  const socket = useSocket(import.meta.env.VITE_WS_DM_URL);
+  const endpoint = `/dm/rooms/${dmRoomId}/messages`;
+  const { data: messages } = useGetApiOmitUndefined<ResponseDm[]>(endpoint);
+  const queryClient = ReactQuery.useQueryClient();
 
   React.useEffect(() => {
     socket.emit('join_dm_room', dmRoomId);
-    socket.on('receive_message', (payload: ResponseDm) => {
-      setMessages((prev) => {
-        return [...prev, payload];
-      });
+    socket.on('receive_message', (message: ResponseDm) => {
+      const queryKey = [endpoint];
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: ResponseDm[] | undefined) => {
+          if (oldData == null) return [message];
+
+          return [...oldData, message];
+        }
+      );
     });
 
     return () => {
@@ -36,23 +44,45 @@ export const DmRoom: React.FC = React.memo(() => {
       socket.emit('leave_dm_room', dmRoomId);
     };
   }, [dmRoomId, socket]);
-
-  // 送信ボタンを押したときの処理
-  function sendMessage(content: string): void {
-    socket.emit('send_message', {
-      content,
-      senderId: user.id,
-      dmRoomId,
-    });
-  }
+  // 更新時の自動スクロール
+  React.useEffect(() => {
+    scrollBottomRef.current?.scrollIntoView();
+  }, [messages]);
 
   return (
     <>
       <ContentLayout title="Direct Message">
         <C.Divider />
-        <DmMessages messages={messages} />
-        <C.Divider />
-        <MessageSendForm sendMessage={sendMessage} />
+        {isBlocked ? (
+          <C.Center h="50vh">
+            <C.Text>This user is blocked</C.Text>
+          </C.Center>
+        ) : (
+          <>
+            <C.Flex
+              flexDir="column"
+              alignItems="flex-start"
+              padding={4}
+              overflowY="auto"
+              overflowX="hidden"
+              height="70vh"
+            >
+              {messages.map((message) => (
+                <Message
+                  key={message.id}
+                  id={message.id}
+                  content={message.content}
+                  createdAt={message.createdAt}
+                  name={message.sender.name}
+                  avatarImageUrl={message.sender.avatarImageUrl}
+                />
+              ))}
+              <div ref={scrollBottomRef} />
+            </C.Flex>
+            <C.Divider />
+            <MessageSendForm roomId={dmRoomId} socket={socket} />
+          </>
+        )}
       </ContentLayout>
     </>
   );

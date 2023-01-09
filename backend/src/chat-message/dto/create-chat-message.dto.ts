@@ -1,8 +1,12 @@
-import * as ClassValidator from 'class-validator';
+import * as CV from 'class-validator';
 
 export class CreateChatMessageDto {
-  @ClassValidator.IsNotEmpty()
-  @ClassValidator.IsString()
-  @ClassValidator.Length(1, 255)
+  @CV.IsNotEmpty()
+  @CV.IsUUID()
+  roomId!: string;
+
+  @CV.IsNotEmpty()
+  @CV.IsString()
+  @CV.Length(1, 255)
   content!: string;
 }

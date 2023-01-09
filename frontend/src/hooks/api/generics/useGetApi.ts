@@ -3,7 +3,7 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { axios } from '../../../lib/axios';
+import { axios } from 'lib/axios';
 
 // 使う際は、このhooks自体を<Suspense> で囲むこと。
 // エラーをキャッチしたい場合は、<ErrorBoundary> で囲むこと。
