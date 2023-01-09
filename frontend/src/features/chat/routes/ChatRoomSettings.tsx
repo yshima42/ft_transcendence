@@ -101,7 +101,7 @@ const CustomAccordion: React.FC<{
 }> = React.memo(({ title, children }) => {
   return (
     <C.AccordionItem>
-      <C.AccordionButton>
+      <C.AccordionButton data-test={`${title}-accordion-button`}>
         <C.Box flex="1" textAlign="left">
           {title}
         </C.Box>
@@ -123,7 +123,11 @@ const LeaveButton: React.FC<{
     <>
       {chatLoginUser !== undefined &&
         (chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN ? (
-          <C.Button colorScheme="red" onClick={exitChatRoom}>
+          <C.Button
+            colorScheme="red"
+            onClick={exitChatRoom}
+            data-test="chat-room-exit-button"
+          >
             Exit
           </C.Button>
         ) : (

@@ -34,8 +34,9 @@ export const Message: React.FC<Props> = ({
         name={name}
         src={avatarImageUrl}
         marginRight={2}
+        dataTest="message-avatar"
       />
-      <C.Text>{content}</C.Text>
+      <C.Text data-test={`message-${content}`}>{content}</C.Text>
     </C.Box>
   );
 };

@@ -74,6 +74,7 @@ export const SecurityAccordionItem: React.FC<Props> = React.memo(
                       message: 'password is at most 128 characters',
                     },
                   })}
+                  data-test="input-chat-room-password"
                 />
                 <C.Input
                   type="hidden"
@@ -88,7 +89,12 @@ export const SecurityAccordionItem: React.FC<Props> = React.memo(
                 {errors.password != null && (
                   <C.Text color="red.500">{errors.password.message}</C.Text>
                 )}
-                <C.Button type="submit" colorScheme="blue" mr={5}>
+                <C.Button
+                  type="submit"
+                  colorScheme="blue"
+                  mr={5}
+                  data-test="lock-button"
+                >
                   Lock
                 </C.Button>
               </form>

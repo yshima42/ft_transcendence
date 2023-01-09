@@ -15,6 +15,7 @@ export const MessageSendForm: React.FC<Props> = ({ sendMessage }) => {
         sendMessage(content);
         setContent('');
       }}
+      data-test="message-form"
     >
       <C.Input
         type="text"
@@ -27,7 +28,9 @@ export const MessageSendForm: React.FC<Props> = ({ sendMessage }) => {
         maxLength={255}
         minLength={1}
       />
-      <C.Button type="submit">Send</C.Button>
+      <C.Button type="submit" data-test="send-button">
+        Send
+      </C.Button>
     </form>
   );
 };

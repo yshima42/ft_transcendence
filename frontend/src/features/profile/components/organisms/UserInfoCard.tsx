@@ -33,7 +33,7 @@ export const UserInfoCard: FC<Props> = memo((props) => {
       <Text fontSize="md" fontWeight="bold" pt="2">
         {user.nickname}
       </Text>
-      <Text fontSize="xs" color="gray">
+      <Text fontSize="xs" color="gray" data-test="user-name">
         {user.name}
       </Text>
       <UserInfoCardButtons user={user} isLoginUser={isLoginUser} />

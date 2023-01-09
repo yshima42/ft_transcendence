@@ -86,6 +86,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
                       message: 'password must be at most 128 characters.',
                     },
                   })}
+                  data-test="input-chat-room-password"
                 />
               </>
             )}
@@ -97,6 +98,7 @@ export const ChatRoomConfirmation: React.FC = React.memo(() => {
               colorScheme="teal"
               mt={4}
               isDisabled={isSubmitting}
+              data-test="chat-room-join-button"
             >
               Join
             </C.Button>

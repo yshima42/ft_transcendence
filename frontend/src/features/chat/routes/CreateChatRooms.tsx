@@ -64,6 +64,7 @@ export const CreateChatRooms: React.FC = React.memo(() => {
                 placeholder="Password"
                 {...register('password')}
                 type="password"
+                data-test="input-chat-room-password"
               />
               <C.FormErrorMessage>
                 {errors.password?.message}
