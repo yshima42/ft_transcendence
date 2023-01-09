@@ -44,6 +44,7 @@ export const useGameInvitation = (): {
 
     return () => {
       socket.off('go_game_room_by_invitation');
+      socket.off('player2_decline_invitation');
     };
   }, [socket, inviteState, navigate]);
 
