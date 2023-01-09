@@ -162,7 +162,7 @@ for (let i = 2; i < 30; i++) {
  * dummy1がdummy2~29をBlockする。
  */
 const blockData: Block[] = [];
-for (let i = 2; i < 30; i++) {
+for (let i = 3; i < 30; i++) {
   const sourceId = idMap.get('dummy1');
   const targetId = idMap.get('dummy' + i.toString());
   if (
@@ -180,7 +180,7 @@ for (let i = 2; i < 30; i++) {
 const chatRooms: ChatRoom[] = [];
 for (let i = 0; i < 10; i++) {
   const id = uuidv4();
-  const name = 'DmRoom' + id;
+  const name = 'ChatRoom-' + id;
   const roomStatus = 'PUBLIC' as ChatRoomStatus;
   chatRooms.push({
     id,
