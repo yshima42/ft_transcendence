@@ -20,7 +20,7 @@ describe('sidebar spec', () => {
 
   it('watch', () => {
     cy.contains('Watch').click();
-    cy.url().should('include', '/games');
+    cy.url().should('include', '/game/rooms');
   });
 
   it('profile', () => {
