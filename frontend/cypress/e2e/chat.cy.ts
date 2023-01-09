@@ -1,4 +1,4 @@
-describe('dm spec', () => {
+describe('chat spec', () => {
   /**
    * dummy1でログイン。
    * passwordなしでチャットルーム新規作成。
