@@ -13,7 +13,7 @@ import {
   MenuItem,
   MenuList,
 } from '@chakra-ui/react';
-import { useLogout } from 'hooks/api';
+import { useLogout, useProfile } from 'hooks/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogoButton } from 'components/atoms/button/LogoButton';
 import { NavigationItem } from 'components/environments/MainLayout/MainLayout';
@@ -24,6 +24,7 @@ type Props = {
 
 export const SpMenu: FC<Props> = memo((props) => {
   const { items } = props;
+  const { user } = useProfile();
   const { logout, isLoading } = useLogout();
 
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export const SpMenu: FC<Props> = memo((props) => {
             </Link>
           ))}
           <MenuDivider />
-          <Link to="/app/profile">
+          <Link to={`/app/users/${user.id}`}>
             <MenuItem icon={<InfoOutlineIcon />}>Profile</MenuItem>
           </Link>
           <MenuItem
