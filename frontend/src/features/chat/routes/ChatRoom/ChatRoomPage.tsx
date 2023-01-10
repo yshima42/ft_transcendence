@@ -139,7 +139,7 @@ const ChatRoomBody: React.FC<{
       socket.emit('leave_room_member', chatRoomId);
       socket.off();
     };
-  }, [chatRoomId, socket]);
+  }, [chatRoomId, socket, blockUsers]);
 
   // 更新時の自動スクロール
   React.useEffect(() => {
