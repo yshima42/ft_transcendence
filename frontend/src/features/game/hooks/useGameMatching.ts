@@ -6,7 +6,6 @@ export enum MatchState {
   SocketConnecting = 0,
   Matching = 1,
   MatchingCancel = 2,
-  Matched = 3,
 }
 
 export const useGameMatching = (): {
@@ -25,7 +24,6 @@ export const useGameMatching = (): {
   useEffect(() => {
     socket.on('go_game_room', (roomId: string) => {
       console.log('[Socket Event] go_game_room');
-      setMatchState(MatchState.Matched);
       navigate(`/app/game/rooms/${roomId}`);
     });
 

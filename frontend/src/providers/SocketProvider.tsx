@@ -6,10 +6,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useDisclosure } from '@chakra-ui/hooks';
 import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
-import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import { InvitationAlert } from './InvitationAlert';
 
@@ -39,9 +37,6 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
   );
   const [isConnected, setConnected] = useState(false);
   const didLogRef = useRef(false);
-  const navigate = useNavigate();
-  const [challengerId, setChallengerId] = useState('');
-  const [ballSpeed, setBallSpeed] = useState(0);
 
   useEffect(() => {
     socket.on('connect_established', () => {
@@ -91,50 +86,14 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
     });
 
-    socket.on(
-      'receive_invitation',
-      (message: { challengerId: string; ballSpeed: number }) => {
-        setChallengerId(message.challengerId);
-        setBallSpeed(message.ballSpeed);
-        onOpen();
-      }
-    );
-
-    socket.on('player1_cancel_invitation', () => {
-      onClose();
-    });
-
     return () => {
       socket.off('connect_established');
       socket.off('set_presence');
       socket.off('delete_presence');
       socket.off('set_game_room_id');
       socket.off('delete_game_room_id');
-      socket.off('receive_invitation');
-      socket.off('player1_cancel_invitation');
     };
   }, [socket]);
-
-  // AlertDialogのleastDestructiveRefでエラーが出てたので以下を参考にエラー対応
-  // (https://github.com/chakra-ui/chakra-ui/discussions/2936)
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef(null);
-
-  const onClickAccept = () => {
-    onClose();
-    socket.emit(
-      'accept_invitation',
-      { challengerId, ballSpeed },
-      (message: { roomId: string }) => {
-        navigate(`/app/game/rooms/${message.roomId}`);
-      }
-    );
-  };
-
-  const onClickDecline = () => {
-    onClose();
-    socket.emit('decline_invitation', { challengerId });
-  };
 
   return (
     <SocketContext.Provider
@@ -146,13 +105,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       }}
     >
       {children}
-      <InvitationAlert
-        isOpen={isOpen}
-        cancelRef={cancelRef}
-        onClickDecline={onClickDecline}
-        onClickAccept={onClickAccept}
-        challengerId={challengerId}
-      />
+      <InvitationAlert socket={socket} isConnected={isConnected} />
     </SocketContext.Provider>
   );
 };

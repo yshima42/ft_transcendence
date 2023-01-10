@@ -7,7 +7,6 @@ export enum InviteState {
   SocketConnecting = 0,
   Inviting = 1,
   InvitingCancel = 2,
-  Matched = 3,
 }
 
 export const useGameInvitation = (
@@ -27,14 +26,13 @@ export const useGameInvitation = (
 
   // socket イベント
   useEffect(() => {
-    socket.on('invitation_error', (message: string) => {
+    socket.on('invitation_room_error', (message: string) => {
       customToast({ description: message });
       navigate('/app');
     });
 
     socket.on('go_game_room_by_invitation', (roomId: string) => {
       console.log('[Socket Event] go_game_room_by_invitation');
-      setInviteState(InviteState.Matched);
       navigate(`/app/game/rooms/${roomId}`);
     });
 
@@ -50,7 +48,7 @@ export const useGameInvitation = (
 
     return () => {
       socket.emit('leave_invitation_room');
-      socket.off('invitation_error');
+      socket.off('invitation_room_error');
       socket.off('go_game_room_by_invitation');
       socket.off('player2_decline_invitation');
     };
@@ -67,7 +65,6 @@ export const useGameInvitation = (
       }
       case InviteState.Inviting: {
         socket.emit('join_invitation_room', { invitationRoomId });
-        // socket.emit('invitation_match', { opponentId, ballSpeed });
         break;
       }
       case InviteState.InvitingCancel: {
@@ -75,7 +72,7 @@ export const useGameInvitation = (
         break;
       }
     }
-  }, [inviteState, socket, navigate, isConnected]);
+  }, [inviteState, socket, navigate, isConnected, invitationRoomId]);
 
   return { inviteState, setInviteState };
 };
