@@ -21,14 +21,16 @@ export type EditProfile = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useProfileEdit = (): Omit<
+export const useProfileEdit = (
+  targetId: string
+): Omit<
   UseMutationResult<ProfileEditResBody, unknown, ProfileFormData, unknown>,
   'mutateAsync'
 > & { editProfile: EditProfile } => {
   const { mutateAsync: editProfile, ...useMutationResult } =
     usePostApiWithErrorToast<ProfileFormData, ProfileEditResBody>(
       `/users/me/profile`,
-      [['/users/me/profile'], ['/game/matches']]
+      [['/users/me/profile'], [`/users/${targetId}/profile`], ['/game/matches']]
     );
 
   return { editProfile, ...useMutationResult };
