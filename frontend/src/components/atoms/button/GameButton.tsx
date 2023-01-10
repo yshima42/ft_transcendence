@@ -78,12 +78,12 @@ export const GameButton: FC<Props> = memo((props) => {
           <ModalCloseButton />
           <ModalBody>
             <Flex align="center" justify="center" height="40vh">
-              <Box bg="white" w="sm" p={4} borderRadius="md" shadow="md">
-                <Heading as="h1" size="lg" textAlign="center">
+              <Box>
+                <Heading as="h1" size="lg" textAlign="center" py={4}>
                   Game Preference
                 </Heading>
                 <Divider />
-                <Heading as="h2" size="md" textAlign="center">
+                <Heading as="h2" size="md" textAlign="center" pt={3}>
                   Ball Speed
                 </Heading>
                 <Center>
