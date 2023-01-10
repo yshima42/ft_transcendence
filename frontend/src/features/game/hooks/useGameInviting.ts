@@ -32,12 +32,12 @@ export const useGameInvitation = (
     });
 
     socket.on('go_game_room_by_invitation', (roomId: string) => {
-      console.log('[Socket Event] go_game_room_by_invitation');
+      // console.log('[Socket Event] go_game_room_by_invitation');
       navigate(`/app/game/rooms/${roomId}`);
     });
 
     socket.on('player2_decline_invitation', () => {
-      console.log('[Socket Event] go_game_room_by_invitation');
+      // console.log('[Socket Event] go_game_room_by_invitation');
       customToast({
         title: 'Declined',
         description: 'Your Invitation was declined',

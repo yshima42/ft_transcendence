@@ -39,11 +39,16 @@ export const UserCard: FC<Props> = memo((props) => {
           </Box>
           <Box>
             <Link to={`/app/users/${id}`}>
-              <Text fontSize="lg" fontWeight="bold">
+              <Text
+                maxWidth="200px"
+                noOfLines={1}
+                fontSize="lg"
+                fontWeight="bold"
+              >
                 {nickname}
               </Text>
             </Link>
-            <Text fontSize="sm" color="gray.500">
+            <Text maxWidth="200px" noOfLines={1} fontSize="sm" color="gray.500">
               {username}
             </Text>
           </Box>
