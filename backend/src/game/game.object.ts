@@ -91,12 +91,14 @@ export class InvitationRoom {
   player1Id: string;
   player2Id: string;
   ballSpeed: number;
+  isAlreadyInvited: boolean;
 
   constructor(player1Id: string, player2Id: string, ballSpeed: number) {
     this.id = uuidv4();
     this.player1Id = player1Id;
     this.player2Id = player2Id;
     this.ballSpeed = ballSpeed;
+    this.isAlreadyInvited = false;
   }
 }
 

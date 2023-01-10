@@ -134,14 +134,10 @@ export class UsersGateway {
       return;
     }
 
-    const player1 = new Player(waitUserId, true);
-    const player2 = new Player(userId, false);
-    const gameRoom = this.createGameRoom(player1, player2, BALL_SPEED);
-
+    const gameRoom = this.createGameRoom(waitUserId, userId, BALL_SPEED);
     // matchingルームで待っているPlayer1に対してのemit
     this.server.to('matching').emit('go_game_room', gameRoom.id);
     this.server.socketsLeave('matching');
-
     // Player2に対してのemit
     socket.emit('go_game_room', gameRoom.id);
   }
@@ -184,67 +180,56 @@ export class UsersGateway {
     const { userId } = socket.data as { userId: string };
     const invitationRoom = this.invitationRooms.get(message.invitationRoomId);
     if (invitationRoom === undefined) {
-      socket.emit('invitation_room_error', 'Invalid invitation.');
+      socket.emit('invitation_room_error', 'Invalid invitation room.');
 
       return;
     }
     socket.data.invitationRoomId = invitationRoom.id;
-    socket.to(userId).emit('invitation_room_error', 'Invitation Canceled.');
+    socket.to(userId).emit('invitation_room_error', 'Invalid invitation room.');
     await socket.join(invitationRoom.id);
+    if (!invitationRoom.isAlreadyInvited) {
+      invitationRoom.isAlreadyInvited = true;
+      this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
+        invitationRoomId: invitationRoom.id,
+        challengerId: userId,
+      });
+    }
   }
 
-  // @SubscribeMessage('invitation_match')
-  // invitationMatch(
-  //   @ConnectedSocket() socket: Socket,
-  //   @MessageBody() message: { opponentId: string; ballSpeed: number }
-  // ): void {
-  //   Logger.debug(
-  //     `${socket.id} ${socket.data.userId as string} invitation_match`
-  //   );
+  @SubscribeMessage('accept_invitation')
+  accept_invitation(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { invitationRoomId: string }
+  ): { roomId: string | undefined } {
+    Logger.debug(
+      `${socket.id} ${socket.data.userId as string} accept_invitation`
+    );
 
-  //   const { userId } = socket.data as { userId: string };
-  //   this.server.to(message.opponentId).emit('receive_invitation', {
-  //     challengerId: userId,
-  //     ballSpeed: message.ballSpeed,
-  //   });
-  // }
+    const invitationRoom = this.invitationRooms.get(message.invitationRoomId);
+    if (invitationRoom === undefined) {
+      return { roomId: undefined };
+    }
 
-  // @SubscribeMessage('accept_invitation')
-  // accept_invitation(
-  //   @ConnectedSocket() socket: Socket,
-  //   @MessageBody() message: { challengerId: string; ballSpeed: number }
-  // ): { roomId: string } {
-  //   Logger.debug(
-  //     `${socket.id} ${socket.data.userId as string} accept_invitation`
-  //   );
-  //   const { userId } = socket.data as { userId: string };
+    const { player1Id, player2Id, ballSpeed } = invitationRoom;
+    const gameRoom = this.createGameRoom(player1Id, player2Id, ballSpeed);
+    this.server
+      .to(invitationRoom.id)
+      .emit('go_game_room_by_invitation', gameRoom.id);
 
-  //   const player1 = new Player(message.challengerId, true);
-  //   const player2 = new Player(userId, false);
-  //   const gameRoom = this.createGameRoom(player1, player2, message.ballSpeed);
+    return { roomId: gameRoom.id };
+  }
 
-  //   if (gameRoom !== undefined) {
-  //     this.server
-  //       .to(gameRoom.player1.id)
-  //       .emit('go_game_room_by_invitation', gameRoom.id);
-  //   }
+  @SubscribeMessage('decline_invitation')
+  decline_invitation(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { invitationRoomId: string }
+  ): void {
+    Logger.debug(
+      `${socket.id} ${socket.data.userId as string} decline_invitation`
+    );
 
-  //   return { roomId: gameRoom.id };
-  // }
-
-  // @SubscribeMessage('decline_invitation')
-  // async decline_invitation(
-  //   @ConnectedSocket() socket: Socket,
-  //   @MessageBody() message: { challengerId: string }
-  // ): Promise<void> {
-  //   Logger.debug(
-  //     `${socket.id} ${socket.data.userId as string} decline_invitation`
-  //   );
-
-  //   this.server.to(message.challengerId).emit('player2_decline_invitation');
-
-  //   await this.leaveGameRoom(socket);
-  // }
+    this.server.to(message.invitationRoomId).emit('player2_decline_invitation');
+  }
 
   @SubscribeMessage('leave_invitation_room')
   async handleLeaveInvitationRoom(
@@ -255,7 +240,6 @@ export class UsersGateway {
     );
 
     await this.leaveInvitationRoom(socket);
-    // this.server.to(message.opponentId).emit('player1_cancel_invitation');
   }
 
   @SubscribeMessage('join_game_room')
@@ -451,34 +435,33 @@ export class UsersGateway {
       .in(invitationRoomId)
       .fetchSockets();
     if (invitationRoomSockets.length === 0) {
-      Logger.error('DDDDDDDelete');
       this.invitationRooms.delete(invitationRoomId);
     }
   }
 
   createGameRoom(
-    player1: Player,
-    player2: Player,
+    player1Id: string,
+    player2Id: string,
     ballSpeed?: number
   ): GameRoom {
     const gameRoom = new GameRoom(
       this.gameService,
       this.server,
       (gameRoom: GameRoom) => this.deleteGameRoom(gameRoom),
-      player1,
-      player2,
+      new Player(player1Id, true),
+      new Player(player2Id, true),
       ballSpeed
     );
     this.gameRooms.set(gameRoom.id, gameRoom);
 
-    this.updatePresence(player1.id, Presence.INGAME);
-    this.addGameRoomId(player1.id, gameRoom.id);
-    this.updatePresence(player2.id, Presence.INGAME);
-    this.addGameRoomId(player2.id, gameRoom.id);
+    this.updatePresence(player1Id, Presence.INGAME);
+    this.addGameRoomId(player1Id, gameRoom.id);
+    this.updatePresence(player2Id, Presence.INGAME);
+    this.addGameRoomId(player2Id, gameRoom.id);
     this.server.to('monitor').emit('game_room_created', {
       roomId: gameRoom.id,
-      player1Id: player1.id,
-      player2Id: player2.id,
+      player1Id,
+      player2Id,
     });
 
     return gameRoom;

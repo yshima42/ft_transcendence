@@ -1,4 +1,4 @@
-import { memo, FC } from 'react';
+import { memo, FC, useRef, useEffect, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogBody,
@@ -7,24 +7,69 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
+import { useNavigate } from 'react-router-dom';
+import { Socket } from 'socket.io-client';
 
 type Props = {
-  isOpen: boolean;
-  cancelRef: React.MutableRefObject<null>;
-  onClickDecline: () => void;
-  onClickAccept: () => void;
-  challengerId: string;
+  socket: Socket;
+  isConnected: boolean;
 };
 
 // このコンポーネントをprovidersに残すか、componentsに入れるか迷ったが、SocketProviderでしか使わないためprovidersに置いておく
 export const InvitationAlert: FC<Props> = memo((props) => {
-  const { isOpen, cancelRef, onClickDecline, onClickAccept, challengerId } =
-    props;
-  const { user: challenger } = useProfile(
-    challengerId === '' ? 'me' : challengerId
-  );
+  const { socket, isConnected } = props;
+
+  // AlertDialogのleastDestructiveRefでエラーが出てたので以下を参考にエラー対応
+  // (https://github.com/chakra-ui/chakra-ui/discussions/2936)
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+  const { customToast } = useCustomToast();
+  const [invitationRoomId, setInvitationRoomId] = useState('');
+  const [challengerId, setChallengerId] = useState<string>();
+  const { user: challenger } = useProfile(challengerId);
+  const cancelRef = useRef(null);
+
+  useEffect(() => {
+    if (!isConnected) return;
+
+    socket.on(
+      'receive_invitation',
+      (message: { invitationRoomId: string; challengerId: string }) => {
+        setInvitationRoomId(message.invitationRoomId);
+        setChallengerId(message.challengerId);
+        onOpen();
+      }
+    );
+
+    return () => {
+      socket.off('receive_invitation');
+    };
+  }, [isConnected, socket, onOpen, onClose]);
+
+  const onClickAccept = () => {
+    onClose();
+    socket.emit(
+      'accept_invitation',
+      { invitationRoomId },
+      (message: { roomId: string | undefined }) => {
+        if (message.roomId === undefined) {
+          customToast({ description: 'The opponent canceled the invitation.' });
+
+          return;
+        }
+        navigate(`/app/game/rooms/${message.roomId}`);
+      }
+    );
+  };
+
+  const onClickDecline = () => {
+    onClose();
+    socket.emit('decline_invitation', { invitationRoomId });
+  };
 
   return (
     <AlertDialog
@@ -44,8 +89,15 @@ export const InvitationAlert: FC<Props> = memo((props) => {
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button onClick={onClickDecline}>Decline</Button>
-            <Button colorScheme="green" onClick={onClickAccept} ml={3}>
+            <Button onClick={onClickDecline} isDisabled={!isConnected}>
+              Decline
+            </Button>
+            <Button
+              colorScheme="green"
+              onClick={onClickAccept}
+              isDisabled={!isConnected}
+              ml={3}
+            >
               Accept
             </Button>
           </AlertDialogFooter>
