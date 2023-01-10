@@ -30,12 +30,10 @@ export const useGameMatching = (): {
     });
 
     return () => {
-      if (matchState === MatchState.Matching) {
-        socket.emit('leave_matching_room');
-      }
+      socket.emit('leave_matching_room');
       socket.off('go_game_room');
     };
-  }, [socket, matchState, navigate]);
+  }, [socket, navigate]);
 
   // 各state のロジック
   useEffect(() => {
@@ -51,7 +49,6 @@ export const useGameMatching = (): {
         break;
       }
       case MatchState.MatchingCancel: {
-        socket.emit('leave_matching_room');
         navigate('/app');
         break;
       }

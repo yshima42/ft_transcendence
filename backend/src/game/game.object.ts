@@ -86,6 +86,20 @@ export class Player {
   }
 }
 
+export class InvitationRoom {
+  id: string;
+  player1Id: string;
+  player2Id: string;
+  ballSpeed: number;
+
+  constructor(player1Id: string, player2Id: string, ballSpeed: number) {
+    this.id = uuidv4();
+    this.player1Id = player1Id;
+    this.player2Id = player2Id;
+    this.ballSpeed = ballSpeed;
+  }
+}
+
 // このクラスでゲーム操作を行う
 export class GameRoom {
   gameService: GameService;
