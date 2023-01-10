@@ -9,11 +9,12 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
+const num = (n: number) => `${n.toString().padStart(3, '0')}`;
 
 /**
  * 50 + 3個のuuidをMapで作成。
  * key  :
- *        dummy1~3
+ *        dummy001~3
  *        dummy-friends1~10
  *        dummy-pending1~10
  *        dummy-recognition1~10
@@ -23,14 +24,14 @@ const prisma = new PrismaClient();
  */
 const idMap = new Map<string, string>();
 for (let i = 1; i <= 3; i++) {
-  idMap.set('dummy' + i.toString(), uuidv4());
+  idMap.set('dummy' + num(i), uuidv4());
 }
 for (let i = 1; i <= 10; i++) {
-  idMap.set('dummy-friends' + i.toString(), uuidv4());
-  idMap.set('dummy-pending' + i.toString(), uuidv4());
-  idMap.set('dummy-recognition' + i.toString(), uuidv4());
-  idMap.set('dummy-blocked' + i.toString(), uuidv4());
-  idMap.set('dummy-add-friend' + i.toString(), uuidv4());
+  idMap.set('dummy-friends' + num(i), uuidv4());
+  idMap.set('dummy-pending' + num(i), uuidv4());
+  idMap.set('dummy-recognition' + num(i), uuidv4());
+  idMap.set('dummy-blocked' + num(i), uuidv4());
+  idMap.set('dummy-add-friend' + num(i), uuidv4());
 }
 
 const onlineStatus = ['ONLINE', 'OFFLINE', 'INGAME'] as const;
@@ -85,13 +86,13 @@ userData.forEach((value) => {
 });
 
 /**
- * dummy1がcreatorとなって、dummy2, 3 とフレンドになる。
+ * dummy001がcreatorとなって、dummy2, 3 とフレンドになる。
  * (オンラインステータス確認のため)
  */
 const friendRequestData: FriendRequest[] = [];
-const creatorId = idMap.get('dummy1');
+const creatorId = idMap.get('dummy001');
 for (let i = 2; i < 4; i++) {
-  const receiverId = idMap.get('dummy' + i.toString());
+  const receiverId = idMap.get('dummy' + num(i));
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -104,12 +105,12 @@ for (let i = 2; i < 4; i++) {
 }
 
 /**
- * dummy1がcreatorとなって、dummy-pending1~10に
+ * dummy001がcreatorとなって、dummy-pending1~10に
  * friend requestを作成する。ステータスはPENDING
  */
 for (let i = 1; i <= 10; i++) {
-  const creatorId = idMap.get('dummy1');
-  const receiverId = idMap.get('dummy-pending' + i.toString());
+  const creatorId = idMap.get('dummy001');
+  const receiverId = idMap.get('dummy-pending' + num(i));
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -122,12 +123,12 @@ for (let i = 1; i <= 10; i++) {
 }
 
 /**
- * dummy1がcreatorとなって、dummy-friends1~5に
+ * dummy001がcreatorとなって、dummy-friends1~5に
  * friend requestを作成する。ステータスはACCEPTED
  */
 for (let i = 1; i <= 5; i++) {
-  const creatorId = idMap.get('dummy1');
-  const receiverId = idMap.get('dummy-friends' + i.toString());
+  const creatorId = idMap.get('dummy001');
+  const receiverId = idMap.get('dummy-friends' + num(i));
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -140,12 +141,12 @@ for (let i = 1; i <= 5; i++) {
 }
 
 /**
- * dummy-friends6~10がcreatorとなって、dummy1に
+ * dummy-friends6~10がcreatorとなって、dummy001に
  * friend requestを作成する。ステータスはACCEPTED
  */
 for (let i = 6; i <= 10; i++) {
-  const creatorId = idMap.get('dummy-friends' + i.toString());
-  const receiverId = idMap.get('dummy1');
+  const creatorId = idMap.get('dummy-friends' + num(i));
+  const receiverId = idMap.get('dummy001');
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -158,12 +159,12 @@ for (let i = 6; i <= 10; i++) {
 }
 
 /**
- * dummy-recognition1~10がcreatorとなって、dummy1に
+ * dummy-recognition1~10がcreatorとなって、dummy001に
  * friend requestを作成する。ステータスはPENDING
  */
 for (let i = 1; i <= 10; i++) {
-  const creatorId = idMap.get('dummy-recognition' + i.toString());
-  const receiverId = idMap.get('dummy1');
+  const creatorId = idMap.get('dummy-recognition' + num(i));
+  const receiverId = idMap.get('dummy001');
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -176,12 +177,12 @@ for (let i = 1; i <= 10; i++) {
 }
 
 /**
- * dummy1がdummy-blocked1~10をBlockする。
+ * dummy001がdummy-blocked1~10をBlockする。
  */
 const blockData: Block[] = [];
 for (let i = 1; i < 10; i++) {
-  const sourceId = idMap.get('dummy1');
-  const targetId = idMap.get('dummy-blocked' + i.toString());
+  const sourceId = idMap.get('dummy001');
+  const targetId = idMap.get('dummy-blocked' + num(i));
   if (targetId !== undefined && sourceId !== undefined) {
     blockData.push({
       targetId,
@@ -207,10 +208,10 @@ for (let i = 0; i < userData.length; i++) {
 const matchResultData: MatchResult[] = [];
 
 /**
- * dummy1が自分以外のユーザー全員と1回ずつ対戦する。
+ * dummy001が自分以外のユーザー全員と1回ずつ対戦する。
  */
 for (let i = 0; i < userData.length; i++) {
-  const playerOneId = idMap.get('dummy1');
+  const playerOneId = idMap.get('dummy001');
   const playerTwoId = userData[i].id;
   if (
     playerOneId !== undefined &&
