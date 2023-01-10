@@ -10,7 +10,7 @@ describe('User Settings', function () {
 
   beforeEach(() => {
     cy.visit('/');
-    cy.getBySel('dummy1-login').click();
+    cy.getBySel('dummy001-login').click();
   });
 
   it('Top Page', () => {
@@ -91,7 +91,7 @@ describe('User Settings', function () {
     cy.getBySel('users-friends-tab').click();
     cy.location('pathname').should('eq', '/app/users');
 
-    const targetNickname = 'nick-dummy-friends1';
+    const targetNickname = 'nick-dummy-friends001';
     const targetSelector = 'users-user-avatar-' + targetNickname;
 
     cy.getBySel('users-friends').within(() => {
