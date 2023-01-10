@@ -8,7 +8,7 @@ import { PendingList } from 'features/friends/components/organisms/PendingList';
 import { RecognitionList } from 'features/friends/components/organisms/RecognitionList';
 import { RequestableUsersList } from 'features/friends/components/organisms/RequestableUsersList';
 
-const tabs = ['Friends', 'Pending', 'Recognition', 'Blocked', 'Add Friend'];
+const tabs = ['Friends', 'Pending', 'Recognition', 'Blocked', 'AddFriend'];
 
 export const Users: FC = memo(() => {
   return (

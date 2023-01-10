@@ -21,6 +21,7 @@ export const RejectButton: FC<Props> = memo((props) => {
       isDisabled={isLoading || isSuccess}
       onClick={onClickReject}
       {...buttonProps}
+      data-test="reject-button"
     >
       Reject
     </Button>
