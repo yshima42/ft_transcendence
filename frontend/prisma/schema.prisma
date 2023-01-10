@@ -129,7 +129,7 @@ model OneTimePasswordAuth {
 }
 
 enum ChatRoomMemberStatus {
-  ADMIN
+  OWNER
   MODERATOR
   NORMAL
   KICKED

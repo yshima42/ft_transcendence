@@ -5,7 +5,7 @@ describe('sidebar spec', () => {
 
   beforeEach(() => {
     cy.visit('/');
-    cy.contains('Admin Test dummy1').click();
+    cy.contains('OWNER Test dummy1').click();
   });
 
   it('users', () => {

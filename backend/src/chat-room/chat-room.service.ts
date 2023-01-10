@@ -39,7 +39,7 @@ export class ChatRoomService {
           chatRoomMembers: {
             create: {
               userId,
-              memberStatus: ChatRoomMemberStatus.ADMIN,
+              memberStatus: ChatRoomMemberStatus.OWNER,
             },
           },
         },
@@ -170,11 +170,11 @@ export class ChatRoomService {
       );
     }
     // もしADMINじゃなかったらエラー
-    if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.ADMIN) {
-      this.logger.warn(`remove: user is not admin: ${chatRoomId}`);
+    if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.OWNER) {
+      this.logger.warn(`remove: user is not OWNER: ${chatRoomId}`);
 
       throw new NestJS.HttpException(
-        'User is not admin',
+        'User is not OWNER',
         NestJS.HttpStatus.FORBIDDEN
       );
     }
