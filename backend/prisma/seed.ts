@@ -17,6 +17,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
+const userName = (n: number) => `dummy${n.toString().padStart(3, '0')}`;
+
 /**
  * 100個のuuidをMapで作成。
  * key  : dummy0~99
@@ -24,7 +26,7 @@ const prisma = new PrismaClient();
  */
 const idMap = new Map<string, string>();
 for (let i = 0; i < 100; i++) {
-  idMap.set('dummy' + i.toString(), uuidv4());
+  idMap.set(userName(i), uuidv4());
 }
 
 const onlineStatus = ['ONLINE', 'OFFLINE', 'INGAME'] as const;
@@ -78,9 +80,9 @@ userData.forEach((value) => {
  * (オンラインステータス確認のため)
  */
 const friendRequestData: FriendRequest[] = [];
-const creatorId = idMap.get('dummy1');
+const creatorId = idMap.get(userName(1));
 for (let i = 2; i < 4; i++) {
-  const receiverId = idMap.get('dummy' + i.toString());
+  const receiverId = idMap.get(userName(i));
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -97,8 +99,8 @@ for (let i = 2; i < 4; i++) {
  * friend requestを作成する。ACCEPTED, PENDINGのいずれか。
  */
 for (let i = 4; i < 30; i++) {
-  const creatorId = idMap.get('dummy1');
-  const receiverId = idMap.get('dummy' + i.toString());
+  const creatorId = idMap.get(userName(1));
+  const receiverId = idMap.get(userName(i));
   if (
     creatorId !== undefined &&
     receiverId !== undefined &&
@@ -119,8 +121,8 @@ for (let i = 4; i < 30; i++) {
  * friend requestを作成する。ACCEPTED or PENDING。
  */
 for (let i = 40; i < 60; i++) {
-  const creatorId = idMap.get('dummy' + i.toString());
-  const receiverId = idMap.get('dummy1');
+  const creatorId = idMap.get(userName(i));
+  const receiverId = idMap.get(userName(1));
   if (
     creatorId !== undefined &&
     receiverId !== undefined &&
@@ -141,8 +143,8 @@ for (let i = 40; i < 60; i++) {
  * friend requestを作成する。PENDING固定。
  */
 for (let i = 2; i < 30; i++) {
-  const creatorId = idMap.get('dummy' + i.toString());
-  const receiverId = idMap.get('dummy' + (i + 1).toString());
+  const creatorId = idMap.get(userName(i));
+  const receiverId = idMap.get(userName(i + 1));
   if (
     creatorId !== undefined &&
     receiverId !== undefined &&
@@ -163,8 +165,8 @@ for (let i = 2; i < 30; i++) {
  */
 const blockData: Block[] = [];
 for (let i = 20; i < 30; i++) {
-  const sourceId = idMap.get('dummy1');
-  const targetId = idMap.get('dummy' + i.toString());
+  const sourceId = idMap.get(userName(1));
+  const targetId = idMap.get(userName(i));
   if (
     targetId !== undefined &&
     sourceId !== undefined &&
@@ -195,7 +197,7 @@ for (let i = 0; i < 10; i++) {
 const chatRoomMembers: ChatRoomMember[] = [];
 for (let i = 0; i < 2; i++) {
   const chatRoomId = chatRooms[i].id;
-  const userId = idMap.get('dummy' + i.toString());
+  const userId = idMap.get(userName(i));
   const memberStatus = 'ADMIN';
   if (userId !== undefined) {
     chatRoomMembers.push({
@@ -208,7 +210,7 @@ for (let i = 0; i < 2; i++) {
 }
 for (let i = 2; i < 100; i++) {
   const chatRoomId = chatRooms[1].id;
-  const userId = idMap.get('dummy' + i.toString());
+  const userId = idMap.get(userName(i));
   const memberStatus = 'NORMAL';
   if (userId !== undefined) {
     chatRoomMembers.push({
@@ -225,7 +227,7 @@ for (let i = 0; i < 1; i++) {
   const id = uuidv4();
   const content = 'Hello' + id;
   const chatRoomId = chatRooms[i].id;
-  const senderId = idMap.get('dummy1');
+  const senderId = idMap.get(userName(1));
   if (senderId !== undefined) {
     chatMessages.push({
       id,
@@ -243,7 +245,7 @@ for (let i = 0; i < 10000; i++) {
   const id = uuidv4();
   const content = i.toString() + 'a'.repeat(255);
   const chatRoomId = chatRooms[1].id;
-  const senderId = idMap.get('dummy1');
+  const senderId = idMap.get(userName(1));
   const now = new Date();
   const createdAt = new Date(now.getTime() + i);
   if (senderId !== undefined) {
@@ -270,7 +272,7 @@ for (let i = 0; i < 2; i++) {
 const dmRoomMembers: DmRoomMember[] = [];
 for (let i = 0; i < 2; i++) {
   const dmRoomId = dmRooms[i].id;
-  const userId = idMap.get('dummy1');
+  const userId = idMap.get(userName(1));
   if (userId !== undefined) {
     dmRoomMembers.push({
       dmRoomId,
@@ -278,7 +280,7 @@ for (let i = 0; i < 2; i++) {
     });
   }
   // const userId2 = idMap.get('dummy2');
-  const userId2 = idMap.get(`dummy${i + 2}`);
+  const userId2 = idMap.get(userName(i + 2));
   if (userId2 !== undefined) {
     dmRoomMembers.push({
       dmRoomId,
@@ -292,7 +294,7 @@ for (let i = 0; i < 2; i++) {
   const id = uuidv4();
   const content = 'Hello' + id;
   const dmRoomId = dmRooms[i].id;
-  const senderId = idMap.get('dummy1');
+  const senderId = idMap.get(userName(1));
   if (senderId !== undefined) {
     dms.push({
       id,
@@ -320,7 +322,7 @@ for (let i = 0; i < 30; i++) {
 
 const matchResultData: MatchResult[] = [];
 for (let i = 0; i < 30; i++) {
-  const playerOneId = idMap.get('dummy1');
+  const playerOneId = idMap.get(userName(1));
   const playerTwoId = idMap.get('dummy' + (i + 1).toString());
   if (playerOneId !== undefined && playerTwoId !== undefined) {
     const date = new Date();
@@ -338,8 +340,8 @@ for (let i = 0; i < 30; i++) {
 }
 
 for (let i = 0; i < 30; i++) {
-  const playerOneId = idMap.get('dummy' + (i + 1).toString());
-  const playerTwoId = idMap.get('dummy' + (i + 2).toString());
+  const playerOneId = idMap.get(userName(i + 1));
+  const playerTwoId = idMap.get(userName(i + 2));
   if (playerOneId !== undefined && playerTwoId !== undefined) {
     const date = new Date();
     date.setDate(date.getDate() - 1);
