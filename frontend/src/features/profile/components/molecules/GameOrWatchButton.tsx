@@ -18,13 +18,19 @@ export const GameOrWatchButton: FC<Props> = memo((props) => {
   const { gameRoomId: loginUserGameRoomId } = useGameRoomId(loginUserId);
   const isPlayer = gameRoomId === loginUserGameRoomId;
 
-  return presence === Presence.OFFLINE ? (
-    <></>
-  ) : presence === Presence.ONLINE ? (
-    <GameButton targetId={targetId} />
-  ) : gameRoomId === undefined ? (
-    <></>
-  ) : (
-    <WatchButton gameRoomId={gameRoomId} isPlayer={isPlayer} />
-  );
+  if (presence === Presence.OFFLINE) {
+    return <></>;
+  } else if (presence === Presence.ONLINE) {
+    return loginUserGameRoomId === undefined ? (
+      <GameButton targetId={targetId} />
+    ) : (
+      <></>
+    );
+  } else {
+    return gameRoomId === undefined ? (
+      <></>
+    ) : (
+      <WatchButton gameRoomId={gameRoomId} isPlayer={isPlayer} />
+    );
+  }
 });
