@@ -18,9 +18,9 @@ export const MatchHistoryCard: FC<Props> = memo((props) => {
   return (
     <>
       {/* TODO:spinnerつける？使うフックを変更し、一時的にspinner表示を削除した */}
-      <Box>
+      <Box bg="gray.200" borderRadius="20px" p={3}>
         <Stack>
-          <Box p={2}>
+          <Box pl={3} pb={4}>
             <Text as="b">Match History</Text>
           </Box>
           <VStack justify="center" data-test="profile-latest-5matches">

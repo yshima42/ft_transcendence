@@ -63,25 +63,25 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
     });
 
     socket.on('set_presence', (userIdToPresence: [string, Presence]) => {
-      console.log('User update presence message received');
+      // console.log('User update presence message received');
       userIdToPresenceMap.set(...userIdToPresence);
       setUserIdToPresenceMap(new Map<string, Presence>(userIdToPresenceMap));
     });
 
     socket.on('delete_presence', (userId: string) => {
-      console.info('User delete presence message received');
+      // console.info('User delete presence message received');
       userIdToPresenceMap.delete(userId);
       setUserIdToPresenceMap(new Map<string, Presence>(userIdToPresenceMap));
     });
 
     socket.on('set_game_room_id', (userIdToGameRoomId: [string, string]) => {
-      console.log('User update gameRoomId message received');
+      // console.log('User update gameRoomId message received');
       userIdToGameRoomIdMap.set(...userIdToGameRoomId);
       setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
     });
 
     socket.on('delete_game_room_id', (userId: string) => {
-      console.log('User delete gameRoomId message received');
+      // console.log('User delete gameRoomId message received');
       userIdToGameRoomIdMap.delete(userId);
       setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
     });

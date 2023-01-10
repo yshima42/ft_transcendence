@@ -16,11 +16,13 @@ export const WebSidebarMenu: FC<Props> = memo((props) => {
     <>
       <Flex
         pos="sticky"
+        top="0"
         h="100vh"
         marginTop="0"
         boxShadow="0 4px 12px 0 rgba(0,0,0,0.15)"
         minW={{ base: '50px', md: '180px' }}
         maxW={{ base: '50px', md: '180px' }}
+        minH="570px"
         flexDir="column"
         justifyContent="space-between"
       >
