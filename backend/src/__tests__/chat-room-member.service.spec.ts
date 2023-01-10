@@ -182,7 +182,7 @@ describe('ChatRoomMemberService', () => {
       data: {
         chatRoomId: chatRoomPublic.id,
         userId: testUsers[0].id,
-        memberStatus: Type.ChatRoomMemberStatus.ADMIN,
+        memberStatus: Type.ChatRoomMemberStatus.OWNER,
       },
     });
     const chatRoomPublicModerator = await prisma.chatRoomMember.create({
@@ -239,7 +239,7 @@ describe('ChatRoomMemberService', () => {
         {
           chatRoomId: chatRoomPublic.id,
           memberId: chatRoomPublicAdmin.userId,
-          memberStatus: Type.ChatRoomMemberStatus.ADMIN,
+          memberStatus: Type.ChatRoomMemberStatus.OWNER,
         },
         chatRoomPublicModerator.userId
       );

@@ -55,7 +55,7 @@ export const ChatRoomMemberList: React.FC<Props> = React.memo(
             window.location.reload();
           } else if (
             responseChatRoomMemberStatus.memberStatus ===
-            ChatRoomMemberStatus.ADMIN
+            ChatRoomMemberStatus.OWNER
           ) {
             window.location.reload();
           }

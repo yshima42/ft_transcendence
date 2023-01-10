@@ -17,7 +17,7 @@ type Props = {
 export const changeChatRoomMemberStatusButtonTexts: {
   [key in ChatRoomMemberStatus]: string;
 } = {
-  ADMIN: '',
+  OWNER: '',
   MODERATOR: 'Demote',
   NORMAL: '',
   KICKED: 'Rejoin',
@@ -40,7 +40,7 @@ const buttonObject = (
 export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
   ({ chatRoomId, memberId, memberStatus, chatLoginUser, socket }) => {
     if (
-      chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN &&
+      chatLoginUser.memberStatus !== ChatRoomMemberStatus.OWNER &&
       chatLoginUser.memberStatus !== ChatRoomMemberStatus.MODERATOR
     ) {
       return null;
@@ -57,20 +57,20 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
       buttonObject(ChatRoomMemberStatus.BANNED, 'Ban', true),
       buttonObject(ChatRoomMemberStatus.MUTED, 'Mute', true),
     ];
-    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.ADMIN) {
+    if (chatLoginUser.memberStatus === ChatRoomMemberStatus.OWNER) {
       switch (memberStatus) {
-        case ChatRoomMemberStatus.ADMIN:
+        case ChatRoomMemberStatus.OWNER:
           return null;
         case ChatRoomMemberStatus.MODERATOR:
           common.push(
             buttonObject(ChatRoomMemberStatus.NORMAL, 'Demote', false),
-            buttonObject(ChatRoomMemberStatus.ADMIN, 'Appoint', false)
+            buttonObject(ChatRoomMemberStatus.OWNER, 'Appoint', false)
           );
           break;
         case ChatRoomMemberStatus.NORMAL:
           common.push(
             buttonObject(ChatRoomMemberStatus.MODERATOR, 'Promote', false),
-            buttonObject(ChatRoomMemberStatus.ADMIN, 'Appoint', false)
+            buttonObject(ChatRoomMemberStatus.OWNER, 'Appoint', false)
           );
           break;
         case ChatRoomMemberStatus.BANNED:
@@ -86,7 +86,7 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
       }
     } else if (chatLoginUser.memberStatus === ChatRoomMemberStatus.MODERATOR) {
       switch (memberStatus) {
-        case ChatRoomMemberStatus.ADMIN:
+        case ChatRoomMemberStatus.OWNER:
           return null;
         case ChatRoomMemberStatus.MODERATOR:
           return null;

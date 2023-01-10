@@ -177,15 +177,15 @@ export class ChatRoomMemberService {
       updateChatRoomMemberDto;
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomMember = await this.findOne(chatRoomId, chatLoginUserId);
-    // ADMIN -> すべての変更を許可
+    // OWNER -> すべての変更を許可
     // MODERATOR -> KICKED, BANED, MUTEDDの変更を許可
     // NORMAL -> 何も変更を許可しない
     // 権限がないRequestの場合はエラー
     if (
-      (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.ADMIN &&
+      (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.OWNER &&
         loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.MODERATOR) ||
       (loginChatRoomMember.memberStatus === ChatRoomMemberStatus.MODERATOR &&
-        (memberStatus === ChatRoomMemberStatus.ADMIN ||
+        (memberStatus === ChatRoomMemberStatus.OWNER ||
           memberStatus === ChatRoomMemberStatus.MODERATOR))
     ) {
       throw new NestJs.HttpException(
@@ -199,8 +199,8 @@ export class ChatRoomMemberService {
       case ChatRoomMemberStatus.KICKED:
         return await this.remove(chatRoomId, memberId);
 
-      // ADMIN -> ADMINの場合は変更に加えて、自分のステータスをMODERATORに変更する
-      case ChatRoomMemberStatus.ADMIN: {
+      // OWNER -> ADMINの場合は変更に加えて、自分のステータスをMODERATORに変更する
+      case ChatRoomMemberStatus.OWNER: {
         const res = await this.prisma.$transaction([
           this.prisma.chatRoomMember.update({
             where: {
@@ -210,7 +210,7 @@ export class ChatRoomMemberService {
               },
             },
             data: {
-              memberStatus: ChatRoomMemberStatus.ADMIN,
+              memberStatus: ChatRoomMemberStatus.OWNER,
             },
           }),
           this.prisma.chatRoomMember.update({
@@ -287,7 +287,7 @@ export class ChatRoomMemberService {
     );
     const chatRoomMember = await this.findOne(chatRoomId, memberId);
     // ADMINは退出できない
-    if (chatRoomMember.memberStatus === ChatRoomMemberStatus.ADMIN) {
+    if (chatRoomMember.memberStatus === ChatRoomMemberStatus.OWNER) {
       throw new NestJs.HttpException(
         'Permission denied',
         NestJs.HttpStatus.FORBIDDEN

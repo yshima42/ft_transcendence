@@ -163,7 +163,7 @@ model DmRoomMember {
 }
 
 enum ChatRoomMemberStatus {
-  ADMIN // チャットルームのオーナー
+  OWNER // チャットルームのオーナー
   MODERATOR // チャットルームのサブオーナー
   NORMAL // チャットルームのメンバー
   KICKED // チャットルームからキックされた

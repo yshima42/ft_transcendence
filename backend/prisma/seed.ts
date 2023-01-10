@@ -198,7 +198,7 @@ const chatRoomMembers: ChatRoomMember[] = [];
 for (let i = 0; i < 2; i++) {
   const chatRoomId = chatRooms[i].id;
   const userId = idMap.get(userName(i));
-  const memberStatus = 'ADMIN';
+  const memberStatus = 'OWNER';
   if (userId !== undefined) {
     chatRoomMembers.push({
       chatRoomId,

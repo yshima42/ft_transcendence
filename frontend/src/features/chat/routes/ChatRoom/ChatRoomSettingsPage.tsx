@@ -58,7 +58,7 @@ const LeaveButton: React.FC<{
 
   return (
     <>
-      {chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN ? (
+      {chatLoginUser.memberStatus !== ChatRoomMemberStatus.OWNER ? (
         <C.Button colorScheme="red" onClick={exitChatRoom}>
           Exit
         </C.Button>
