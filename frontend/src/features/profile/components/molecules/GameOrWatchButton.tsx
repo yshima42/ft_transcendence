@@ -6,14 +6,17 @@ import { WatchButton } from 'components/atoms/button/WatchButton';
 import { Presence } from 'providers/SocketProvider';
 
 type Props = {
+  loginUserId: string;
   targetId: string;
 };
 
 // targetIdがオンラインなら対戦申し込み(Game)ボタン、ゲーム中なら観戦(Watch)ボタン、オフラインなら何も表示しない
 export const GameOrWatchButton: FC<Props> = memo((props) => {
-  const { targetId } = props;
+  const { loginUserId, targetId } = props;
   const { presence } = useUserPresence(targetId);
   const { gameRoomId } = useGameRoomId(targetId);
+  const { gameRoomId: loginUserGameRoomId } = useGameRoomId(loginUserId);
+  const isPlayer = gameRoomId === loginUserGameRoomId;
 
   return presence === Presence.OFFLINE ? (
     <></>
@@ -22,6 +25,6 @@ export const GameOrWatchButton: FC<Props> = memo((props) => {
   ) : gameRoomId === undefined ? (
     <></>
   ) : (
-    <WatchButton gameRoomId={gameRoomId} />
+    <WatchButton gameRoomId={gameRoomId} isPlayer={isPlayer} />
   );
 });

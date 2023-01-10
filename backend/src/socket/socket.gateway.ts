@@ -339,7 +339,7 @@ export class UsersGateway {
     },
     @ConnectedSocket() socket: Socket
   ): void {
-    const { roomId } = socket.data as { roomId: string };
+    const { gameRoomId: roomId } = socket.data as { gameRoomId: string };
     const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
       socket.emit('game_room_error', 'Invalid game room.');
