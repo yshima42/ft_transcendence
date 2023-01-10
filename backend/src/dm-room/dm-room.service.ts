@@ -101,7 +101,7 @@ export class DmRoomService {
             user: {
               select: {
                 id: true,
-                name: true,
+                nickname: true,
                 avatarImageUrl: true,
               },
             },

@@ -3,7 +3,7 @@ export type ResponseDmRoom = {
   dmRoomMembers: Array<{
     user: {
       id: string;
-      name: string;
+      nickname: string;
       avatarImageUrl: string;
     };
   }>;

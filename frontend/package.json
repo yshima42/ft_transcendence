@@ -12,8 +12,6 @@
     "preview": "vite preview",
     "lint:es": "eslint '{src,cypress}/**/*.{js,jsx,ts,tsx}'",
     "lint:es:fix": "eslint --fix '{src,cypress}/**/*.{js,jsx,ts,tsx}'",
-    "lint:style": "stylelint 'src/**/*.{css,less,sass,scss}'",
-    "lint:style:fix": "stylelint --fix 'src/**/*.{css,less,sass,scss}'",
     "lint": "npm run --silent lint:style; npm run --silent lint:es",
     "lint:fix": "npm run --silent lint:style:fix; npm run --silent lint:es:fix",
     "format": "prettier --write --loglevel=warn '{src,cypress}/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}' './*.json'",

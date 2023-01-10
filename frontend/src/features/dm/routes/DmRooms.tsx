@@ -37,7 +37,7 @@ export const DmRooms: React.FC = React.memo(() => {
                           {new Date(dmRoom.dms[0].createdAt).toLocaleString()}
                         </C.Text>
                       )}
-                      <C.Heading fontSize="xl">{`${dmRoom.dmRoomMembers[0].user.name}`}</C.Heading>
+                      <C.Heading fontSize="xl">{`${dmRoom.dmRoomMembers[0].user.nickname}`}</C.Heading>
                     </C.Box>
                   </C.Flex>
                 </C.Box>
