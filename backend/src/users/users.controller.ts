@@ -101,7 +101,7 @@ export class UsersController {
     required: false,
   })
   async findUser(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Query('fields') fields: string
   ): Promise<UserDto> {
     return await this.usersService.find(id, fields);
