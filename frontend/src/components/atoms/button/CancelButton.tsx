@@ -21,6 +21,7 @@ export const CancelButton: FC<Props> = memo((props) => {
       isDisabled={isLoading || isSuccess}
       onClick={onClickCancel}
       {...buttonProps}
+      data-test="cancel-button"
     >
       Cancel
     </Button>
