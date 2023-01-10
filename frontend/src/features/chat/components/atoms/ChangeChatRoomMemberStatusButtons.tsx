@@ -63,14 +63,12 @@ export const ChangeChatRoomMemberStatusButtons: React.FC<Props> = React.memo(
           return null;
         case ChatRoomMemberStatus.MODERATOR:
           common.push(
-            buttonObject(ChatRoomMemberStatus.NORMAL, 'Demote', false),
-            buttonObject(ChatRoomMemberStatus.OWNER, 'Appoint', false)
+            buttonObject(ChatRoomMemberStatus.NORMAL, 'Demote', false)
           );
           break;
         case ChatRoomMemberStatus.NORMAL:
           common.push(
-            buttonObject(ChatRoomMemberStatus.MODERATOR, 'Promote', false),
-            buttonObject(ChatRoomMemberStatus.OWNER, 'Appoint', false)
+            buttonObject(ChatRoomMemberStatus.MODERATOR, 'Promote', false)
           );
           break;
         case ChatRoomMemberStatus.BANNED:
