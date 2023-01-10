@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { Flex } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
 import { useCanvas } from '../hooks/useCanvas';
 import { Player } from '../utils/gameObjs';
@@ -25,9 +25,13 @@ export const PongGame: FC<Props> = memo((props) => {
 
   return (
     <Flex alignItems="center" p={4}>
-      <AvatarWithNickname user={user1} />
+      <Box p={2}>
+        <AvatarWithNickname user={user1} />
+      </Box>
       <canvas ref={canvasRef} />
-      <AvatarWithNickname user={user2} />
+      <Box p={2}>
+        <AvatarWithNickname user={user2} />
+      </Box>
     </Flex>
   );
 });
