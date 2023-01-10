@@ -62,7 +62,6 @@ export class ChatMessageService {
     return chatMessage;
   }
 
-  // Find all chat message in a chat room, except those that have been blocked by the user
   // ユーザーによってブロックされたものを除き、チャットルームですべてのチャットメッセージを見つける
   async findAllNotBlocked(
     chatRoomId: string,
