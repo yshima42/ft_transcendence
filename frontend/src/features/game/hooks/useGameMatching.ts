@@ -24,7 +24,7 @@ export const useGameMatching = (): {
   // socket イベント
   useEffect(() => {
     socket.on('go_game_room', (roomId: string) => {
-      console.log('[Socket Event] go_game_room');
+      // console.log('[Socket Event] go_game_room');
       setMatchState(MatchState.Matched);
       navigate(`/app/game/rooms/${roomId}`);
     });
