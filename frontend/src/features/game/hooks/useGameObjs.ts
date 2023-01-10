@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo } from 'react';
 import { Socket } from 'socket.io-client';
-import { BG_COLOR, CANVAS_WIDTH } from '../utils/gameConfig';
+import { BG_COLOR, CANVAS_HEIGHT, CANVAS_WIDTH } from '../utils/gameConfig';
 import { Ball, Paddle, Player } from '../utils/gameObjs';
 
 export const useGameObjs = (
@@ -81,18 +81,33 @@ export const useGameObjs = (
   // レスポンシブ対応の処理
   useLayoutEffect(() => {
     const updateSize = (): void => {
-      const padding = 300;
+      const xPadding = 300;
+      const yPadding = 100;
       const minimumWidth = 300;
+      const maxWidth = 780;
+      const canvasRatio = CANVAS_HEIGHT / CANVAS_WIDTH;
 
-      // window.innerWidthに合わせてcanvasのサイズを変更する
-      // ただし、最小値はminimumWidth
-      // window.innerHeightに合わせてcanvasのサイズ変更は未実装
-      if (window.innerWidth > padding + minimumWidth) {
-        canvas.width = window.innerWidth - padding;
-      } else {
+      // window.innerWidth、window.innerHeightに合わせてcanvasのサイズを変更する
+      // ただし、widthの最小値はminimumWidth、最大値はmaxWidth
+      if (
+        window.innerWidth < minimumWidth + xPadding ||
+        window.innerHeight < (minimumWidth + xPadding) * canvasRatio
+      ) {
         canvas.width = minimumWidth;
+      } else if (
+        window.innerWidth > maxWidth + xPadding &&
+        window.innerHeight > (maxWidth + xPadding) * canvasRatio
+      ) {
+        canvas.width = maxWidth;
+      } else if (
+        (window.innerWidth - xPadding) * canvasRatio <
+        window.innerHeight - yPadding
+      ) {
+        canvas.width = window.innerWidth - xPadding;
+      } else {
+        canvas.width = (window.innerHeight - yPadding) / canvasRatio;
       }
-      canvas.height = canvas.width - padding;
+      canvas.height = canvas.width * canvasRatio;
       canvas.ratio = canvas.width / CANVAS_WIDTH;
     };
 
