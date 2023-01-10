@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Patch,
   Param,
   Delete,
   UseGuards,
@@ -15,6 +16,7 @@ import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseChatRoom } from './chat-room.interface';
 import { ChatRoomService } from './chat-room.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
+import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @Controller('chat/rooms')
 @Sw.ApiTags('chat-room')
@@ -53,6 +55,24 @@ export class ChatRoomController {
     @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
   ): Promise<Omit<ChatRoom, 'password'>> {
     const res = await this.chatRoomService.findOne(chatRoomId);
+    // omit password
+    const { password, ...rest } = res;
+    void password; // 使わないとエラーでるのでvoidキャスト的な
+
+    return rest;
+  }
+
+  @Patch(':chatRoomId')
+  async update(
+    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @Body() updateChatRoomDto: UpdateChatRoomDto,
+    @GetUser() user: User
+  ): Promise<Omit<ChatRoom, 'password'>> {
+    const res = await this.chatRoomService.update(
+      chatRoomId,
+      updateChatRoomDto,
+      user.id
+    );
     // omit password
     const { password, ...rest } = res;
     void password; // 使わないとエラーでるのでvoidキャスト的な
