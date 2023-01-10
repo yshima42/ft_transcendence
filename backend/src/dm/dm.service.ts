@@ -51,7 +51,12 @@ export class DmService {
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 100,
     });
+    dms.reverse();
 
     return dms;
   }

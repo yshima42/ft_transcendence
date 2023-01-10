@@ -94,7 +94,12 @@ export class ChatMessageService {
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 100,
     });
+    chatMessage.reverse();
     this.logger.debug(
       `findAllNotBlocked: ${this.json({ chatMessage, chatRoomId, userId })}`
     );
