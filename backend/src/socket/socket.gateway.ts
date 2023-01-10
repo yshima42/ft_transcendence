@@ -215,7 +215,7 @@ export class UsersGateway {
       .emit('go_game_room_by_invitation', gameRoom.id);
     // 別タブでモーダルがでているとき、全て閉じる
     const { userId } = socket.data as { userId: string };
-    socket.to(userId).emit('close_invitation_modal');
+    socket.to(userId).emit('close_invitation_alert');
 
     return { roomId: gameRoom.id };
   }
@@ -232,7 +232,7 @@ export class UsersGateway {
     this.server.to(message.invitationRoomId).emit('player2_decline_invitation');
     // 別タブでモーダルがでているとき、全て閉じる
     const { userId } = socket.data as { userId: string };
-    socket.to(userId).emit('close_invitation_modal');
+    socket.to(userId).emit('close_invitation_alert');
   }
 
   @SubscribeMessage('leave_invitation_room')
