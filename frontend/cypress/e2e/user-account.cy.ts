@@ -146,12 +146,94 @@ describe('User Settings', function () {
     cy.getBySel('users-friends').within(() => {
       cy.getBySel(targetSelector).click();
     });
-    cy.getBySel('block').click();
-    cy.getBySel('unblock').should('be.visible');
+    cy.getBySel('block-button').click();
+    cy.getBySel('unblock-button').should('be.visible');
 
     cy.getBySel('sidenav-users').click();
     cy.getBySel('users-blocked-tab').click();
     cy.location('pathname').should('eq', '/app/users');
     cy.getBySel(targetSelector).should('be.visible');
+  });
+
+  /**
+   * シナリオ UA-6
+   * サイドバーからFriendタブを表示。
+   * FriendRelationによって、表示されるFriend関連のボタンを確認。
+   *
+   * チェック項目No.59
+   */
+  it('他のユーザープロフィールのフレンド関係ボタン表示', () => {
+    // name, nickname, avatarも確認するべきかも。
+    // あと、そのボタンをクリックした場合の挙動も確認するべきか・・・。
+
+    // Friendのプロフィール確認。
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-friends-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    const targetFriendNickname = 'nick-dummy-friends1';
+    const targetFriendSelector = 'users-user-avatar-' + targetFriendNickname;
+
+    cy.getBySel('users-friends').within(() => {
+      cy.getBySel(targetFriendSelector).click();
+    });
+
+    cy.getBySel('accept-button').should('not.exist');
+    cy.getBySel('cancel-button').should('not.exist');
+    cy.getBySel('reject-button').should('not.exist');
+    cy.getBySel('request-button').should('not.exist');
+
+    // Pendingのプロフィール確認。
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-pending-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    const targetPendingNickname = 'nick-dummy-pending1';
+    const targetPendingSelector = 'users-user-avatar-' + targetPendingNickname;
+
+    cy.getBySel('users-pending').within(() => {
+      cy.getBySel(targetPendingSelector).click();
+    });
+
+    cy.getBySel('cancel-button').should('be.visible');
+    cy.getBySel('accept-button').should('not.exist');
+    cy.getBySel('reject-button').should('not.exist');
+    cy.getBySel('request-button').should('not.exist');
+
+    // Recognitionのプロフィール確認。
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-recognition-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    const targetRecognitionNickname = 'nick-dummy-recognition1';
+    const targetRecognitionSelector =
+      'users-user-avatar-' + targetRecognitionNickname;
+
+    cy.getBySel('users-recognition').within(() => {
+      cy.getBySel(targetRecognitionSelector).click();
+    });
+
+    cy.getBySel('accept-button').should('be.visible');
+    cy.getBySel('reject-button').should('be.visible');
+    cy.getBySel('cancel-button').should('not.exist');
+    cy.getBySel('request-button').should('not.exist');
+
+    // Add Friendのプロフィール確認。
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-addfriend-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    const targetAddFriendNickname = 'nick-dummy-add-friend1';
+    const targetAddFriendSelector =
+      'users-user-avatar-' + targetAddFriendNickname;
+
+    cy.getBySel('users-add-friend').within(() => {
+      cy.getBySel(targetAddFriendSelector).click();
+    });
+
+    cy.getBySel('request-button').should('be.visible');
+    cy.getBySel('accept-button').should('not.exist');
+    cy.getBySel('reject-button').should('not.exist');
+    cy.getBySel('cancel-button').should('not.exist');
   });
 });
