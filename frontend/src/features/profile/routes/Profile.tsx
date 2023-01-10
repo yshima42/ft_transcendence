@@ -41,17 +41,17 @@ export const Profile: FC = memo(() => {
           }}
           gap={5}
         >
-          <GridItem bg="gray" area="profile">
+          <GridItem area="profile">
             <Suspense fallback={<CenterSpinner />}>
               <UserInfoCard user={user} isLoginUser={isLoginUser} />
             </Suspense>
           </GridItem>
-          <GridItem bg="gray" area="stats">
+          <GridItem area="stats">
             <Suspense fallback={<CenterSpinner />}>
               <StatsCard id={user.id} />
             </Suspense>
           </GridItem>
-          <GridItem bg="gray" area="history">
+          <GridItem area="history">
             <Suspense fallback={<CenterSpinner />}>
               <MatchHistoryCard id={user.id} isLoginUser={isLoginUser} />
             </Suspense>

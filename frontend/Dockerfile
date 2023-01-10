@@ -11,5 +11,9 @@ RUN yarn install
 
 COPY . .
 
+# reactQueryDevtoolsを本番環境で表示させないため
+# FROMの下につけたいが、yarn installでdependenciesしかインストールされなくなるのでここに書く
+ENV NODE_ENV production
+
 EXPOSE 5173
 CMD [ "yarn", "dev" ]
