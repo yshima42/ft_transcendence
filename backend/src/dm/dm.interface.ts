@@ -20,6 +20,7 @@ export type ResponseDm = {
   content: string;
   createdAt: Date;
   sender: {
+    id: string;
     name: string;
     avatarImageUrl: string;
     onlineStatus: OnlineStatus;

@@ -73,6 +73,7 @@ export const DmRoom: React.FC = React.memo(() => {
                   id={message.id}
                   content={message.content}
                   createdAt={message.createdAt}
+                  userId={message.sender.id}
                   name={message.sender.name}
                   avatarImageUrl={message.sender.avatarImageUrl}
                 />

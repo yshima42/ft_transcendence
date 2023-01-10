@@ -9,7 +9,7 @@ import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
 import * as SocketIOClient from 'socket.io-client';
-import { UserAvatar } from 'components/organisms/avatar/UserAvatar';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 import { ChangeChatRoomMemberStatusButtons } from 'features/chat/components/atoms/ChangeChatRoomMemberStatusButtons';
 
 type Props = {
@@ -97,12 +97,12 @@ const ChatRoomMemberListItem: React.FC<{
   return (
     <C.ListItem key={member.user.id}>
       <C.Flex>
-        <UserAvatar
+        <LinkedAvatar
           id={member.user.id}
           size="sm"
           name={member.user.nickname}
           src={member.user.avatarImageUrl}
-        ></UserAvatar>
+        ></LinkedAvatar>
         <C.Text ml={10}>{member.user.nickname}</C.Text>
         <C.Spacer />
         <C.Text mr={5}>{member.memberStatus}</C.Text>
