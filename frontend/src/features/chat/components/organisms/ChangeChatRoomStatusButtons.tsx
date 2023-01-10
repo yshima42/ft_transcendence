@@ -57,7 +57,11 @@ export const ChangeChatRoomStatusButtons: React.FC<{
           <C.PopoverHeader>Protect</C.PopoverHeader>
           <C.PopoverBody>
             <C.Text>Set a password</C.Text>
-            <form onSubmit={handleSubmit(changeChatRoomStatusProtect)}>
+            <form
+              onSubmit={handleSubmit(async (data) =>
+                await changeChatRoomStatusProtect(data)
+              )}
+            >
               <C.Input
                 type="password"
                 placeholder="Password"
