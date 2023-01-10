@@ -241,7 +241,7 @@ for (let i = 0; i < 1; i++) {
 
 // chatMessage
 const chatMessage2: ChatMessage[] = [];
-for (let i = 0; i < 10000; i++) {
+for (let i = 0; i < 2000; i++) {
   const id = uuidv4();
   const content = i.toString() + 'a'.repeat(255);
   const chatRoomId = chatRooms[1].id;
@@ -388,9 +388,9 @@ const main = async () => {
   await prisma.chatMessage.createMany({
     data: chatMessages,
   });
-  // await prisma.chatMessage.createMany({
-  //   data: chatMessage2,
-  // });
+  await prisma.chatMessage.createMany({
+    data: chatMessage2,
+  });
   // await prisma.dmRoom.createMany({
   //   data: dmRooms,
   // });
