@@ -5,8 +5,6 @@ import { ResponseChatMessage } from 'src/chat-message/chat-message.interface';
 import { ChatMessageModule } from 'src/chat-message/chat-message.module';
 import { ChatMessageService } from 'src/chat-message/chat-message.service';
 import { ChatRoomMemberModule } from 'src/chat-room-member/chat-room-member.module';
-import { ChatRoomMemberService } from 'src/chat-room-member/chat-room-member.service';
-import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -106,10 +104,6 @@ describe('ChatMessageService', () => {
     }).compile();
 
     gChatMessageService = gModule.get<ChatMessageService>(ChatMessageService);
-    chatRoomService = gModule.get<ChatRoomService>(ChatRoomService);
-    chatRoomMemberService = gModule.get<ChatRoomMemberService>(
-      ChatRoomMemberService
-    );
     gPrisma = gModule.get<PrismaService>(PrismaService);
 
     // dbの初期化
