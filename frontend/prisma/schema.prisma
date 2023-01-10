@@ -10,8 +10,8 @@ datasource db {
 model Block {
   sourceId                  String @db.Uuid
   targetId                  String @db.Uuid
-  User_Block_sourceIdToUser User   @relation("Block_sourceIdToUser", fields: [sourceId], references: [id])
-  User_Block_targetIdToUser User   @relation("Block_targetIdToUser", fields: [targetId], references: [id])
+  User_Block_sourceIdToUser User   @relation("Block_sourceIdToUser", fields: [sourceId], references: [id], onDelete: Cascade)
+  User_Block_targetIdToUser User   @relation("Block_targetIdToUser", fields: [targetId], references: [id], onDelete: Cascade)
 
   @@id([sourceId, targetId])
 }
@@ -94,8 +94,8 @@ model MatchResult {
   playerOneScore                     Int
   playerTwoScore                     Int
   finishedAt                         DateTime @default(now()) @db.Timestamptz(3)
-  User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id])
-  User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id])
+  User_MatchResult_playerOneIdToUser User     @relation("MatchResult_playerOneIdToUser", fields: [playerOneId], references: [id], onDelete: Cascade)
+  User_MatchResult_playerTwoIdToUser User     @relation("MatchResult_playerTwoIdToUser", fields: [playerTwoId], references: [id], onDelete: Cascade)
 }
 
 model User {

@@ -65,21 +65,16 @@ export class DmRoomService {
     });
   }
 
-  // ブロックしているユーザーは取得しない
   async findAllWithoutBlockUser(userId: string): Promise<ResponseDmRoom[]> {
     const dmRooms = await this.prisma.dmRoom.findMany({
-      // ブロックしているユーザーは取得しない
       where: {
+        // ブロックしているユーザーは取得しない
         dmRoomMembers: {
           every: {
             user: {
-              blocking: {
-                every: {
-                  sourceId: {
-                    not: {
-                      equals: userId,
-                    },
-                  },
+              blockedBy: {
+                some: {
+                  sourceId: userId,
                 },
               },
             },

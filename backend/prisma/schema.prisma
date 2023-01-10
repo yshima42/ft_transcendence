@@ -84,9 +84,9 @@ enum FriendRequestStatus {
 }
 
 model Block {
-  source   User   @relation("source", fields: [sourceId], references: [id])
+  source   User   @relation("source", fields: [sourceId], references: [id], onDelete: Cascade)
   sourceId String @db.Uuid
-  target   User   @relation("target", fields: [targetId], references: [id])
+  target   User   @relation("target", fields: [targetId], references: [id], onDelete: Cascade)
   targetId String @db.Uuid
 
   @@id([sourceId, targetId])
@@ -94,9 +94,9 @@ model Block {
 
 model MatchResult {
   id             String   @id @default(uuid()) @db.Uuid
-  playerOne      User     @relation("playerOne", fields: [playerOneId], references: [id])
+  playerOne      User     @relation("playerOne", fields: [playerOneId], references: [id], onDelete: Cascade)
   playerOneId    String   @db.Uuid
-  playerTwo      User     @relation("playerTwo", fields: [playerTwoId], references: [id])
+  playerTwo      User     @relation("playerTwo", fields: [playerTwoId], references: [id], onDelete: Cascade)
   playerTwoId    String   @db.Uuid
   playerOneScore Int
   playerTwoScore Int
