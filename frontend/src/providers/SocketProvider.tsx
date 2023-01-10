@@ -9,7 +9,7 @@ import {
 import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
 import { Socket } from 'socket.io-client';
-import { InvitationAlert } from './InvitationAlert';
+import { InvitationModal } from './InvitationModal';
 
 export enum Presence {
   OFFLINE = 0,
@@ -105,7 +105,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       }}
     >
       {children}
-      <InvitationAlert socket={socket} isConnected={isConnected} />
+      <InvitationModal socket={socket} isConnected={isConnected} />
     </SocketContext.Provider>
   );
 };

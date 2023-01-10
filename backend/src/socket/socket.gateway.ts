@@ -185,15 +185,13 @@ export class UsersGateway {
       return;
     }
     socket.data.invitationRoomId = invitationRoom.id;
+    // 別タブで他の招待ルームにいる場合、退去させる。
     socket.to(userId).emit('invitation_room_error', 'Invalid invitation room.');
     await socket.join(invitationRoom.id);
-    if (!invitationRoom.isAlreadyInvited) {
-      invitationRoom.isAlreadyInvited = true;
-      this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
-        invitationRoomId: invitationRoom.id,
-        challengerId: userId,
-      });
-    }
+    this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
+      invitationRoomId: invitationRoom.id,
+      challengerId: userId,
+    });
   }
 
   @SubscribeMessage('accept_invitation')
@@ -215,6 +213,9 @@ export class UsersGateway {
     this.server
       .to(invitationRoom.id)
       .emit('go_game_room_by_invitation', gameRoom.id);
+    // 別タブでモーダルがでているとき、全て閉じる
+    const { userId } = socket.data as { userId: string };
+    socket.to(userId).emit('close_invitation_modal');
 
     return { roomId: gameRoom.id };
   }
@@ -229,6 +230,9 @@ export class UsersGateway {
     );
 
     this.server.to(message.invitationRoomId).emit('player2_decline_invitation');
+    // 別タブでモーダルがでているとき、全て閉じる
+    const { userId } = socket.data as { userId: string };
+    socket.to(userId).emit('close_invitation_modal');
   }
 
   @SubscribeMessage('leave_invitation_room')
