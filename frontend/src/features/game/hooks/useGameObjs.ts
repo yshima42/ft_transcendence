@@ -83,17 +83,17 @@ export const useGameObjs = (
     const updateSize = (): void => {
       const xPadding = 300;
       const yPadding = 160;
-      const minimumWidth = 300;
+      const minWidth = 300;
       const maxWidth = 780;
       const canvasRatio = CANVAS_HEIGHT / CANVAS_WIDTH;
 
       // window.innerWidth、window.innerHeightに合わせてcanvasのサイズを変更する
       // ただし、widthの最小値はminimumWidth、最大値はmaxWidth
       if (
-        window.innerWidth < minimumWidth + xPadding ||
-        window.innerHeight < (minimumWidth + xPadding) * canvasRatio
+        window.innerWidth < minWidth + xPadding ||
+        window.innerHeight < (minWidth + xPadding) * canvasRatio
       ) {
-        canvas.width = minimumWidth;
+        canvas.width = minWidth;
       } else if (
         window.innerWidth > maxWidth + xPadding &&
         window.innerHeight > (maxWidth + xPadding) * canvasRatio
