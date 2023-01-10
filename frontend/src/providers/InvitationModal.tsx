@@ -20,7 +20,7 @@ type Props = {
 };
 
 // このコンポーネントをprovidersに残すか、componentsに入れるか迷ったが、SocketProviderでしか使わないためprovidersに置いておく
-export const InvitationAlert: FC<Props> = memo((props) => {
+export const InvitationModal: FC<Props> = memo((props) => {
   const { socket, isConnected } = props;
 
   // AlertDialogのleastDestructiveRefでエラーが出てたので以下を参考にエラー対応
@@ -45,8 +45,13 @@ export const InvitationAlert: FC<Props> = memo((props) => {
       }
     );
 
+    socket.on('close_invitation_modal', () => {
+      onClose();
+    });
+
     return () => {
       socket.off('receive_invitation');
+      socket.off('close_invitation_modal');
     };
   }, [isConnected, socket, onOpen, onClose]);
 
