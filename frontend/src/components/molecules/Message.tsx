@@ -7,7 +7,7 @@ type Props = {
   content: string;
   createdAt: Date;
   userId: string;
-  name: string;
+  nickname: string;
   avatarImageUrl: string;
 };
 
@@ -16,7 +16,7 @@ export const Message: React.FC<Props> = ({
   content,
   createdAt,
   userId,
-  name,
+  nickname,
   avatarImageUrl,
 }) => {
   return (
@@ -31,12 +31,12 @@ export const Message: React.FC<Props> = ({
         {new Date(createdAt).toLocaleString()}
       </C.Text>
       <C.Text fontSize="sm" fontWeight="bold">
-        {name}
+        {nickname}
       </C.Text>
       <LinkedAvatar
         id={userId}
         size="sm"
-        name={name}
+        name={nickname}
         src={avatarImageUrl}
         marginRight={2}
       />

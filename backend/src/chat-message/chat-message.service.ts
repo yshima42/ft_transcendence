@@ -49,7 +49,7 @@ export class ChatMessageService {
         sender: {
           select: {
             id: true,
-            name: true,
+            nickname: true,
             avatarImageUrl: true,
           },
         },
@@ -89,7 +89,7 @@ export class ChatMessageService {
         sender: {
           select: {
             id: true,
-            name: true,
+            nickname: true,
             avatarImageUrl: true,
           },
         },

@@ -24,7 +24,7 @@ export class DmService {
         sender: {
           select: {
             id: true,
-            name: true,
+            nickname: true,
             avatarImageUrl: true,
             onlineStatus: true,
           },
@@ -47,7 +47,7 @@ export class DmService {
         sender: {
           select: {
             id: true,
-            name: true,
+            nickname: true,
             avatarImageUrl: true,
             onlineStatus: true,
           },
