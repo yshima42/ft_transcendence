@@ -182,11 +182,11 @@ export class ChatRoomMemberService {
     // NORMAL -> 何も変更を許可しない
     // 権限がないRequestの場合はエラー
     if (
+      memberStatus === ChatRoomMemberStatus.OWNER ||
       (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.OWNER &&
         loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.MODERATOR) ||
       (loginChatRoomMember.memberStatus === ChatRoomMemberStatus.MODERATOR &&
-        (memberStatus === ChatRoomMemberStatus.OWNER ||
-          memberStatus === ChatRoomMemberStatus.MODERATOR))
+        memberStatus === ChatRoomMemberStatus.MODERATOR)
     ) {
       throw new NestJs.HttpException(
         'Permission denied',
@@ -198,36 +198,6 @@ export class ChatRoomMemberService {
       // KICKEDの場合は、テーブルから消去する
       case ChatRoomMemberStatus.KICKED:
         return await this.remove(chatRoomId, memberId);
-
-      // OWNER -> ADMINの場合は変更に加えて、自分のステータスをMODERATORに変更する
-      case ChatRoomMemberStatus.OWNER: {
-        const res = await this.prisma.$transaction([
-          this.prisma.chatRoomMember.update({
-            where: {
-              chatRoomId_userId: {
-                chatRoomId,
-                userId: memberId,
-              },
-            },
-            data: {
-              memberStatus: ChatRoomMemberStatus.OWNER,
-            },
-          }),
-          this.prisma.chatRoomMember.update({
-            where: {
-              chatRoomId_userId: {
-                chatRoomId,
-                userId: chatLoginUserId,
-              },
-            },
-            data: {
-              memberStatus: ChatRoomMemberStatus.MODERATOR,
-            },
-          }),
-        ]);
-
-        return res[1];
-      }
 
       default: {
         this.logger.debug(
