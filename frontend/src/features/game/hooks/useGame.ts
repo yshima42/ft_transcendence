@@ -58,6 +58,10 @@ export const useGame = (
     keyUpEvent,
   } = useGameObjs(socket);
 
+  useEffect(() => {
+    setGamePhase(GamePhase.SocketConnecting);
+  }, [roomId]);
+
   // socket イベント
   useEffect(() => {
     socket.on('game_room_error', (message: string) => {
