@@ -37,7 +37,7 @@ export const Message: React.FC<Props> = ({
         src={avatarImageUrl}
         marginRight={2}
       />
-      <C.Text maxW="400px">{content}</C.Text>
+      <C.Text maxW="300px">{content}</C.Text>
     </C.Box>
   );
 };
