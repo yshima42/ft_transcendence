@@ -1,10 +1,12 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
 
 type Props = {
   id: string;
   content: string;
   createdAt: Date;
+  userId: string;
   name: string;
   avatarImageUrl: string;
 };
@@ -13,6 +15,7 @@ export const Message: React.FC<Props> = ({
   id,
   content,
   createdAt,
+  userId,
   name,
   avatarImageUrl,
 }) => {
@@ -30,8 +33,8 @@ export const Message: React.FC<Props> = ({
       <C.Text fontSize="sm" fontWeight="bold">
         {name}
       </C.Text>
-      <C.Avatar
-        id={id}
+      <LinkedAvatar
+        id={userId}
         size="sm"
         name={name}
         src={avatarImageUrl}
