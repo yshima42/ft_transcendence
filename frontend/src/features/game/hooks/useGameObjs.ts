@@ -82,7 +82,7 @@ export const useGameObjs = (
   useLayoutEffect(() => {
     const updateSize = (): void => {
       const xPadding = 300;
-      const yPadding = 100;
+      const yPadding = 160;
       const minimumWidth = 300;
       const maxWidth = 780;
       const canvasRatio = CANVAS_HEIGHT / CANVAS_WIDTH;
