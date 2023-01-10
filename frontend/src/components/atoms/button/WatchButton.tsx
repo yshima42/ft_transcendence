@@ -11,7 +11,7 @@ export const WatchButton: FC<Props> = memo((props) => {
   const { gameRoomId, ...buttonProps } = props;
 
   return (
-    <Link to={`/app/games/${gameRoomId}`}>
+    <Link to={`/app/game/rooms/${gameRoomId}`}>
       <Button mr={2} size="sm" {...buttonProps}>
         Watch
       </Button>

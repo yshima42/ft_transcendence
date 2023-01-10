@@ -34,7 +34,7 @@ export const useGameInvitation = (): {
     socket.on('go_game_room_by_invitation', (roomId: string) => {
       console.log('[Socket Event] go_game_room_by_invitation');
       setInviteState(InviteState.Matched);
-      navigate(`/app/games/${roomId}`);
+      navigate(`/app/game/rooms/${roomId}`);
     });
 
     socket.on('player2_decline_invitation', () => {

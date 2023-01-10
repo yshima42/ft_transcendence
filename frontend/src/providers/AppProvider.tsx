@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { BrowserRouter } from 'react-router-dom';
 import theme from '../theme/theme';
-import { ErrorProvider } from './ErrorProvider';
 
 type Props = {
   children: React.ReactNode;
@@ -24,9 +23,7 @@ export const AppProvider: FC<Props> = memo((props) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider theme={theme}>
-        <BrowserRouter>
-          <ErrorProvider>{children}</ErrorProvider>
-        </BrowserRouter>
+        <BrowserRouter>{children}</BrowserRouter>
       </ChakraProvider>
       {/* TODO: https://tanstack.com/query/v4/docs/react/devtools */}
       <ReactQueryDevtools initialIsOpen={false} position={'bottom-right'} />
