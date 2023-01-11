@@ -34,7 +34,6 @@ export const useGameMonitoring = (): {
     });
 
     socket.on('game_room_created', (createdRoomOutline: GameOutline) => {
-      // console.log('[Socket Event] game_room_created');
       inGameOutlineMap.set(createdRoomOutline.roomId, {
         roomId: createdRoomOutline.roomId,
         player1Id: createdRoomOutline.player1Id,
@@ -44,7 +43,6 @@ export const useGameMonitoring = (): {
     });
 
     socket.on('game_room_deleted', (deletedRoomId: string) => {
-      // console.log('[Socket Event] game_room_deleted');
       inGameOutlineMap.delete(deletedRoomId);
       setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
     });

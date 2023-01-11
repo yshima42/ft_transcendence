@@ -5,18 +5,15 @@ import { SocketContext } from 'providers/SocketProvider';
 
 export enum InviteState {
   SocketConnecting = 0,
-  GamePreference = 1,
-  Inviting = 2,
-  InvitingCancel = 3,
-  InvitingDeclined = 4,
-  Matched = 5,
+  Inviting = 1,
+  InvitingCancel = 2,
 }
 
-export const useGameInvitation = (): {
+export const useGameInvitation = (
+  invitationRoomId: string
+): {
   inviteState: InviteState;
   setInviteState: React.Dispatch<React.SetStateAction<InviteState>>;
-  setOpponentId: React.Dispatch<React.SetStateAction<string>>;
-  setBallSpeed: React.Dispatch<React.SetStateAction<number>>;
 } => {
   const [inviteState, setInviteState] = useState(InviteState.SocketConnecting);
   const socketContext = useContext(SocketContext);
@@ -25,72 +22,55 @@ export const useGameInvitation = (): {
   }
   const { socket, isConnected } = socketContext;
   const navigate = useNavigate();
-  const [opponentId, setOpponentId] = useState('');
-  const [ballSpeed, setBallSpeed] = useState(0);
   const { customToast } = useCustomToast();
 
   // socket イベント
   useEffect(() => {
+    socket.on('invitation_room_error', (message: string) => {
+      customToast({ description: message });
+      navigate(-1);
+    });
+
     socket.on('go_game_room_by_invitation', (roomId: string) => {
-      // console.log('[Socket Event] go_game_room_by_invitation');
-      setInviteState(InviteState.Matched);
       navigate(`/app/game/rooms/${roomId}`);
     });
 
     socket.on('player2_decline_invitation', () => {
-      // console.log('[Socket Event] go_game_room_by_invitation');
-      setInviteState(InviteState.InvitingDeclined);
+      customToast({
+        title: 'Declined',
+        description: 'Your Invitation was declined',
+        status: 'warning',
+      });
+      navigate(-1);
     });
 
     return () => {
+      socket.emit('leave_invitation_room');
+      socket.off('invitation_room_error');
       socket.off('go_game_room_by_invitation');
       socket.off('player2_decline_invitation');
     };
-  }, [socket, inviteState, navigate]);
+  }, [socket, navigate, customToast]);
 
   // 各state のロジック
   useEffect(() => {
     switch (inviteState) {
       case InviteState.SocketConnecting: {
         if (isConnected) {
-          setInviteState(InviteState.GamePreference);
+          setInviteState(InviteState.Inviting);
         }
         break;
       }
       case InviteState.Inviting: {
-        if (opponentId !== undefined) {
-          socket.emit('invitation_match', {
-            opponentId,
-            ballSpeed,
-          });
-        }
+        socket.emit('join_invitation_room', { invitationRoomId });
         break;
       }
       case InviteState.InvitingCancel: {
-        if (opponentId !== undefined) {
-          socket.emit('cancel_invitation', {
-            opponentId,
-          });
-        }
-        navigate(-1);
-        break;
-      }
-      case InviteState.InvitingDeclined: {
-        customToast({
-          title: 'Declined',
-          description: 'Your Invitation was declined',
-          status: 'warning',
-        });
         navigate(-1);
         break;
       }
     }
-  }, [inviteState, socket, navigate, isConnected]);
+  }, [inviteState, socket, navigate, isConnected, invitationRoomId]);
 
-  return {
-    inviteState,
-    setInviteState,
-    setOpponentId,
-    setBallSpeed,
-  };
+  return { inviteState, setInviteState };
 };

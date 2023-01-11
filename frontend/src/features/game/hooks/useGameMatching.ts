@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 
@@ -6,7 +7,6 @@ export enum MatchState {
   SocketConnecting = 0,
   Matching = 1,
   MatchingCancel = 2,
-  Matched = 3,
 }
 
 export const useGameMatching = (): {
@@ -20,22 +20,25 @@ export const useGameMatching = (): {
   }
   const { socket, isConnected } = socketContext;
   const navigate = useNavigate();
+  const { customToast } = useCustomToast();
 
   // socket イベント
   useEffect(() => {
+    socket.on('matching_room_error', (message: string) => {
+      customToast({ description: message });
+      navigate('/app');
+    });
+
     socket.on('go_game_room', (roomId: string) => {
-      // console.log('[Socket Event] go_game_room');
-      setMatchState(MatchState.Matched);
       navigate(`/app/game/rooms/${roomId}`);
     });
 
     return () => {
-      if (matchState === MatchState.Matching) {
-        socket.emit('leave_matching_room');
-      }
+      socket.emit('leave_matching_room');
+      socket.off('matching_room_error');
       socket.off('go_game_room');
     };
-  }, [socket, matchState, navigate]);
+  }, [socket, navigate, customToast]);
 
   // 各state のロジック
   useEffect(() => {
@@ -51,7 +54,6 @@ export const useGameMatching = (): {
         break;
       }
       case MatchState.MatchingCancel: {
-        socket.emit('leave_matching_room');
         navigate('/app');
         break;
       }

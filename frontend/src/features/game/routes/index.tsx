@@ -12,7 +12,7 @@ export const GameRoutes: FC = () => {
       <Route path="rooms" element={<InGameList />} />
       <Route path="rooms/:id" element={<Game />} />
       <Route path="matching" element={<Matching />} />
-      <Route path="inviting" element={<Inviting />} />
+      <Route path="inviting/:id" element={<Inviting />} />
       <Route path="*" element={<Page404 />} />
     </Routes>
   );
