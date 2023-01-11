@@ -476,7 +476,7 @@ export class UsersGateway {
       this.server,
       (gameRoom: GameRoom) => this.deleteGameRoom(gameRoom),
       new Player(player1Id, true),
-      new Player(player2Id, true),
+      new Player(player2Id, false),
       ballSpeed
     );
     this.gameRooms.set(gameRoom.id, gameRoom);
