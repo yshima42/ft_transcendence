@@ -9,14 +9,21 @@ import { RecognitionList } from 'features/friends/components/organisms/Recogniti
 import { RequestableUsersList } from 'features/friends/components/organisms/RequestableUsersList';
 
 const tabs = ['Friends', 'Pending', 'Recognition', 'Blocked', 'AddFriend'];
+const dataTestList = [
+  'users-friends-tab',
+  'users-pending-tab',
+  'users-recognition-tab',
+  'users-blocked-tab',
+  'users-add-friend-tab',
+];
 
 export const Users: FC = memo(() => {
   return (
     <ContentLayout title="Users">
       <Tabs variant="soft-rounded">
         <TabList>
-          {tabs.map((tab) => (
-            <Tab key={tab} data-test={'users-' + tab.toLowerCase() + '-tab'}>
+          {tabs.map((tab, index) => (
+            <Tab key={tab} data-test={dataTestList[index]}>
               {tab}
             </Tab>
           ))}

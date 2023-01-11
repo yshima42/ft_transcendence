@@ -220,7 +220,7 @@ describe('User Settings', function () {
 
     // Add Friendのプロフィール確認。
     cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-addfriend-tab').click();
+    cy.getBySel('users-add-friend-tab').click();
     cy.location('pathname').should('eq', '/app/users');
 
     const targetAddFriendNickname = 'nick-dummy-add-friend1';
@@ -235,5 +235,58 @@ describe('User Settings', function () {
     cy.getBySel('accept-button').should('not.exist');
     cy.getBySel('reject-button').should('not.exist');
     cy.getBySel('cancel-button').should('not.exist');
+  });
+
+  it('フレンド申請を送ることができる', () => {
+    // Add Friendのプロフィール確認。
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-add-friend-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    const targetAddFriendNickname = 'nick-dummy-add-friend1';
+    const targetAddFriendSelector =
+      'users-user-avatar-' + targetAddFriendNickname;
+
+    cy.getBySel('users-add-friend').within(() => {
+      cy.getBySel(targetAddFriendSelector).click();
+    });
+    cy.location('pathname').should('contain', '/app/users');
+
+    cy.getBySel('request-button').should('be.visible').click();
+    cy.getBySel('cancel-button').should('be.visible');
+
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-pending-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    cy.getBySel('users-pending').within(() => {
+      cy.getBySel(targetAddFriendSelector).should('be.visible');
+    });
+  });
+
+  it.only('フレンド申請を取り消すことができる', () => {
+    // Pendingのプロフィール確認。
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-pending-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    const targetNickname = 'nick-dummy-pending1';
+    const targetSelector = 'users-user-avatar-' + targetNickname;
+
+    cy.getBySel('users-pending').within(() => {
+      cy.getBySel(targetSelector).click();
+    });
+    cy.location('pathname').should('contain', '/app/users');
+
+    cy.getBySel('cancel-button').should('be.visible').click();
+    cy.getBySel('request-button').should('be.visible');
+
+    cy.getBySel('sidenav-users').click();
+    cy.getBySel('users-add-friend-tab').click();
+    cy.location('pathname').should('eq', '/app/users');
+
+    cy.getBySel('users-add-friend').within(() => {
+      cy.getBySel(targetSelector).should('be.visible');
+    });
   });
 });
