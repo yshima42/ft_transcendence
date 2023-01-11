@@ -91,7 +91,7 @@ describe('User Settings', function () {
 
     // アバターアップロード
     cy.getBySel('profile-edit').click();
-    cy.getBySelLike('file-select').selectFile(uploadFilePath);
+    cy.getBySelLike('file-select').selectFile(uploadFilePath, { force: true });
     cy.getBySelLike('submit').click();
 
     // ファイルがアップロードされているか確認

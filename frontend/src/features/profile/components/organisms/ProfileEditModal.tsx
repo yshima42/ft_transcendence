@@ -90,6 +90,7 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     src={user.avatarImageUrl}
                   />
                   <input
+                    hidden
                     ref={inputRef}
                     type="file"
                     accept="image/*"
