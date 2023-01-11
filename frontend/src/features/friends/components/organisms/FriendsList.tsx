@@ -29,7 +29,7 @@ export const FriendsList: FC = () => {
           buttons={
             <>
               <GameOrWatchButton targetId={user.id} />
-              <DmButton targetId={user.id} />
+              <DmButton targetId={user.id} nickname={user.nickname} />
             </>
           }
           isFriend={true}

@@ -11,7 +11,7 @@ export const ContentLayout: FC<Props> = (props) => {
 
   return (
     <Container maxW="980px" px={{ base: 4, md: 8 }} py={{ base: 12, md: 8 }}>
-      <Heading as="h2" size="md">
+      <Heading as="h2" size="md" data-test="content-title">
         {title}
       </Heading>
       <Box py={8}>{children}</Box>

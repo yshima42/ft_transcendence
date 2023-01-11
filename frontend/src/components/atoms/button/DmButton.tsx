@@ -6,11 +6,12 @@ import { useNavigate } from 'react-router-dom';
 
 type Props = ButtonProps & {
   targetId: string;
+  nickname: string;
 };
 
 export const DmButton: FC<Props> = memo((props) => {
   const navigate = useNavigate();
-  const { targetId, ...buttonProps } = props;
+  const { targetId, nickname, ...buttonProps } = props;
 
   const onClickDm = async () => {
     try {
@@ -28,7 +29,12 @@ export const DmButton: FC<Props> = memo((props) => {
   };
 
   return (
-    <Button size="sm" onClick={onClickDm} {...buttonProps}>
+    <Button
+      size="sm"
+      onClick={onClickDm}
+      {...buttonProps}
+      data-test={`${nickname}-dm-button`}
+    >
       DM
     </Button>
   );

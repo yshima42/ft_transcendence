@@ -34,8 +34,11 @@ export const MessageSendForm: React.FC<Props> = ({ roomId, socket }) => {
         onChange={(e) => setContent(e.target.value)}
         maxLength={255}
         minLength={1}
+        data-test="message-form"
       />
-      <C.Button type="submit">Send</C.Button>
+      <C.Button type="submit" data-test="send-button">
+        Send
+      </C.Button>
     </form>
   );
 };
