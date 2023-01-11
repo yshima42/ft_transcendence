@@ -11,13 +11,12 @@ import {
 describe('Profile', function () {
   // DBセットアップ
   before(() => {
-    cy.exec(
-      'yarn --cwd ../backend ts-node prisma/seed-cypress-user-account.ts'
-    );
+    // cy.exec('yarn --cwd ../backend db:seed:test:ua');
   });
 
   // dummy1でログイン
   beforeEach(() => {
+    cy.exec('yarn --cwd ../backend db:seed:test:ua');
     cy.visit('/');
     cy.getBySel('dummy1-login').click();
   });
@@ -112,7 +111,7 @@ describe('Profile', function () {
    * チェック項目No.27, 60
    */
   it.only('他のユーザーをブロックすることができ、そのブロックを解除することができる。', () => {
-    const targetNickname = 'nick-dummy-friends1';
+    const targetNickname = 'n-friends1';
 
     visitProfileFromUsersTab(UsersTab.FRIENDS, targetNickname);
     cy.getBySel('block-button').click();
@@ -134,7 +133,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を送ることができる', () => {
-    const targetNickname = 'nick-dummy-add-friend1';
+    const targetNickname = 'n-add-friend1';
 
     visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetNickname);
     cy.getBySel('request-button').should('be.visible').click();
@@ -151,7 +150,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を取り消すことができる', () => {
-    const targetNickname = 'nick-dummy-pending1';
+    const targetNickname = 'n-pending1';
 
     visitProfileFromUsersTab(UsersTab.PENDING, targetNickname);
     cy.getBySel('cancel-button').should('be.visible').click();
@@ -168,7 +167,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を承認することができる', () => {
-    const targetNickname = 'nick-dummy-recognition1';
+    const targetNickname = 'n-recognition1';
 
     visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
     cy.getBySel('accept-button').should('be.visible').click();
@@ -187,7 +186,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を拒否することができる', () => {
-    const targetNickname = 'nick-dummy-recognition2';
+    const targetNickname = 'n-recognition2';
 
     visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
     cy.getBySel('reject-button').should('be.visible').click();

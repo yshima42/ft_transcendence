@@ -33,6 +33,7 @@ export const visitMyProfile = (): void => {
 
 export const visitUsersTab = (tab: UsersTab): void => {
   const dataTest = getUsersDataTest(tab) + '-tab';
+
   cy.getBySel('sidenav-users').click();
   cy.getBySelLike(dataTest).click();
   cy.location('pathname').should('eq', '/app/users');
@@ -43,8 +44,10 @@ export const visitProfileFromUsersTab = (
   nickname: string
 ): void => {
   visitUsersTab(tab);
+
   const targetSelector = 'users-user-avatar-' + nickname;
   const dataTest = getUsersDataTest(tab) + '-grid';
+
   cy.getBySelLike(dataTest).within(() => {
     cy.getBySel(targetSelector).should('be.visible').click();
   });
@@ -56,8 +59,10 @@ export const assertUserIsInUsersTab = (
   nickname: string
 ): void => {
   visitUsersTab(tab);
+
   const targetSelector = 'users-user-avatar-' + nickname;
   const dataTest = getUsersDataTest(tab) + '-grid';
+
   cy.getBySelLike(dataTest).within(() => {
     cy.getBySel(targetSelector).should('be.visible');
   });
@@ -68,8 +73,10 @@ export const assertUserIsNotInUsersTab = (
   nickname: string
 ): void => {
   visitUsersTab(tab);
+
   const targetSelector = 'users-user-avatar-' + nickname;
   const dataTest = getUsersDataTest(tab) + '-grid';
+
   cy.getBySelLike(dataTest).within(() => {
     cy.getBySel(targetSelector).should('not.exist');
   });

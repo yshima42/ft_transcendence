@@ -26,13 +26,12 @@ const changeRelation = (
 describe('Users', function () {
   // DBセットアップ
   before(() => {
-    cy.exec(
-      'yarn --cwd ../backend ts-node prisma/seed-cypress-user-account.ts'
-    );
+    // cy.exec('yarn --cwd ../backend db:seed:test:ua');
   });
 
   // dummy1でログイン
   beforeEach(() => {
+    cy.exec('yarn --cwd ../backend db:seed:test:ua');
     cy.visit('/');
     cy.getBySel('dummy1-login').click();
   });
@@ -63,7 +62,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('他のユーザーのブロックを解除することができる。', () => {
-    const targetNickname = 'nick-dummy-blocked1';
+    const targetNickname = 'n-blocked1';
 
     visitUsersTab(UsersTab.BLOCKED);
     changeRelation(UsersTab.BLOCKED, 'unblock-button', targetNickname);
@@ -77,10 +76,10 @@ describe('Users', function () {
    * チェック項目No.59
    */
   it('他のユーザープロフィールのフレンド関係ボタン表示', () => {
-    const targetFriendNickname = 'nick-dummy-friends2';
-    const targetPendingNickname = 'nick-dummy-pending1';
-    const targetRecognitionNickname = 'nick-dummy-recognition1';
-    const targetAddFriendNickname = 'nick-dummy-add-friend1';
+    const targetFriendNickname = 'n-friends2';
+    const targetPendingNickname = 'n-pending1';
+    const targetRecognitionNickname = 'n-recognition1';
+    const targetAddFriendNickname = 'n-add-friend1';
 
     // Friendsのプロフィール確認。
     visitProfileFromUsersTab(UsersTab.FRIENDS, targetFriendNickname);
@@ -119,7 +118,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を送ることができる', () => {
-    const targetNickname = 'nick-dummy-add-friend1';
+    const targetNickname = 'n-add-friend1';
 
     visitUsersTab(UsersTab.ADD_FRIEND);
     changeRelation(UsersTab.ADD_FRIEND, 'request-button', targetNickname);
@@ -134,7 +133,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を取り消すことができる', () => {
-    const targetNickname = 'nick-dummy-pending1';
+    const targetNickname = 'n-pending1';
 
     visitUsersTab(UsersTab.PENDING);
     changeRelation(UsersTab.PENDING, 'cancel-button', targetNickname);
@@ -149,7 +148,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を承認することができる', () => {
-    const targetNickname = 'nick-dummy-recognition1';
+    const targetNickname = 'n-recognition1';
 
     visitUsersTab(UsersTab.RECOGNITION);
     changeRelation(UsersTab.RECOGNITION, 'accept-button', targetNickname);
@@ -164,7 +163,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を拒否することができる', () => {
-    const targetNickname = 'nick-dummy-recognition2';
+    const targetNickname = 'n-recognition2';
 
     visitUsersTab(UsersTab.RECOGNITION);
     changeRelation(UsersTab.RECOGNITION, 'reject-button', targetNickname);

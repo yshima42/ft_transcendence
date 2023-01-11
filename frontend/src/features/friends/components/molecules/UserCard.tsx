@@ -32,6 +32,7 @@ export const UserCard: FC<Props> = memo((props) => {
                 id={id}
                 size="md"
                 src={avatarImageUrl}
+                // LinkedAvatarにdata-testを作りたいが、影響が大きいので暫定的に
                 data-test={'users-user-avatar-' + nickname}
               />
             ) : (
@@ -39,6 +40,7 @@ export const UserCard: FC<Props> = memo((props) => {
                 id={id}
                 size="md"
                 src={avatarImageUrl}
+                // LinkedAvatarにdata-testを作りたいが、影響が大きいので暫定的に
                 data-test={'users-user-avatar-' + nickname}
               />
             )}
