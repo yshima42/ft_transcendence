@@ -112,7 +112,12 @@ export const SignUp: FC = memo(() => {
               <FormLabel htmlFor="nickname" fontSize="lg">
                 Nickname
               </FormLabel>
-              <Input id="nickname" name="nickname" onChange={onProfileChange} />
+              <Input
+                id="nickname"
+                name="nickname"
+                maxLength={50}
+                onChange={onProfileChange}
+              />
             </HStack>
           </Box>
 
