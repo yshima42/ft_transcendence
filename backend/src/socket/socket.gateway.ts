@@ -201,11 +201,15 @@ export class UsersGateway {
     socket.to(userId).emit('invitation_room_error', 'Invitation canceled.');
 
     await socket.join(invitationRoom.id);
-    this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
-      invitationRoomId: invitationRoom.id,
-      challengerId: userId,
-      ballSpeedType: invitationRoom.ballSpeedType,
-    });
+    // 招待中に、別タブ、直打ちで、同じinvitation_room に入れるため、1回だけemit。
+    if (!invitationRoom.isAlreadyInvited) {
+      invitationRoom.isAlreadyInvited = true;
+      this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
+        invitationRoomId: invitationRoom.id,
+        challengerId: userId,
+        ballSpeedType: invitationRoom.ballSpeedType,
+      });
+    }
   }
 
   @SubscribeMessage('accept_invitation')
