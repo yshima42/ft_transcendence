@@ -1,6 +1,35 @@
 /* eslint-disable jest/no-focused-tests */
 import { GameStats } from '../../src/hooks/api/game/useGameStats';
 
+// type UsersTab = 'Friends' | 'Pending' | 'Blocked' | 'Add Friend';
+enum UsersTab {
+  FRIENDS,
+  PENDING,
+  RECOGNITION,
+  BLOCKED,
+  ADD_FRIEND,
+}
+
+const getUsersTabDataTest = (tab: UsersTab): string => {
+  const usersTabDataTest: string[] = [
+    'friends-tab',
+    'pending-tab',
+    'recognition-tab',
+    'blocked-tab',
+    'add-friend-tab',
+  ];
+
+  return usersTabDataTest[tab];
+};
+
+const visitUsersTab = (tab: UsersTab) => {
+  const dataTest = getUsersTabDataTest(tab);
+  console.log(dataTest);
+  cy.getBySel('sidenav-users').click();
+  cy.getBySelLike(dataTest).click();
+  cy.location('pathname').should('eq', '/app/users');
+};
+
 describe('User Settings', function () {
   // DBセットアップ
   before(() => {
@@ -238,37 +267,28 @@ describe('User Settings', function () {
   });
 
   it('フレンド申請を送ることができる', () => {
-    // Add Friendのプロフィール確認。
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-add-friend-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
+    visitUsersTab(UsersTab.ADD_FRIEND);
 
-    const targetAddFriendNickname = 'nick-dummy-add-friend1';
-    const targetAddFriendSelector =
-      'users-user-avatar-' + targetAddFriendNickname;
+    const targetNickname = 'nick-dummy-add-friend1';
+    const targetSelector = 'users-user-avatar-' + targetNickname;
 
     cy.getBySel('users-add-friend').within(() => {
-      cy.getBySel(targetAddFriendSelector).click();
+      cy.getBySel(targetSelector).click();
     });
     cy.location('pathname').should('contain', '/app/users');
 
     cy.getBySel('request-button').should('be.visible').click();
     cy.getBySel('cancel-button').should('be.visible');
 
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-pending-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
+    visitUsersTab(UsersTab.PENDING);
 
     cy.getBySel('users-pending').within(() => {
-      cy.getBySel(targetAddFriendSelector).should('be.visible');
+      cy.getBySel(targetSelector).should('be.visible');
     });
   });
 
-  it.only('フレンド申請を取り消すことができる', () => {
-    // Pendingのプロフィール確認。
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-pending-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
+  it('フレンド申請を取り消すことができる', () => {
+    visitUsersTab(UsersTab.PENDING);
 
     const targetNickname = 'nick-dummy-pending1';
     const targetSelector = 'users-user-avatar-' + targetNickname;
@@ -281,9 +301,51 @@ describe('User Settings', function () {
     cy.getBySel('cancel-button').should('be.visible').click();
     cy.getBySel('request-button').should('be.visible');
 
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-add-friend-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
+    visitUsersTab(UsersTab.ADD_FRIEND);
+
+    cy.getBySel('users-add-friend').within(() => {
+      cy.getBySel(targetSelector).should('be.visible');
+    });
+  });
+
+  it('フレンド申請を承認することができる', () => {
+    visitUsersTab(UsersTab.RECOGNITION);
+
+    const targetNickname = 'nick-dummy-recognition1';
+    const targetSelector = 'users-user-avatar-' + targetNickname;
+
+    cy.getBySel('users-recognition').within(() => {
+      cy.getBySel(targetSelector).click();
+    });
+    cy.location('pathname').should('contain', '/app/users');
+
+    cy.getBySel('accept-button').should('be.visible').click();
+    cy.getBySel('profile-user-avatar')
+      .children('div.chakra-avatar__badge')
+      .should('be.visible');
+
+    visitUsersTab(UsersTab.FRIENDS);
+
+    cy.getBySel('users-friends').within(() => {
+      cy.getBySel(targetSelector).should('be.visible');
+    });
+  });
+
+  it.only('フレンド申請を拒否することができる', () => {
+    visitUsersTab(UsersTab.RECOGNITION);
+
+    const targetNickname = 'nick-dummy-recognition2';
+    const targetSelector = 'users-user-avatar-' + targetNickname;
+
+    cy.getBySel('users-recognition').within(() => {
+      cy.getBySel(targetSelector).click();
+    });
+    cy.location('pathname').should('contain', '/app/users');
+
+    cy.getBySel('reject-button').should('be.visible').click();
+    cy.getBySel('request-button').should('be.visible');
+
+    visitUsersTab(UsersTab.ADD_FRIEND);
 
     cy.getBySel('users-add-friend').within(() => {
       cy.getBySel(targetSelector).should('be.visible');
