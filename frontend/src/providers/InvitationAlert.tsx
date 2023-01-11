@@ -82,15 +82,23 @@ export const InvitationAlert: FC<Props> = memo((props) => {
       setNewInvitationData(message);
     });
 
-    socket.on('close_invitation_alert', () => {
-      onClose();
-    });
+    socket.on(
+      'close_invitation_alert',
+      (message: { invitationRoomId: string | null }) => {
+        if (
+          message.invitationRoomId === null ||
+          invitationRoomId === message.invitationRoomId
+        ) {
+          onClose();
+        }
+      }
+    );
 
     return () => {
       socket.off('receive_invitation');
       socket.off('close_invitation_alert');
     };
-  }, [isConnected, socket, onClose]);
+  }, [isConnected, socket, onClose, invitationRoomId]);
 
   const onClickAccept = useCallback(() => {
     // useState での値の更新は非同期なので、isButtonDisabled.current を使う。
@@ -100,8 +108,8 @@ export const InvitationAlert: FC<Props> = memo((props) => {
     socket.emit(
       'accept_invitation',
       { invitationRoomId },
-      (message: { roomId: string | undefined }) => {
-        if (message.roomId === undefined) {
+      (message: { roomId: string | null }) => {
+        if (message.roomId === null) {
           customToast({ description: 'The opponent canceled the invitation.' });
 
           return;
