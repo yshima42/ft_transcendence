@@ -16,7 +16,7 @@ export const PendingList: FC = () => {
         lg: 'repeat(2, 1fr)',
       }}
       gap={6}
-      data-test="users-pending"
+      data-test="users-pending-grid"
     >
       {users.map((user) => (
         <UserCard

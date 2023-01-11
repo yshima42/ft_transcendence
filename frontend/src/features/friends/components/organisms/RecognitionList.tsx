@@ -17,7 +17,7 @@ export const RecognitionList: FC = () => {
         lg: 'repeat(2, 1fr)',
       }}
       gap={6}
-      data-test="users-recognition"
+      data-test="users-recognition-grid"
     >
       {users.map((user) => (
         <UserCard
