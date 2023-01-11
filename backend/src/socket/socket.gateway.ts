@@ -66,6 +66,7 @@ export class UsersGateway {
 
     await socket.join(user.id);
 
+    // 別タブで出ている招待モーダルを閉じる。
     socket.to(user.id).emit('close_invitation_alert');
     socket.emit('connect_established');
     Logger.debug('connected: ' + socket.id);
