@@ -20,7 +20,7 @@ enum Presence {
   INGAME = 2,
 }
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: 'http://localhost:5173/' } })
 export class UsersGateway {
   public userIdToPresence: Map<string, Presence>;
   public userIdToGameRoomId: Map<string, string>;
