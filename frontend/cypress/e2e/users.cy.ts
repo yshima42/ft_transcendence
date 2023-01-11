@@ -38,9 +38,8 @@ describe('Users', function () {
   });
 
   /**
-   * シナリオ UA-4
-   * サイドバーからFriendタブを表示。
-   * Friendの一覧を取得し、バッチの表示を確認する。
+   * シナリオ Users-1
+   * Friendsタブでバッジの表示されているか確認する。
    *
    * チェック項目No.21, 61
    */
@@ -56,14 +55,13 @@ describe('Users', function () {
   });
 
   /**
-   * シナリオ UA-
-   * サイドバーからBlockedタブを表示。
-   * Blockedの中から一人選び、アンブロックボタンをクリック。
-   * ブロック一覧に存在しないことを確認。
+   * シナリオ Users-2
+   * Blockedタブに表示されるユーザー一人選び、UnBlockボタンをクリック。
+   * プロフィールページでRejectボタンをクリック。
+   * ブロック一覧に表示されないことを確認。
    *
-   * チェック項目No.
+   * チェック項目No.21,78
    */
-
   it('他のユーザーのブロックを解除することができる。', () => {
     const targetNickname = 'nick-dummy-blocked1';
 
@@ -72,7 +70,7 @@ describe('Users', function () {
   });
 
   /**
-   * シナリオ UA-6
+   * シナリオ Users-3
    * サイドバーからFriendタブを表示。
    * FriendRelationによって、表示されるFriend関連のボタンを確認。
    *
@@ -84,9 +82,8 @@ describe('Users', function () {
     const targetRecognitionNickname = 'nick-dummy-recognition1';
     const targetAddFriendNickname = 'nick-dummy-add-friend1';
 
-    // Friendのプロフィール確認。
+    // Friendsのプロフィール確認。
     visitProfileFromUsersTab(UsersTab.FRIENDS, targetFriendNickname);
-
     cy.getBySel('accept-button').should('not.exist');
     cy.getBySel('cancel-button').should('not.exist');
     cy.getBySel('reject-button').should('not.exist');
@@ -94,7 +91,6 @@ describe('Users', function () {
 
     // Pendingのプロフィール確認。
     visitProfileFromUsersTab(UsersTab.PENDING, targetPendingNickname);
-
     cy.getBySel('cancel-button').should('be.visible');
     cy.getBySel('accept-button').should('not.exist');
     cy.getBySel('reject-button').should('not.exist');
@@ -102,7 +98,6 @@ describe('Users', function () {
 
     // Recognitionのプロフィール確認。
     visitProfileFromUsersTab(UsersTab.RECOGNITION, targetRecognitionNickname);
-
     cy.getBySel('accept-button').should('be.visible');
     cy.getBySel('reject-button').should('be.visible');
     cy.getBySel('cancel-button').should('not.exist');
@@ -110,7 +105,6 @@ describe('Users', function () {
 
     // Add Friendのプロフィール確認。
     visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetAddFriendNickname);
-
     cy.getBySel('request-button').should('be.visible');
     cy.getBySel('accept-button').should('not.exist');
     cy.getBySel('reject-button').should('not.exist');
@@ -118,12 +112,11 @@ describe('Users', function () {
   });
 
   /**
-   * シナリオ UA-
-   * サイドバーからAdd Friendタブを表示。
-   * Add Friendの中から一人選び、リクエストボタンをクリック。
+   * シナリオ Users-4
+   * Add Friendタブの中から一人選び、Requestボタンをクリック。
    * Pendingタブに存在することを確認。
    *
-   * チェック項目No.
+   * チェック項目No.21,78
    */
   it('フレンド申請を送ることができる', () => {
     const targetNickname = 'nick-dummy-add-friend1';
@@ -133,6 +126,13 @@ describe('Users', function () {
     assertUserIsInUsersTab(UsersTab.PENDING, targetNickname);
   });
 
+  /**
+   * シナリオ Users-5
+   * Pendingタブの中から一人選び、Cancelボタンをクリック。
+   * Add Friendタブに存在することを確認。
+   *
+   * チェック項目No.21,78
+   */
   it('フレンド申請を取り消すことができる', () => {
     const targetNickname = 'nick-dummy-pending1';
 
@@ -141,6 +141,13 @@ describe('Users', function () {
     assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
 
+  /**
+   * シナリオ Users-6
+   * Recognitionタブの中から一人選び、Acceptボタンをクリック。
+   * Friendsタブに存在することを確認。
+   *
+   * チェック項目No.21,78
+   */
   it('フレンド申請を承認することができる', () => {
     const targetNickname = 'nick-dummy-recognition1';
 
@@ -149,6 +156,13 @@ describe('Users', function () {
     assertUserIsInUsersTab(UsersTab.FRIENDS, targetNickname);
   });
 
+  /**
+   * シナリオ Users-7
+   * Recognitionタブの中から一人選び、Rejectボタンをクリック。
+   * Add Friendタブに存在することを確認。
+   *
+   * チェック項目No.21,78
+   */
   it('フレンド申請を拒否することができる', () => {
     const targetNickname = 'nick-dummy-recognition2';
 

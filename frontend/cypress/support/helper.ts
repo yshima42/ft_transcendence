@@ -62,3 +62,15 @@ export const assertUserIsInUsersTab = (
     cy.getBySel(targetSelector).should('be.visible');
   });
 };
+
+export const assertUserIsNotInUsersTab = (
+  tab: UsersTab,
+  nickname: string
+): void => {
+  visitUsersTab(tab);
+  const targetSelector = 'users-user-avatar-' + nickname;
+  const dataTest = getUsersDataTest(tab) + '-grid';
+  cy.getBySelLike(dataTest).within(() => {
+    cy.getBySel(targetSelector).should('not.exist');
+  });
+};
