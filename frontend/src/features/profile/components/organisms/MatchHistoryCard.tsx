@@ -1,5 +1,6 @@
 import { memo, FC } from 'react';
-import { Box, Flex, Stack, Text, VStack } from '@chakra-ui/react';
+import { TimeIcon } from '@chakra-ui/icons';
+import { Box, Center, Flex, Heading, Stack, VStack } from '@chakra-ui/react';
 import { useMatchHistory } from 'hooks/api/game/useMatchHistory';
 import { GameResultCard } from '../molecules/GameResultCard';
 
@@ -29,12 +30,15 @@ export const MatchHistoryCard: FC<Props> = memo((props) => {
         direction="column"
       >
         <Stack>
-          <Box pl={3} pb={2}>
-            <Text as="b">Match History</Text>
-          </Box>
+          <Flex pl={3} pb={2}>
+            <TimeIcon w="6" h="6" pr="2" />
+            <Heading size="md">Match History</Heading>
+          </Flex>
           <VStack justify="center" data-test="profile-latest-5matches">
             {latest5Matches.length === 0 ? (
-              <Flex>No Data</Flex>
+              <Center h="450px">
+                <Flex color="gray.600">No Match History</Flex>
+              </Center>
             ) : (
               latest5Matches.map((match) => (
                 <Box key={match.id}>

@@ -40,7 +40,6 @@ export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
       direction="column"
     >
       <Flex>
-        {/* TODO トロフィーにしたい */}
         <SunIcon w="6" h="6" pr="2" />
         <Heading size="md">Stats</Heading>
       </Flex>
