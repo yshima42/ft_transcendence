@@ -1,14 +1,14 @@
 import { memo, FC } from 'react';
 import { Box, HStack, Tag, TagLabel } from '@chakra-ui/react';
 import { User } from '@prisma/client';
-import { useBlockRelation } from 'hooks/api';
+import { useBlockRelation, useProfile } from 'hooks/api';
 import { useFriendRelation } from 'hooks/api/friend/useFriendRelation';
 import { DmButton } from 'components/atoms/button/DmButton';
+import { GameOrWatchButton } from 'components/molecules/GameOrWatchButton';
 import { OtpAuthButton } from '../atoms/OtpAuthButton';
 import { ProfileEditButton } from '../atoms/ProfileEditButton';
 import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
-import { GameOrWatchButton } from './GameOrWatchButton';
 
 type Props = {
   user: User;
@@ -19,6 +19,7 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
   const { user, isLoginUser } = props;
   const { isUserBlocked } = useBlockRelation(user.id);
   const { friendRelation } = useFriendRelation(user.id);
+  const { user: loginUser } = useProfile();
 
   return (
     <>
@@ -35,7 +36,7 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
       ) : (
         <>
           <HStack>
-            <GameOrWatchButton targetId={user.id} />
+            <GameOrWatchButton loginUserId={loginUser.id} targetId={user.id} />
             <DmButton targetId={user.id} />
           </HStack>
           <Box m={2}>

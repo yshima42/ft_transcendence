@@ -13,7 +13,7 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
-  @Length(1, 50)
+  @Length(1, 20)
   @ApiProperty({
     default: 'patrash',
   })
