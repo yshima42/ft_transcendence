@@ -25,7 +25,7 @@ export const MessageSendForm: React.FC<Props> = ({ roomId, socket }) => {
         setContent('');
       }}
     >
-      <HStack pos="sticky" bottom="0">
+      <HStack>
         <C.Input
           type="text"
           name="content"
