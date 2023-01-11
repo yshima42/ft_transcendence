@@ -42,6 +42,7 @@ export const InvitationAlert: FC<Props> = memo((props) => {
   const [challengerId, setChallengerId] = useState<string>();
   const [ballSpeedType, setBallSpeedType] = useState<BallSpeedType>();
   const { user: challenger } = useProfile(challengerId);
+  const isButtonDisabled = useRef(false);
   const cancelRef = useRef(null);
   const isMatchingPage = Boolean(useMatch('/app/game/matching'));
   const isInvitingPage = Boolean(useMatch('/app/game/inviting/:id'));
@@ -60,6 +61,7 @@ export const InvitationAlert: FC<Props> = memo((props) => {
       setInvitationRoomId(newInvitationData.invitationRoomId);
       setChallengerId(newInvitationData.challengerId);
       setBallSpeedType(newInvitationData.ballSpeedType);
+      isButtonDisabled.current = false;
       onOpen();
     }
     setNewInvitationData(null);
@@ -91,6 +93,9 @@ export const InvitationAlert: FC<Props> = memo((props) => {
   }, [isConnected, socket, onClose]);
 
   const onClickAccept = useCallback(() => {
+    // useState での値の更新は非同期なので、isButtonDisabled.current を使う。
+    if (isButtonDisabled.current) return;
+    isButtonDisabled.current = true;
     onClose();
     socket.emit(
       'accept_invitation',
@@ -107,6 +112,8 @@ export const InvitationAlert: FC<Props> = memo((props) => {
   }, [customToast, invitationRoomId, navigate, onClose, socket]);
 
   const onClickDecline = useCallback(() => {
+    if (isButtonDisabled.current) return;
+    isButtonDisabled.current = true;
     onClose();
     socket.emit('decline_invitation', { invitationRoomId });
   }, [invitationRoomId, onClose, socket]);
