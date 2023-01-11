@@ -66,6 +66,7 @@ export class UsersGateway {
 
     await socket.join(user.id);
 
+    socket.to(user.id).emit('close_invitation_alert');
     socket.emit('connect_established');
     Logger.debug('connected: ' + socket.id);
   }
@@ -119,10 +120,9 @@ export class UsersGateway {
       return;
     }
 
-    // 別タブで、マッチング中や招待中や招待受け中であれば、それをキャンセルする。
+    // 別タブで、マッチング中や招待中であれば、それをキャンセルする。
     socket.to(userId).emit('matching_room_error', 'Matching canceled.');
     socket.to(userId).emit('invitation_room_error', 'Invitation canceled.');
-    socket.to(userId).emit('close_invitation_alert');
 
     const matchingSockets = await this.server.in('matching').fetchSockets();
     // 1人目の場合2人目ユーザーを待つ
@@ -191,10 +191,9 @@ export class UsersGateway {
       return;
     }
     socket.data.invitationRoomId = invitationRoom.id;
-    // 別タブで、マッチング中や招待中や招待受け中であれば、それをキャンセルする。
+    // 別タブで、マッチング中や招待中であれば、それをキャンセルする。
     socket.to(userId).emit('matching_room_error', 'Matching canceled.');
     socket.to(userId).emit('invitation_room_error', 'Invitation canceled.');
-    socket.to(userId).emit('close_invitation_alert');
 
     await socket.join(invitationRoom.id);
     this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
