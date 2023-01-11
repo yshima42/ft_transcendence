@@ -79,7 +79,6 @@ export const useGame = (
         readyCountDownNum: number;
         nextGamePhase: GamePhase;
       }) => {
-        // console.log('[Socket Event] set_game_info');
         player1.id = message.player1.id;
         player2.id = message.player2.id;
         player1.score = message.player1.score;
@@ -92,12 +91,10 @@ export const useGame = (
     );
 
     socket.on('update_ready_count_down_num', (newCountDownNum: number) => {
-      // console.log('[Socket Event] update_ready_count_down_num');
       setReadyCountDownNum(newCountDownNum);
     });
 
     socket.on('update_game_phase', (nextGamePhase: GamePhase) => {
-      // console.log(`[Socket Event] update_game_phase ${nextGamePhase}`);
       setGamePhase(nextGamePhase);
     });
 
