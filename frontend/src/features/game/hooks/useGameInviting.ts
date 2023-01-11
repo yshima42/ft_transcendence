@@ -28,7 +28,7 @@ export const useGameInvitation = (
   useEffect(() => {
     socket.on('invitation_room_error', (message: string) => {
       customToast({ description: message });
-      navigate('/app');
+      navigate(-1);
     });
 
     socket.on('go_game_room_by_invitation', (roomId: string) => {
@@ -41,7 +41,7 @@ export const useGameInvitation = (
         description: 'Your Invitation was declined',
         status: 'warning',
       });
-      navigate('/app');
+      navigate(-1);
     });
 
     return () => {
