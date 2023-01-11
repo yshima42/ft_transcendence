@@ -107,6 +107,7 @@ export class InvitationRoom {
   player2Id: string;
   ballSpeedType: BallSpeedType;
   isAlreadyInvited: boolean;
+  isAlreadyReply: boolean;
 
   constructor(
     player1Id: string,
@@ -118,6 +119,7 @@ export class InvitationRoom {
     this.player2Id = player2Id;
     this.ballSpeedType = ballSpeedType;
     this.isAlreadyInvited = false;
+    this.isAlreadyReply = false;
   }
 }
 

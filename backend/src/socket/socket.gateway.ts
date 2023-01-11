@@ -247,6 +247,7 @@ export class UsersGateway {
     Logger.debug(
       `${socket.id} ${socket.data.userId as string} declineInvitation`
     );
+
     // 別タブでモーダルがでているとき、全て閉じる
     const { userId } = socket.data as { userId: string };
     socket.to(userId).emit('close_invitation_alert');
@@ -263,6 +264,12 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userId as string} declineInvitationForReady`
     );
 
+    const invitationRoom = this.invitationRooms.get(message.invitationRoomId);
+    // 複数タブの場合、自動Decline で複数回やってくるので、１回のみ送信。
+    if (invitationRoom === undefined || invitationRoom.isAlreadyReply) {
+      return;
+    }
+    invitationRoom.isAlreadyReply = true;
     this.server
       .to(message.invitationRoomId)
       .emit('invitation_room_error', 'The opponent is ready for another game.');
