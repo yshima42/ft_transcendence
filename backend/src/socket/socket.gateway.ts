@@ -230,18 +230,32 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('decline_invitation')
-  decline_invitation(
+  declineInvitation(
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: { invitationRoomId: string }
   ): void {
     Logger.debug(
-      `${socket.id} ${socket.data.userId as string} decline_invitation`
+      `${socket.id} ${socket.data.userId as string} declineInvitation`
     );
     // 別タブでモーダルがでているとき、全て閉じる
     const { userId } = socket.data as { userId: string };
     socket.to(userId).emit('close_invitation_alert');
 
     this.server.to(message.invitationRoomId).emit('player2_decline_invitation');
+  }
+
+  @SubscribeMessage('decline_invitation_for_ready_game')
+  declineInvitationForReadyGame(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: { invitationRoomId: string }
+  ): void {
+    Logger.debug(
+      `${socket.id} ${socket.data.userId as string} declineInvitationForReady`
+    );
+
+    this.server
+      .to(message.invitationRoomId)
+      .emit('invitation_room_error', 'The opponent is ready for another game.');
   }
 
   @SubscribeMessage('leave_invitation_room')
