@@ -17,7 +17,13 @@ export const UserCard: FC<Props> = memo((props) => {
   const { id, username, nickname, avatarImageUrl, buttons, isFriend } = props;
 
   return (
-    <Box p={4} bg="white" borderRadius="md" shadow="md">
+    <Box
+      p={4}
+      bg="white"
+      borderRadius="md"
+      shadow="md"
+      data-test={'users-user-card-' + nickname}
+    >
       <Flex align="center">
         <Flex align="center" mr={2}>
           <Box w="60px">
