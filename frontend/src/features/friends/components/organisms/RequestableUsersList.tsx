@@ -15,7 +15,7 @@ export const RequestableUsersList: FC = () => {
         lg: 'repeat(2, 1fr)',
       }}
       gap={6}
-      data-test="users-add-friend"
+      data-test="users-add-friend-grid"
     >
       {users.map((user) => (
         <UserCard

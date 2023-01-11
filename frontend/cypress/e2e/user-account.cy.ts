@@ -1,7 +1,6 @@
 /* eslint-disable jest/no-focused-tests */
 import { GameStats } from '../../src/hooks/api/game/useGameStats';
 
-// type UsersTab = 'Friends' | 'Pending' | 'Blocked' | 'Add Friend';
 enum UsersTab {
   FRIENDS,
   PENDING,
@@ -12,22 +11,45 @@ enum UsersTab {
 
 const getUsersTabDataTest = (tab: UsersTab): string => {
   const usersTabDataTest: string[] = [
-    'friends-tab',
-    'pending-tab',
-    'recognition-tab',
-    'blocked-tab',
-    'add-friend-tab',
+    'users-friends',
+    'users-pending',
+    'users-recognition',
+    'users-blocked',
+    'users-add-friend',
   ];
 
   return usersTabDataTest[tab];
 };
 
+const visitMyProfile = () => {
+  cy.getBySel('sidenav-user-avatar').click();
+  cy.location('pathname').should('contain', '/app/users');
+};
+
 const visitUsersTab = (tab: UsersTab) => {
-  const dataTest = getUsersTabDataTest(tab);
-  console.log(dataTest);
+  const dataTest = getUsersTabDataTest(tab) + '-tab';
   cy.getBySel('sidenav-users').click();
-  cy.getBySelLike(dataTest).click();
+  cy.getBySel(dataTest).click();
   cy.location('pathname').should('eq', '/app/users');
+};
+
+const visitProfileFromUsersTab = (tab: UsersTab, nickname: string) => {
+  visitUsersTab(tab);
+  const targetSelector = 'users-user-avatar-' + nickname;
+  const dataTest = getUsersTabDataTest(tab) + '-grid';
+  cy.getBySel(dataTest).within(() => {
+    cy.getBySel(targetSelector).should('be.visible').click();
+  });
+  cy.location('pathname').should('contain', '/app/users');
+};
+
+const assertUserIsInUsersTab = (tab: UsersTab, nickname: string) => {
+  visitUsersTab(tab);
+  const targetSelector = 'users-user-avatar-' + nickname;
+  const dataTest = getUsersTabDataTest(tab) + '-grid';
+  cy.getBySel(dataTest).within(() => {
+    cy.getBySel(targetSelector).should('be.visible');
+  });
 };
 
 describe('User Settings', function () {
@@ -57,10 +79,9 @@ describe('User Settings', function () {
    * チェック項目No.17, 58
    */
   it('ユーザーは、ウェブサイトに表示される一意の名前を選択できるようにする必要がある（ニックネーム）', () => {
-    cy.getBySel('sidenav-user-avatar').click();
-    cy.location('pathname').should('contain', '/app/users');
+    visitMyProfile();
     cy.getBySel('profile-edit').click();
-    cy.getBySelLike('nickname-input').clear().type('New Nickname');
+    cy.getBySelLike('nickname-input').type('New Nickname');
     cy.getBySelLike('submit').click();
     cy.getBySel('profile-nickname').should('contain', 'New Nickname');
   });
@@ -80,8 +101,7 @@ describe('User Settings', function () {
     const uploadFilePath = 'cypress/fixtures/zazen_obousan.png';
     const partOfUploadDirPath = 'avatar/dummy1';
 
-    cy.getBySel('sidenav-user-avatar').click();
-    cy.location('pathname').should('contain', '/app/users');
+    visitMyProfile();
 
     // デフォルトアバターが設定されているか確認。
     cy.getBySel('profile-user-avatar')
@@ -112,8 +132,7 @@ describe('User Settings', function () {
    * チェック項目No.22, 23
    */
   it('統計情報（勝敗、ラダーレベル(勝率)、実績など）がユーザープロフィールに表示される', () => {
-    cy.getBySel('sidenav-user-avatar').click();
-    cy.location('pathname').should('contain', '/app/users');
+    visitMyProfile();
 
     // ゲームの結果（最新5件）が表示されているか確認
     // バックエンドのデータと一致しているか確認するのは大変なので、
@@ -143,12 +162,10 @@ describe('User Settings', function () {
    * チェック項目No.21, 61
    */
   it('フレンドインターフェースでは、フレンドとその状態（オフライン／オンライン／ゲーム中等）を確認することができる', () => {
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-friends-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
+    visitUsersTab(UsersTab.FRIENDS);
 
     // バッジが表示されているか確認
-    cy.getBySel('users-friends').within(() => {
+    cy.getBySel('users-friends-grid').within(() => {
       cy.getBySelLike('users-user-avatar').each(($el) => {
         cy.wrap($el).children('div.chakra-avatar__badge').should('be.visible');
       });
@@ -165,23 +182,14 @@ describe('User Settings', function () {
    * チェック項目No.27, 60
    */
   it('他のユーザーをブロックすることができる。', () => {
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-friends-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
-
     const targetNickname = 'nick-dummy-friends1';
-    const targetSelector = 'users-user-avatar-' + targetNickname;
 
-    cy.getBySel('users-friends').within(() => {
-      cy.getBySel(targetSelector).click();
-    });
+    visitProfileFromUsersTab(UsersTab.FRIENDS, targetNickname);
+
     cy.getBySel('block-button').click();
     cy.getBySel('unblock-button').should('be.visible');
 
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-blocked-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
-    cy.getBySel(targetSelector).should('be.visible');
+    assertUserIsInUsersTab(UsersTab.BLOCKED, targetNickname);
   });
 
   /**
@@ -192,20 +200,13 @@ describe('User Settings', function () {
    * チェック項目No.59
    */
   it('他のユーザープロフィールのフレンド関係ボタン表示', () => {
-    // name, nickname, avatarも確認するべきかも。
-    // あと、そのボタンをクリックした場合の挙動も確認するべきか・・・。
+    const targetFriendNickname = 'nick-dummy-friends2';
+    const targetPendingNickname = 'nick-dummy-pending1';
+    const targetRecognitionNickname = 'nick-dummy-recognition1';
+    const targetAddFriendNickname = 'nick-dummy-add-friend1';
 
     // Friendのプロフィール確認。
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-friends-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
-
-    const targetFriendNickname = 'nick-dummy-friends1';
-    const targetFriendSelector = 'users-user-avatar-' + targetFriendNickname;
-
-    cy.getBySel('users-friends').within(() => {
-      cy.getBySel(targetFriendSelector).click();
-    });
+    visitProfileFromUsersTab(UsersTab.FRIENDS, targetFriendNickname);
 
     cy.getBySel('accept-button').should('not.exist');
     cy.getBySel('cancel-button').should('not.exist');
@@ -213,16 +214,7 @@ describe('User Settings', function () {
     cy.getBySel('request-button').should('not.exist');
 
     // Pendingのプロフィール確認。
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-pending-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
-
-    const targetPendingNickname = 'nick-dummy-pending1';
-    const targetPendingSelector = 'users-user-avatar-' + targetPendingNickname;
-
-    cy.getBySel('users-pending').within(() => {
-      cy.getBySel(targetPendingSelector).click();
-    });
+    visitProfileFromUsersTab(UsersTab.PENDING, targetPendingNickname);
 
     cy.getBySel('cancel-button').should('be.visible');
     cy.getBySel('accept-button').should('not.exist');
@@ -230,17 +222,7 @@ describe('User Settings', function () {
     cy.getBySel('request-button').should('not.exist');
 
     // Recognitionのプロフィール確認。
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-recognition-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
-
-    const targetRecognitionNickname = 'nick-dummy-recognition1';
-    const targetRecognitionSelector =
-      'users-user-avatar-' + targetRecognitionNickname;
-
-    cy.getBySel('users-recognition').within(() => {
-      cy.getBySel(targetRecognitionSelector).click();
-    });
+    visitProfileFromUsersTab(UsersTab.RECOGNITION, targetRecognitionNickname);
 
     cy.getBySel('accept-button').should('be.visible');
     cy.getBySel('reject-button').should('be.visible');
@@ -248,17 +230,7 @@ describe('User Settings', function () {
     cy.getBySel('request-button').should('not.exist');
 
     // Add Friendのプロフィール確認。
-    cy.getBySel('sidenav-users').click();
-    cy.getBySel('users-add-friend-tab').click();
-    cy.location('pathname').should('eq', '/app/users');
-
-    const targetAddFriendNickname = 'nick-dummy-add-friend1';
-    const targetAddFriendSelector =
-      'users-user-avatar-' + targetAddFriendNickname;
-
-    cy.getBySel('users-add-friend').within(() => {
-      cy.getBySel(targetAddFriendSelector).click();
-    });
+    visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetAddFriendNickname);
 
     cy.getBySel('request-button').should('be.visible');
     cy.getBySel('accept-button').should('not.exist');
@@ -267,88 +239,48 @@ describe('User Settings', function () {
   });
 
   it('フレンド申請を送ることができる', () => {
-    visitUsersTab(UsersTab.ADD_FRIEND);
-
     const targetNickname = 'nick-dummy-add-friend1';
-    const targetSelector = 'users-user-avatar-' + targetNickname;
 
-    cy.getBySel('users-add-friend').within(() => {
-      cy.getBySel(targetSelector).click();
-    });
-    cy.location('pathname').should('contain', '/app/users');
+    visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetNickname);
 
     cy.getBySel('request-button').should('be.visible').click();
     cy.getBySel('cancel-button').should('be.visible');
 
-    visitUsersTab(UsersTab.PENDING);
-
-    cy.getBySel('users-pending').within(() => {
-      cy.getBySel(targetSelector).should('be.visible');
-    });
+    assertUserIsInUsersTab(UsersTab.PENDING, targetNickname);
   });
 
   it('フレンド申請を取り消すことができる', () => {
-    visitUsersTab(UsersTab.PENDING);
-
     const targetNickname = 'nick-dummy-pending1';
-    const targetSelector = 'users-user-avatar-' + targetNickname;
 
-    cy.getBySel('users-pending').within(() => {
-      cy.getBySel(targetSelector).click();
-    });
-    cy.location('pathname').should('contain', '/app/users');
+    visitProfileFromUsersTab(UsersTab.PENDING, targetNickname);
 
     cy.getBySel('cancel-button').should('be.visible').click();
     cy.getBySel('request-button').should('be.visible');
 
-    visitUsersTab(UsersTab.ADD_FRIEND);
-
-    cy.getBySel('users-add-friend').within(() => {
-      cy.getBySel(targetSelector).should('be.visible');
-    });
+    assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
 
   it('フレンド申請を承認することができる', () => {
-    visitUsersTab(UsersTab.RECOGNITION);
-
     const targetNickname = 'nick-dummy-recognition1';
-    const targetSelector = 'users-user-avatar-' + targetNickname;
 
-    cy.getBySel('users-recognition').within(() => {
-      cy.getBySel(targetSelector).click();
-    });
-    cy.location('pathname').should('contain', '/app/users');
+    visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
 
     cy.getBySel('accept-button').should('be.visible').click();
     cy.getBySel('profile-user-avatar')
       .children('div.chakra-avatar__badge')
       .should('be.visible');
 
-    visitUsersTab(UsersTab.FRIENDS);
-
-    cy.getBySel('users-friends').within(() => {
-      cy.getBySel(targetSelector).should('be.visible');
-    });
+    assertUserIsInUsersTab(UsersTab.FRIENDS, targetNickname);
   });
 
-  it.only('フレンド申請を拒否することができる', () => {
-    visitUsersTab(UsersTab.RECOGNITION);
-
+  it('フレンド申請を拒否することができる', () => {
     const targetNickname = 'nick-dummy-recognition2';
-    const targetSelector = 'users-user-avatar-' + targetNickname;
 
-    cy.getBySel('users-recognition').within(() => {
-      cy.getBySel(targetSelector).click();
-    });
-    cy.location('pathname').should('contain', '/app/users');
+    visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
 
     cy.getBySel('reject-button').should('be.visible').click();
     cy.getBySel('request-button').should('be.visible');
 
-    visitUsersTab(UsersTab.ADD_FRIEND);
-
-    cy.getBySel('users-add-friend').within(() => {
-      cy.getBySel(targetSelector).should('be.visible');
-    });
+    assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
 });
