@@ -1,10 +1,27 @@
 /* eslint-disable jest/no-focused-tests */
 import {
   assertUserIsInUsersTab,
+  getUsersDataTest,
+  RelationChangeButton,
   UsersTab,
   visitProfileFromUsersTab,
   visitUsersTab,
 } from '../support/helper';
+
+const changeRelation = (
+  tab: UsersTab,
+  button: RelationChangeButton,
+  nickname: string
+) => {
+  const dataTest = getUsersDataTest(tab) + '-grid';
+
+  cy.getBySelLike(dataTest).within(() => {
+    cy.getBySel('user-card-' + nickname).within(() => {
+      cy.getBySel(button).should('be.visible').click();
+    });
+    cy.getBySel('user-card-' + nickname).should('not.exist');
+  });
+};
 
 describe('Users', function () {
   // DBセットアップ
@@ -46,17 +63,12 @@ describe('Users', function () {
    *
    * チェック項目No.
    */
+
   it('他のユーザーのブロックを解除することができる。', () => {
     const targetNickname = 'nick-dummy-blocked1';
 
     visitUsersTab(UsersTab.BLOCKED);
-
-    cy.getBySelLike('blocked-grid').within(() => {
-      cy.getBySel('users-user-card-' + targetNickname).within(() => {
-        cy.getBySel('unblock-button').should('be.visible').click();
-      });
-      cy.getBySel('users-user-card-' + targetNickname).should('not.exist');
-    });
+    changeRelation(UsersTab.BLOCKED, 'unblock-button', targetNickname);
   });
 
   /**
@@ -117,14 +129,7 @@ describe('Users', function () {
     const targetNickname = 'nick-dummy-add-friend1';
 
     visitUsersTab(UsersTab.ADD_FRIEND);
-
-    cy.getBySelLike('add-friend-grid').within(() => {
-      cy.getBySel('users-user-card-' + targetNickname).within(() => {
-        cy.getBySel('request-button').should('be.visible').click();
-      });
-      cy.getBySel('users-user-card-' + targetNickname).should('not.exist');
-    });
-
+    changeRelation(UsersTab.ADD_FRIEND, 'request-button', targetNickname);
     assertUserIsInUsersTab(UsersTab.PENDING, targetNickname);
   });
 
@@ -132,28 +137,15 @@ describe('Users', function () {
     const targetNickname = 'nick-dummy-pending1';
 
     visitUsersTab(UsersTab.PENDING);
-
-    cy.getBySelLike('pending-grid').within(() => {
-      cy.getBySel('users-user-card-' + targetNickname).within(() => {
-        cy.getBySel('cancel-button').should('be.visible').click();
-      });
-      cy.getBySel('users-user-card-' + targetNickname).should('not.exist');
-    });
-
+    changeRelation(UsersTab.PENDING, 'cancel-button', targetNickname);
     assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
 
   it('フレンド申請を承認することができる', () => {
     const targetNickname = 'nick-dummy-recognition1';
+
     visitUsersTab(UsersTab.RECOGNITION);
-
-    cy.getBySelLike('recognition-grid').within(() => {
-      cy.getBySel('users-user-card-' + targetNickname).within(() => {
-        cy.getBySel('accept-button').should('be.visible').click();
-      });
-      cy.getBySel('users-user-card-' + targetNickname).should('not.exist');
-    });
-
+    changeRelation(UsersTab.RECOGNITION, 'accept-button', targetNickname);
     assertUserIsInUsersTab(UsersTab.FRIENDS, targetNickname);
   });
 
@@ -161,14 +153,7 @@ describe('Users', function () {
     const targetNickname = 'nick-dummy-recognition2';
 
     visitUsersTab(UsersTab.RECOGNITION);
-
-    cy.getBySelLike('recognition-grid').within(() => {
-      cy.getBySel('users-user-card-' + targetNickname).within(() => {
-        cy.getBySel('reject-button').should('be.visible').click();
-      });
-      cy.getBySel('users-user-card-' + targetNickname).should('not.exist');
-    });
-
+    changeRelation(UsersTab.RECOGNITION, 'reject-button', targetNickname);
     assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
 });

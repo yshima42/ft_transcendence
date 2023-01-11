@@ -6,27 +6,35 @@ export enum UsersTab {
   ADD_FRIEND,
 }
 
+export type RelationChangeButton =
+  | 'block-button'
+  | 'unblock-button'
+  | 'accept-button'
+  | 'reject-button'
+  | 'cancel-button'
+  | 'request-button';
+
 export const getUsersDataTest = (tab: UsersTab): string => {
   const usersTabDataTest: string[] = [
-    'users-friends',
-    'users-pending',
-    'users-recognition',
-    'users-blocked',
-    'users-add-friend',
+    'friends',
+    'pending',
+    'recognition',
+    'blocked',
+    'add-friend',
   ];
 
   return usersTabDataTest[tab];
 };
 
 export const visitMyProfile = (): void => {
-  cy.getBySel('sidenav-user-avatar').click();
+  cy.getBySelLike('sidenav-user-avatar').click();
   cy.location('pathname').should('contain', '/app/users');
 };
 
 export const visitUsersTab = (tab: UsersTab): void => {
   const dataTest = getUsersDataTest(tab) + '-tab';
   cy.getBySel('sidenav-users').click();
-  cy.getBySel(dataTest).click();
+  cy.getBySelLike(dataTest).click();
   cy.location('pathname').should('eq', '/app/users');
 };
 
@@ -37,7 +45,7 @@ export const visitProfileFromUsersTab = (
   visitUsersTab(tab);
   const targetSelector = 'users-user-avatar-' + nickname;
   const dataTest = getUsersDataTest(tab) + '-grid';
-  cy.getBySel(dataTest).within(() => {
+  cy.getBySelLike(dataTest).within(() => {
     cy.getBySel(targetSelector).should('be.visible').click();
   });
   cy.location('pathname').should('contain', '/app/users');
@@ -50,7 +58,7 @@ export const assertUserIsInUsersTab = (
   visitUsersTab(tab);
   const targetSelector = 'users-user-avatar-' + nickname;
   const dataTest = getUsersDataTest(tab) + '-grid';
-  cy.getBySel(dataTest).within(() => {
+  cy.getBySelLike(dataTest).within(() => {
     cy.getBySel(targetSelector).should('be.visible');
   });
 };
