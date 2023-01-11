@@ -43,7 +43,7 @@ export const useGameInvitation = (
         description: 'Your Invitation was declined',
         status: 'warning',
       });
-      navigate(-1);
+      navigate('/app');
     });
 
     return () => {
