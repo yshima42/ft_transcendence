@@ -14,7 +14,7 @@ export class UserDto {
   updatedAt?: Date;
 
   @IsString()
-  @Length(1, 50)
+  @Length(1, 20)
   @ApiProperty({ default: 'dummy1' })
   name?: string;
 
