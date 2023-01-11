@@ -6,6 +6,12 @@ import {
   CANVAS_WIDTH,
 } from './gameConfig';
 
+export enum BallSpeedType {
+  SLOW = 'SLOW',
+  NORMAL = 'NORMAL',
+  FAST = 'FAST',
+}
+
 export class Ball {
   x: number;
   y: number;
