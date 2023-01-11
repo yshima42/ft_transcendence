@@ -397,8 +397,7 @@ export class UsersGateway {
     const { gameRoomId: roomId } = socket.data as { gameRoomId: string };
     const gameRoom = this.gameRooms.get(roomId);
     if (gameRoom === undefined) {
-      socket.emit('game_room_error', 'Invalid game room.');
-
+      // 既に削除されてる場合があるので、エラー通知しない。
       return;
     }
     gameRoom.handleInput(message.userCommand);
