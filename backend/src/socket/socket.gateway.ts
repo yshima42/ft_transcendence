@@ -66,8 +66,10 @@ export class UsersGateway {
 
     await socket.join(user.id);
 
-    // 別タブで出ている招待モーダルを閉じる。
-    socket.to(user.id).emit('close_invitation_alert');
+    // 別タブで出ている招待モーダルを全て閉じる。
+    socket
+      .to(user.id)
+      .emit('close_invitation_alert', { invitationRoomId: null });
     socket.emit('connect_established');
     Logger.debug('connected: ' + socket.id);
   }
@@ -216,19 +218,21 @@ export class UsersGateway {
   accept_invitation(
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: { invitationRoomId: string }
-  ): { roomId: string | undefined } {
+  ): { roomId: string | null } {
     Logger.debug(
       `${socket.id} ${socket.data.userId as string} accept_invitation`
     );
 
     // 別タブでモーダルがでているとき、全て閉じる
     const { userId } = socket.data as { userId: string };
-    socket.to(userId).emit('close_invitation_alert');
+    const { invitationRoomId } = message;
+    socket.to(userId).emit('close_invitation_alert', { invitationRoomId });
 
-    const invitationRoom = this.invitationRooms.get(message.invitationRoomId);
+    const invitationRoom = this.invitationRooms.get(invitationRoomId);
     if (invitationRoom === undefined) {
-      return { roomId: undefined };
+      return { roomId: null };
     }
+    invitationRoom.isAlreadyReply = true;
 
     const { player1Id, player2Id, ballSpeedType } = invitationRoom;
     const gameRoom = this.createGameRoom(player1Id, player2Id, ballSpeedType);
@@ -250,7 +254,14 @@ export class UsersGateway {
 
     // 別タブでモーダルがでているとき、全て閉じる
     const { userId } = socket.data as { userId: string };
-    socket.to(userId).emit('close_invitation_alert');
+    const { invitationRoomId } = message;
+    socket.to(userId).emit('close_invitation_alert', { invitationRoomId });
+
+    const invitationRoom = this.invitationRooms.get(invitationRoomId);
+    if (invitationRoom === undefined) {
+      return;
+    }
+    invitationRoom.isAlreadyReply = true;
 
     this.server.to(message.invitationRoomId).emit('player2_decline_invitation');
   }
@@ -479,6 +490,12 @@ export class UsersGateway {
       .in(invitationRoomId)
       .fetchSockets();
     if (invitationRoomSockets.length === 0) {
+      // 返信きていない場合、モーダルを閉じてもらう。
+      if (!invitationRoom.isAlreadyReply) {
+        this.server
+          .to(invitationRoom.player2Id)
+          .emit('close_invitation_alert', { invitationRoomId });
+      }
       this.invitationRooms.delete(invitationRoomId);
     }
   }
