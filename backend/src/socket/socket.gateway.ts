@@ -111,12 +111,18 @@ export class UsersGateway {
     );
 
     const { userId } = socket.data as { userId: string };
+    // ゲーム中に、/matching に直打ちアクセスされた場合、ゲームルームに飛ばす。
     const gameRoomId = this.userIdToGameRoomId.get(userId);
     if (gameRoomId !== undefined) {
       socket.emit('go_game_room', gameRoomId);
 
       return;
     }
+
+    // 別タブで、マッチング中や招待中や招待受け中であれば、それをキャンセルする。
+    socket.to(userId).emit('matching_room_error', 'Matching canceled.');
+    socket.to(userId).emit('invitation_room_error', 'Invitation canceled.');
+    socket.to(userId).emit('close_invitation_alert');
 
     const matchingSockets = await this.server.in('matching').fetchSockets();
     // 1人目の場合2人目ユーザーを待つ
@@ -185,8 +191,11 @@ export class UsersGateway {
       return;
     }
     socket.data.invitationRoomId = invitationRoom.id;
-    // 別タブで他の招待ルームにいる場合、退去させる。
-    socket.to(userId).emit('invitation_room_error', 'Invalid invitation room.');
+    // 別タブで、マッチング中や招待中や招待受け中であれば、それをキャンセルする。
+    socket.to(userId).emit('matching_room_error', 'Matching canceled.');
+    socket.to(userId).emit('invitation_room_error', 'Invitation canceled.');
+    socket.to(userId).emit('close_invitation_alert');
+
     await socket.join(invitationRoom.id);
     this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
       invitationRoomId: invitationRoom.id,
@@ -203,6 +212,10 @@ export class UsersGateway {
       `${socket.id} ${socket.data.userId as string} accept_invitation`
     );
 
+    // 別タブでモーダルがでているとき、全て閉じる
+    const { userId } = socket.data as { userId: string };
+    socket.to(userId).emit('close_invitation_alert');
+
     const invitationRoom = this.invitationRooms.get(message.invitationRoomId);
     if (invitationRoom === undefined) {
       return { roomId: undefined };
@@ -213,9 +226,6 @@ export class UsersGateway {
     this.server
       .to(invitationRoom.id)
       .emit('go_game_room_by_invitation', gameRoom.id);
-    // 別タブでモーダルがでているとき、全て閉じる
-    const { userId } = socket.data as { userId: string };
-    socket.to(userId).emit('close_invitation_alert');
 
     return { roomId: gameRoom.id };
   }
@@ -228,11 +238,11 @@ export class UsersGateway {
     Logger.debug(
       `${socket.id} ${socket.data.userId as string} decline_invitation`
     );
-
-    this.server.to(message.invitationRoomId).emit('player2_decline_invitation');
     // 別タブでモーダルがでているとき、全て閉じる
     const { userId } = socket.data as { userId: string };
     socket.to(userId).emit('close_invitation_alert');
+
+    this.server.to(message.invitationRoomId).emit('player2_decline_invitation');
   }
 
   @SubscribeMessage('leave_invitation_room')
