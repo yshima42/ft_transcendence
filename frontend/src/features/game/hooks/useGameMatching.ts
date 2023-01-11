@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'providers/SocketProvider';
 
@@ -19,9 +20,15 @@ export const useGameMatching = (): {
   }
   const { socket, isConnected } = socketContext;
   const navigate = useNavigate();
+  const { customToast } = useCustomToast();
 
   // socket イベント
   useEffect(() => {
+    socket.on('matching_room_error', (message: string) => {
+      customToast({ description: message });
+      navigate('/app');
+    });
+
     socket.on('go_game_room', (roomId: string) => {
       // console.log('[Socket Event] go_game_room');
       navigate(`/app/game/rooms/${roomId}`);
@@ -29,9 +36,10 @@ export const useGameMatching = (): {
 
     return () => {
       socket.emit('leave_matching_room');
+      socket.off('matching_room_error');
       socket.off('go_game_room');
     };
-  }, [socket, navigate]);
+  }, [socket, navigate, customToast]);
 
   // 各state のロジック
   useEffect(() => {
