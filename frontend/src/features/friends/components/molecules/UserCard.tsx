@@ -22,7 +22,7 @@ export const UserCard: FC<Props> = memo((props) => {
       bg="white"
       borderRadius="md"
       shadow="md"
-      data-test={'users-user-card-' + nickname}
+      data-test={'user-card-' + nickname}
     >
       <Flex align="center">
         <Flex align="center" mr={2}>
