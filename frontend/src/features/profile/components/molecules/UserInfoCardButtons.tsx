@@ -4,11 +4,11 @@ import { User } from '@prisma/client';
 import { useBlockRelation, useProfile } from 'hooks/api';
 import { useFriendRelation } from 'hooks/api/friend/useFriendRelation';
 import { DmButton } from 'components/atoms/button/DmButton';
+import { GameOrWatchButton } from 'components/molecules/GameOrWatchButton';
 import { OtpAuthButton } from '../atoms/OtpAuthButton';
 import { ProfileEditButton } from '../atoms/ProfileEditButton';
 import { BlockRelationButton } from './BlockRelationButton';
 import { FriendButton } from './FriendButton';
-import { GameOrWatchButton } from './GameOrWatchButton';
 
 type Props = {
   user: User;
