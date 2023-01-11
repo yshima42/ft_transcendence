@@ -10,8 +10,8 @@ import {
 } from '@nestjs/websockets';
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
-import { BALL_SPEED } from 'src/game/config/game-config';
 import {
+  BallSpeedType,
   GameOutline,
   GamePhase,
   GameRoom,
@@ -140,7 +140,7 @@ export class UsersGateway {
       return;
     }
 
-    const gameRoom = this.createGameRoom(waitUserId, userId, BALL_SPEED);
+    const gameRoom = this.createGameRoom(waitUserId, userId);
     // matchingルームで待っているPlayer1に対してのemit
     this.server.to('matching').emit('go_game_room', gameRoom.id);
     this.server.socketsLeave('matching');
@@ -160,15 +160,19 @@ export class UsersGateway {
   @SubscribeMessage('create_invitation_room')
   createInvitationRoom(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() message: { opponentId: string; ballSpeed: number }
+    @MessageBody() message: { opponentId: string; ballSpeedType: BallSpeedType }
   ): { invitationRoomId: string } {
     Logger.debug(
       `${socket.id} ${socket.data.userId as string} create_invitation_room`
     );
 
     const { userId } = socket.data as { userId: string };
-    const { opponentId, ballSpeed } = message;
-    const invitationRoom = new InvitationRoom(userId, opponentId, ballSpeed);
+    const { opponentId, ballSpeedType } = message;
+    const invitationRoom = new InvitationRoom(
+      userId,
+      opponentId,
+      ballSpeedType
+    );
     this.invitationRooms.set(invitationRoom.id, invitationRoom);
 
     return { invitationRoomId: invitationRoom.id };
@@ -199,6 +203,7 @@ export class UsersGateway {
     this.server.to(invitationRoom.player2Id).emit('receive_invitation', {
       invitationRoomId: invitationRoom.id,
       challengerId: userId,
+      ballSpeedType: invitationRoom.ballSpeedType,
     });
   }
 
@@ -220,8 +225,8 @@ export class UsersGateway {
       return { roomId: undefined };
     }
 
-    const { player1Id, player2Id, ballSpeed } = invitationRoom;
-    const gameRoom = this.createGameRoom(player1Id, player2Id, ballSpeed);
+    const { player1Id, player2Id, ballSpeedType } = invitationRoom;
+    const gameRoom = this.createGameRoom(player1Id, player2Id, ballSpeedType);
     this.server
       .to(invitationRoom.id)
       .emit('go_game_room_by_invitation', gameRoom.id);
@@ -469,7 +474,7 @@ export class UsersGateway {
   createGameRoom(
     player1Id: string,
     player2Id: string,
-    ballSpeed?: number
+    ballSpeedType?: BallSpeedType
   ): GameRoom {
     const gameRoom = new GameRoom(
       this.gameService,
@@ -477,7 +482,7 @@ export class UsersGateway {
       (gameRoom: GameRoom) => this.deleteGameRoom(gameRoom),
       new Player(player1Id, true),
       new Player(player2Id, false),
-      ballSpeed
+      ballSpeedType
     );
     this.gameRooms.set(gameRoom.id, gameRoom);
 

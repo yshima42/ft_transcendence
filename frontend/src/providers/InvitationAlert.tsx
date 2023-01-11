@@ -7,8 +7,10 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
+  Text,
   useDisclosure,
 } from '@chakra-ui/react';
+import { BallSpeedType } from 'features/game/utils/gameObjs';
 import { useProfile } from 'hooks/api';
 import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useMatch, useNavigate } from 'react-router-dom';
@@ -19,6 +21,12 @@ type Props = {
   isConnected: boolean;
 };
 
+interface InvitationData {
+  invitationRoomId: string;
+  challengerId: string;
+  ballSpeedType: BallSpeedType;
+}
+
 // このコンポーネントをprovidersに残すか、componentsに入れるか迷ったが、SocketProviderでしか使わないためprovidersに置いておく
 export const InvitationAlert: FC<Props> = memo((props) => {
   const { socket, isConnected } = props;
@@ -28,12 +36,11 @@ export const InvitationAlert: FC<Props> = memo((props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
   const { customToast } = useCustomToast();
-  const [newInvitationData, setNewInvitationData] = useState<{
-    invitationRoomId: string;
-    challengerId: string;
-  } | null>(null);
+  const [newInvitationData, setNewInvitationData] =
+    useState<InvitationData | null>(null);
   const [invitationRoomId, setInvitationRoomId] = useState<string>();
   const [challengerId, setChallengerId] = useState<string>();
+  const [ballSpeedType, setBallSpeedType] = useState<BallSpeedType>();
   const { user: challenger } = useProfile(challengerId);
   const cancelRef = useRef(null);
   const isMatchingPage = Boolean(useMatch('/app/game/matching'));
@@ -52,6 +59,7 @@ export const InvitationAlert: FC<Props> = memo((props) => {
     } else {
       setInvitationRoomId(newInvitationData.invitationRoomId);
       setChallengerId(newInvitationData.challengerId);
+      setBallSpeedType(newInvitationData.ballSpeedType);
       onOpen();
     }
     setNewInvitationData(null);
@@ -68,12 +76,9 @@ export const InvitationAlert: FC<Props> = memo((props) => {
   useEffect(() => {
     if (!isConnected) return;
 
-    socket.on(
-      'receive_invitation',
-      (message: { invitationRoomId: string; challengerId: string }) => {
-        setNewInvitationData(message);
-      }
-    );
+    socket.on('receive_invitation', (message: InvitationData) => {
+      setNewInvitationData(message);
+    });
 
     socket.on('close_invitation_alert', () => {
       onClose();
@@ -119,8 +124,11 @@ export const InvitationAlert: FC<Props> = memo((props) => {
           </AlertDialogHeader>
 
           <AlertDialogBody>
-            <strong>{challenger.nickname}</strong> invited to a PongGame. Do you
-            accept this Challenge Match?
+            <Text>
+              <strong>{challenger.nickname}</strong> invited to a PongGame.
+            </Text>
+            <Text>Do you accept this Challenge Match?</Text>
+            <Text>BallSpeed: {ballSpeedType}</Text>
           </AlertDialogBody>
 
           <AlertDialogFooter>
