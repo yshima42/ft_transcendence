@@ -2,6 +2,7 @@
 import { GameStats } from '../../src/hooks/api/game/useGameStats';
 import {
   assertUserIsInUsersTab,
+  assertUserIsNotInUsersTab,
   UsersTab,
   visitMyProfile,
   visitProfileFromUsersTab,
@@ -22,9 +23,8 @@ describe('Profile', function () {
   });
 
   /**
-   * シナリオ UA-1
-   * サイドバーのアバターからプロフィールページへ移動。
-   * Editボタンクリックして、ProfileEdit表示。
+   * シナリオ Profile-1
+   * ProfileページでEditボタンをクリックして、ProfileEdit表示する。
    * ニックネームを変更し、表示の変更を確認。
    *
    * チェック項目No.17, 58
@@ -38,9 +38,8 @@ describe('Profile', function () {
   });
 
   /**
-   * シナリオ UA-2
-   * サイドバーのアバターからプロフィールページへ移動。
-   * デフォルトアバターが設定されているか確認。
+   * シナリオ Profile-2
+   * Profileページでデフォルトアバターが設定されているか確認。
    * Editボタンクリックして、ProfileEdit表示。
    * アバターをアップロードし、パスの変更を確認。
    *
@@ -76,9 +75,8 @@ describe('Profile', function () {
   });
 
   /**
-   * シナリオ UA-3
-   * サイドバーのアバターからプロフィールページへ移動。
-   * Stats, MatchHistoryの確認をする。
+   * シナリオ Profile-3
+   * ProfileページでStats, MatchHistoryの確認をする。
    *
    * チェック項目No.22, 23
    */
@@ -106,68 +104,94 @@ describe('Profile', function () {
   });
 
   /**
-   * シナリオ UA-5
-   * サイドバーからFriendタブを表示。
-   * Friendの中から一人選び、アバターからプロフィールへ移動。
-   * プロフィールページでブロックボタンをクリック。
-   * Friendタブの、ブロック一覧に存在することを確認。
+   * シナリオ Profile-4
+   * Friendタブの中から一人選び、プロフィールへ移動。
+   * プロフィールページでBlockボタンをクリック。
+   * Blockedタブに表示されることを確認。
    *
    * チェック項目No.27, 60
    */
-  it('他のユーザーをブロックすることができる。', () => {
+  it.only('他のユーザーをブロックすることができ、そのブロックを解除することができる。', () => {
     const targetNickname = 'nick-dummy-friends1';
 
     visitProfileFromUsersTab(UsersTab.FRIENDS, targetNickname);
-
     cy.getBySel('block-button').click();
     cy.getBySel('unblock-button').should('be.visible');
-
     assertUserIsInUsersTab(UsersTab.BLOCKED, targetNickname);
+
+    visitProfileFromUsersTab(UsersTab.FRIENDS, targetNickname);
+    cy.getBySel('unblock-button').click();
+    cy.getBySel('block-button').should('be.visible');
+    assertUserIsNotInUsersTab(UsersTab.BLOCKED, targetNickname);
   });
 
+  /**
+   * シナリオ Profile-5
+   * Add Friendタブの中から一人選び、プロフィールへ移動。
+   * プロフィールページでRequestボタンをクリック。
+   * Pendingタブに存在することを確認。
+   *
+   * チェック項目No.21,78
+   */
   it('フレンド申請を送ることができる', () => {
     const targetNickname = 'nick-dummy-add-friend1';
 
     visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetNickname);
-
     cy.getBySel('request-button').should('be.visible').click();
     cy.getBySel('cancel-button').should('be.visible');
-
     assertUserIsInUsersTab(UsersTab.PENDING, targetNickname);
   });
 
+  /**
+   * シナリオ Profile-6
+   * Pendingタブの中から一人選び、プロフィールへ移動。
+   * プロフィールページでCancelボタンをクリック。
+   * Add Friendタブに存在することを確認。
+   *
+   * チェック項目No.21,78
+   */
   it('フレンド申請を取り消すことができる', () => {
     const targetNickname = 'nick-dummy-pending1';
 
     visitProfileFromUsersTab(UsersTab.PENDING, targetNickname);
-
     cy.getBySel('cancel-button').should('be.visible').click();
     cy.getBySel('request-button').should('be.visible');
-
     assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
 
+  /**
+   * シナリオ Profile-7
+   * Recognitionタブの中から一人選び、プロフィールへ移動。
+   * プロフィールページでAcceptボタンをクリック。
+   * Friendsタブに存在することを確認。
+   *
+   * チェック項目No.21,78
+   */
   it('フレンド申請を承認することができる', () => {
     const targetNickname = 'nick-dummy-recognition1';
 
     visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
-
     cy.getBySel('accept-button').should('be.visible').click();
     cy.getBySel('profile-user-avatar')
       .children('div.chakra-avatar__badge')
       .should('be.visible');
-
     assertUserIsInUsersTab(UsersTab.FRIENDS, targetNickname);
   });
 
+  /**
+   * シナリオ Profile-8
+   * Recognitionタブの中から一人選び、プロフィールへ移動。
+   * プロフィールページでRejectボタンをクリック。
+   * Add Friendタブに存在することを確認。
+   *
+   * チェック項目No.21,78
+   */
   it('フレンド申請を拒否することができる', () => {
     const targetNickname = 'nick-dummy-recognition2';
 
     visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
-
     cy.getBySel('reject-button').should('be.visible').click();
     cy.getBySel('request-button').should('be.visible');
-
     assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
 });
