@@ -54,7 +54,7 @@ idMap.forEach((value, key) => {
     name: key,
     avatarImageUrl:
       'https://placehold.jp/2b52ee/ffffff/150x150.png?text=' + key,
-    nickname: 'nickname' + key,
+    nickname: key,
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
