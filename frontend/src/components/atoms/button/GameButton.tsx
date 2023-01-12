@@ -1,4 +1,4 @@
-import { memo, FC, useState, useContext } from 'react';
+import { memo, FC, useState, useContext, useRef } from 'react';
 import {
   Box,
   Button,
@@ -39,8 +39,11 @@ export const GameButton: FC<Props> = memo((props) => {
   );
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const isButtonDisabled = useRef(false);
 
   const onClickPreferenceOk = () => {
+    if (isButtonDisabled.current) return;
+    isButtonDisabled.current = true;
     socket.emit(
       'create_invitation_room',
       { opponentId: targetId, ballSpeedType },
