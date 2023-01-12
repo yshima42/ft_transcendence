@@ -21,8 +21,6 @@ export const ChatRoutes: FC = () => {
       resetErrorBoundary: (...args: unknown[]) => void;
     }) => {
       const { error, resetErrorBoundary } = props;
-      console.log('error');
-      console.log(error);
       const isInvalidUrlError =
         isAxiosError(error) &&
         (error.response?.status === 400 || error.response?.status === 404);
