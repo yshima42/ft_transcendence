@@ -17,7 +17,13 @@ export const UserCard: FC<Props> = memo((props) => {
   const { id, username, nickname, avatarImageUrl, buttons, isFriend } = props;
 
   return (
-    <Box p={4} bg="white" borderRadius="md" shadow="md">
+    <Box
+      p={4}
+      bg="white"
+      borderRadius="md"
+      shadow="md"
+      data-test={'user-card-' + nickname}
+    >
       <Flex align="center">
         <Flex align="center" mr={2}>
           <Box w="60px">
@@ -26,6 +32,7 @@ export const UserCard: FC<Props> = memo((props) => {
                 id={id}
                 size="md"
                 src={avatarImageUrl}
+                // LinkedAvatarにdata-testを作りたいが、影響が大きいので暫定的に
                 data-test={'users-user-avatar-' + nickname}
               />
             ) : (
@@ -33,6 +40,7 @@ export const UserCard: FC<Props> = memo((props) => {
                 id={id}
                 size="md"
                 src={avatarImageUrl}
+                // LinkedAvatarにdata-testを作りたいが、影響が大きいので暫定的に
                 data-test={'users-user-avatar-' + nickname}
               />
             )}

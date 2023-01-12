@@ -269,17 +269,25 @@ export class GameRoom {
     clearInterval(this.interval);
     this.deleteGameRoom(this);
 
+    this.server
+      .in([roomId, `watch_${roomId}`])
+      .emit('update_game_phase', GamePhase.Result);
+
     const muchResult: CreateMatchResultDto = {
       playerOneId: this.player1.id,
       playerTwoId: this.player2.id,
       playerOneScore: this.player1.score,
       playerTwoScore: this.player2.score,
     };
-    await this.gameService.addMatchResult(muchResult);
-
-    this.server
-      .in([roomId, `watch_${roomId}`])
-      .emit('update_game_phase', GamePhase.Result);
+    try {
+      await this.gameService.addMatchResult(muchResult);
+    } catch (e) {
+      // socket イベント関数ではないため、throw new wsException は使わない。
+      this.server.in([roomId, `watch_${roomId}`]).emit('exception', {
+        status: 'error',
+        message: 'Failed to save match result.',
+      });
+    }
   }
 
   // 1フレームごとにクライアントに送信。
