@@ -43,13 +43,13 @@ export const Message: React.FC<Props> = ({
           <C.Box
             key={id}
             padding={4}
-            backgroundColor="teal.50"
+            backgroundColor="teal.200"
             borderRadius="lg"
             marginBottom={4}
             marginRight={7}
             alignSelf="flex-end"
           >
-            <C.Text minW="150px" maxW="360px">
+            <C.Text minW="180px" maxW="360px">
               {content}
             </C.Text>
           </C.Box>
@@ -77,7 +77,7 @@ export const Message: React.FC<Props> = ({
             marginBottom={4}
             marginLeft={7}
           >
-            <C.Text minW="150px" maxW="360px">
+            <C.Text minW="180px" maxW="360px">
               {content}
             </C.Text>
           </C.Box>
