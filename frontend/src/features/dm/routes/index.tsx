@@ -1,15 +1,50 @@
-import { FC } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { FC, useCallback } from 'react';
+import { ToastId } from '@chakra-ui/react';
+import { isAxiosError } from 'axios';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
+import { ErrorBoundary } from 'react-error-boundary';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Page404 } from 'features/auth/routes/Page404';
-import { DmRoom } from './DmRoom';
-import { DmRooms } from './DmRooms';
+import { DmRoomPage } from './DmRoomPage';
+import { DmRoomsPage } from './DmRoomsPage';
 
 export const DmRoutes: FC = () => {
+  const { customToast } = useCustomToast();
+
+  const fallbackRender = useCallback(
+    (props: {
+      error: Error;
+      resetErrorBoundary: (...args: unknown[]) => void;
+    }) => {
+      const { error, resetErrorBoundary } = props;
+      console.log('error');
+      console.log(error);
+      const isInvalidUrlError =
+        isAxiosError(error) &&
+        (error.response?.status === 400 || error.response?.status === 404);
+
+      console.log(isInvalidUrlError);
+      if (!isInvalidUrlError) {
+        throw error;
+      }
+      const toastId: ToastId = 'not-exist-url';
+      if (!customToast.isActive(toastId)) {
+        customToast({ id: toastId, description: 'Not exist the url.' });
+      }
+      resetErrorBoundary();
+
+      return <Navigate to="/app" />;
+    },
+    [customToast]
+  );
+
   return (
-    <Routes>
-      <Route path="rooms" element={<DmRooms />} />
-      <Route path="rooms/:chatRoomId" element={<DmRoom />} />
-      <Route path="*" element={<Page404 />} />
-    </Routes>
+    <ErrorBoundary fallbackRender={fallbackRender}>
+      <Routes>
+        <Route path="rooms" element={<DmRoomsPage />} />
+        <Route path="rooms/:dmRoomId" element={<DmRoomPage />} />
+        <Route path="*" element={<Page404 />} />
+      </Routes>
+    </ErrorBoundary>
   );
 };
