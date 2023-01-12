@@ -17,7 +17,7 @@ export const DummyAuthButton: FC<Props> = memo((props) => {
       href={`${API_URL}/auth/login/dummy?name=${dummyId}`}
       data-test={`${dummyId}-login`}
     >
-      OWNER Test {dummyId}
+      Admin Test {dummyId}
     </Button>
   );
 });
