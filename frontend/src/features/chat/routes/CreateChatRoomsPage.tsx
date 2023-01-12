@@ -78,7 +78,12 @@ const CreateChatRoomForm: React.FC = React.memo(() => {
             <C.FormErrorMessage>{errors.password?.message}</C.FormErrorMessage>
           </C.Box>
         )}
-        <C.Button colorScheme="blue" type="submit" isDisabled={isLoading}>
+        <C.Button
+          bg="teal.300"
+          color="white"
+          type="submit"
+          isDisabled={isLoading}
+        >
           Create
         </C.Button>
       </form>
