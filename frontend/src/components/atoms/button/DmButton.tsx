@@ -15,9 +15,7 @@ export const DmButton: FC<Props> = memo((props) => {
   const onClickDm = async () => {
     try {
       const res = await axios.post(`/dm/rooms/${targetId}`);
-      navigate(`/app/dm/rooms/${res.data as string}`, {
-        state: { dmRoomId: res.data as string, memberId: targetId },
-      });
+      navigate(`/app/dm/rooms/${res.data as string}`);
     } catch (e) {
       const error = e as AxiosError;
       if (error.response == null) return;

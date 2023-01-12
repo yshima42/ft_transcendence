@@ -53,7 +53,7 @@ jobs:
       - name: backend prisma migrate
         run: yarn --cwd backend prisma migrate dev --name init
       - name: backend test
-        run: yarn --cwd backend test:runInBand
+        run: yarn --cwd backend test
       - name: frontend install
         run: yarn --cwd frontend install
       - name: frontend prisma db pull

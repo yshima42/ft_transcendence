@@ -14,9 +14,9 @@ export const Login: FC = memo(() => {
         <Stack spacing={4} py={4} px={10}>
           <Auth42Button />
           <Divider />
-          <DummyAuthButton dummyId="dummy1" />
-          <DummyAuthButton dummyId="dummy2" />
-          <DummyAuthButton dummyId="dummy3" />
+          <DummyAuthButton dummyId="dummy001" />
+          <DummyAuthButton dummyId="dummy002" />
+          <DummyAuthButton dummyId="dummy003" />
         </Stack>
       </Box>
     </Flex>
