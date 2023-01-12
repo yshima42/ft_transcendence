@@ -39,7 +39,9 @@ export const Message: React.FC<Props> = ({
         src={avatarImageUrl}
         marginRight={2}
       />
-      <C.Text data-test={`message-${content}`}>{content}</C.Text>
+      <C.Text maxW="300px" data-test={`message-${content}`}>
+        {content}
+      </C.Text>
     </C.Box>
   );
 };

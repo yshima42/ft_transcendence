@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { HStack } from '@chakra-ui/react';
 import * as SocketIOClient from 'socket.io-client';
 
 type Props = {
@@ -24,21 +25,23 @@ export const MessageSendForm: React.FC<Props> = ({ roomId, socket }) => {
         setContent('');
       }}
     >
-      <C.Input
-        type="text"
-        name="content"
-        placeholder="message"
-        size="lg"
-        isRequired
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        maxLength={255}
-        minLength={1}
-        data-test="message-form"
-      />
-      <C.Button type="submit" data-test="send-button">
-        Send
-      </C.Button>
+      <HStack>
+        <C.Input
+          type="text"
+          name="content"
+          placeholder="message"
+          size="md"
+          isRequired
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          maxLength={255}
+          minLength={1}
+          data-test="message-form"
+        />
+        <C.Button type="submit" data-test="send-button">
+          Send
+        </C.Button>
+      </HStack>
     </form>
   );
 };
