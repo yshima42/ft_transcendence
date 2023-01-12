@@ -12,7 +12,7 @@ export const NavItem: FC<Props> = memo((props) => {
   const { title, icon, to } = props;
 
   return (
-    <Flex mt={5} flexDir="column" w="100%" alignItems="flex-start">
+    <Flex mt={4} flexDir="column" w="100%" alignItems="flex-start">
       <Menu placement="right">
         <Link to={to}>
           <Flex
