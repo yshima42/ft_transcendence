@@ -6,15 +6,15 @@ import { useNavigate } from 'react-router-dom';
 export const useChatRoomProtectSetting = (
   chatRoomId: string
 ): {
-  changeChatRoomStatusProtect: (data: { password: string }) => Promise<void>;
-  changeChatRoomStatusPublic: () => Promise<void>;
-  changeChatRoomStatusPrivate: () => Promise<void>;
+  changeChatRoomStatusProtect: (data: { password: string }) => void;
+  changeChatRoomStatusPublic: () => void;
+  changeChatRoomStatusPrivate: () => void;
 } => {
   const navigate = useNavigate();
   const endpoint = `/chat/rooms/${chatRoomId}`;
   const url = `/app/chat/rooms/${chatRoomId}`;
   const queryKeys: ReactQuery.QueryKey[] = [['/chat/rooms']];
-  const { mutateAsync } = usePatchApiWithErrorToast<
+  const { mutate } = usePatchApiWithErrorToast<
     {
       roomStatus: ChatRoomStatus;
       password: string | undefined;
@@ -22,24 +22,24 @@ export const useChatRoomProtectSetting = (
     Promise<void>
   >(endpoint, queryKeys);
 
-  const changeChatRoomStatusProtect = async (data: { password: string }) => {
-    await mutateAsync({
+  const changeChatRoomStatusProtect = (data: { password: string }) => {
+    mutate({
       roomStatus: ChatRoomStatus.PROTECTED,
       password: data.password,
     });
     navigate(url);
   };
 
-  const changeChatRoomStatusPublic = async () => {
-    await mutateAsync({
+  const changeChatRoomStatusPublic = () => {
+    mutate({
       roomStatus: ChatRoomStatus.PUBLIC,
       password: undefined,
     });
     navigate(url);
   };
 
-  const changeChatRoomStatusPrivate = async () => {
-    await mutateAsync({
+  const changeChatRoomStatusPrivate = () => {
+    mutate({
       roomStatus: ChatRoomStatus.PRIVATE,
       password: undefined,
     });
