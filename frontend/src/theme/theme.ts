@@ -1,6 +1,14 @@
 import { extendTheme } from '@chakra-ui/react';
 
 const theme = extendTheme({
+  components: {
+    Button: {
+      baseStyle: {
+        fontWeight: 'semibold',
+        rounded: 'full',
+      },
+    },
+  },
   styles: {
     global: {
       body: {
@@ -10,4 +18,5 @@ const theme = extendTheme({
     },
   },
 });
+
 export default theme;
