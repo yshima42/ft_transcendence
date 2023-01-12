@@ -29,8 +29,9 @@ export class DmRoomController {
 
   @NestJs.Get(':dmRoomId')
   async findOne(
-    @NestJs.Param('dmRoomId', new NestJs.ParseUUIDPipe()) dmRoomId: string
+    @NestJs.Param('dmRoomId', new NestJs.ParseUUIDPipe()) dmRoomId: string,
+    @GetUser() user: User
   ): Promise<ResponseDmRoom> {
-    return await this.dmRoomService.findOne(dmRoomId);
+    return await this.dmRoomService.findOne(dmRoomId, user.id);
   }
 }
