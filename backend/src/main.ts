@@ -7,7 +7,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    // TODO: 本番環境、開発環境でログレベルを切り替える
     logger: ['error', 'warn', 'debug', 'log', 'verbose'],
   });
   // log
