@@ -61,7 +61,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('他のユーザーのブロックを解除することができる。', () => {
-    const targetNickname = 'n-blocked1';
+    const targetNickname = 'n-blocked001';
 
     visitUsersTab(UsersTab.BLOCKED);
     changeRelation(UsersTab.BLOCKED, 'unblock-button', targetNickname);
@@ -75,7 +75,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を送ることができる', () => {
-    const targetNickname = 'n-add-friend1';
+    const targetNickname = 'n-add-friend001';
 
     visitUsersTab(UsersTab.ADD_FRIEND);
     changeRelation(UsersTab.ADD_FRIEND, 'request-button', targetNickname);
@@ -90,7 +90,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を取り消すことができる', () => {
-    const targetNickname = 'n-pending1';
+    const targetNickname = 'n-pending001';
 
     visitUsersTab(UsersTab.PENDING);
     changeRelation(UsersTab.PENDING, 'cancel-button', targetNickname);
@@ -105,7 +105,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を承認することができる', () => {
-    const targetNickname = 'n-recognition1';
+    const targetNickname = 'n-recognition001';
 
     visitUsersTab(UsersTab.RECOGNITION);
     changeRelation(UsersTab.RECOGNITION, 'accept-button', targetNickname);
@@ -120,7 +120,7 @@ describe('Users', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を拒否することができる', () => {
-    const targetNickname = 'n-recognition2';
+    const targetNickname = 'n-recognition002';
 
     visitUsersTab(UsersTab.RECOGNITION);
     changeRelation(UsersTab.RECOGNITION, 'reject-button', targetNickname);
