@@ -74,23 +74,35 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
     });
 
     socket.on('set_presence', (userIdToPresence: [string, Presence]) => {
-      userIdToPresenceMap.set(...userIdToPresence);
-      setUserIdToPresenceMap(new Map<string, Presence>(userIdToPresenceMap));
+      setUserIdToPresenceMap((userIdToPresenceMap) => {
+        userIdToPresenceMap.set(...userIdToPresence);
+
+        return new Map<string, Presence>(userIdToPresenceMap);
+      });
     });
 
     socket.on('delete_presence', (userId: string) => {
-      userIdToPresenceMap.delete(userId);
-      setUserIdToPresenceMap(new Map<string, Presence>(userIdToPresenceMap));
+      setUserIdToPresenceMap((userIdToPresenceMap) => {
+        userIdToPresenceMap.delete(userId);
+
+        return new Map<string, Presence>(userIdToPresenceMap);
+      });
     });
 
     socket.on('set_game_room_id', (userIdToGameRoomId: [string, string]) => {
-      userIdToGameRoomIdMap.set(...userIdToGameRoomId);
-      setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
+      setUserIdToGameRoomIdMap((userIdToGameRoomIdMap) => {
+        userIdToGameRoomIdMap.set(...userIdToGameRoomId);
+
+        return new Map<string, string>(userIdToGameRoomIdMap);
+      });
     });
 
     socket.on('delete_game_room_id', (userId: string) => {
-      userIdToGameRoomIdMap.delete(userId);
-      setUserIdToGameRoomIdMap(new Map<string, string>(userIdToGameRoomIdMap));
+      setUserIdToGameRoomIdMap((userIdToGameRoomIdMap) => {
+        userIdToGameRoomIdMap.delete(userId);
+
+        return new Map<string, string>(userIdToGameRoomIdMap);
+      });
     });
 
     return () => {
@@ -101,7 +113,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       socket.off('set_game_room_id');
       socket.off('delete_game_room_id');
     };
-  }, [socket]);
+  }, [socket, customToast]);
 
   return (
     <SocketContext.Provider
