@@ -10,6 +10,7 @@ import { useSocket } from 'hooks/socket/useSocket';
 import * as ReactRouter from 'react-router-dom';
 import * as SocketIOClient from 'socket.io-client';
 import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
+import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
 import { ChangeChatRoomMemberStatusButtons } from 'features/chat/components/atoms/ChangeChatRoomMemberStatusButtons';
 
 type Props = {
@@ -103,7 +104,11 @@ const ChatRoomMemberListItem: React.FC<{
           name={member.user.nickname}
           src={member.user.avatarImageUrl}
         ></LinkedAvatar>
-        <C.Text ml={10}>{member.user.nickname}</C.Text>
+        <LinkedNickname
+          ml={10}
+          id={member.user.id}
+          nickname={member.user.nickname}
+        />
         <C.Spacer />
         <C.Text mr={5}>{member.memberStatus}</C.Text>
         {chatLoginUser.user.id === member.user.id && (

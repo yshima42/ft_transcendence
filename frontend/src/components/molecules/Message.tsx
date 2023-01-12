@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
+import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
 
 type Props = {
   id: string;
@@ -31,7 +32,7 @@ export const Message: React.FC<Props> = ({
         {new Date(createdAt).toLocaleString()}
       </C.Text>
       <C.Text fontSize="sm" fontWeight="bold">
-        {nickname}
+        <LinkedNickname id={userId} nickname={nickname} />
       </C.Text>
       <LinkedAvatar
         id={userId}
