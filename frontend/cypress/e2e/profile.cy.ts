@@ -125,7 +125,7 @@ describe('Profile', function () {
    *
    * チェック項目No.27, 60
    */
-  it.only('他のユーザーをブロックすることができ、そのブロックを解除することができる。', () => {
+  it('他のユーザーをブロックすることができ、そのブロックを解除することができる。', () => {
     const targetNickname = 'n-friends1';
 
     visitProfileFromUsersTab(UsersTab.FRIENDS, targetNickname);
@@ -208,50 +208,50 @@ describe('Profile', function () {
     cy.getBySel('request-button').should('be.visible');
     assertUserIsInUsersTab(UsersTab.ADD_FRIEND, targetNickname);
   });
-});
 
-/**
- * シナリオ Profile-9
- * サイドバーからFriendタブを表示。
- * FriendRelationによって、表示されるFriend関連のボタンを確認。
- *
- * チェック項目No.59,61
- */
-it.only('他のユーザーのProfileが表示できる', () => {
-  const targetFriendNickname = 'n-friends2';
-  const targetPendingNickname = 'n-pending1';
-  const targetRecognitionNickname = 'n-recognition1';
-  const targetAddFriendNickname = 'n-add-friend1';
+  /**
+   * シナリオ Profile-9
+   * サイドバーからFriendタブを表示。
+   * FriendRelationによって、表示されるFriend関連のボタンを確認。
+   *
+   * チェック項目No.59,61
+   */
+  it('他のユーザーのProfileが表示できる', () => {
+    const targetFriendNickname = 'n-friends2';
+    const targetPendingNickname = 'n-pending1';
+    const targetRecognitionNickname = 'n-recognition1';
+    const targetAddFriendNickname = 'n-add-friend1';
 
-  // Friendsのプロフィール確認。
-  visitProfileFromUsersTab(UsersTab.FRIENDS, targetFriendNickname);
-  validateProfile(targetFriendNickname);
-  cy.getBySel('accept-button').should('not.exist');
-  cy.getBySel('cancel-button').should('not.exist');
-  cy.getBySel('reject-button').should('not.exist');
-  cy.getBySel('request-button').should('not.exist');
+    // Friendsのプロフィール確認。
+    visitProfileFromUsersTab(UsersTab.FRIENDS, targetFriendNickname);
+    validateProfile(targetFriendNickname);
+    cy.getBySel('accept-button').should('not.exist');
+    cy.getBySel('cancel-button').should('not.exist');
+    cy.getBySel('reject-button').should('not.exist');
+    cy.getBySel('request-button').should('not.exist');
 
-  // Pendingのプロフィール確認。
-  visitProfileFromUsersTab(UsersTab.PENDING, targetPendingNickname);
-  validateProfile(targetPendingNickname);
-  cy.getBySel('cancel-button').should('be.visible');
-  cy.getBySel('accept-button').should('not.exist');
-  cy.getBySel('reject-button').should('not.exist');
-  cy.getBySel('request-button').should('not.exist');
+    // Pendingのプロフィール確認。
+    visitProfileFromUsersTab(UsersTab.PENDING, targetPendingNickname);
+    validateProfile(targetPendingNickname);
+    cy.getBySel('cancel-button').should('be.visible');
+    cy.getBySel('accept-button').should('not.exist');
+    cy.getBySel('reject-button').should('not.exist');
+    cy.getBySel('request-button').should('not.exist');
 
-  // Recognitionのプロフィール確認。
-  visitProfileFromUsersTab(UsersTab.RECOGNITION, targetRecognitionNickname);
-  validateProfile(targetRecognitionNickname);
-  cy.getBySel('accept-button').should('be.visible');
-  cy.getBySel('reject-button').should('be.visible');
-  cy.getBySel('cancel-button').should('not.exist');
-  cy.getBySel('request-button').should('not.exist');
+    // Recognitionのプロフィール確認。
+    visitProfileFromUsersTab(UsersTab.RECOGNITION, targetRecognitionNickname);
+    validateProfile(targetRecognitionNickname);
+    cy.getBySel('accept-button').should('be.visible');
+    cy.getBySel('reject-button').should('be.visible');
+    cy.getBySel('cancel-button').should('not.exist');
+    cy.getBySel('request-button').should('not.exist');
 
-  // Add Friendのプロフィール確認。
-  visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetAddFriendNickname);
-  validateProfile(targetRecognitionNickname);
-  cy.getBySel('request-button').should('be.visible');
-  cy.getBySel('accept-button').should('not.exist');
-  cy.getBySel('reject-button').should('not.exist');
-  cy.getBySel('cancel-button').should('not.exist');
+    // Add Friendのプロフィール確認。
+    visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetAddFriendNickname);
+    validateProfile(targetAddFriendNickname);
+    cy.getBySel('request-button').should('be.visible');
+    cy.getBySel('accept-button').should('not.exist');
+    cy.getBySel('reject-button').should('not.exist');
+    cy.getBySel('cancel-button').should('not.exist');
+  });
 });
