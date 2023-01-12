@@ -42,11 +42,7 @@ export const GameResultCard: FC<Props> = memo((props) => {
                   Win!!
                 </Text>
               ) : (
-                <Text
-                  as="b"
-                  textColor="red.500"
-                  data-test={'profile-match-result-' + matchId}
-                >
+                <Text as="b" data-test={'profile-match-result-' + matchId}>
                   Lose...
                 </Text>
               )}
