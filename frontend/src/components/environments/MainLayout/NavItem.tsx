@@ -12,21 +12,21 @@ export const NavItem: FC<Props> = memo((props) => {
   const { title, icon, to } = props;
 
   return (
-    <Flex mt={30} flexDir="column" w="100%" alignItems="flex-start">
+    <Flex mt={4} flexDir="column" w="100%" alignItems="flex-start">
       <Menu placement="right">
         <Link to={to}>
           <Flex
             p={3}
-            borderRadius={8}
-            _hover={{ textDecor: 'none', backgroundColor: '#AEC8CA' }}
+            rounded="full"
+            w="160px"
+            _hover={{
+              textDecor: 'none',
+              backgroundColor: 'gray.100',
+            }}
           >
-            <MenuButton
-              w="100%"
-              _hover={{ textDecor: 'none', backgroundColor: '#AEC8CA' }}
-              data-test={'sidenav-' + title.toLowerCase()}
-            >
+            <MenuButton w="100%" data-test={'sidenav-' + title.toLowerCase()}>
               <Flex>
-                <Icon as={icon} fontSize="xl" color={'gray.700'} />
+                <Icon as={icon} fontSize="xl" color={'gray.600'} />
                 <Text ml={5} display={{ base: 'none', md: 'flex' }}>
                   {title}
                 </Text>

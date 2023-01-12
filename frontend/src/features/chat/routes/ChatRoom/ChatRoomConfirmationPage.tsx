@@ -82,7 +82,8 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
         )}
         <C.Button
           type="submit"
-          colorScheme="teal"
+          bg="teal.300"
+          color="white"
           mt={4}
           isDisabled={isSubmitting}
         >
