@@ -163,6 +163,19 @@ describe('GameService', () => {
         BadRequestException
       );
     });
+
+    it('Failure case5', async () => {
+      const input: CreateMatchResultDto = {
+        playerOneId: userArray[0].id,
+        playerTwoId: userArray[0].id,
+        playerOneScore: 3,
+        playerTwoScore: 5,
+      };
+
+      await expect(gameService.addMatchResult(input)).rejects.toThrow(
+        BadRequestException
+      );
+    });
   });
 
   describe('findManyHistory', () => {
