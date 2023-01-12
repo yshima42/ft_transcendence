@@ -208,19 +208,19 @@ for (let i = 0; i < 1; i++) {
     });
   }
 }
-// for (let i = 2; i < 100; i++) {
-//   const chatRoomId = chatRooms[1].id;
-//   const userId = idMap.get(userName(i));
-//   const memberStatus = 'NORMAL';
-//   if (userId !== undefined) {
-//     chatRoomMembers.push({
-//       chatRoomId,
-//       userId,
-//       memberStatus,
-//       statusUntil: null,
-//     });
-//   }
-// }
+for (let i = 2; i < 100; i++) {
+  const chatRoomId = chatRooms[0].id;
+  const userId = idMap.get(userName(i));
+  const memberStatus = 'NORMAL';
+  if (userId !== undefined) {
+    chatRoomMembers.push({
+      chatRoomId,
+      userId,
+      memberStatus,
+      statusUntil: null,
+    });
+  }
+}
 
 // const chatMessages: ChatMessage[] = [];
 // for (let i = 1; i < 2; i++) {
