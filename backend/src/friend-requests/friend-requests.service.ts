@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FriendRequest, User } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateFriendRequestDto } from './dto/update-friend-request.dto';
 import { FriendRelation } from './interfaces/friend-relation.interface';
@@ -131,15 +132,29 @@ export class FriendRequestsService {
   async update(
     updateFriendRequestDto: UpdateFriendRequestDto
   ): Promise<FriendRequest> {
-    return await this.prisma.friendRequest.update({
-      where: {
-        creatorId_receiverId: {
-          creatorId: updateFriendRequestDto.creatorId,
-          receiverId: updateFriendRequestDto.receiverId,
+    if (updateFriendRequestDto.creatorId === updateFriendRequestDto.receiverId)
+      throw new BadRequestException(
+        'You cannot send a friend-request to yourself.'
+      );
+
+    try {
+      return await this.prisma.friendRequest.update({
+        where: {
+          creatorId_receiverId: {
+            creatorId: updateFriendRequestDto.creatorId,
+            receiverId: updateFriendRequestDto.receiverId,
+          },
         },
-      },
-      data: updateFriendRequestDto,
-    });
+        data: updateFriendRequestDto,
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('Friend request is not found.');
+        }
+      }
+      throw error;
+    }
   }
 
   async removeOne(
