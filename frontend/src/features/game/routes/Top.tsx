@@ -10,13 +10,14 @@ export const Top: FC = memo(() => {
   const { user } = useProfile();
   const { gameRoomId } = useGameRoomId(user.id);
 
+  // フリー素材(https://www.animatedimages.org/img-animated-table-tennis-image-0012-192706.htm)
   return (
     <ContentLayout title="">
       <Center h="400px">
         <VStack>
           <Box>
             <Image
-              src="https://i.pinimg.com/originals/f6/bf/f5/f6bff5da3b05f36d85d13a778836ebeb.gif"
+              src="https://www.animatedimages.org/data/media/682/animated-table-tennis-image-0012.gif"
               alt="Pong"
             />
           </Box>
