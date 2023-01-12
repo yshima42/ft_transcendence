@@ -28,9 +28,10 @@ export class ChatRoomMemberController {
 
   @NestJs.Get()
   async findAll(
-    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string,
+    @GetUser() user: User
   ): Promise<ResponseChatRoomMember[]> {
-    return await this.chatRoomMemberService.findAll(chatRoomId);
+    return await this.chatRoomMemberService.findAll(chatRoomId, user.id);
   }
 
   // me
