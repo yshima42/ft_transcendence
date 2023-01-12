@@ -28,6 +28,34 @@ export const Message: React.FC<Props> = ({
     <>
       {isLoginUser ? (
         <>
+          <HStack alignSelf="flex-end">
+            <C.Text fontSize="xs" color="gray.500">
+              {new Date(createdAt).toLocaleString()}
+            </C.Text>
+            <LinkedNickname id={userId} nickname={nickname} fontSize="xs" />
+            <LinkedAvatar
+              id={userId}
+              size="xs"
+              name={nickname}
+              src={avatarImageUrl}
+            />
+          </HStack>
+          <C.Box
+            key={id}
+            padding={4}
+            backgroundColor="teal.50"
+            borderRadius="lg"
+            marginBottom={4}
+            marginRight={7}
+            alignSelf="flex-end"
+          >
+            <C.Text minW="150px" maxW="360px">
+              {content}
+            </C.Text>
+          </C.Box>
+        </>
+      ) : (
+        <>
           <HStack>
             <LinkedAvatar
               id={userId}
@@ -44,40 +72,12 @@ export const Message: React.FC<Props> = ({
           <C.Box
             key={id}
             padding={4}
-            backgroundColor="teal.50"
+            backgroundColor="gray.100"
             borderRadius="lg"
             marginBottom={4}
             marginLeft={7}
           >
-            <C.Text minW="150px" maxW="300px">
-              {content}
-            </C.Text>
-          </C.Box>
-        </>
-      ) : (
-        <>
-          <HStack alignSelf="flex-end">
-            <C.Text fontSize="xs" color="gray.500">
-              {new Date(createdAt).toLocaleString()}
-            </C.Text>
-            <LinkedNickname id={userId} nickname={nickname} fontSize="xs" />
-            <LinkedAvatar
-              id={userId}
-              size="xs"
-              name={nickname}
-              src={avatarImageUrl}
-            />
-          </HStack>
-          <C.Box
-            key={id}
-            padding={4}
-            backgroundColor="gray.100"
-            borderRadius="lg"
-            marginBottom={4}
-            marginRight={7}
-            alignSelf="flex-end"
-          >
-            <C.Text minW="150px" maxW="300px">
+            <C.Text minW="150px" maxW="360px">
               {content}
             </C.Text>
           </C.Box>
