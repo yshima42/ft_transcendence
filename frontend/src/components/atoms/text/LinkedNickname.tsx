@@ -12,7 +12,7 @@ export const LinkedNickname: FC<Props> = memo((props) => {
 
   return (
     <Link to={`/app/users/${id}`}>
-      <Text maxWidth="100px" noOfLines={1} {...textProps}>
+      <Text maxWidth="200px" noOfLines={1} {...textProps}>
         {nickname}
       </Text>
     </Link>
