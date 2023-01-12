@@ -26,7 +26,7 @@ export const NavItem: FC<Props> = memo((props) => {
           >
             <MenuButton w="100%" data-test={'sidenav-' + title.toLowerCase()}>
               <Flex>
-                <Icon as={icon} fontSize="xl" color={'gray.700'} />
+                <Icon as={icon} fontSize="xl" color={'gray.600'} />
                 <Text ml={5} display={{ base: 'none', md: 'flex' }}>
                   {title}
                 </Text>

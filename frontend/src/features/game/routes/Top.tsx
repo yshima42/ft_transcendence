@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { Button, Center } from '@chakra-ui/react';
+import { Box, Button, Center, Image, VStack } from '@chakra-ui/react';
 import { useProfile } from 'hooks/api';
 import { useGameRoomId } from 'hooks/utils/useGameRoomId';
 import { useNavigate } from 'react-router-dom';
@@ -12,14 +12,30 @@ export const Top: FC = memo(() => {
 
   return (
     <ContentLayout title="">
-      <Center>
-        {gameRoomId === undefined ? (
-          <Button onClick={() => navigate('/app/game/matching')}>Match</Button>
-        ) : (
-          <Button onClick={() => navigate(`/app/game/rooms/${gameRoomId}`)}>
-            Reconnect
-          </Button>
-        )}
+      <Center h="400px">
+        <VStack>
+          <Box>
+            <Image
+              src="https://i.pinimg.com/originals/f6/bf/f5/f6bff5da3b05f36d85d13a778836ebeb.gif"
+              alt="Pong"
+            />
+          </Box>
+          <Box>
+            {gameRoomId === undefined ? (
+              <Button
+                onClick={() => navigate('/app/game/matching')}
+                bg="teal.300"
+                color="white"
+              >
+                Match
+              </Button>
+            ) : (
+              <Button onClick={() => navigate(`/app/game/rooms/${gameRoomId}`)}>
+                Reconnect
+              </Button>
+            )}
+          </Box>
+        </VStack>
       </Center>
     </ContentLayout>
   );
