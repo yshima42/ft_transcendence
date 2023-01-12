@@ -44,12 +44,7 @@ export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
         <Heading size="md">Stats</Heading>
       </Flex>
       <Flex justify="center" align="center" pt="4">
-        <CircularProgress
-          value={gameStats.winRate}
-          // TODO 彩度調節したい
-          // color={colorScaleRYG(winRate)}
-          size="200px"
-        >
+        <CircularProgress value={gameStats.winRate} size="200px">
           <CircularProgressLabel>
             <Text
               fontSize="2xl"
