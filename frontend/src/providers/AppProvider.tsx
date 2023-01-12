@@ -25,7 +25,6 @@ export const AppProvider: FC<Props> = memo((props) => {
       <ChakraProvider theme={theme}>
         <BrowserRouter>{children}</BrowserRouter>
       </ChakraProvider>
-      {/* TODO: https://tanstack.com/query/v4/docs/react/devtools */}
       <ReactQueryDevtools initialIsOpen={false} position={'bottom-right'} />
     </QueryClientProvider>
   );

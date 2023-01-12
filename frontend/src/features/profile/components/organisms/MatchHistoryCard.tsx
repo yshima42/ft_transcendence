@@ -13,12 +13,10 @@ export const MatchHistoryCard: FC<Props> = memo((props) => {
   const { id, isLoginUser } = props;
   const { matchHistory } = useMatchHistory(isLoginUser ? 'me' : id);
 
-  // TODO:機能要件の時に変更する。フロントでロジックを書きたくない？
   const latest5Matches = matchHistory.slice(0, 5);
 
   return (
     <>
-      {/* TODO:spinnerつける？使うフックを変更し、一時的にspinner表示を削除した */}
       <Flex
         w="100%"
         h="100%"
