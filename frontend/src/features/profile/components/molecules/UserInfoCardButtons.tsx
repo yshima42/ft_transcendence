@@ -27,7 +27,7 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
         <>
           <ProfileEditButton user={user} />
           <HStack>
-            <Tag size="md" fontSize="md" variant="outline" colorScheme="blue">
+            <Tag size="md" fontSize="md" variant="outline" colorScheme="teal">
               <TagLabel>2FactorAuth</TagLabel>
             </Tag>
             <OtpAuthButton />
