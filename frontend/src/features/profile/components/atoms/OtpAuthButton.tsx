@@ -34,7 +34,6 @@ export const OtpAuthButton: FC = memo(() => {
         <Button
           size="xs"
           fontSize="xs"
-          bg="red.200"
           isDisabled={isLoadingCreate}
           onClick={onClickInactive}
         >
@@ -44,7 +43,7 @@ export const OtpAuthButton: FC = memo(() => {
         <Button
           size="xs"
           fontSize="xs"
-          bg="green.200"
+          bg="teal.300"
           isDisabled={isLoadingInactivate}
           onClick={onClickActive}
         >
