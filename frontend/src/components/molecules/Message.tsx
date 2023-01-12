@@ -1,11 +1,14 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { LinkedAvatar } from 'components/atoms/avatar/LinkedAvatar';
+import { LinkedNickname } from 'components/atoms/text/LinkedNickname';
 
 type Props = {
   id: string;
   content: string;
   createdAt: Date;
-  name: string;
+  userId: string;
+  nickname: string;
   avatarImageUrl: string;
 };
 
@@ -13,7 +16,8 @@ export const Message: React.FC<Props> = ({
   id,
   content,
   createdAt,
-  name,
+  userId,
+  nickname,
   avatarImageUrl,
 }) => {
   return (
@@ -27,13 +31,11 @@ export const Message: React.FC<Props> = ({
       <C.Text fontSize="xs" color="gray.500">
         {new Date(createdAt).toLocaleString()}
       </C.Text>
-      <C.Text fontSize="sm" fontWeight="bold">
-        {name}
-      </C.Text>
-      <C.Avatar
-        id={id}
+      <LinkedNickname id={userId} nickname={nickname} />
+      <LinkedAvatar
+        id={userId}
         size="sm"
-        name={name}
+        name={nickname}
         src={avatarImageUrl}
         marginRight={2}
       />

@@ -65,31 +65,26 @@ export class DmRoomService {
     });
   }
 
-  // ブロックしているユーザーは取得しない
   async findAllWithoutBlockUser(userId: string): Promise<ResponseDmRoom[]> {
     const dmRooms = await this.prisma.dmRoom.findMany({
-      // ブロックしているユーザーは取得しない
       where: {
+        // 自分自身が入っているルームのみ取得
         dmRoomMembers: {
-          every: {
-            user: {
-              blocking: {
-                every: {
-                  sourceId: {
-                    not: {
-                      equals: userId,
-                    },
+          some: {
+            userId,
+          },
+        },
+        // ブロックしているユーザーは取得しない
+        NOT: {
+          dmRoomMembers: {
+            some: {
+              user: {
+                blockedBy: {
+                  some: {
+                    sourceId: userId,
                   },
                 },
               },
-            },
-          },
-        },
-        // 自分自身が入っているルームのみ取得
-        AND: {
-          dmRoomMembers: {
-            some: {
-              userId,
             },
           },
         },
@@ -106,7 +101,7 @@ export class DmRoomService {
             user: {
               select: {
                 id: true,
-                name: true,
+                nickname: true,
                 avatarImageUrl: true,
               },
             },
@@ -126,5 +121,42 @@ export class DmRoomService {
     });
 
     return dmRooms;
+  }
+
+  async findOne(dmRoomId: string): Promise<ResponseDmRoom> {
+    const dmRoom = await this.prisma.dmRoom.findUnique({
+      where: {
+        id: dmRoomId,
+      },
+      select: {
+        id: true,
+        dmRoomMembers: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                nickname: true,
+                avatarImageUrl: true,
+              },
+            },
+          },
+        },
+        dms: {
+          select: {
+            content: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+    if (dmRoom === null) {
+      throw new HttpException('dm room not found', HttpStatus.NOT_FOUND);
+    }
+
+    return dmRoom;
   }
 }
