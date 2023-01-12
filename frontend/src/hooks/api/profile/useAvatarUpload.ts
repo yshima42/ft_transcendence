@@ -20,7 +20,9 @@ export type UploadAvatar = UseMutateAsyncFunction<
   unknown
 >;
 
-export const useAvatarUpload = (): Omit<
+export const useAvatarUpload = (
+  targetId: string
+): Omit<
   UseMutationResult<AvatarUploadResBody, unknown, AvatarFormData, unknown>,
   'mutateAsync'
 > & {
@@ -29,6 +31,7 @@ export const useAvatarUpload = (): Omit<
   const { mutateAsync: uploadAvatar, ...useMutationResult } =
     usePostFileApiWithErrorToast<AvatarUploadResBody>('/users/me/avatar', [
       ['/users/me/profile'],
+      [`/users/${targetId}/profile`],
       ['/game/matches'],
     ]);
 
