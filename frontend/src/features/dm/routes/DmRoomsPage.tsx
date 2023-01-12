@@ -19,7 +19,7 @@ export const DmRoomsPage: React.FC = React.memo(() => {
           {dmRooms.map((dmRoom) => (
             <C.ListItem key={dmRoom.id}>
               <Link to={`${dmRoom.id}`}>
-                <C.Box p={5} shadow="md" borderWidth="1px">
+                <C.Box p={5} shadow="md" borderWidth="1px" borderRadius="md">
                   <C.Flex>
                     <C.Box>
                       {/* 投稿がない場合は何も表示しない */}
