@@ -24,7 +24,7 @@ describe('sidebar spec', () => {
   });
 
   it('profile', () => {
-    cy.contains('nicknamedummy001').click();
+    cy.contains('dummy001').click();
     cy.url().should('include', '/users');
   });
 

@@ -126,7 +126,7 @@ describe('Profile', function () {
    * チェック項目No.27, 60
    */
   it('他のユーザーをブロックすることができ、そのブロックを解除することができる。', () => {
-    const targetNickname = 'n-friends1';
+    const targetNickname = 'n-friends001';
 
     visitProfileFromUsersTab(UsersTab.FRIENDS, targetNickname);
     cy.getBySel('block-button').click();
@@ -148,7 +148,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を送ることができる', () => {
-    const targetNickname = 'n-add-friend1';
+    const targetNickname = 'n-add-friend001';
 
     visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetNickname);
     cy.getBySel('request-button').should('be.visible').click();
@@ -165,7 +165,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を取り消すことができる', () => {
-    const targetNickname = 'n-pending1';
+    const targetNickname = 'n-pending001';
 
     visitProfileFromUsersTab(UsersTab.PENDING, targetNickname);
     cy.getBySel('cancel-button').should('be.visible').click();
@@ -182,7 +182,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を承認することができる', () => {
-    const targetNickname = 'n-recognition1';
+    const targetNickname = 'n-recognition001';
 
     visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
     cy.getBySel('accept-button').should('be.visible').click();
@@ -201,7 +201,7 @@ describe('Profile', function () {
    * チェック項目No.21,78
    */
   it('フレンド申請を拒否することができる', () => {
-    const targetNickname = 'n-recognition2';
+    const targetNickname = 'n-recognition002';
 
     visitProfileFromUsersTab(UsersTab.RECOGNITION, targetNickname);
     cy.getBySel('reject-button').should('be.visible').click();
@@ -217,10 +217,10 @@ describe('Profile', function () {
    * チェック項目No.59,61
    */
   it('他のユーザーのProfileが表示できる', () => {
-    const targetFriendNickname = 'n-friends2';
-    const targetPendingNickname = 'n-pending1';
-    const targetRecognitionNickname = 'n-recognition1';
-    const targetAddFriendNickname = 'n-add-friend1';
+    const targetFriendNickname = 'n-friends002';
+    const targetPendingNickname = 'n-pending001';
+    const targetRecognitionNickname = 'n-recognition001';
+    const targetAddFriendNickname = 'n-add-friend001';
 
     // Friendsのプロフィール確認。
     visitProfileFromUsersTab(UsersTab.FRIENDS, targetFriendNickname);

@@ -15,11 +15,11 @@ const num = (n: number) => `${n.toString().padStart(3, '0')}`;
  * 50 + 3個のuuidをMapで作成。
  * key  :
  *        dummy001~3
- *        friends1~10
- *        pending1~10
- *        recognition1~10
- *        blocked1~10
- *        add-friend1~10
+ *        friends001~10
+ *        pending001~10
+ *        recognition001~10
+ *        blocked001~10
+ *        add-friend001~10
  * value: uuid
  */
 const idMap = new Map<string, string>();
@@ -105,7 +105,7 @@ for (let i = 2; i < 4; i++) {
 }
 
 /**
- * dummy001がcreatorとなって、pending1~10に
+ * dummy001がcreatorとなって、pending001~10に
  * friend requestを作成する。ステータスはPENDING
  */
 for (let i = 1; i <= 10; i++) {
@@ -123,7 +123,7 @@ for (let i = 1; i <= 10; i++) {
 }
 
 /**
- * dummy001がcreatorとなって、friends1~5に
+ * dummy001がcreatorとなって、friends001~5に
  * friend requestを作成する。ステータスはACCEPTED
  */
 for (let i = 1; i <= 5; i++) {
@@ -159,7 +159,7 @@ for (let i = 6; i <= 10; i++) {
 }
 
 /**
- * recognition1~10がcreatorとなって、dummy001に
+ * recognition001~10がcreatorとなって、dummy001に
  * friend requestを作成する。ステータスはPENDING
  */
 for (let i = 1; i <= 10; i++) {
@@ -177,7 +177,7 @@ for (let i = 1; i <= 10; i++) {
 }
 
 /**
- * dummy001がblocked1~10をBlockする。
+ * dummy001がblocked001~10をBlockする。
  */
 const blockData: Block[] = [];
 for (let i = 1; i < 10; i++) {
