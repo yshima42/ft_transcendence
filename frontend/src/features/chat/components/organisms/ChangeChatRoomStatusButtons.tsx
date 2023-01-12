@@ -32,6 +32,8 @@ export const ChangeChatRoomStatusButtons: React.FC<{
         colorScheme="blue"
         onClick={changeChatRoomStatusPublic}
         isDisabled={chatRoom.roomStatus === ChatRoomStatus.PUBLIC}
+        bg="teal.300"
+        color="white"
       >
         Public
       </C.Button>
@@ -39,6 +41,8 @@ export const ChangeChatRoomStatusButtons: React.FC<{
         colorScheme="blue"
         onClick={changeChatRoomStatusPrivate}
         isDisabled={chatRoom.roomStatus === ChatRoomStatus.PRIVATE}
+        bg="teal.300"
+        color="white"
       >
         Private
       </C.Button>
@@ -47,6 +51,8 @@ export const ChangeChatRoomStatusButtons: React.FC<{
           <C.Button
             colorScheme="blue"
             isDisabled={chatRoom.roomStatus === ChatRoomStatus.PROTECTED}
+            bg="teal.300"
+            color="white"
           >
             Protect
           </C.Button>
@@ -58,8 +64,8 @@ export const ChangeChatRoomStatusButtons: React.FC<{
           <C.PopoverBody>
             <C.Text>Set a password</C.Text>
             <form
-              onSubmit={handleSubmit(async (data) =>
-                await changeChatRoomStatusProtect(data)
+              onSubmit={handleSubmit(
+                async (data) => await changeChatRoomStatusProtect(data)
               )}
             >
               <C.Input

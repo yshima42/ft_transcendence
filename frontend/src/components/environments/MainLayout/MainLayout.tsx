@@ -1,7 +1,12 @@
 import { FC, memo } from 'react';
-import { AtSignIcon, ChatIcon, EmailIcon, ViewIcon } from '@chakra-ui/icons';
+import {
+  AtSignIcon,
+  ChatIcon,
+  EmailIcon,
+  StarIcon,
+  ViewIcon,
+} from '@chakra-ui/icons';
 import { Box, Flex } from '@chakra-ui/react';
-// import { Header } from 'components/organisms/layout/Header';
 import { useMatch } from 'react-router-dom';
 import { SpMenu } from 'components/environments/MainLayout/SpMenu';
 import { WebSidebarMenu } from 'components/environments/MainLayout/WebSidebarMenu';
@@ -20,6 +25,12 @@ export type NavigationItem = {
 export const MainLayout: FC<MainProps> = memo((props) => {
   const { children } = props;
   const navigation = [
+    {
+      title: 'Game',
+      to: '/app',
+      icon: StarIcon,
+      iconComponent: <StarIcon />,
+    },
     {
       title: 'Users',
       to: 'users',

@@ -7,7 +7,7 @@ export const LogoButton: FC = memo(() => {
     <Link to="/app">
       <Text
         px={3}
-        bgGradient="linear(to-l, #7928CA, #FF0080)"
+        bgGradient="linear(to-l, teal.400, teal.300)"
         bgClip="text"
         fontSize="2xl"
         fontWeight="extrabold"

@@ -20,7 +20,7 @@ const dataTestList = [
 export const Users: FC = memo(() => {
   return (
     <ContentLayout title="Users">
-      <Tabs variant="soft-rounded">
+      <Tabs variant="soft-rounded" colorScheme="gray">
         <TabList>
           {tabs.map((tab, index) => (
             <Tab key={tab} data-test={dataTestList[index]}>
