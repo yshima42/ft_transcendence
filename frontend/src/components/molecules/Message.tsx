@@ -31,9 +31,7 @@ export const Message: React.FC<Props> = ({
       <C.Text fontSize="xs" color="gray.500">
         {new Date(createdAt).toLocaleString()}
       </C.Text>
-      <C.Text fontSize="sm" fontWeight="bold">
-        <LinkedNickname id={userId} nickname={nickname} />
-      </C.Text>
+      <LinkedNickname id={userId} nickname={nickname} />
       <LinkedAvatar
         id={userId}
         size="sm"
