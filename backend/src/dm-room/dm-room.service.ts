@@ -123,7 +123,13 @@ export class DmRoomService {
     return dmRooms;
   }
 
-  async findOne(dmRoomId: string): Promise<ResponseDmRoom> {
+  async findOne(dmRoomId: string, userId: string): Promise<ResponseDmRoom> {
+    if (!(await this.isDmRoomMember(dmRoomId, userId))) {
+      throw new NestJs.HttpException(
+        'you are not dm room member',
+        NestJs.HttpStatus.BAD_REQUEST
+      );
+    }
     const dmRoom = await this.prisma.dmRoom.findUnique({
       where: {
         id: dmRoomId,
@@ -161,5 +167,31 @@ export class DmRoomService {
     }
 
     return dmRoom;
+  }
+
+  // DmRoomのメンバーかどうか
+  async isDmRoomMember(dmRoomId: string, userId: string): Promise<boolean> {
+    const dmRoom = await this.prisma.dmRoom.findUnique({
+      where: {
+        id: dmRoomId,
+      },
+      select: {
+        dmRoomMembers: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
+    if (dmRoom === null) {
+      throw new NestJs.HttpException(
+        'dm room not found',
+        NestJs.HttpStatus.NOT_FOUND
+      );
+    }
+
+    return dmRoom.dmRoomMembers.some((dmRoomMember) => {
+      return dmRoomMember.userId === userId;
+    });
   }
 }

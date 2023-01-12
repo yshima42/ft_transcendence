@@ -29,7 +29,6 @@ export class ChatMessageService {
       chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED ||
       chatRoomMember.memberStatus === ChatRoomMemberStatus.MUTED
     ) {
-      // TODO ソケットなのでHttpのエラーではない
       throw new NestJs.HttpException(
         'You are banned or muted',
         NestJs.HttpStatus.BAD_REQUEST
