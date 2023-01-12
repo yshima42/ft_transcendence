@@ -101,7 +101,17 @@ export class ChatRoomMemberService {
     });
   }
 
-  async findAll(chatRoomId: string): Promise<ResponseChatRoomMember[]> {
+  async findAll(
+    chatRoomId: string,
+    userId: string
+  ): Promise<ResponseChatRoomMember[]> {
+    // chatRoomのメンバーかどうか
+    if (!(await this.isChatRoomMember(chatRoomId, userId))) {
+      throw new NestJs.HttpException(
+        'You are not a member of this chatRoom',
+        NestJs.HttpStatus.UNAUTHORIZED
+      );
+    }
     const chatRoomMembers = await this.prisma.chatRoomMember.findMany({
       where: {
         chatRoomId,
@@ -326,5 +336,22 @@ export class ChatRoomMemberService {
       .catch((e: Error) => {
         this.logger.error(`handleCron: ${this.json({ e })}`);
       });
+  }
+
+  // chatRoomのメンバーかどうか
+  async isChatRoomMember(chatRoomId: string, userId: string): Promise<boolean> {
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    this.logger.debug(
+      `isChatRoomMember: ${this.json({ chatRoomMember, chatRoomId, userId })}`
+    );
+
+    return chatRoomMember !== null;
   }
 }
