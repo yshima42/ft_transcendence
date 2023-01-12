@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import * as ReactQuery from '@tanstack/react-query';
 import { ResponseDm } from 'features/dm/types/dm';
 import { useBlockRelation } from 'hooks/api/block/useBlockRelation';
@@ -62,10 +63,10 @@ export const DmRoom: React.FC = React.memo(() => {
             <C.Flex
               flexDir="column"
               alignItems="flex-start"
-              padding={4}
+              padding={3}
               overflowY="auto"
               overflowX="hidden"
-              height="70vh"
+              minH="400px"
             >
               {messages.map((message) => (
                 <Message
@@ -79,8 +80,10 @@ export const DmRoom: React.FC = React.memo(() => {
               ))}
               <div ref={scrollBottomRef} />
             </C.Flex>
-            <C.Divider />
-            <MessageSendForm roomId={dmRoomId} socket={socket} />
+            <Flex p="5%" flexDir="column" w="100%" mb={4} as="nav">
+              <C.Divider />
+              <MessageSendForm roomId={dmRoomId} socket={socket} />
+            </Flex>
           </>
         )}
       </ContentLayout>

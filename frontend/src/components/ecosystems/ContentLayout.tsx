@@ -14,7 +14,7 @@ export const ContentLayout: FC<Props> = (props) => {
       <Heading as="h2" size="md">
         {title}
       </Heading>
-      <Box py={8}>{children}</Box>
+      <Box pt={8}>{children}</Box>
     </Container>
   );
 };

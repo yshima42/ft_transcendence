@@ -11,7 +11,6 @@ import {
 export class GameService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // TODO 自分で自分と戦う場合の処理
   async addMatchResult(
     createMatchResultDto: CreateMatchResultDto
   ): Promise<MatchResult> {
@@ -25,11 +24,16 @@ export class GameService {
     ) {
       throw new BadRequestException('Invalid score');
     }
+    const playerOneId = createMatchResultDto.playerOneId;
+    const playerTwoId = createMatchResultDto.playerTwoId;
+    if (playerOneId === playerTwoId) {
+      throw new BadRequestException('Do not play with yourself');
+    }
 
     const matchResult = await this.prisma.matchResult.create({
       data: {
-        playerOneId: createMatchResultDto.playerOneId,
-        playerTwoId: createMatchResultDto.playerTwoId,
+        playerOneId,
+        playerTwoId,
         playerOneScore,
         playerTwoScore,
       },

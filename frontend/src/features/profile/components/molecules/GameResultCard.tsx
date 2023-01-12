@@ -16,7 +16,6 @@ type Props = {
 export const GameResultCard: FC<Props> = memo((props) => {
   const { matchId, playerOne, playerTwo, score, createdAt, win } = props;
 
-  // TODO:spinnerつける？使うフックを変更し、一時的にspinner表示を削除した
   return (
     <>
       <Box h="100px" bg="gray.50" borderRadius={20} px={4}>
