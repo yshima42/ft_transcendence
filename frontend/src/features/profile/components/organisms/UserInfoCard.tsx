@@ -46,7 +46,12 @@ export const UserInfoCard: FC<Props> = memo((props) => {
       >
         {user.nickname}
       </Text>
-      <Text fontSize="xs" color="gray" maxWidth="200px">
+      <Text
+        fontSize="xs"
+        color="gray"
+        maxWidth="200px"
+        data-test={'profile-name'}
+      >
         {user.name}
       </Text>
       <UserInfoCardButtons user={user} isLoginUser={isLoginUser} />

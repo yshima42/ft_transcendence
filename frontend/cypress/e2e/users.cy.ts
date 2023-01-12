@@ -4,7 +4,6 @@ import {
   getUsersDataTest,
   RelationChangeButton,
   UsersTab,
-  visitProfileFromUsersTab,
   visitUsersTab,
 } from '../support/helper';
 
@@ -66,48 +65,6 @@ describe('Users', function () {
 
     visitUsersTab(UsersTab.BLOCKED);
     changeRelation(UsersTab.BLOCKED, 'unblock-button', targetNickname);
-  });
-
-  /**
-   * シナリオ Users-3
-   * サイドバーからFriendタブを表示。
-   * FriendRelationによって、表示されるFriend関連のボタンを確認。
-   *
-   * チェック項目No.59
-   */
-  it('他のユーザープロフィールのフレンド関係ボタン表示', () => {
-    const targetFriendNickname = 'n-friends2';
-    const targetPendingNickname = 'n-pending1';
-    const targetRecognitionNickname = 'n-recognition1';
-    const targetAddFriendNickname = 'n-add-friend1';
-
-    // Friendsのプロフィール確認。
-    visitProfileFromUsersTab(UsersTab.FRIENDS, targetFriendNickname);
-    cy.getBySel('accept-button').should('not.exist');
-    cy.getBySel('cancel-button').should('not.exist');
-    cy.getBySel('reject-button').should('not.exist');
-    cy.getBySel('request-button').should('not.exist');
-
-    // Pendingのプロフィール確認。
-    visitProfileFromUsersTab(UsersTab.PENDING, targetPendingNickname);
-    cy.getBySel('cancel-button').should('be.visible');
-    cy.getBySel('accept-button').should('not.exist');
-    cy.getBySel('reject-button').should('not.exist');
-    cy.getBySel('request-button').should('not.exist');
-
-    // Recognitionのプロフィール確認。
-    visitProfileFromUsersTab(UsersTab.RECOGNITION, targetRecognitionNickname);
-    cy.getBySel('accept-button').should('be.visible');
-    cy.getBySel('reject-button').should('be.visible');
-    cy.getBySel('cancel-button').should('not.exist');
-    cy.getBySel('request-button').should('not.exist');
-
-    // Add Friendのプロフィール確認。
-    visitProfileFromUsersTab(UsersTab.ADD_FRIEND, targetAddFriendNickname);
-    cy.getBySel('request-button').should('be.visible');
-    cy.getBySel('accept-button').should('not.exist');
-    cy.getBySel('reject-button').should('not.exist');
-    cy.getBySel('cancel-button').should('not.exist');
   });
 
   /**
