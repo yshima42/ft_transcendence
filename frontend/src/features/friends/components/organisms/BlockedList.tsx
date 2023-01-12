@@ -16,6 +16,7 @@ export const BlockedList: FC = () => {
         lg: 'repeat(2, 1fr)',
       }}
       gap={6}
+      data-test={'users-blocked-grid'}
     >
       {users.map((user) => (
         <UserCard

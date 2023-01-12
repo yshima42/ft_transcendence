@@ -33,8 +33,8 @@ type Props = {
 
 export const ProfileEditModal: FC<Props> = memo((props) => {
   const { user, isOpen, onClose } = props;
-  const { editProfile, isLoading: isLoading1 } = useProfileEdit();
-  const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
+  const { editProfile, isLoading: isLoading1 } = useProfileEdit(user.id);
+  const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload(user.id);
   const [profileFormData, setProfileFormData] = useState<ProfileFormData>();
   const [avatarFormData, setAvatarFormData] = useState<AvatarFormData>();
 
@@ -90,6 +90,7 @@ export const ProfileEditModal: FC<Props> = memo((props) => {
                     src={user.avatarImageUrl}
                   />
                   <input
+                    hidden
                     ref={inputRef}
                     type="file"
                     accept="image/*"

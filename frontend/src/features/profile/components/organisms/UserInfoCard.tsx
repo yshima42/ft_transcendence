@@ -35,7 +35,12 @@ export const UserInfoCard: FC<Props> = memo((props) => {
           data-test="profile-user-avatar"
         />
       ) : (
-        <LinkedAvatar id={user.id} size="2xl" src={user.avatarImageUrl} />
+        <LinkedAvatar
+          id={user.id}
+          size="2xl"
+          src={user.avatarImageUrl}
+          data-test="profile-user-avatar"
+        />
       )}
       <Text
         fontSize="md"
@@ -46,7 +51,12 @@ export const UserInfoCard: FC<Props> = memo((props) => {
       >
         {user.nickname}
       </Text>
-      <Text fontSize="xs" color="gray" maxWidth="200px">
+      <Text
+        fontSize="xs"
+        color="gray"
+        maxWidth="200px"
+        data-test={'profile-name'}
+      >
         {user.name}
       </Text>
       <UserInfoCardButtons user={user} isLoginUser={isLoginUser} />

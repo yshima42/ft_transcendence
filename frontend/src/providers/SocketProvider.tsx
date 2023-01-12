@@ -6,8 +6,10 @@ import {
   useRef,
   useState,
 } from 'react';
+import { ToastId } from '@chakra-ui/react';
 import { WS_BASE_URL } from 'config';
 import { useSocket } from 'hooks/socket/useSocket';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { Socket } from 'socket.io-client';
 import { InvitationAlert } from './InvitationAlert';
 
@@ -36,6 +38,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
     new Map<string, string>()
   );
   const [isConnected, setConnected] = useState(false);
+  const { customToast } = useCustomToast();
   const didLogRef = useRef(false);
 
   useEffect(() => {
@@ -62,6 +65,14 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     });
 
+    socket.on('exception', (data: { status: string; message: string }) => {
+      const { message } = data;
+      const id: ToastId = 'wsException';
+      if (!customToast.isActive(id)) {
+        customToast({ id, description: message });
+      }
+    });
+
     socket.on('set_presence', (userIdToPresence: [string, Presence]) => {
       userIdToPresenceMap.set(...userIdToPresence);
       setUserIdToPresenceMap(new Map<string, Presence>(userIdToPresenceMap));
@@ -84,6 +95,7 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
 
     return () => {
       socket.off('connect_established');
+      socket.off('exception');
       socket.off('set_presence');
       socket.off('delete_presence');
       socket.off('set_game_room_id');

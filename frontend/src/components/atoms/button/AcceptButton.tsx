@@ -21,6 +21,7 @@ export const AcceptButton: FC<Props> = memo((props) => {
       isDisabled={isLoading || isSuccess}
       onClick={onClickAccept}
       {...buttonProps}
+      data-test="accept-button"
     >
       Accept
     </Button>
