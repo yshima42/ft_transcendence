@@ -1,4 +1,3 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import * as NestJs from '@nestjs/common';
 import * as Schedule from '@nestjs/schedule';
 import {
@@ -13,15 +12,15 @@ import { ResponseChatRoomMember } from './chat-room-member.interface';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
 import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
-@Injectable()
+@NestJs.Injectable()
 export class ChatRoomMemberService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => ChatRoomService))
+    @NestJs.Inject(NestJs.forwardRef(() => ChatRoomService))
     private readonly chatRoomService: ChatRoomService
   ) {}
 
-  private readonly logger = new Logger('ChatRoomMemberService');
+  private readonly logger = new NestJs.Logger('ChatRoomMemberService');
   private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
 
   async create(
@@ -152,7 +151,6 @@ export class ChatRoomMemberService {
         memberStatus: true,
       },
     });
-    // TODO: WebSocketでのエラーも考慮するとここでHttpのエラーを投げるべきか検討する必要あり。
     if (chatRoomMember === null) {
       throw new NestJs.HttpException(
         'ChatRoomMember not found',

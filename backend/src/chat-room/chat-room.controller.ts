@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { ChatRoom, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -18,15 +8,15 @@ import { ChatRoomService } from './chat-room.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
 import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
-@Controller('chat/rooms')
+@NestJs.Controller('chat/rooms')
 @Sw.ApiTags('chat-room')
-@UseGuards(JwtOtpAuthGuard)
+@NestJs.UseGuards(JwtOtpAuthGuard)
 export class ChatRoomController {
   constructor(private readonly chatRoomService: ChatRoomService) {}
 
-  @Post()
+  @NestJs.Post()
   async create(
-    @Body() createChatroomDto: CreateChatRoomDto,
+    @NestJs.Body() createChatroomDto: CreateChatRoomDto,
     @GetUser() user: User
   ): Promise<Omit<ChatRoom, 'password'>> {
     const res = await this.chatRoomService.create(createChatroomDto, user.id);
@@ -38,21 +28,21 @@ export class ChatRoomController {
   }
 
   // 自分が入っていないチャット全部
-  @Get()
+  @NestJs.Get()
   async findJoinableRooms(@GetUser() user: User): Promise<ResponseChatRoom[]> {
     return await this.chatRoomService.findJoinableRooms(user.id);
   }
 
   // 自分が入っているチャット全部
-  @Get('me')
+  @NestJs.Get('me')
   async findJoinedRooms(@GetUser() user: User): Promise<ResponseChatRoom[]> {
     return await this.chatRoomService.findJoinedRooms(user.id);
   }
 
   // chatRoomIdで検索
-  @Get(':chatRoomId')
+  @NestJs.Get(':chatRoomId')
   async findOne(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string
   ): Promise<Omit<ChatRoom, 'password'>> {
     const res = await this.chatRoomService.findOne(chatRoomId);
     // omit password
@@ -62,10 +52,10 @@ export class ChatRoomController {
     return rest;
   }
 
-  @Patch(':chatRoomId')
+  @NestJs.Patch(':chatRoomId')
   async update(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Body() updateChatRoomDto: UpdateChatRoomDto,
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string,
+    @NestJs.Body() updateChatRoomDto: UpdateChatRoomDto,
     @GetUser() user: User
   ): Promise<Omit<ChatRoom, 'password'>> {
     const res = await this.chatRoomService.update(
@@ -81,9 +71,9 @@ export class ChatRoomController {
   }
 
   // delete
-  @Delete(':chatRoomId')
+  @NestJs.Delete(':chatRoomId')
   async remove(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<void> {
     await this.chatRoomService.remove(chatRoomId, user.id);

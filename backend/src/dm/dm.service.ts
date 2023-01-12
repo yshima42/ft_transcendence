@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDm } from './dm.interface';
 import { CreateDmDto } from './dto/create-dm.dto';
 
-@Injectable()
+@NestJs.Injectable()
 export class DmService {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -35,7 +35,14 @@ export class DmService {
     return dm;
   }
 
-  async findAllNotBlocked(dmRoomId: string): Promise<ResponseDm[]> {
+  async findAllNotBlocked(
+    dmRoomId: string,
+    userId: string
+  ): Promise<ResponseDm[]> {
+    // 自分がDmRoomのメンバーであるか
+    if (!(await this.isDmRoomMember(dmRoomId, userId))) {
+      throw new NestJs.ForbiddenException();
+    }
     const dms = await this.prisma.dm.findMany({
       where: {
         dmRoomId,
@@ -61,5 +68,21 @@ export class DmService {
     dms.reverse();
 
     return dms;
+  }
+
+  // 自分がDmRoomのメンバーであるか
+  async isDmRoomMember(dmRoomId: string, userId: string): Promise<boolean> {
+    const dmRoom = await this.prisma.dmRoom.findFirst({
+      where: {
+        id: dmRoomId,
+        dmRoomMembers: {
+          some: {
+            userId,
+          },
+        },
+      },
+    });
+
+    return dmRoom !== null;
   }
 }

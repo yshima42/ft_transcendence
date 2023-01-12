@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  ParseUUIDPipe,
-  UseGuards,
-} from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -13,15 +6,15 @@ import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
 import { ResponseDmRoom } from './dm-room.interface';
 import { DmRoomService } from './dm-room.service';
 
-@Controller('dm/rooms')
+@NestJs.Controller('dm/rooms')
 @Sw.ApiTags('dm-room')
-@UseGuards(JwtOtpAuthGuard)
+@NestJs.UseGuards(JwtOtpAuthGuard)
 export class DmRoomController {
   constructor(private readonly dmRoomService: DmRoomService) {}
 
-  @Post(':userId')
+  @NestJs.Post(':userId')
   async findOneOrCreate(
-    @Param('userId', new ParseUUIDPipe()) userId: string,
+    @NestJs.Param('userId', new NestJs.ParseUUIDPipe()) userId: string,
     @GetUser() user: User
   ): Promise<string> {
     const res = await this.dmRoomService.findOrCreate(userId, user.id);
@@ -29,14 +22,14 @@ export class DmRoomController {
     return res.id;
   }
 
-  @Get()
+  @NestJs.Get()
   async findAll(@GetUser() user: User): Promise<ResponseDmRoom[]> {
     return await this.dmRoomService.findAllWithoutBlockUser(user.id);
   }
 
-  @Get(':dmRoomId')
+  @NestJs.Get(':dmRoomId')
   async findOne(
-    @Param('dmRoomId', new ParseUUIDPipe()) dmRoomId: string
+    @NestJs.Param('dmRoomId', new NestJs.ParseUUIDPipe()) dmRoomId: string
   ): Promise<ResponseDmRoom> {
     return await this.dmRoomService.findOne(dmRoomId);
   }
