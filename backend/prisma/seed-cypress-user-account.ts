@@ -15,11 +15,11 @@ const num = (n: number) => `${n.toString().padStart(3, '0')}`;
  * 50 + 3個のuuidをMapで作成。
  * key  :
  *        dummy001~3
- *        dummy-friends1~10
- *        dummy-pending1~10
- *        dummy-recognition1~10
- *        dummy-blocked1~10
- *        dummy-add-friend1~10
+ *        friends1~10
+ *        pending1~10
+ *        recognition1~10
+ *        blocked1~10
+ *        add-friend1~10
  * value: uuid
  */
 const idMap = new Map<string, string>();
@@ -27,11 +27,11 @@ for (let i = 1; i <= 3; i++) {
   idMap.set('dummy' + num(i), uuidv4());
 }
 for (let i = 1; i <= 10; i++) {
-  idMap.set('dummy-friends' + num(i), uuidv4());
-  idMap.set('dummy-pending' + num(i), uuidv4());
-  idMap.set('dummy-recognition' + num(i), uuidv4());
-  idMap.set('dummy-blocked' + num(i), uuidv4());
-  idMap.set('dummy-add-friend' + num(i), uuidv4());
+  idMap.set('friends' + num(i), uuidv4());
+  idMap.set('pending' + num(i), uuidv4());
+  idMap.set('recognition' + num(i), uuidv4());
+  idMap.set('blocked' + num(i), uuidv4());
+  idMap.set('add-friend' + num(i), uuidv4());
 }
 
 const onlineStatus = ['ONLINE', 'OFFLINE', 'INGAME'] as const;
@@ -64,7 +64,7 @@ idMap.forEach((value, key) => {
     name: key,
     avatarImageUrl:
       `https://placehold.jp/${colorCode}/fffffe/150x150.png?text=` + key,
-    nickname: 'nick-' + key,
+    nickname: 'n-' + key,
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -105,12 +105,12 @@ for (let i = 2; i < 4; i++) {
 }
 
 /**
- * dummy001がcreatorとなって、dummy-pending1~10に
+ * dummy001がcreatorとなって、pending1~10に
  * friend requestを作成する。ステータスはPENDING
  */
 for (let i = 1; i <= 10; i++) {
   const creatorId = idMap.get('dummy001');
-  const receiverId = idMap.get('dummy-pending' + num(i));
+  const receiverId = idMap.get('pending' + num(i));
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -123,12 +123,12 @@ for (let i = 1; i <= 10; i++) {
 }
 
 /**
- * dummy001がcreatorとなって、dummy-friends1~5に
+ * dummy001がcreatorとなって、friends1~5に
  * friend requestを作成する。ステータスはACCEPTED
  */
 for (let i = 1; i <= 5; i++) {
   const creatorId = idMap.get('dummy001');
-  const receiverId = idMap.get('dummy-friends' + num(i));
+  const receiverId = idMap.get('friends' + num(i));
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
       creatorId,
@@ -141,11 +141,11 @@ for (let i = 1; i <= 5; i++) {
 }
 
 /**
- * dummy-friends6~10がcreatorとなって、dummy001に
+ * friends6~10がcreatorとなって、dummy001に
  * friend requestを作成する。ステータスはACCEPTED
  */
 for (let i = 6; i <= 10; i++) {
-  const creatorId = idMap.get('dummy-friends' + num(i));
+  const creatorId = idMap.get('friends' + num(i));
   const receiverId = idMap.get('dummy001');
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
@@ -159,11 +159,11 @@ for (let i = 6; i <= 10; i++) {
 }
 
 /**
- * dummy-recognition1~10がcreatorとなって、dummy001に
+ * recognition1~10がcreatorとなって、dummy001に
  * friend requestを作成する。ステータスはPENDING
  */
 for (let i = 1; i <= 10; i++) {
-  const creatorId = idMap.get('dummy-recognition' + num(i));
+  const creatorId = idMap.get('recognition' + num(i));
   const receiverId = idMap.get('dummy001');
   if (creatorId !== undefined && receiverId !== undefined) {
     friendRequestData.push({
@@ -177,12 +177,12 @@ for (let i = 1; i <= 10; i++) {
 }
 
 /**
- * dummy001がdummy-blocked1~10をBlockする。
+ * dummy001がblocked1~10をBlockする。
  */
 const blockData: Block[] = [];
 for (let i = 1; i < 10; i++) {
   const sourceId = idMap.get('dummy001');
-  const targetId = idMap.get('dummy-blocked' + num(i));
+  const targetId = idMap.get('blocked' + num(i));
   if (targetId !== undefined && sourceId !== undefined) {
     blockData.push({
       targetId,

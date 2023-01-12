@@ -35,15 +35,10 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
         </>
       ) : (
         <>
-          {!isUserBlocked && (
-            <HStack>
-              <GameOrWatchButton
-                loginUserId={loginUser.id}
-                targetId={user.id}
-              />
-              <DmButton targetId={user.id} />
-            </HStack>
-          )}
+          <HStack>
+            <GameOrWatchButton loginUserId={loginUser.id} targetId={user.id} />
+            <DmButton targetId={user.id} />
+          </HStack>
           <Box m={2}>
             <HStack>
               <FriendButton
