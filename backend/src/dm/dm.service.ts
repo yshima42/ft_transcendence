@@ -23,7 +23,8 @@ export class DmService {
         createdAt: true,
         sender: {
           select: {
-            name: true,
+            id: true,
+            nickname: true,
             avatarImageUrl: true,
             onlineStatus: true,
           },
@@ -45,13 +46,19 @@ export class DmService {
         createdAt: true,
         sender: {
           select: {
-            name: true,
+            id: true,
+            nickname: true,
             avatarImageUrl: true,
             onlineStatus: true,
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 100,
     });
+    dms.reverse();
 
     return dms;
   }

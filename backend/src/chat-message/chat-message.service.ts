@@ -49,7 +49,7 @@ export class ChatMessageService {
         sender: {
           select: {
             id: true,
-            name: true,
+            nickname: true,
             avatarImageUrl: true,
           },
         },
@@ -62,6 +62,7 @@ export class ChatMessageService {
     return chatMessage;
   }
 
+  // ユーザーによってブロックされたものを除き、チャットルームですべてのチャットメッセージを見つける
   async findAllNotBlocked(
     chatRoomId: string,
     userId: string
@@ -69,12 +70,13 @@ export class ChatMessageService {
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
         chatRoomId,
-        // 自分がブロックしているユーザーのメッセージは取得しない
-        sender: {
-          blockedBy: {
-            every: {
-              targetId: {
-                equals: userId,
+        // Block tableにおいて、sourceIdがuserIdでtargetIdがsenderIdのレコードがある場合、ブロックされている
+        // ブロックされているUserがSenderのメッセージは除く
+        NOT: {
+          sender: {
+            blockedBy: {
+              some: {
+                sourceId: userId,
               },
             },
           },
@@ -87,68 +89,19 @@ export class ChatMessageService {
         sender: {
           select: {
             id: true,
-            name: true,
+            nickname: true,
             avatarImageUrl: true,
           },
         },
       },
-    });
-    this.logger.debug(
-      `findAllNotBlocked: ${this.json({ chatMessage, chatRoomId, userId })}`
-    );
-
-    return chatMessage;
-  }
-
-  async findAllNotBlockedLimit(
-    chatRoomId: string,
-    userId: string,
-    limit: number,
-    offset: number
-  ): Promise<ResponseChatMessage[]> {
-    const chatMessage = await this.prisma.chatMessage.findMany({
-      where: {
-        chatRoomId,
-        // 自分がブロックしているユーザーのメッセージは取得しない
-        sender: {
-          blockedBy: {
-            every: {
-              targetId: {
-                equals: userId,
-              },
-            },
-          },
-        },
-      },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-        sender: {
-          select: {
-            id: true,
-            name: true,
-            avatarImageUrl: true,
-          },
-        },
-      },
-      // 最新のメッセージから取得する
       orderBy: {
         createdAt: 'desc',
       },
-      take: limit,
-      skip: offset,
+      take: 100,
     });
-    // 並び替え
     chatMessage.reverse();
     this.logger.debug(
-      `findAllNotBlockedLimit: ${this.json({
-        chatMessage,
-        chatRoomId,
-        userId,
-        limit,
-        offset,
-      })}`
+      `findAllNotBlocked: ${this.json({ chatMessage, chatRoomId, userId })}`
     );
 
     return chatMessage;

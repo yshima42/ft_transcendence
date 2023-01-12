@@ -5,7 +5,7 @@ export type ResponseDmRoom = {
   dmRoomMembers: Array<{
     user: {
       id: string;
-      name: string;
+      nickname: string;
       avatarImageUrl: string;
     };
   }>;
@@ -20,7 +20,8 @@ export type ResponseDm = {
   content: string;
   createdAt: Date;
   sender: {
-    name: string;
+    id: string;
+    nickname: string;
     avatarImageUrl: string;
     onlineStatus: OnlineStatus;
   };
