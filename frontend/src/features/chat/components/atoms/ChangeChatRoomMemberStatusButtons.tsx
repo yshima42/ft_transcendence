@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
 import { LimitTime, ResponseChatRoomMember } from 'features/chat/types/chat';
+import { useNavigate } from 'react-router-dom';
 import * as SocketIOClient from 'socket.io-client';
 
 const limitList: LimitTime[] = ['1m', '1h', '1d', '1w', '1M', 'forever'];
@@ -138,6 +139,7 @@ const ChatRoomMemberButtonWithLimitTime: React.FC<{
   socket: SocketIOClient.Socket;
   text: string;
 }> = React.memo(({ chatRoomId, memberId, memberStatus, socket, text }) => {
+  const navigate = useNavigate();
   function handleClick(limitTime: LimitTime) {
     socket.emit('changeChatRoomMemberStatusSocket', {
       chatRoomId,
@@ -145,6 +147,7 @@ const ChatRoomMemberButtonWithLimitTime: React.FC<{
       memberStatus,
       limitTime,
     });
+    navigate(`/app/chat/rooms/${chatRoomId}`);
   }
 
   return (
@@ -175,12 +178,14 @@ const ChatRoomMemberButton: React.FC<{
   socket: SocketIOClient.Socket;
   text: string;
 }> = React.memo(({ chatRoomId, memberId, memberStatus, socket, text }) => {
+  const navigate = useNavigate();
   function handleClick() {
     socket.emit('changeChatRoomMemberStatusSocket', {
       chatRoomId,
       memberId,
       memberStatus,
     });
+    navigate(`/app/chat/rooms/${chatRoomId}`);
   }
 
   return <C.Button onClick={handleClick}>{text}</C.Button>;

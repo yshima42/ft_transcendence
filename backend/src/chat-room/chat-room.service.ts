@@ -161,6 +161,13 @@ export class ChatRoomService {
     userId: string
   ): Promise<ChatRoom> {
     const { roomStatus, password } = updateChatroomDto;
+    // userがOWNERでない場合、エラー
+    if (!(await this.isOwner(chatRoomId, userId))) {
+      throw new NestJS.HttpException(
+        'User is not admin',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
     let hashedPassword: string | undefined;
     if (password !== undefined) {
       hashedPassword = await bcrypt.hash(password, 10);
@@ -203,25 +210,9 @@ export class ChatRoomService {
   // remove
   async remove(chatRoomId: string, memberId: string): Promise<ChatRoom> {
     this.logger.debug(`remove: ${this.json({ chatRoomId, memberId })}`);
-    // userのチャットでの権限を取得
-    const loginChatRoomMember = await this.chatRoomMemberService.findOne(
-      chatRoomId,
-      memberId
-    );
-    if (loginChatRoomMember === undefined) {
-      this.logger.warn(`remove: user is not in chatRoom: ${chatRoomId}`);
-
+    if (!(await this.isOwner(chatRoomId, memberId))) {
       throw new NestJS.HttpException(
-        'User is not in chatRoom',
-        NestJS.HttpStatus.NOT_FOUND
-      );
-    }
-    // もしADMINじゃなかったらエラー
-    if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.OWNER) {
-      this.logger.warn(`remove: user is not OWNER: ${chatRoomId}`);
-
-      throw new NestJS.HttpException(
-        'User is not OWNER',
+        'User is not admin',
         NestJS.HttpStatus.FORBIDDEN
       );
     }
@@ -233,5 +224,25 @@ export class ChatRoomService {
     this.logger.debug(`remove: ${this.json({ chatRoom })}`);
 
     return chatRoom;
+  }
+
+  // ChatRoomのOWNERユーザーか
+  async isOwner(chatRoomId: string, userId: string): Promise<boolean> {
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    if (chatRoomMember === null) {
+      return false;
+    }
+    if (chatRoomMember.memberStatus === ChatRoomMemberStatus.OWNER) {
+      return true;
+    }
+
+    return false;
   }
 }
