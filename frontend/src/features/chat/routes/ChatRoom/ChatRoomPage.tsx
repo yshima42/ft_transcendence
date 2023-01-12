@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { SettingsIcon } from '@chakra-ui/icons';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import * as ReactQuery from '@tanstack/react-query';
@@ -57,7 +58,7 @@ const ChatRoomHeader: React.FC<{ chatRoomId: string }> = React.memo(
     return (
       <C.Flex justifyContent="flex-end" mb={4}>
         <C.Link as={ReactRouter.Link} to={url}>
-          <C.Button colorScheme="blue">Settings</C.Button>
+          <C.Icon as={SettingsIcon} size="xl" />
         </C.Link>
       </C.Flex>
     );
