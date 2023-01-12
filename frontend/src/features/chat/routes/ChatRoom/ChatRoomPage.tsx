@@ -58,7 +58,7 @@ const ChatRoomHeader: React.FC<{ chatRoomId: string }> = React.memo(
     return (
       <C.Flex justifyContent="flex-end" mb={4}>
         <C.Link as={ReactRouter.Link} to={url}>
-          <C.Icon as={SettingsIcon} size="xl" />
+          <C.Icon as={SettingsIcon} boxSize={6} color="gray.600" />
         </C.Link>
       </C.Flex>
     );
