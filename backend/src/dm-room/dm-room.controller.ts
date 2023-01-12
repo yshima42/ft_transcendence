@@ -33,4 +33,11 @@ export class DmRoomController {
   async findAll(@GetUser() user: User): Promise<ResponseDmRoom[]> {
     return await this.dmRoomService.findAllWithoutBlockUser(user.id);
   }
+
+  @Get(':dmRoomId')
+  async findOne(
+    @Param('dmRoomId', new ParseUUIDPipe()) dmRoomId: string
+  ): Promise<ResponseDmRoom> {
+    return await this.dmRoomService.findOne(dmRoomId);
+  }
 }
