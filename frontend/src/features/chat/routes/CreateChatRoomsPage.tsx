@@ -55,7 +55,9 @@ const CreateChatRoomForm: React.FC = React.memo(() => {
               },
             })}
           />
-          <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
+          {errors.name != null && (
+            <C.Text color="red.500">{errors.name.message}</C.Text>
+          )}
         </C.Box>
         {chatRoomStatus === ChatRoomStatus.PROTECTED && (
           <C.Box>
@@ -75,7 +77,9 @@ const CreateChatRoomForm: React.FC = React.memo(() => {
                 },
               })}
             />
-            <C.FormErrorMessage>{errors.password?.message}</C.FormErrorMessage>
+            {errors.password != null && (
+              <C.Text color="red.500">{errors.password.message}</C.Text>
+            )}{' '}
           </C.Box>
         )}
         <C.Button

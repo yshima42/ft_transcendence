@@ -1,10 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import { DmRoom } from '@prisma/client';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDmRoom } from './dm-room.interface';
 
-@Injectable()
+@NestJs.Injectable()
 export class DmRoomService {
   constructor(
     private readonly prisma: PrismaService,
@@ -15,9 +15,9 @@ export class DmRoomService {
   async findOrCreate(userId: string, loginUserId: string): Promise<DmRoom> {
     // 自分自身とのDMは作成できない
     if (userId === loginUserId) {
-      throw new HttpException(
+      throw new NestJs.HttpException(
         'you cannot create dm room with yourself',
-        HttpStatus.BAD_REQUEST
+        NestJs.HttpStatus.BAD_REQUEST
       );
     }
     // ブロック関係の場合は作成できない
@@ -27,9 +27,9 @@ export class DmRoomService {
       userId
     );
     if (isUserBlocked) {
-      throw new HttpException(
+      throw new NestJs.HttpException(
         'you cannot open dm room with block relation',
-        HttpStatus.BAD_REQUEST
+        NestJs.HttpStatus.BAD_REQUEST
       );
     }
 
@@ -154,7 +154,10 @@ export class DmRoomService {
       },
     });
     if (dmRoom === null) {
-      throw new HttpException('dm room not found', HttpStatus.NOT_FOUND);
+      throw new NestJs.HttpException(
+        'dm room not found',
+        NestJs.HttpStatus.NOT_FOUND
+      );
     }
 
     return dmRoom;
