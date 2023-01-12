@@ -2,7 +2,6 @@ import { Server } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import {
   BALL_SIZE,
-  BALL_SPEED,
   BALL_START_X,
   BALL_START_Y,
   CANVAS_HEIGHT,
@@ -35,17 +34,33 @@ export interface GameOutline {
   player2Id: string;
 }
 
+export enum BallSpeedType {
+  SLOW = 'SLOW',
+  NORMAL = 'NORMAL',
+  FAST = 'FAST',
+}
+
 class Ball {
   x: number;
   y: number;
   dx: number;
   dy: number;
 
-  constructor(speed: number) {
+  constructor(ballSpeedType?: BallSpeedType) {
     this.x = BALL_START_X;
     this.y = BALL_START_Y;
-    this.dx = speed;
-    this.dy = speed;
+    const getBallSpeed = (ballSpeedType: BallSpeedType) => {
+      switch (ballSpeedType) {
+        case BallSpeedType.SLOW:
+          return 4;
+        case BallSpeedType.NORMAL:
+          return 5;
+        case BallSpeedType.FAST:
+          return 7;
+      }
+    };
+    this.dx = getBallSpeed(ballSpeedType ?? BallSpeedType.NORMAL);
+    this.dy = getBallSpeed(ballSpeedType ?? BallSpeedType.NORMAL);
   }
 
   boundX(): void {
@@ -86,6 +101,28 @@ export class Player {
   }
 }
 
+export class InvitationRoom {
+  id: string;
+  player1Id: string;
+  player2Id: string;
+  ballSpeedType: BallSpeedType;
+  isAlreadyInvited: boolean;
+  isAlreadyReply: boolean;
+
+  constructor(
+    player1Id: string,
+    player2Id: string,
+    ballSpeedType: BallSpeedType
+  ) {
+    this.id = uuidv4();
+    this.player1Id = player1Id;
+    this.player2Id = player2Id;
+    this.ballSpeedType = ballSpeedType;
+    this.isAlreadyInvited = false;
+    this.isAlreadyReply = false;
+  }
+}
+
 // このクラスでゲーム操作を行う
 export class GameRoom {
   gameService: GameService;
@@ -109,7 +146,7 @@ export class GameRoom {
     deleteGameRoom: (gameRoom: GameRoom) => void,
     player1: Player,
     player2: Player,
-    ballSpeed?: number
+    ballSpeedType?: BallSpeedType
   ) {
     this.gameService = gameService;
     this.server = server;
@@ -119,7 +156,7 @@ export class GameRoom {
     this.player2 = player2;
     this.paddle1 = new Paddle(0);
     this.paddle2 = new Paddle(CANVAS_WIDTH - PADDLE_WIDTH);
-    this.ball = new Ball(ballSpeed ?? BALL_SPEED);
+    this.ball = new Ball(ballSpeedType);
     this.interval = setInterval(() => {
       // イニシャライズのための空変数
     });
