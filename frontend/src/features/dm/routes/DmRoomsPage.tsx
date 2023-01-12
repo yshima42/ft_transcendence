@@ -21,7 +21,7 @@ export const DmRoomsPage: React.FC = React.memo(() => {
               <Link to={`${dmRoom.id}`}>
                 <C.Box p={5} shadow="md" borderWidth="1px">
                   <C.Flex>
-                    <C.Box>
+                    <C.Box data-test={dmRoom.dmRoomMembers[0].user.nickname}>
                       {/* 投稿がない場合は何も表示しない */}
                       {dmRoom.dms.length !== 0 && (
                         <C.Text

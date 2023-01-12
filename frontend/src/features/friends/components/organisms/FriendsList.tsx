@@ -33,7 +33,7 @@ export const FriendsList: FC = () => {
                 loginUserId={loginUser.id}
                 targetId={user.id}
               />
-              <DmButton targetId={user.id} />
+              <DmButton targetId={user.id} nickname={user.nickname} />
             </>
           }
           isFriend={true}

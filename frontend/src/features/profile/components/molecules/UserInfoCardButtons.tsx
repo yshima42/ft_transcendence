@@ -37,7 +37,7 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
         <>
           <HStack>
             <GameOrWatchButton loginUserId={loginUser.id} targetId={user.id} />
-            <DmButton targetId={user.id} />
+            <DmButton targetId={user.id} nickname={user.nickname} />
           </HStack>
           <Box m={2}>
             <HStack>
