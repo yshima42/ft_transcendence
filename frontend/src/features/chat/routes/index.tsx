@@ -24,8 +24,6 @@ export const ChatRoutes: FC = () => {
       const isInvalidUrlError =
         isAxiosError(error) &&
         (error.response?.status === 400 || error.response?.status === 404);
-
-      console.log(isInvalidUrlError);
       if (!isInvalidUrlError) {
         throw error;
       }
