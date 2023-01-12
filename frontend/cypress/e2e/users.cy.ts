@@ -28,11 +28,11 @@ describe('Users', function () {
     // cy.exec('yarn --cwd ../backend db:seed:test:ua');
   });
 
-  // dummy1でログイン
+  // dummy001でログイン
   beforeEach(() => {
     cy.exec('yarn --cwd ../backend db:seed:test:ua');
     cy.visit('/');
-    cy.getBySel('dummy1-login').click();
+    cy.getBySel('dummy001-login').click();
   });
 
   /**

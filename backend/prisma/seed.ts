@@ -54,7 +54,7 @@ idMap.forEach((value, key) => {
     name: key,
     avatarImageUrl:
       'https://placehold.jp/2b52ee/ffffff/150x150.png?text=' + key,
-    nickname: 'nickname' + key,
+    nickname: key,
     onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -180,9 +180,9 @@ for (let i = 20; i < 30; i++) {
 }
 
 const chatRooms: ChatRoom[] = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1; i++) {
   const id = uuidv4();
-  const name = 'DmRoom' + id;
+  const name = 'ChatRoom' + id;
   const roomStatus = 'PUBLIC' as ChatRoomStatus;
   chatRooms.push({
     id,
@@ -195,9 +195,9 @@ for (let i = 0; i < 10; i++) {
 }
 
 const chatRoomMembers: ChatRoomMember[] = [];
-for (let i = 0; i < 2; i++) {
-  const chatRoomId = chatRooms[i].id;
-  const userId = idMap.get(userName(i));
+for (let i = 0; i < 1; i++) {
+  const chatRoomId = chatRooms[0].id;
+  const userId = idMap.get(userName(1));
   const memberStatus = 'OWNER';
   if (userId !== undefined) {
     chatRoomMembers.push({
@@ -209,7 +209,7 @@ for (let i = 0; i < 2; i++) {
   }
 }
 for (let i = 2; i < 100; i++) {
-  const chatRoomId = chatRooms[1].id;
+  const chatRoomId = chatRooms[0].id;
   const userId = idMap.get(userName(i));
   const memberStatus = 'NORMAL';
   if (userId !== undefined) {
@@ -222,29 +222,29 @@ for (let i = 2; i < 100; i++) {
   }
 }
 
-const chatMessages: ChatMessage[] = [];
-for (let i = 0; i < 1; i++) {
-  const id = uuidv4();
-  const content = 'Hello' + id;
-  const chatRoomId = chatRooms[i].id;
-  const senderId = idMap.get(userName(1));
-  if (senderId !== undefined) {
-    chatMessages.push({
-      id,
-      content,
-      chatRoomId,
-      senderId,
-      createdAt: new Date(),
-    });
-  }
-}
+// const chatMessages: ChatMessage[] = [];
+// for (let i = 1; i < 2; i++) {
+//   const id = uuidv4();
+//   const content = 'Hello' + id;
+//   const chatRoomId = chatRooms[i].id;
+//   const senderId = idMap.get(userName(1));
+//   if (senderId !== undefined) {
+//     chatMessages.push({
+//       id,
+//       content,
+//       chatRoomId,
+//       senderId,
+//       createdAt: new Date(),
+//     });
+//   }
+// }
 
 // chatMessage
 const chatMessage2: ChatMessage[] = [];
 for (let i = 0; i < 2000; i++) {
   const id = uuidv4();
   const content = i.toString() + 'a'.repeat(255);
-  const chatRoomId = chatRooms[1].id;
+  const chatRoomId = chatRooms[0].id;
   const senderId = idMap.get(userName(1));
   const now = new Date();
   const createdAt = new Date(now.getTime() + i);
@@ -259,52 +259,7 @@ for (let i = 0; i < 2000; i++) {
   }
 }
 
-const dmRooms: DmRoom[] = [];
-for (let i = 0; i < 2; i++) {
-  const id = uuidv4();
-  dmRooms.push({
-    id,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
-}
 
-const dmRoomMembers: DmRoomMember[] = [];
-for (let i = 0; i < 2; i++) {
-  const dmRoomId = dmRooms[i].id;
-  const userId = idMap.get(userName(1));
-  if (userId !== undefined) {
-    dmRoomMembers.push({
-      dmRoomId,
-      userId,
-    });
-  }
-  // const userId2 = idMap.get('dummy2');
-  const userId2 = idMap.get(userName(i + 2));
-  if (userId2 !== undefined) {
-    dmRoomMembers.push({
-      dmRoomId,
-      userId: userId2,
-    });
-  }
-}
-
-const dms: Dm[] = [];
-for (let i = 0; i < 2; i++) {
-  const id = uuidv4();
-  const content = 'Hello' + id;
-  const dmRoomId = dmRooms[i].id;
-  const senderId = idMap.get(userName(1));
-  if (senderId !== undefined) {
-    dms.push({
-      id,
-      content,
-      dmRoomId,
-      senderId,
-      createdAt: new Date(),
-    });
-  }
-}
 
 const GAMEWINSCORE = 5;
 const getLoserScore = () => {
@@ -385,21 +340,12 @@ const main = async () => {
   await prisma.chatRoomMember.createMany({
     data: chatRoomMembers,
   });
-  await prisma.chatMessage.createMany({
-    data: chatMessages,
-  });
+  // await prisma.chatMessage.createMany({
+  //   data: chatMessages,
+  // });
   await prisma.chatMessage.createMany({
     data: chatMessage2,
   });
-  // await prisma.dmRoom.createMany({
-  //   data: dmRooms,
-  // });
-  // await prisma.dmRoomMember.createMany({
-  //   data: dmRoomMembers,
-  // });
-  // await prisma.dm.createMany({
-  //   data: dms,
-  // });
   await prisma.matchResult.createMany({
     data: matchResultData,
   });

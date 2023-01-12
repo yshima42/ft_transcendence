@@ -26,7 +26,10 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
           <C.Text>Invite Link</C.Text>
           <C.Text>{chatRoomInviteLink}</C.Text>
         </C.Box>
-        <ChangeChatRoomStatusButtons chatRoomId={chatRoomId} />
+        {/* チャットルームの状態変更ボタン  chatLoginUserがOWNERの場合のみ表示する */}
+        {chatLoginUser.memberStatus === ChatRoomMemberStatus.OWNER && (
+          <ChangeChatRoomStatusButtons chatRoomId={chatRoomId} />
+        )}
         <C.Accordion allowToggle>
           {/* ChatRoomMemberListAccordion */}
           <C.AccordionItem>

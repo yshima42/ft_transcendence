@@ -14,7 +14,7 @@ const num = (n: number) => `${n.toString().padStart(3, '0')}`;
 /**
  * 50 + 3個のuuidをMapで作成。
  * key  :
- *        dummy1~3
+ *        dummy001~3
  *        friends1~10
  *        pending1~10
  *        recognition1~10

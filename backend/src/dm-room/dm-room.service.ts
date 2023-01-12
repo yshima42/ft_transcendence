@@ -122,4 +122,41 @@ export class DmRoomService {
 
     return dmRooms;
   }
+
+  async findOne(dmRoomId: string): Promise<ResponseDmRoom> {
+    const dmRoom = await this.prisma.dmRoom.findUnique({
+      where: {
+        id: dmRoomId,
+      },
+      select: {
+        id: true,
+        dmRoomMembers: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                nickname: true,
+                avatarImageUrl: true,
+              },
+            },
+          },
+        },
+        dms: {
+          select: {
+            content: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+    if (dmRoom === null) {
+      throw new HttpException('dm room not found', HttpStatus.NOT_FOUND);
+    }
+
+    return dmRoom;
+  }
 }

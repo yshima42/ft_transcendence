@@ -29,11 +29,11 @@ describe('Profile', function () {
     // cy.exec('yarn --cwd ../backend db:seed:test:ua');
   });
 
-  // dummy1でログイン
+  // dummy001でログイン
   beforeEach(() => {
     cy.exec('yarn --cwd ../backend db:seed:test:ua');
     cy.visit('/');
-    cy.getBySel('dummy1-login').click();
+    cy.getBySel('dummy001-login').click();
   });
 
   /**
@@ -61,9 +61,9 @@ describe('Profile', function () {
    */
   it('ユーザーは、アバターをアップロードすることができる', () => {
     const defaultAvatarPath =
-      'https://placehold.jp/0C163D/fffffe/150x150.png?text=dummy1';
+      'https://placehold.jp/0C163D/fffffe/150x150.png?text=dummy001';
     const uploadFilePath = 'cypress/fixtures/zazen_obousan.png';
-    const partOfUploadDirPath = 'avatar/dummy1';
+    const partOfUploadDirPath = 'avatar/dummy001';
 
     visitMyProfile();
 

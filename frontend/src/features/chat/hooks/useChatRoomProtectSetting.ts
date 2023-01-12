@@ -1,6 +1,6 @@
 import { ChatRoomStatus } from '@prisma/client';
 import * as ReactQuery from '@tanstack/react-query';
-import { usePatchApi } from 'hooks/api/generics/usePatchApi';
+import { usePatchApiWithErrorToast } from 'hooks/api/generics/usePatchApi';
 import { useNavigate } from 'react-router-dom';
 
 export const useChatRoomProtectSetting = (
@@ -14,7 +14,7 @@ export const useChatRoomProtectSetting = (
   const endpoint = `/chat/rooms/${chatRoomId}`;
   const url = `/app/chat/rooms/${chatRoomId}`;
   const queryKeys: ReactQuery.QueryKey[] = [['/chat/rooms']];
-  const { mutateAsync, isSuccess } = usePatchApi<
+  const { mutateAsync } = usePatchApiWithErrorToast<
     {
       roomStatus: ChatRoomStatus;
       password: string | undefined;
@@ -27,9 +27,7 @@ export const useChatRoomProtectSetting = (
       roomStatus: ChatRoomStatus.PROTECTED,
       password: data.password,
     });
-    if (isSuccess) {
-      navigate(url);
-    }
+    navigate(url);
   };
 
   const changeChatRoomStatusPublic = async () => {
@@ -37,9 +35,7 @@ export const useChatRoomProtectSetting = (
       roomStatus: ChatRoomStatus.PUBLIC,
       password: undefined,
     });
-    if (isSuccess) {
-      navigate(url);
-    }
+    navigate(url);
   };
 
   const changeChatRoomStatusPrivate = async () => {
@@ -47,9 +43,7 @@ export const useChatRoomProtectSetting = (
       roomStatus: ChatRoomStatus.PRIVATE,
       password: undefined,
     });
-    if (isSuccess) {
-      navigate(url);
-    }
+    navigate(url);
   };
 
   return {
