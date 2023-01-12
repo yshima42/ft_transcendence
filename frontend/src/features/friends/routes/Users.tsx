@@ -13,7 +13,7 @@ const tabs = ['Friends', 'Pending', 'Recognition', 'Blocked', 'Add Friend'];
 export const Users: FC = memo(() => {
   return (
     <ContentLayout title="Users">
-      <Tabs variant="soft-rounded">
+      <Tabs variant="soft-rounded" colorScheme="teal.200">
         <TabList>
           {tabs.map((tab) => (
             <Tab key={tab} data-test={'users-' + tab.toLowerCase() + '-tab'}>
