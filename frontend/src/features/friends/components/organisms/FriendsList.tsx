@@ -1,11 +1,12 @@
 import { FC } from 'react';
 import { Grid } from '@chakra-ui/react';
-import { useFriends } from 'hooks/api';
+import { useFriends, useProfile } from 'hooks/api';
 import { DmButton } from 'components/atoms/button/DmButton';
+import { GameOrWatchButton } from 'components/molecules/GameOrWatchButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
-import { GameOrWatchButton } from 'features/profile/components/molecules/GameOrWatchButton';
 
 export const FriendsList: FC = () => {
+  const { user: loginUser } = useProfile();
   const { users } = useFriends();
 
   if (users === undefined) return <></>;
@@ -28,7 +29,10 @@ export const FriendsList: FC = () => {
           avatarImageUrl={user.avatarImageUrl}
           buttons={
             <>
-              <GameOrWatchButton targetId={user.id} />
+              <GameOrWatchButton
+                loginUserId={loginUser.id}
+                targetId={user.id}
+              />
               <DmButton targetId={user.id} />
             </>
           }

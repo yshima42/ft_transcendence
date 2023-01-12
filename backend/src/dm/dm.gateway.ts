@@ -8,7 +8,7 @@ import { CreateDmDto } from './dto/create-dm.dto';
 
 @WebSocket.WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: 'http://localhost:5173/',
   },
   namespace: 'dm',
 })
