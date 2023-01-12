@@ -4,6 +4,7 @@ import * as ReactQuery from '@tanstack/react-query';
 import { ResponseDm, ResponseDmRoom } from 'features/dm/types/dm';
 import { useBlockRelation } from 'hooks/api/block/useBlockRelation';
 import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
+import { useProfile } from 'hooks/api/profile/useProfile';
 import { useSocket } from 'hooks/socket/useSocket';
 import { useParams } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -12,11 +13,15 @@ import { MessageSendForm } from 'components/molecules/MessageSendForm';
 
 export const DmRoomPage: React.FC = React.memo(() => {
   const { dmRoomId } = useParams() as { dmRoomId: string };
+  const dmLoginUser = useProfile();
   const dmRoomInfoEndpoint = `/dm/rooms/${dmRoomId}`;
   const { data: dmRoom } =
     useGetApiOmitUndefined<ResponseDmRoom>(dmRoomInfoEndpoint);
+  const dmUser = dmRoom.dmRoomMembers.find(
+    (dmRoomMember) => dmRoomMember.user.id !== dmLoginUser.user.id
+  )?.user;
   const { isUserBlocked: isBlocked } = useBlockRelation(
-    dmRoom.dmRoomMembers[0].user.id
+    dmUser?.id ?? 'undefined'
   );
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
   const socket = useSocket(import.meta.env.VITE_WS_DM_URL);
