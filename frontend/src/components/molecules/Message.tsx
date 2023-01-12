@@ -32,13 +32,6 @@ export const Message: React.FC<Props> = ({
             <C.Text fontSize="xs" color="gray.500">
               {new Date(createdAt).toLocaleString()}
             </C.Text>
-            <LinkedNickname id={userId} nickname={nickname} fontSize="xs" />
-            <LinkedAvatar
-              id={userId}
-              size="xs"
-              name={nickname}
-              src={avatarImageUrl}
-            />
           </HStack>
           <C.Box
             key={id}
@@ -46,7 +39,6 @@ export const Message: React.FC<Props> = ({
             backgroundColor="teal.200"
             borderRadius="lg"
             marginBottom={4}
-            marginRight={7}
             alignSelf="flex-end"
           >
             <C.Text minW="180px" maxW="360px">
