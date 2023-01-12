@@ -26,6 +26,7 @@ export const Top: FC = memo(() => {
                 onClick={() => navigate('/app/game/matching')}
                 bg="teal.300"
                 color="white"
+                mt="5"
               >
                 Match
               </Button>
