@@ -1,10 +1,8 @@
 import { memo, FC } from 'react';
-import { HStack } from '@chakra-ui/react';
 import { FriendRelation } from 'hooks/api/friend/useFriendRelation';
-import { AcceptButton } from 'components/atoms/button/AcceptButton';
 import { CancelButton } from 'components/atoms/button/CancelButton';
-import { RejectButton } from 'components/atoms/button/RejectButton';
 import { RequestButton } from 'components/atoms/button/RequestButton';
+import { AcceptAndRejectButton } from 'components/molecules/AcceptAndRejectButton';
 
 type Props = {
   targetId: string;
@@ -23,10 +21,7 @@ export const FriendButton: FC<Props> = memo((props) => {
       ) : friendRelation === 'PENDING' ? (
         <CancelButton targetId={targetId} />
       ) : (
-        <HStack>
-          <AcceptButton targetId={targetId} />
-          <RejectButton targetId={targetId} />
-        </HStack>
+        <AcceptAndRejectButton targetId={targetId} />
       )}
     </>
   );
