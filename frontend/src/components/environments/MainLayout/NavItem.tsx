@@ -17,7 +17,7 @@ export const NavItem: FC<Props> = memo((props) => {
         <Link to={to}>
           <Flex
             p={3}
-            borderRadius={100}
+            rounded="full"
             w="160px"
             _hover={{
               textDecor: 'none',

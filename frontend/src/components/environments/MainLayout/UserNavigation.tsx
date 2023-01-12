@@ -28,7 +28,6 @@ export const UserNavigation: FC = memo(() => {
         <LinkedNickname id={user.id} nickname={user.nickname} size="sm" />
         <Button
           size="xs"
-          rounded="lg"
           onClick={onClickLogout}
           color="gray"
           maxW={90}
