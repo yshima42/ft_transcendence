@@ -24,7 +24,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "preinstall": "npx typesync || :",
     "prepare": "npx simple-git-hooks || :",
-    "setup:dev": "bash ./setup-dev.sh"
+    "setup:dev": "bash ./setup-dev.sh",
+    "db:seed:test:ua": "ts-node prisma/seed-cypress-user-account.ts"
   },
   "dependencies": {
     "@nestjs/cli": "^9.1.7",

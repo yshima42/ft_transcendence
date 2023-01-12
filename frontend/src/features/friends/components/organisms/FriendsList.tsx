@@ -18,7 +18,7 @@ export const FriendsList: FC = () => {
         lg: 'repeat(2, 1fr)',
       }}
       gap={6}
-      data-test={'users-friends'}
+      data-test={'users-friends-grid'}
     >
       {users.map((user) => (
         <UserCard

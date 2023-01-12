@@ -24,8 +24,8 @@ import { useNavigate } from 'react-router-dom';
 export const SignUp: FC = memo(() => {
   const { user } = useProfile();
   const navigate = useNavigate();
-  const { editProfile, isLoading: isLoading1 } = useProfileEdit();
-  const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload();
+  const { editProfile, isLoading: isLoading1 } = useProfileEdit(user.id);
+  const { uploadAvatar, isLoading: isLoading2 } = useAvatarUpload(user.id);
   const [profileFormData, setProfileFormData] = useState<ProfileFormData>();
   const [avatarFormData, setAvatarFormData] = useState<AvatarFormData>();
 

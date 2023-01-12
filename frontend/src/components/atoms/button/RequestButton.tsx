@@ -20,6 +20,7 @@ export const RequestButton: FC<Props> = memo((props) => {
       isDisabled={isLoading || isSuccess}
       onClick={onClickRequest}
       {...buttonProps}
+      data-test="request-button"
     >
       Request
     </Button>
