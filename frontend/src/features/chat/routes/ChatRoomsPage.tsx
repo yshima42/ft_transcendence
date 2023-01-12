@@ -25,7 +25,8 @@ export const ChatRoomsPage: React.FC = React.memo(() => {
 const ChatRoomsHeader: React.FC = React.memo(() => (
   <C.Flex justifyContent="flex-end" mb={4}>
     <C.Button
-      colorScheme="blue"
+      bg="teal.300"
+      color="white"
       as={Link}
       to="create"
       data-testid="create-chat-room"
