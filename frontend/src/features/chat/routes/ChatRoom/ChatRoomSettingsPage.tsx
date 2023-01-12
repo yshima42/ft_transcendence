@@ -7,6 +7,7 @@ import { ResponseChatRoomMember } from 'features/chat/types/chat';
 import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import * as ReactRouter from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
+import { ChangeChatRoomStatusButtons } from 'features/chat/components/organisms/ChangeChatRoomStatusButtons';
 import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomMemberList';
 
 export const ChatRoomSettingsPage: React.FC = React.memo(() => {
@@ -25,6 +26,10 @@ export const ChatRoomSettingsPage: React.FC = React.memo(() => {
           <C.Text>Invite Link</C.Text>
           <C.Text>{chatRoomInviteLink}</C.Text>
         </C.Box>
+        {/* チャットルームの状態変更ボタン  chatLoginUserがOWNERの場合のみ表示する */}
+        {chatLoginUser.memberStatus === ChatRoomMemberStatus.OWNER && (
+          <ChangeChatRoomStatusButtons chatRoomId={chatRoomId} />
+        )}
         <C.Accordion allowToggle>
           {/* ChatRoomMemberListAccordion */}
           <C.AccordionItem>
@@ -58,7 +63,7 @@ const LeaveButton: React.FC<{
 
   return (
     <>
-      {chatLoginUser.memberStatus !== ChatRoomMemberStatus.ADMIN ? (
+      {chatLoginUser.memberStatus !== ChatRoomMemberStatus.OWNER ? (
         <C.Button colorScheme="red" onClick={exitChatRoom}>
           Exit
         </C.Button>

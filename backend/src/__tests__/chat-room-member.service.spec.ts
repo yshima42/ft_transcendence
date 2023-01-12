@@ -1,7 +1,7 @@
 import * as NestJs from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as T from '@prisma/client';
+import * as Type from '@prisma/client';
 import { ChatRoomModule } from 'src/chat-room/chat-room.module';
 import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { CreateChatRoomDto } from 'src/chat-room/dto/create-chat-room.dto';
@@ -45,21 +45,21 @@ describe('ChatRoomMemberService', () => {
   });
 
   it('create a chat room user', async () => {
-    const testUsers: T.User[] = [];
+    const testUsers: Type.User[] = [];
     for (let i = 0; i < 10; i++) {
       const user = await prisma.user.create({
         data: {
           name: `test user ${uuidv4()}`,
           avatarImageUrl: `test avatarImageUrl ${uuidv4()}`,
           nickname: `test nickname ${uuidv4()}`,
-          onlineStatus: T.OnlineStatus.ONLINE,
+          onlineStatus: Type.OnlineStatus.ONLINE,
         },
       });
       testUsers.push(user);
     }
     const createChatRoomDto: CreateChatRoomDto = {
       name: `test ${uuidv4()}`,
-      roomStatus: T.ChatRoomStatus.PUBLIC,
+      roomStatus: Type.ChatRoomStatus.PUBLIC,
     };
     const testChatRoom = await chatRoomService.create(
       createChatRoomDto,
@@ -69,7 +69,7 @@ describe('ChatRoomMemberService', () => {
     // create a chat room protected by password
     const createChatRoomDto2: CreateChatRoomDto = {
       name: `test protected ${uuidv4()}`,
-      roomStatus: T.ChatRoomStatus.PROTECTED,
+      roomStatus: Type.ChatRoomStatus.PROTECTED,
       password: 'password',
     };
     const testChatRoomProtected = await chatRoomService.create(
@@ -166,7 +166,7 @@ describe('ChatRoomMemberService', () => {
           name: `test user ${uuidv4()}`,
           avatarImageUrl: `test avatarImageUrl ${uuidv4()}`,
           nickname: `test nickname ${uuidv4()}`,
-          onlineStatus: T.OnlineStatus.ONLINE,
+          onlineStatus: Type.OnlineStatus.ONLINE,
         },
       });
       testUsers.push(user);
@@ -174,7 +174,7 @@ describe('ChatRoomMemberService', () => {
     const chatRoomPublic = await prisma.chatRoom.create({
       data: {
         name: 'chat room public',
-        roomStatus: T.ChatRoomStatus.PUBLIC,
+        roomStatus: Type.ChatRoomStatus.PUBLIC,
         password: null,
       },
     });
@@ -182,28 +182,28 @@ describe('ChatRoomMemberService', () => {
       data: {
         chatRoomId: chatRoomPublic.id,
         userId: testUsers[0].id,
-        memberStatus: T.ChatRoomMemberStatus.ADMIN,
+        memberStatus: Type.ChatRoomMemberStatus.OWNER,
       },
     });
     const chatRoomPublicModerator = await prisma.chatRoomMember.create({
       data: {
         chatRoomId: chatRoomPublic.id,
         userId: testUsers[1].id,
-        memberStatus: T.ChatRoomMemberStatus.MODERATOR,
+        memberStatus: Type.ChatRoomMemberStatus.MODERATOR,
       },
     });
     const chatRoomPublicNormal1 = await prisma.chatRoomMember.create({
       data: {
         chatRoomId: chatRoomPublic.id,
         userId: testUsers[2].id,
-        memberStatus: T.ChatRoomMemberStatus.NORMAL,
+        memberStatus: Type.ChatRoomMemberStatus.NORMAL,
       },
     });
     const chatRoomPublicNormal2 = await prisma.chatRoomMember.create({
       data: {
         chatRoomId: chatRoomPublic.id,
         userId: testUsers[3].id,
-        memberStatus: T.ChatRoomMemberStatus.NORMAL,
+        memberStatus: Type.ChatRoomMemberStatus.NORMAL,
       },
     });
     // const chatRoomPublicBanned = await prisma.chatRoomMember.create({
@@ -226,7 +226,7 @@ describe('ChatRoomMemberService', () => {
         {
           chatRoomId: chatRoomPublic.id,
           memberId: chatRoomPublicNormal1.userId,
-          memberStatus: T.ChatRoomMemberStatus.MODERATOR,
+          memberStatus: Type.ChatRoomMemberStatus.MODERATOR,
         },
         chatRoomPublicNormal2.userId
       );
@@ -239,7 +239,7 @@ describe('ChatRoomMemberService', () => {
         {
           chatRoomId: chatRoomPublic.id,
           memberId: chatRoomPublicAdmin.userId,
-          memberStatus: T.ChatRoomMemberStatus.ADMIN,
+          memberStatus: Type.ChatRoomMemberStatus.OWNER,
         },
         chatRoomPublicModerator.userId
       );
@@ -252,7 +252,7 @@ describe('ChatRoomMemberService', () => {
         {
           chatRoomId: chatRoomPublic.id,
           memberId: chatRoomPublicModerator.userId,
-          memberStatus: T.ChatRoomMemberStatus.MODERATOR,
+          memberStatus: Type.ChatRoomMemberStatus.MODERATOR,
         },
         chatRoomPublicModerator.userId
       );

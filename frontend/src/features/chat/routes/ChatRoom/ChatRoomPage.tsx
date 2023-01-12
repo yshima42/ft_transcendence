@@ -140,7 +140,7 @@ const ChatRoomBody: React.FC<{
       socket.emit('leave_room_member', chatRoomId);
       socket.off();
     };
-  }, [chatRoomId, socket]);
+  }, [chatRoomId, socket, blockUsers]);
 
   // 更新時の自動スクロール
   React.useEffect(() => {
@@ -164,7 +164,8 @@ const ChatRoomBody: React.FC<{
             id={message.id}
             content={message.content}
             createdAt={message.createdAt}
-            name={message.sender.name}
+            userId={message.sender.id}
+            nickname={message.sender.nickname}
             avatarImageUrl={message.sender.avatarImageUrl}
           />
         ))}

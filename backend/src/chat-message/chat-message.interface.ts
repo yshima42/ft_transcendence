@@ -4,7 +4,7 @@ export type ResponseChatMessage = {
   content: string;
   sender: {
     id: string;
-    name: string;
+    nickname: string;
     avatarImageUrl: string;
   };
 };

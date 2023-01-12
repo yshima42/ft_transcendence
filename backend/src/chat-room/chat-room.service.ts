@@ -7,6 +7,7 @@ import { ChatRoomMemberService } from 'src/chat-room-member/chat-room-member.ser
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
+import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @Injectable()
 export class ChatRoomService {
@@ -39,7 +40,7 @@ export class ChatRoomService {
           chatRoomMembers: {
             create: {
               userId,
-              memberStatus: ChatRoomMemberStatus.ADMIN,
+              memberStatus: ChatRoomMemberStatus.OWNER,
             },
           },
         },
@@ -153,6 +154,52 @@ export class ChatRoomService {
     return chatRoom;
   }
 
+  // update
+  async update(
+    chatRoomId: string,
+    updateChatroomDto: UpdateChatRoomDto,
+    userId: string
+  ): Promise<ChatRoom> {
+    const { roomStatus, password } = updateChatroomDto;
+    let hashedPassword: string | undefined;
+    if (password !== undefined) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+    // userのチャットでの権限を取得
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    if (chatRoomMember === null) {
+      throw new NestJS.HttpException(
+        'User is not in chatRoom',
+        NestJS.HttpStatus.NOT_FOUND
+      );
+    }
+    if (chatRoomMember?.memberStatus !== ChatRoomMemberStatus.OWNER) {
+      throw new NestJS.HttpException(
+        'User is not admin',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
+
+    const chatRoom = await this.prisma.chatRoom.update({
+      where: {
+        id: chatRoomId,
+      },
+      data: {
+        password: hashedPassword,
+        roomStatus,
+      },
+    });
+
+    return chatRoom;
+  }
+
   // remove
   async remove(chatRoomId: string, memberId: string): Promise<ChatRoom> {
     this.logger.debug(`remove: ${this.json({ chatRoomId, memberId })}`);
@@ -170,11 +217,11 @@ export class ChatRoomService {
       );
     }
     // もしADMINじゃなかったらエラー
-    if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.ADMIN) {
-      this.logger.warn(`remove: user is not admin: ${chatRoomId}`);
+    if (loginChatRoomMember.memberStatus !== ChatRoomMemberStatus.OWNER) {
+      this.logger.warn(`remove: user is not OWNER: ${chatRoomId}`);
 
       throw new NestJS.HttpException(
-        'User is not admin',
+        'User is not OWNER',
         NestJS.HttpStatus.FORBIDDEN
       );
     }

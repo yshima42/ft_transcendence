@@ -5,7 +5,7 @@ describe('sidebar spec', () => {
 
   beforeEach(() => {
     cy.visit('/');
-    cy.contains('Admin Test dummy1').click();
+    cy.getBySel('dummy001-login').click();
   });
 
   it('users', () => {
@@ -24,7 +24,7 @@ describe('sidebar spec', () => {
   });
 
   it('profile', () => {
-    cy.contains('nicknamedummy1').click();
+    cy.contains('dummy001').click();
     cy.url().should('include', '/users');
   });
 
