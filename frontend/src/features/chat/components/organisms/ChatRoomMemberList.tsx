@@ -21,20 +21,12 @@ type Props = {
 export const ChatRoomMemberList: React.FC<Props> = React.memo(
   ({ chatRoomId, chatLoginUser }) => {
     const socket = useSocket(import.meta.env.VITE_WS_CHAT_URL);
+    const endpoint = `/chat/rooms/${chatRoomId}/members`;
     const { data: chatMembers, refetch: refetchChatMembers } =
-      useGetApiOmitUndefined<ResponseChatRoomMember[]>(
-        `/chat/rooms/${chatRoomId}/members`
-      );
+      useGetApiOmitUndefined<ResponseChatRoomMember[]>(endpoint);
     const navigate = ReactRouter.useNavigate();
 
     React.useEffect(() => {
-      const fetchData = async () => {
-        try {
-          await refetchChatMembers();
-        } catch (err) {
-          console.log(err);
-        }
-      };
       // webSocket
       socket.emit('join_room_member', chatRoomId);
       // webSocketのイベントを受け取る関数を登録
@@ -60,13 +52,13 @@ export const ChatRoomMemberList: React.FC<Props> = React.memo(
           ) {
             window.location.reload();
           }
-          fetchData().catch((err) => console.log(err));
+          refetchChatMembers().catch((err) => console.log(err));
         }
       );
 
       return () => {
         socket.emit('leave_room_member', chatRoomId);
-        socket.off('changeChatRoomMemberStatusSocket', fetchData);
+        socket.off('changeChatRoomMemberStatusSocket', refetchChatMembers);
       };
     }, []);
 
