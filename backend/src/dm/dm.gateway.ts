@@ -59,11 +59,17 @@ export class DmGateway {
     createDmDto: CreateDmDto,
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): Promise<void> {
-    const newMessage = await this.dmService.create(
-      createDmDto,
-      client.data.userId as string
-    );
-    this.server.in(createDmDto.roomId).emit('receive_message', newMessage);
+    try {
+      const newMessage = await this.dmService.create(
+        createDmDto,
+        client.data.userId as string
+      );
+      this.server.in(createDmDto.roomId).emit('receive_message', newMessage);
+    } catch (error) {
+      if (error instanceof NestJs.ForbiddenException)
+        throw new WebSocket.WsException(error.message);
+      throw error;
+    }
   }
 
   @WebSocket.SubscribeMessage('join_dm_room')

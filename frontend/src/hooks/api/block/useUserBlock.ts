@@ -31,7 +31,11 @@ export const useUserBlock = (
   const { mutateAsync: blockUser, ...useMutationResult } =
     usePostApiWithErrorToast<UserBlockReqBody, UserBlockResBody>(
       `/users/me/blocks`,
-      [['/users/me/blocks'], [`/users/me/block-relations/${targetId}`]]
+      [
+        ['/users/me/blocks'],
+        [`/users/me/block-relations/${targetId}`],
+        [`/dm/rooms`],
+      ]
     );
 
   return { blockUser, ...useMutationResult };
