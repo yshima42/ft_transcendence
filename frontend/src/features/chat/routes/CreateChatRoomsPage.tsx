@@ -26,14 +26,21 @@ const CreateChatRoomForm: React.FC = React.memo(() => {
   const [chatRoomStatus, setChatRoomStatus] = React.useState<ChatRoomStatus>(
     ChatRoomStatus.PUBLIC
   );
-
+  const onSubmit = (data: ChatRoomCreateFormValues) => {
+    // PROTECTEDではない場合は、passwordを削除する
+    CreateChatRoom(
+      chatRoomStatus === ChatRoomStatus.PROTECTED
+        ? data
+        : { ...data, password: undefined }
+    );
+  };
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setChatRoomStatus(e.target.value as ChatRoomStatus);
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit(CreateChatRoom)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <C.Box>
           <C.Heading size="sm">Chat Room Status</C.Heading>
           <C.Select {...register('roomStatus')} onChange={onChange}>
