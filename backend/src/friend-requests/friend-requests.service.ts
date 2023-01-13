@@ -149,6 +149,8 @@ export class FriendRequestsService {
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
+        // An operation failed because it depends on one or more records that were required but not found.
+        // 参考: https://reffect.co.jp/node-js/prisma-basic
         if (error.code === 'P2025') {
           throw new NotFoundException('Friend request is not found.');
         }
