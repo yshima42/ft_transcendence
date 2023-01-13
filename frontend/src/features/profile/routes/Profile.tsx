@@ -19,7 +19,7 @@ export const Profile: FC = memo(() => {
     <ContentLayout title="Profile">
       <Flex justify="center">
         <Grid
-          minW={{ base: '500px', md: '800px' }}
+          minW={{ base: '500px', md: '740px' }}
           minH={{ base: '900px', md: '600px' }}
           templateAreas={{
             base: `"profile stats"
