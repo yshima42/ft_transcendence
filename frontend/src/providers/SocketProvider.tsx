@@ -54,12 +54,20 @@ const SocketProvider: FC<PropsWithChildren> = ({ children }) => {
             userIdToPresence: Array<[string, Presence]>;
             userIdToGameRoomId: Array<[string, string]>;
           }) => {
-            setUserIdToPresenceMap(
-              new Map<string, Presence>(message.userIdToPresence)
-            );
-            setUserIdToGameRoomIdMap(
-              new Map<string, string>(message.userIdToGameRoomId)
-            );
+            setUserIdToPresenceMap((userIdToPresenceMap) => {
+              message.userIdToPresence.forEach((userIdToPresence) => {
+                userIdToPresenceMap.set(...userIdToPresence);
+              });
+
+              return new Map<string, Presence>(userIdToPresenceMap);
+            });
+            setUserIdToGameRoomIdMap((userIdToGameRoomIdMap) => {
+              message.userIdToGameRoomId.forEach((userIdToGameRoomId) => {
+                userIdToGameRoomIdMap.set(...userIdToGameRoomId);
+              });
+
+              return new Map<string, string>(userIdToGameRoomIdMap);
+            });
           }
         );
       }
