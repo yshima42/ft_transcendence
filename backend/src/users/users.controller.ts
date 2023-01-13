@@ -307,23 +307,6 @@ export class UsersController {
     );
   }
 
-  // numberがレスポンスとして返ってくるのは修正するべきでは
-  // 上記検討次第swagger対応予定
-  @Delete('me/friends/:id')
-  @ApiOperation({
-    summary: 'フレンド解除',
-    description: 'フレンドを解除するユーザーのUUIDをpathで渡す',
-  })
-  async unfriend(
-    @GetUser() user: User,
-    @Param('id', ParseUUIDPipe) friendId: string
-  ): Promise<{ count: number }> {
-    return await this.friendRequestService.removeBetweenFriends(
-      user.id,
-      friendId
-    );
-  }
-
   // フレンドリクエストをキャンセルした場合FriendRequestが返ってくるべきなのか
   // Postmanで試すと'PENDING'が返ってくるが正しい挙動か
   // 上記検討次第swagger対応予定
