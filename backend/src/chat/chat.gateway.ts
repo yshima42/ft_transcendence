@@ -65,14 +65,20 @@ export class ChatGateway {
     @WebSocket.ConnectedSocket() client: SocketIO.Socket
   ): Promise<void> {
     this.logger.debug(`handleMessage: ${this.json(createChatMessageDto)}`);
-    const newMessage = await this.chatMessageService.create(
-      createChatMessageDto,
-      client.data.userId as string
-    );
-    this.logger.debug(`newMessage: ${this.json(newMessage)}`);
-    this.server
-      .in(createChatMessageDto.roomId)
-      .emit('receive_message', newMessage);
+    try {
+      const newMessage = await this.chatMessageService.create(
+        createChatMessageDto,
+        client.data.userId as string
+      );
+      this.logger.debug(`newMessage: ${this.json(newMessage)}`);
+      this.server
+        .in(createChatMessageDto.roomId)
+        .emit('receive_message', newMessage);
+    } catch (error) {
+      if (error instanceof NestJs.HttpException)
+        throw new WebSocket.WsException(error.message);
+      throw error;
+    }
   }
 
   // ChatRoomに参加したときに呼ばれる
