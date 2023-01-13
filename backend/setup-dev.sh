@@ -24,5 +24,5 @@ fi
 # rm -rf "prisma/migrations"
 yarn install
 yarn prisma generate # prismaの型定義を生成
-yarn prisma migrate dev 
+yarn prisma migrate dev
 yarn prisma db seed

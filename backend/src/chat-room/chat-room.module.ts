@@ -1,11 +1,10 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { ChatRoomMemberModule } from 'src/chat-room-member/chat-room-member.module';
+import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ChatRoomController } from './chat-room.controller';
 import { ChatRoomService } from './chat-room.service';
 
 @Module({
-  imports: [PrismaModule, forwardRef(() => ChatRoomMemberModule)],
+  imports: [PrismaModule],
   controllers: [ChatRoomController],
   providers: [ChatRoomService],
   exports: [ChatRoomService],

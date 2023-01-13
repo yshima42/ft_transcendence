@@ -1,12 +1,13 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
-import { Flex } from '@chakra-ui/react';
+import { Flex, ToastId } from '@chakra-ui/react';
 import * as ReactQuery from '@tanstack/react-query';
 import { ResponseDm, ResponseDmRoom } from 'features/dm/types/dm';
 import { useBlockRelation } from 'hooks/api/block/useBlockRelation';
 import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { useProfile } from 'hooks/api/profile/useProfile';
 import { useSocket } from 'hooks/socket/useSocket';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import { useParams } from 'react-router-dom';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { Message } from 'components/molecules/Message';
@@ -29,6 +30,7 @@ export const DmRoomPage: React.FC = React.memo(() => {
   const endpoint = `/dm/rooms/${dmRoomId}/messages`;
   const { data: messages } = useGetApiOmitUndefined<ResponseDm[]>(endpoint);
   const queryClient = ReactQuery.useQueryClient();
+  const { customToast } = useCustomToast();
 
   React.useEffect(() => {
     socket.emit('join_dm_room', dmRoomId);
@@ -43,8 +45,17 @@ export const DmRoomPage: React.FC = React.memo(() => {
         }
       );
     });
+    // 例外の取得
+    socket.on('exception', (data: { status: string; message: string }) => {
+      const { message } = data;
+      const id: ToastId = 'wsException';
+      if (!customToast.isActive(id)) {
+        customToast({ id, description: message });
+      }
+    });
 
     return () => {
+      socket.off('exception');
       socket.off('receive_message');
       socket.emit('leave_dm_room', dmRoomId);
     };
