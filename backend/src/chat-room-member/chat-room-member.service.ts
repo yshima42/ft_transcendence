@@ -1,4 +1,3 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import * as NestJs from '@nestjs/common';
 import * as Schedule from '@nestjs/schedule';
 import {
@@ -13,15 +12,15 @@ import { ResponseChatRoomMember } from './chat-room-member.interface';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
 import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
-@Injectable()
+@NestJs.Injectable()
 export class ChatRoomMemberService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => ChatRoomService))
+    @NestJs.Inject(NestJs.forwardRef(() => ChatRoomService))
     private readonly chatRoomService: ChatRoomService
   ) {}
 
-  private readonly logger = new Logger('ChatRoomMemberService');
+  private readonly logger = new NestJs.Logger('ChatRoomMemberService');
   private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
 
   async create(
@@ -102,7 +101,17 @@ export class ChatRoomMemberService {
     });
   }
 
-  async findAll(chatRoomId: string): Promise<ResponseChatRoomMember[]> {
+  async findAll(
+    chatRoomId: string,
+    userId: string
+  ): Promise<ResponseChatRoomMember[]> {
+    // chatRoomのメンバーかどうか
+    if (!(await this.isChatRoomMember(chatRoomId, userId))) {
+      throw new NestJs.HttpException(
+        'You are not a member of this chatRoom',
+        NestJs.HttpStatus.UNAUTHORIZED
+      );
+    }
     const chatRoomMembers = await this.prisma.chatRoomMember.findMany({
       where: {
         chatRoomId,
@@ -152,7 +161,6 @@ export class ChatRoomMemberService {
         memberStatus: true,
       },
     });
-    // TODO: WebSocketでのエラーも考慮するとここでHttpのエラーを投げるべきか検討する必要あり。
     if (chatRoomMember === null) {
       throw new NestJs.HttpException(
         'ChatRoomMember not found',
@@ -328,5 +336,22 @@ export class ChatRoomMemberService {
       .catch((e: Error) => {
         this.logger.error(`handleCron: ${this.json({ e })}`);
       });
+  }
+
+  // chatRoomのメンバーかどうか
+  async isChatRoomMember(chatRoomId: string, userId: string): Promise<boolean> {
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    this.logger.debug(
+      `isChatRoomMember: ${this.json({ chatRoomMember, chatRoomId, userId })}`
+    );
+
+    return chatRoomMember !== null;
   }
 }

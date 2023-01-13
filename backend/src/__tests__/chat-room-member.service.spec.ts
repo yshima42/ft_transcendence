@@ -96,7 +96,8 @@ describe('ChatRoomMemberService', () => {
     }
     {
       const chatRoomMembers = await chatRoomMemberService.findAll(
-        testChatRoom.id
+        testChatRoom.id,
+        testUsers[1].id
       );
       expect(chatRoomMembers).toBeDefined();
     }

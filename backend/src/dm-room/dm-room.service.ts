@@ -1,10 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import { DmRoom } from '@prisma/client';
 import { BlocksService } from 'src/blocks/blocks.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseDmRoom } from './dm-room.interface';
 
-@Injectable()
+@NestJs.Injectable()
 export class DmRoomService {
   constructor(
     private readonly prisma: PrismaService,
@@ -15,9 +15,9 @@ export class DmRoomService {
   async findOrCreate(userId: string, loginUserId: string): Promise<DmRoom> {
     // 自分自身とのDMは作成できない
     if (userId === loginUserId) {
-      throw new HttpException(
+      throw new NestJs.HttpException(
         'you cannot create dm room with yourself',
-        HttpStatus.BAD_REQUEST
+        NestJs.HttpStatus.BAD_REQUEST
       );
     }
     // ブロック関係の場合は作成できない
@@ -27,9 +27,9 @@ export class DmRoomService {
       userId
     );
     if (isUserBlocked) {
-      throw new HttpException(
+      throw new NestJs.HttpException(
         'you cannot open dm room with block relation',
-        HttpStatus.BAD_REQUEST
+        NestJs.HttpStatus.BAD_REQUEST
       );
     }
 
@@ -123,7 +123,13 @@ export class DmRoomService {
     return dmRooms;
   }
 
-  async findOne(dmRoomId: string): Promise<ResponseDmRoom> {
+  async findOne(dmRoomId: string, userId: string): Promise<ResponseDmRoom> {
+    if (!(await this.isDmRoomMember(dmRoomId, userId))) {
+      throw new NestJs.HttpException(
+        'you are not dm room member',
+        NestJs.HttpStatus.BAD_REQUEST
+      );
+    }
     const dmRoom = await this.prisma.dmRoom.findUnique({
       where: {
         id: dmRoomId,
@@ -154,9 +160,38 @@ export class DmRoomService {
       },
     });
     if (dmRoom === null) {
-      throw new HttpException('dm room not found', HttpStatus.NOT_FOUND);
+      throw new NestJs.HttpException(
+        'dm room not found',
+        NestJs.HttpStatus.NOT_FOUND
+      );
     }
 
     return dmRoom;
+  }
+
+  // DmRoomのメンバーかどうか
+  async isDmRoomMember(dmRoomId: string, userId: string): Promise<boolean> {
+    const dmRoom = await this.prisma.dmRoom.findUnique({
+      where: {
+        id: dmRoomId,
+      },
+      select: {
+        dmRoomMembers: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
+    if (dmRoom === null) {
+      throw new NestJs.HttpException(
+        'dm room not found',
+        NestJs.HttpStatus.NOT_FOUND
+      );
+    }
+
+    return dmRoom.dmRoomMembers.some((dmRoomMember) => {
+      return dmRoomMember.userId === userId;
+    });
   }
 }

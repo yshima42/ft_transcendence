@@ -15,7 +15,8 @@ const useLeaveChatRoomSub = (
   const { mutate } = useDeleteApiReset(endpoint(chatRoomId), queryKeys);
 
   function leaveChatRoom() {
-    mutate({}, { onSuccess: () => navigate(navigateUrl) });
+    mutate({});
+    navigate(navigateUrl);
   }
 
   return { leaveChatRoom };

@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  UseGuards,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import * as NestJs from '@nestjs/common';
 import * as Sw from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
@@ -16,16 +7,16 @@ import { ResponseChatRoomMember } from './chat-room-member.interface';
 import { ChatRoomMemberService } from './chat-room-member.service';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
 
-@Controller('chat/rooms/:chatRoomId/members')
+@NestJs.Controller('chat/rooms/:chatRoomId/members')
 @Sw.ApiTags('chat-room-user')
-@UseGuards(JwtOtpAuthGuard)
+@NestJs.UseGuards(JwtOtpAuthGuard)
 export class ChatRoomMemberController {
   constructor(private readonly chatRoomMemberService: ChatRoomMemberService) {}
 
-  @Post()
+  @NestJs.Post()
   async create(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
-    @Body() createChatRoomMemberDto: CreateChatRoomMemberDto,
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string,
+    @NestJs.Body() createChatRoomMemberDto: CreateChatRoomMemberDto,
     @GetUser() user: User
   ): Promise<void> {
     await this.chatRoomMemberService.create(
@@ -35,26 +26,27 @@ export class ChatRoomMemberController {
     );
   }
 
-  @Get()
+  @NestJs.Get()
   async findAll(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string,
+    @GetUser() user: User
   ): Promise<ResponseChatRoomMember[]> {
-    return await this.chatRoomMemberService.findAll(chatRoomId);
+    return await this.chatRoomMemberService.findAll(chatRoomId, user.id);
   }
 
   // me
-  @Get('me')
+  @NestJs.Get('me')
   async findMe(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<ResponseChatRoomMember> {
     return await this.chatRoomMemberService.findOne(chatRoomId, user.id);
   }
 
   // 退出
-  @Delete('me')
+  @NestJs.Delete('me')
   async removeMe(
-    @Param('chatRoomId', new ParseUUIDPipe()) chatRoomId: string,
+    @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string,
     @GetUser() user: User
   ): Promise<void> {
     await this.chatRoomMemberService.remove(chatRoomId, user.id);

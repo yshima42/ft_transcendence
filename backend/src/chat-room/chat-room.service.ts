@@ -1,4 +1,3 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import * as NestJS from '@nestjs/common';
 import { ChatRoom, ChatRoomMemberStatus, ChatRoomStatus } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -9,15 +8,15 @@ import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
 import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
-@Injectable()
+@NestJS.Injectable()
 export class ChatRoomService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => ChatRoomMemberService))
+    @NestJS.Inject(NestJS.forwardRef(() => ChatRoomMemberService))
     private readonly chatRoomMemberService: ChatRoomMemberService
   ) {}
 
-  private readonly logger = new Logger('ChatRoomService');
+  private readonly logger = new NestJS.Logger('ChatRoomService');
   private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
 
   async create(
@@ -26,7 +25,7 @@ export class ChatRoomService {
   ): Promise<ChatRoom> {
     const { name, password, roomStatus } = createChatroomDto;
     this.logger.debug(`create: ${this.json({ createChatroomDto, userId })}`);
-
+    // パスワードがある場合はハッシュ化
     let hashedPassword: string | undefined;
     if (password !== undefined) {
       hashedPassword = await bcrypt.hash(password, 10);
