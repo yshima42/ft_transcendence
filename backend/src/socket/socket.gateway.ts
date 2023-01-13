@@ -1,4 +1,4 @@
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -7,6 +7,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { parse } from 'cookie';
 import { Server, Socket } from 'socket.io';
@@ -49,29 +50,34 @@ export class UsersGateway {
   private readonly server!: Server;
 
   async handleConnection(@ConnectedSocket() socket: Socket): Promise<void> {
-    const cookie: string | undefined = socket.handshake.headers.cookie;
-    if (cookie === undefined) {
-      throw new UnauthorizedException();
-    }
-    const { accessToken } = parse(cookie);
-    const payload = this.jwt.verify<{ id: string }>(accessToken, {
-      secret: this.config.get('JWT_SECRET'),
-    });
-    const { id } = payload;
-    const user = await this.prisma.user.findUnique({ where: { id } });
-    if (user === null) {
-      throw new UnauthorizedException();
-    }
-    socket.data.userId = user.id;
+    try {
+      const cookie: string | undefined = socket.handshake.headers.cookie;
+      if (cookie === undefined) {
+        throw new WsException('Authentication failed.');
+      }
+      const { accessToken } = parse(cookie);
+      const payload = this.jwt.verify<{ id: string }>(accessToken, {
+        secret: this.config.get('JWT_SECRET'),
+      });
+      const { id } = payload;
+      const user = await this.prisma.user.findUnique({ where: { id } });
+      if (user === null) {
+        throw new WsException('Authentication failed.');
+      }
+      socket.data.userId = user.id;
+      await socket.join(user.id);
 
-    await socket.join(user.id);
-
-    // 別タブで出ている招待モーダルを全て閉じる。
-    socket
-      .to(user.id)
-      .emit('close_invitation_alert', { invitationRoomId: null });
-    socket.emit('connect_established');
-    Logger.debug('connected: ' + socket.id);
+      // 別タブで出ている招待モーダルを全て閉じる。
+      socket
+        .to(user.id)
+        .emit('close_invitation_alert', { invitationRoomId: null });
+      socket.emit('connect_established');
+      Logger.debug('connected: ' + socket.id);
+    } catch (e) {
+      if (e instanceof Error) {
+        socket.emit('exception', { status: 'error', message: e.message });
+      }
+    }
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
@@ -507,7 +513,9 @@ export class UsersGateway {
     const gameRoom = new GameRoom(
       this.gameService,
       this.server,
-      (gameRoom: GameRoom) => this.deleteGameRoom(gameRoom),
+      (gameRoom: GameRoom) => {
+        this.deleteGameRoom(gameRoom);
+      },
       new Player(player1Id, true),
       new Player(player2Id, false),
       ballSpeedType
