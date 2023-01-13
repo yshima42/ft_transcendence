@@ -10,6 +10,8 @@ services:
       - backend
     networks:
       - front-tier
+    # 新しいバージョンならhealthcheckとdependsonで対応するところ
+    command: ["sh", "-c", "./wait-for-it.sh -t 10 backend:3000 --strict -- yarn dev"]
 
   backend:
     build: ./backend
