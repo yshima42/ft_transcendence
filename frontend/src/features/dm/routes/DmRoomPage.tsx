@@ -55,6 +55,7 @@ export const DmRoomPage: React.FC = React.memo(() => {
     });
 
     return () => {
+      socket.off('exception');
       socket.off('receive_message');
       socket.emit('leave_dm_room', dmRoomId);
     };
