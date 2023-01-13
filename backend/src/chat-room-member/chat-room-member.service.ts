@@ -4,9 +4,9 @@ import {
   ChatRoomMemberStatus,
   ChatRoomStatus,
   ChatRoomMember,
+  ChatRoom,
 } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { ChatRoomService } from 'src/chat-room/chat-room.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoomMember } from './chat-room-member.interface';
 import { CreateChatRoomMemberDto } from './dto/create-chat-room-member.dto';
@@ -14,16 +14,12 @@ import { UpdateChatRoomMemberDto } from './dto/update-chat-room-member.dto';
 
 @NestJs.Injectable()
 export class ChatRoomMemberService {
-  constructor(
-    private readonly prisma: PrismaService,
-    @NestJs.Inject(NestJs.forwardRef(() => ChatRoomService))
-    private readonly chatRoomService: ChatRoomService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private readonly logger = new NestJs.Logger('ChatRoomMemberService');
   private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
 
-  async create(
+  async createOrFind(
     chatRoomId: string,
     createChatRoomMemberDto: CreateChatRoomMemberDto,
     chatLoginUserId: string
@@ -37,7 +33,7 @@ export class ChatRoomMemberService {
     );
     const enteredPassword = createChatRoomMemberDto.chatRoomPassword;
     // chatRoomのステータスを取得
-    const chatRoom = await this.chatRoomService.findOne(chatRoomId);
+    const chatRoom = await this.getChatRoom(chatRoomId);
     if (chatRoom.roomStatus === ChatRoomStatus.PROTECTED) {
       if (enteredPassword === undefined || enteredPassword === '') {
         throw new NestJs.HttpException(
@@ -91,6 +87,14 @@ export class ChatRoomMemberService {
 
       return chatRoomMember;
     }
+
+    this.logger.debug(
+      `create: ${this.json({
+        chatRoomId,
+        createChatRoomMemberDto,
+        chatLoginUserId,
+      })}`
+    );
 
     return await this.prisma.chatRoomMember.create({
       data: {
@@ -183,10 +187,24 @@ export class ChatRoomMemberService {
     );
     const { chatRoomId, memberId, memberStatus, limitTime } =
       updateChatRoomMemberDto;
+    // chatRoomのメンバーかどうか
+    if (!(await this.isChatRoomMember(chatRoomId, chatLoginUserId))) {
+      throw new NestJs.HttpException(
+        'You are not a member of this chatRoom',
+        NestJs.HttpStatus.FORBIDDEN
+      );
+    }
+    // targetMemberがchatRoomのメンバーかどうか
+    if (!(await this.isChatRoomMember(chatRoomId, memberId))) {
+      throw new NestJs.HttpException(
+        'Target member is not a member of this chatRoom',
+        NestJs.HttpStatus.FORBIDDEN
+      );
+    }
     // loginUserIdのchatRoomでのステータスを取得
     const loginChatRoomMember = await this.findOne(chatRoomId, chatLoginUserId);
     // OWNER -> すべての変更を許可
-    // MODERATOR -> KICKED, BANED, MUTEDDの変更を許可
+    // MODERATOR -> KICKED, BANED, MUTEDの変更を許可
     // NORMAL -> 何も変更を許可しない
     // 権限がないRequestの場合はエラー
     if (
@@ -263,6 +281,13 @@ export class ChatRoomMemberService {
         memberId,
       })}`
     );
+    // chatRoomのメンバーかどうか
+    if (!(await this.isChatRoomMember(chatRoomId, memberId))) {
+      throw new NestJs.HttpException(
+        'You are not a member of this chatRoom',
+        NestJs.HttpStatus.UNAUTHORIZED
+      );
+    }
     const chatRoomMember = await this.findOne(chatRoomId, memberId);
     // ADMINは退出できない
     if (chatRoomMember.memberStatus === ChatRoomMemberStatus.OWNER) {
@@ -351,7 +376,34 @@ export class ChatRoomMemberService {
     this.logger.debug(
       `isChatRoomMember: ${this.json({ chatRoomMember, chatRoomId, userId })}`
     );
+    if (chatRoomMember === null) {
+      return false;
+    }
+    // BANNEDの場合はメンバーではないとみなす
+    if (chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED) {
+      return false;
+    }
 
-    return chatRoomMember !== null;
+    return true;
+  }
+
+  // chatRoomのステータスを取得
+  async getChatRoom(chatRoomId: string): Promise<ChatRoom> {
+    const chatRoom = await this.prisma.chatRoom.findUnique({
+      where: {
+        id: chatRoomId,
+      },
+    });
+    this.logger.debug(
+      `getChatRoomStatus: ${this.json({ chatRoom, chatRoomId })}`
+    );
+    if (chatRoom === null) {
+      throw new NestJs.HttpException(
+        'ChatRoom not found',
+        NestJs.HttpStatus.NOT_FOUND
+      );
+    }
+
+    return chatRoom;
   }
 }

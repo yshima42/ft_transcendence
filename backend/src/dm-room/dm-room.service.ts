@@ -11,8 +11,16 @@ export class DmRoomService {
     private readonly blocksService: BlocksService
   ) {}
 
+  private readonly logger = new NestJs.Logger('DmRoomService');
+  private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
+
   // ない場合はRoomを作成、ある場合はRoomを返す
   async findOrCreate(userId: string, loginUserId: string): Promise<DmRoom> {
+    // ログ
+    this.logger.log(
+      `findOrCreate: userId=${userId}, loginUserId=${loginUserId}`
+    );
+
     // 自分自身とのDMは作成できない
     if (userId === loginUserId) {
       throw new NestJs.HttpException(
@@ -33,6 +41,7 @@ export class DmRoomService {
       );
     }
 
+    // すでにDMルームがあるかどうか
     const dmRoom = await this.prisma.dmRoom.findFirst({
       where: {
         dmRoomMembers: {
@@ -45,10 +54,12 @@ export class DmRoomService {
       },
     });
 
+    // すでにDMルームがある場合はそのルームを返す
     if (dmRoom !== null) {
       return dmRoom;
     }
 
+    // DMルームがない場合は作成する
     return await this.prisma.dmRoom.create({
       data: {
         dmRoomMembers: {
@@ -124,6 +135,7 @@ export class DmRoomService {
   }
 
   async findOne(dmRoomId: string, userId: string): Promise<ResponseDmRoom> {
+    this.logger.log(`findOne: dmRoomId=${dmRoomId}, userId=${userId}`);
     if (!(await this.isDmRoomMember(dmRoomId, userId))) {
       throw new NestJs.HttpException(
         'you are not dm room member',
@@ -169,29 +181,46 @@ export class DmRoomService {
     return dmRoom;
   }
 
-  // DmRoomのメンバーかどうか
+  // 自分がDmRoomのメンバーであるか
   async isDmRoomMember(dmRoomId: string, userId: string): Promise<boolean> {
-    const dmRoom = await this.prisma.dmRoom.findUnique({
+    const dmRoom = await this.prisma.dmRoom.findFirst({
       where: {
         id: dmRoomId,
-      },
-      select: {
         dmRoomMembers: {
-          select: {
-            userId: true,
+          some: {
+            userId,
           },
         },
       },
     });
     if (dmRoom === null) {
-      throw new NestJs.HttpException(
-        'dm room not found',
-        NestJs.HttpStatus.NOT_FOUND
-      );
+      return false;
     }
-
-    return dmRoom.dmRoomMembers.some((dmRoomMember) => {
-      return dmRoomMember.userId === userId;
+    // dmRoomの自分以外のメンバーを取得
+    const dmRoomMember = await this.prisma.dmRoomMember.findFirst({
+      where: {
+        dmRoomId,
+        userId: {
+          not: userId,
+        },
+      },
+      select: {
+        userId: true,
+      },
     });
+    if (dmRoomMember === null) {
+      return false;
+    }
+    // 自分がメンバーをブロックしていないか
+    const isBlocked = await this.prisma.block.findUnique({
+      where: {
+        sourceId_targetId: {
+          sourceId: userId,
+          targetId: dmRoomMember.userId,
+        },
+      },
+    });
+
+    return isBlocked === null;
   }
 }

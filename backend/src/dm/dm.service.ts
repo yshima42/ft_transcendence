@@ -7,10 +7,20 @@ import { CreateDmDto } from './dto/create-dm.dto';
 export class DmService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private readonly logger = new NestJs.Logger('ChatRoomMemberService');
+  private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
+
   async create(
     createDmDto: CreateDmDto,
     senderId: string
   ): Promise<ResponseDm> {
+    this.logger.log(
+      `create: createDmDto=${this.json(createDmDto)}, senderId=${senderId}`
+    );
+    // 自分がDmRoomのメンバーであるか, ブロック関係の場合は作成できない
+    if (!(await this.isDmRoomMember(createDmDto.roomId, senderId))) {
+      throw new NestJs.ForbiddenException();
+    }
     const dm = await this.prisma.dm.create({
       data: {
         content: createDmDto.content,
@@ -82,7 +92,34 @@ export class DmService {
         },
       },
     });
+    if (dmRoom === null) {
+      return false;
+    }
+    // dmRoomの自分以外のメンバーを取得
+    const dmRoomMember = await this.prisma.dmRoomMember.findFirst({
+      where: {
+        dmRoomId,
+        userId: {
+          not: userId,
+        },
+      },
+      select: {
+        userId: true,
+      },
+    });
+    if (dmRoomMember === null) {
+      return false;
+    }
+    // 自分がメンバーをブロックしていないか
+    const isBlocked = await this.prisma.block.findUnique({
+      where: {
+        sourceId_targetId: {
+          sourceId: userId,
+          targetId: dmRoomMember.userId,
+        },
+      },
+    });
 
-    return dmRoom !== null;
+    return isBlocked === null;
   }
 }

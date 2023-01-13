@@ -80,7 +80,7 @@ describe('ChatRoomMemberService', () => {
     const createChatRoomMemberDto: CreateChatRoomMemberDto = {};
     {
       // 保護されていないチャットルームに対して、パスワードを入力しなかった場合通常通りに作成できる
-      const chatRoomMember = await chatRoomMemberService.create(
+      const chatRoomMember = await chatRoomMemberService.createOrFind(
         testChatRoom.id,
         createChatRoomMemberDto,
         testUsers[1].id
@@ -113,7 +113,7 @@ describe('ChatRoomMemberService', () => {
       // 保護されたチャットルームに対して、パスワードを入力しなかった場合 400
       const createChatRoomMemberDto: CreateChatRoomMemberDto = {};
       await expect(async () => {
-        await chatRoomMemberService.create(
+        await chatRoomMemberService.createOrFind(
           testChatRoomProtected.id,
           createChatRoomMemberDto,
           testUsers[1].id
@@ -131,7 +131,7 @@ describe('ChatRoomMemberService', () => {
         chatRoomPassword: 'wrong password',
       };
       await expect(async () => {
-        await chatRoomMemberService.create(
+        await chatRoomMemberService.createOrFind(
           testChatRoomProtected.id,
           createChatRoomMemberDto,
           testUsers[1].id
@@ -148,7 +148,7 @@ describe('ChatRoomMemberService', () => {
       const createChatRoomMemberDto: CreateChatRoomMemberDto = {
         chatRoomPassword: 'password',
       };
-      const chatRoomMember = await chatRoomMemberService.create(
+      const chatRoomMember = await chatRoomMemberService.createOrFind(
         testChatRoomProtected.id,
         createChatRoomMemberDto,
         testUsers[1].id

@@ -3,6 +3,7 @@ import * as Sw from '@nestjs/swagger';
 import { ChatRoom, User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { JwtOtpAuthGuard } from 'src/auth/guards/jwt-otp-auth.guard';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { ChatRoomService } from './chat-room.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
@@ -12,7 +13,10 @@ import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 @Sw.ApiTags('chat-room')
 @NestJs.UseGuards(JwtOtpAuthGuard)
 export class ChatRoomController {
-  constructor(private readonly chatRoomService: ChatRoomService) {}
+  constructor(
+    private readonly chatRoomService: ChatRoomService,
+    private readonly prisma: PrismaService
+  ) {}
 
   @NestJs.Post()
   async create(
@@ -44,7 +48,12 @@ export class ChatRoomController {
   async findOne(
     @NestJs.Param('chatRoomId', new NestJs.ParseUUIDPipe()) chatRoomId: string
   ): Promise<Omit<ChatRoom, 'password'>> {
-    const res = await this.chatRoomService.findOne(chatRoomId);
+    const res = await this.prisma.chatRoom.findUnique({
+      where: { id: chatRoomId },
+    });
+    if (res == null) {
+      throw new NestJs.NotFoundException('chatRoom not found');
+    }
     // omit password
     const { password, ...rest } = res;
     void password; // 使わないとエラーでるのでvoidキャスト的な

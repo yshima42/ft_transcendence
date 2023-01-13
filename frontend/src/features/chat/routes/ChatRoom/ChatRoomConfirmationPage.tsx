@@ -45,9 +45,7 @@ const ChatRoomConfirmationFormPage: React.FC = React.memo(() => {
 
       return;
     }
-    navigate(chatRoomLink, {
-      state: { chatRoomId, chatName, roomStatus },
-    });
+    navigate(chatRoomLink);
   };
 
   const onSubmit: ReactHookForm.SubmitHandler<Inputs> = async (data) => {
