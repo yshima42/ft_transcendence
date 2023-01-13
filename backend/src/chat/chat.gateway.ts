@@ -129,16 +129,22 @@ export class ChatGateway {
       throw new WebSocket.WsException('cookie is undefined');
     }
     const chatLoginUserId = this.getUserIdFromCookie(cookie);
-    const updatedChatRoomMember = await this.chatRoomMemberService.update(
-      updateChatRoomMemberDto,
-      chatLoginUserId
-    );
-    const res = this.server
-      .in(updateChatRoomMemberDto.chatRoomId)
-      .emit('changeChatRoomMemberStatusSocket', updateChatRoomMemberDto); // チャットルーム内の全員に送信(自分含む)
-    this.logger.debug(`changeStatus: ${this.json(res)}`);
+    try {
+      const updatedChatRoomMember = await this.chatRoomMemberService.update(
+        updateChatRoomMemberDto,
+        chatLoginUserId
+      );
+      const res = this.server
+        .in(updateChatRoomMemberDto.chatRoomId)
+        .emit('changeChatRoomMemberStatusSocket', updateChatRoomMemberDto); // チャットルーム内の全員に送信(自分含む)
+      this.logger.debug(`changeStatus: ${this.json(res)}`);
 
-    return updatedChatRoomMember;
+      return updatedChatRoomMember;
+    } catch (error) {
+      if (error instanceof NestJs.HttpException)
+        throw new WebSocket.WsException(error.message);
+      throw error;
+    }
   }
 
   getUserIdFromCookie(cookie: string): string {
