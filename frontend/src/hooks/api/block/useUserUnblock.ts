@@ -27,7 +27,11 @@ export const useUserUnblock = (
   const { mutateAsync: unblockUser, ...useMutationResult } =
     useDeleteApiWithErrorToast<UnblockUserResBody>(
       `/users/me/blocks/${targetId}`,
-      [['/users/me/blocks'], [`/users/me/block-relations/${targetId}`]]
+      [
+        ['/users/me/blocks'],
+        [`/users/me/block-relations/${targetId}`],
+        [`/dm/rooms`],
+      ]
     );
 
   return { unblockUser, ...useMutationResult };
