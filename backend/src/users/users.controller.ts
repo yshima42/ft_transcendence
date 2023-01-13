@@ -146,14 +146,18 @@ export class UsersController {
     @GetUser() user: User,
     @UploadedFile(FileService.parseFilePipe()) file: Express.Multer.File
   ): Promise<User> {
-    this.fileService.deleteOldFile(file.filename, user);
+    const newFilename = file.filename;
     const backendUrl = this.config.get<string>('BACKEND_URL') as string;
 
     const UpdateUserDto = {
-      avatarImageUrl: `${backendUrl}/users/${user.id}/avatar/${file.filename}`,
+      avatarImageUrl: `${backendUrl}/users/${user.id}/avatar/${newFilename}`,
     };
+    const updatedUser = await this.usersService.update(user.id, UpdateUserDto);
 
-    return await this.usersService.update(user.id, UpdateUserDto);
+    // avatarImageUrl 更新終わってから、古いファイル消す。
+    this.fileService.deleteOldFile(newFilename, user);
+
+    return updatedUser;
   }
 
   @Get(':id/game/matches')
