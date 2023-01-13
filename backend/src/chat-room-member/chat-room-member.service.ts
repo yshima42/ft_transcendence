@@ -195,7 +195,16 @@ export class ChatRoomMemberService {
       );
     }
     // targetMemberがchatRoomのメンバーかどうか
-    if (!(await this.isChatRoomMember(chatRoomId, memberId))) {
+    if (
+      (await this.prisma.chatRoomMember.findUnique({
+        where: {
+          chatRoomId_userId: {
+            chatRoomId,
+            userId: memberId,
+          },
+        },
+      })) == null
+    ) {
       throw new NestJs.HttpException(
         'Target member is not a member of this chatRoom',
         NestJs.HttpStatus.FORBIDDEN
