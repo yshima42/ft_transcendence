@@ -224,35 +224,6 @@ export class FriendRequestsService {
     return await this.removeTwo(userId, requestUserId);
   }
 
-  // 命名に違和感あり
-  async removeBetweenFriends(
-    userId: string,
-    friendId: string
-  ): Promise<{ count: number }> {
-    const acceptedRequests = await this.prisma.friendRequest.findMany({
-      where: {
-        OR: [
-          {
-            creatorId: userId,
-            receiverId: friendId,
-            status: 'ACCEPTED',
-          },
-          {
-            creatorId: friendId,
-            receiverId: userId,
-            status: 'ACCEPTED',
-          },
-        ],
-      },
-    });
-
-    if (acceptedRequests.length === 0) {
-      throw new NotFoundException('This user is not your friend.');
-    }
-
-    return await this.removeTwo(userId, friendId);
-  }
-
   async getFriendRelation(
     meId: string,
     otherId: string
