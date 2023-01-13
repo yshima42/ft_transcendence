@@ -10,6 +10,7 @@ import {
   Query,
   Body,
   Patch,
+  UseFilters,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -19,6 +20,7 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetFtProfile } from './decorator/get-ft-profile.decorator';
 import { GetUser } from './decorator/get-user.decorator';
+import { LoginHttpExceptionFilter } from './filter/login-http-exception.filter';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtOtpAuthGuard } from './guards/jwt-otp-auth.guard';
@@ -46,10 +48,12 @@ export class AuthController {
   };
 
   @Get('login/42')
+  @UseFilters(LoginHttpExceptionFilter)
   @UseGuards(FtOauthGuard)
   ftOauth(): void {}
 
   @Get('login/42/callback')
+  @UseFilters(LoginHttpExceptionFilter)
   @UseGuards(FtOauthGuard)
   // decoratorの中でメンバ変数を使えないので空にしている
   // 戻り値でオーバーライドされるので問題ない
@@ -89,6 +93,7 @@ export class AuthController {
   @Get('login/dummy')
   // decoratorの中でメンバ変数を使えないので空にしている
   // 戻り値でオーバーライドされるので問題ない
+  @UseFilters(LoginHttpExceptionFilter)
   @Redirect()
   @ApiOperation({
     summary: 'seedで作ったdummy1~5のaccessTokenを取得(ログイン)',
