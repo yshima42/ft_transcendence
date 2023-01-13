@@ -23,28 +23,37 @@ export const useGameMonitoring = (): {
     if (!isConnected) return;
 
     socket.emit('join_monitor_room', (inGameOutlines: GameOutline[]) => {
-      inGameOutlines.forEach((inGameOutline) =>
-        inGameOutlineMap.set(inGameOutline.roomId, {
-          roomId: inGameOutline.roomId,
-          player1Id: inGameOutline.player1Id,
-          player2Id: inGameOutline.player2Id,
-        })
-      );
-      setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
+      setInGameOutlineMap((inGameOutlineMap) => {
+        inGameOutlines.forEach((inGameOutline) =>
+          inGameOutlineMap.set(inGameOutline.roomId, {
+            roomId: inGameOutline.roomId,
+            player1Id: inGameOutline.player1Id,
+            player2Id: inGameOutline.player2Id,
+          })
+        );
+
+        return new Map<string, GameOutline>(inGameOutlineMap);
+      });
     });
 
     socket.on('game_room_created', (createdRoomOutline: GameOutline) => {
-      inGameOutlineMap.set(createdRoomOutline.roomId, {
-        roomId: createdRoomOutline.roomId,
-        player1Id: createdRoomOutline.player1Id,
-        player2Id: createdRoomOutline.player2Id,
+      setInGameOutlineMap((inGameOutlineMap) => {
+        inGameOutlineMap.set(createdRoomOutline.roomId, {
+          roomId: createdRoomOutline.roomId,
+          player1Id: createdRoomOutline.player1Id,
+          player2Id: createdRoomOutline.player2Id,
+        });
+
+        return new Map<string, GameOutline>(inGameOutlineMap);
       });
-      setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
     });
 
     socket.on('game_room_deleted', (deletedRoomId: string) => {
-      inGameOutlineMap.delete(deletedRoomId);
-      setInGameOutlineMap(new Map<string, GameOutline>(inGameOutlineMap));
+      setInGameOutlineMap((inGameOutlineMap) => {
+        inGameOutlineMap.delete(deletedRoomId);
+
+        return new Map<string, GameOutline>(inGameOutlineMap);
+      });
     });
 
     return () => {
