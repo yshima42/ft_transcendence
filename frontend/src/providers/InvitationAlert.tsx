@@ -151,7 +151,8 @@ export const InvitationAlert: FC<Props> = memo((props) => {
               Decline
             </Button>
             <Button
-              colorScheme="green"
+              bg="teal.300"
+              color="white"
               onClick={onClickAccept}
               isDisabled={!isConnected}
               ml={3}

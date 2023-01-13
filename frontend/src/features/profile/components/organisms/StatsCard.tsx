@@ -44,7 +44,11 @@ export const StatsCard: FC<StatsCardProps> = memo(({ id }: StatsCardProps) => {
         <Heading size="md">Stats</Heading>
       </Flex>
       <Flex justify="center" align="center" pt="4">
-        <CircularProgress value={gameStats.winRate} size="200px">
+        <CircularProgress
+          value={gameStats.winRate}
+          size="200px"
+          color="teal.300"
+        >
           <CircularProgressLabel>
             <Text
               fontSize="2xl"
