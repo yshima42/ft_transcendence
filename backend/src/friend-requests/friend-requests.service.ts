@@ -126,6 +126,9 @@ export class FriendRequestsService {
           },
         ],
       },
+      orderBy: {
+        nickname: 'asc',
+      },
     });
   }
 
