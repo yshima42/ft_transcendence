@@ -21,8 +21,8 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
-rm -rf "prisma/migrations"
+# rm -rf "prisma/migrations"
 yarn install
 yarn prisma generate # prismaの型定義を生成
-yarn prisma migrate dev --name init
+yarn prisma migrate dev 
 yarn prisma db seed
