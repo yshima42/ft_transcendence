@@ -25,7 +25,7 @@ export class ChatRoomService {
   ): Promise<ChatRoom> {
     const { name, password, roomStatus } = createChatroomDto;
     this.logger.debug(`create: ${this.json({ createChatroomDto, userId })}`);
-
+    // パスワードがある場合はハッシュ化
     let hashedPassword: string | undefined;
     if (password !== undefined) {
       hashedPassword = await bcrypt.hash(password, 10);
