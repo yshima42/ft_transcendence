@@ -66,6 +66,7 @@
           "guard": "always",
           "decorator": "always",
           "gateway": "always",
+          "filter": "always",
           "object": "always",
           /*
            * swagger用のentityファイルがuser.entity.tsで、
