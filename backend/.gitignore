@@ -41,3 +41,6 @@ prisma/dbml
 prisma/docs
 prisma/generated
 prisma/erd.md
+
+# PCのスペックによりtimeoutする場合があるので、以下の設定を追加
+.yarnrc
