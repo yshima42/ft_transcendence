@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { SettingsIcon } from '@chakra-ui/icons';
 import * as C from '@chakra-ui/react';
+import { ToastId } from '@chakra-ui/react';
 import { ChatRoomMemberStatus, ChatRoom } from '@prisma/client';
 import * as ReactQuery from '@tanstack/react-query';
 import { useBanRedirect } from 'features/chat/hooks/useBanRedirect';
@@ -12,6 +13,7 @@ import {
 import { useBlockUsers } from 'hooks/api/block/useBlockUsers';
 import { useGetApiOmitUndefined } from 'hooks/api/generics/useGetApi';
 import { useSocket } from 'hooks/socket/useSocket';
+import { useCustomToast } from 'hooks/utils/useCustomToast';
 import * as ReactRouter from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
@@ -104,6 +106,7 @@ const ChatRoomBody: React.FC<{
   const scrollBottomRef = React.useRef<HTMLDivElement>(null);
   const { users: blockUsers } = useBlockUsers();
   const queryClient = ReactQuery.useQueryClient();
+  const { customToast } = useCustomToast();
 
   React.useEffect(() => {
     socket.emit('join_room_member', chatRoomId);
@@ -119,6 +122,14 @@ const ChatRoomBody: React.FC<{
           return [...oldData, message];
         }
       );
+    });
+    // 例外の取得
+    socket.on('exception', (data: { status: string; message: string }) => {
+      const { message } = data;
+      const id: ToastId = 'wsException';
+      if (!customToast.isActive(id)) {
+        customToast({ id, description: message });
+      }
     });
     // webSocketのイベントを受け取る関数を登録
     socket.on(

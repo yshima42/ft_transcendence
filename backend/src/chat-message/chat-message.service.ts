@@ -20,6 +20,13 @@ export class ChatMessageService {
     senderId: string
   ): Promise<ResponseChatMessage> {
     const { roomId, content } = createChatMessageDto;
+    // chatRoomのメンバーかどうか
+    if (!(await this.isChatRoomMember(roomId, senderId))) {
+      throw new NestJs.HttpException(
+        'You are not chat room member',
+        NestJs.HttpStatus.BAD_REQUEST
+      );
+    }
     // ban || mute しているユーザーはメッセージを送信できない
     const chatRoomMember = await this.chatRoomMemberService.findOne(
       roomId,
@@ -29,7 +36,6 @@ export class ChatMessageService {
       chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED ||
       chatRoomMember.memberStatus === ChatRoomMemberStatus.MUTED
     ) {
-      // TODO ソケットなのでHttpのエラーではない
       throw new NestJs.HttpException(
         'You are banned or muted',
         NestJs.HttpStatus.BAD_REQUEST
@@ -67,6 +73,12 @@ export class ChatMessageService {
     chatRoomId: string,
     userId: string
   ): Promise<ResponseChatMessage[]> {
+    if (!(await this.isChatRoomMember(chatRoomId, userId))) {
+      throw new NestJs.HttpException(
+        'You are not chat room member',
+        NestJs.HttpStatus.BAD_REQUEST
+      );
+    }
     const chatMessage = await this.prisma.chatMessage.findMany({
       where: {
         chatRoomId,
@@ -105,5 +117,22 @@ export class ChatMessageService {
     );
 
     return chatMessage;
+  }
+
+  // chatRoomのメンバーかどうか
+  async isChatRoomMember(chatRoomId: string, userId: string): Promise<boolean> {
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    this.logger.debug(
+      `isChatRoomMember: ${this.json({ chatRoomMember, chatRoomId, userId })}`
+    );
+
+    return chatRoomMember !== null;
   }
 }

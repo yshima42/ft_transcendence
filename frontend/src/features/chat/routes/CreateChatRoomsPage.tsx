@@ -26,14 +26,21 @@ const CreateChatRoomForm: React.FC = React.memo(() => {
   const [chatRoomStatus, setChatRoomStatus] = React.useState<ChatRoomStatus>(
     ChatRoomStatus.PUBLIC
   );
-
+  const onSubmit = (data: ChatRoomCreateFormValues) => {
+    // PROTECTEDではない場合は、passwordを削除する
+    CreateChatRoom(
+      chatRoomStatus === ChatRoomStatus.PROTECTED
+        ? data
+        : { ...data, password: undefined }
+    );
+  };
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setChatRoomStatus(e.target.value as ChatRoomStatus);
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit(CreateChatRoom)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <C.Box>
           <C.Heading size="sm">Chat Room Status</C.Heading>
           <C.Select {...register('roomStatus')} onChange={onChange}>
@@ -55,7 +62,9 @@ const CreateChatRoomForm: React.FC = React.memo(() => {
               },
             })}
           />
-          <C.FormErrorMessage>{errors.name?.message}</C.FormErrorMessage>
+          {errors.name != null && (
+            <C.Text color="red.500">{errors.name.message}</C.Text>
+          )}
         </C.Box>
         {chatRoomStatus === ChatRoomStatus.PROTECTED && (
           <C.Box>
@@ -75,7 +84,9 @@ const CreateChatRoomForm: React.FC = React.memo(() => {
                 },
               })}
             />
-            <C.FormErrorMessage>{errors.password?.message}</C.FormErrorMessage>
+            {errors.password != null && (
+              <C.Text color="red.500">{errors.password.message}</C.Text>
+            )}{' '}
           </C.Box>
         )}
         <C.Button
