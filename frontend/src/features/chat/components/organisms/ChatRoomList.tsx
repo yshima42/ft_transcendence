@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 const ChatRoomBox: React.FC<{ chatRoom: ResponseChatRoom }> = React.memo(
   ({ chatRoom }) => (
-    <C.Box p={5} shadow="md" borderWidth="1px">
+    <C.Box p={5} shadow="md" borderWidth="1px" borderRadius="md">
       {/* 投稿がない場合は何も表示しない */}
       {chatRoom.chatMessages.length !== 0 && (
         <C.Text fontSize="sm" data-testid="chat-room-created-at">

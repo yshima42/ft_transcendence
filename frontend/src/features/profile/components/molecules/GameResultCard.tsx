@@ -18,7 +18,7 @@ export const GameResultCard: FC<Props> = memo((props) => {
 
   return (
     <>
-      <Box h="100px" bg="gray.50" borderRadius={20} px={4}>
+      <Box h="100px" bg="gray.50" minW="350px" borderRadius={20} px={4}>
         <HStack>
           <AvatarWithNickname
             nickname={playerOne.nickname}
@@ -31,11 +31,21 @@ export const GameResultCard: FC<Props> = memo((props) => {
             avatarImageUrl={playerTwo.avatarImageUrl}
             id={playerTwo.id}
           />
-          <Box w="50px">
+          <Box>
             <Center>
-              <Text as="b" data-test={'profile-match-result-' + matchId}>
-                {win ? 'Win!!' : 'Lose...'}
-              </Text>
+              {win ? (
+                <Text
+                  as="b"
+                  textColor="teal.400"
+                  data-test={'profile-match-result-' + matchId}
+                >
+                  Win!!
+                </Text>
+              ) : (
+                <Text as="b" data-test={'profile-match-result-' + matchId}>
+                  Lose...
+                </Text>
+              )}
             </Center>
           </Box>
         </HStack>
