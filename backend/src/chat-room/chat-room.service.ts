@@ -1,8 +1,7 @@
 import * as NestJS from '@nestjs/common';
 import { ChatRoom, ChatRoomMemberStatus, ChatRoomStatus } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import * as Prisma from '@prisma/client/runtime';
 import * as bcrypt from 'bcrypt';
-import { ChatRoomMemberService } from 'src/chat-room-member/chat-room-member.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ResponseChatRoom } from './chat-room.interface';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
@@ -10,11 +9,7 @@ import { UpdateChatRoomDto } from './dto/update-chat-room.dto';
 
 @NestJS.Injectable()
 export class ChatRoomService {
-  constructor(
-    private readonly prisma: PrismaService,
-    @NestJS.Inject(NestJS.forwardRef(() => ChatRoomMemberService))
-    private readonly chatRoomMemberService: ChatRoomMemberService
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private readonly logger = new NestJS.Logger('ChatRoomService');
   private readonly json = (obj: any): string => JSON.stringify(obj, null, 2);
@@ -25,6 +20,13 @@ export class ChatRoomService {
   ): Promise<ChatRoom> {
     const { name, password, roomStatus } = createChatroomDto;
     this.logger.debug(`create: ${this.json({ createChatroomDto, userId })}`);
+    // PROTECTEDではない場合にパスワードがある場合はエラー
+    if (roomStatus !== ChatRoomStatus.PROTECTED && password !== undefined) {
+      throw new NestJS.HttpException(
+        'Password is not allowed',
+        NestJS.HttpStatus.BAD_REQUEST
+      );
+    }
     // パスワードがある場合はハッシュ化
     let hashedPassword: string | undefined;
     if (password !== undefined) {
@@ -48,7 +50,7 @@ export class ChatRoomService {
 
       return chatRoom;
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           this.logger.warn(`createChatRoom: chatRoom is already exists`);
           throw new NestJS.HttpException(
@@ -135,7 +137,14 @@ export class ChatRoomService {
   }
 
   // findOne
-  async findOne(chatRoomId: string): Promise<ChatRoom> {
+  async findOne(chatRoomId: string, userId: string): Promise<ChatRoom> {
+    // チャットルームのメンバーかどうか
+    if (!(await this.isChatRoomMember(chatRoomId, userId))) {
+      throw new NestJS.HttpException(
+        'User is not member',
+        NestJS.HttpStatus.FORBIDDEN
+      );
+    }
     const chatRoom = await this.prisma.chatRoom.findUnique({
       where: {
         id: chatRoomId,
@@ -215,14 +224,27 @@ export class ChatRoomService {
         NestJS.HttpStatus.FORBIDDEN
       );
     }
-    const chatRoom = await this.prisma.chatRoom.delete({
-      where: {
-        id: chatRoomId,
-      },
-    });
-    this.logger.debug(`remove: ${this.json({ chatRoom })}`);
+    try {
+      const chatRoom = await this.prisma.chatRoom.delete({
+        where: {
+          id: chatRoomId,
+        },
+      });
+      this.logger.debug(`remove: ${this.json({ chatRoom })}`);
 
-    return chatRoom;
+      return chatRoom;
+    } catch (error) {
+      // 存在しない場合
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NestJS.HttpException(
+            'ChatRoom is not found',
+            NestJS.HttpStatus.NOT_FOUND
+          );
+        }
+      }
+      throw error;
+    }
   }
 
   // ChatRoomのOWNERユーザーか
@@ -243,5 +265,29 @@ export class ChatRoomService {
     }
 
     return false;
+  }
+
+  // chatRoomのメンバーかどうか
+  async isChatRoomMember(chatRoomId: string, userId: string): Promise<boolean> {
+    const chatRoomMember = await this.prisma.chatRoomMember.findUnique({
+      where: {
+        chatRoomId_userId: {
+          chatRoomId,
+          userId,
+        },
+      },
+    });
+    this.logger.debug(
+      `isChatRoomMember: ${this.json({ chatRoomMember, chatRoomId, userId })}`
+    );
+    if (chatRoomMember === null) {
+      return false;
+    }
+    // BANNEDの場合はメンバーではないとみなす
+    if (chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED) {
+      return false;
+    }
+
+    return true;
   }
 }

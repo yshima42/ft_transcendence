@@ -27,15 +27,12 @@ export class ChatMessageService {
         NestJs.HttpStatus.BAD_REQUEST
       );
     }
-    // ban || mute しているユーザーはメッセージを送信できない
+    // mute しているユーザーはメッセージを送信できない
     const chatRoomMember = await this.chatRoomMemberService.findOne(
       roomId,
       senderId
     );
-    if (
-      chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED ||
-      chatRoomMember.memberStatus === ChatRoomMemberStatus.MUTED
-    ) {
+    if (chatRoomMember.memberStatus === ChatRoomMemberStatus.MUTED) {
       throw new NestJs.HttpException(
         'You are banned or muted',
         NestJs.HttpStatus.BAD_REQUEST
@@ -68,7 +65,7 @@ export class ChatMessageService {
     return chatMessage;
   }
 
-  // ユーザーによってブロックされたものを除き、チャットルームですべてのチャットメッセージを見つける
+  // ユーザーによってブロックされたものを除き、チャットルームですべてのチャットメッセージを取得する
   async findAllNotBlocked(
     chatRoomId: string,
     userId: string
@@ -132,7 +129,14 @@ export class ChatMessageService {
     this.logger.debug(
       `isChatRoomMember: ${this.json({ chatRoomMember, chatRoomId, userId })}`
     );
+    if (chatRoomMember === null) {
+      return false;
+    }
+    // BANNEDの場合はメンバーではないとみなす
+    if (chatRoomMember.memberStatus === ChatRoomMemberStatus.BANNED) {
+      return false;
+    }
 
-    return chatRoomMember !== null;
+    return true;
   }
 }

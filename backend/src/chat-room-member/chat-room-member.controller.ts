@@ -19,7 +19,7 @@ export class ChatRoomMemberController {
     @NestJs.Body() createChatRoomMemberDto: CreateChatRoomMemberDto,
     @GetUser() user: User
   ): Promise<void> {
-    await this.chatRoomMemberService.create(
+    await this.chatRoomMemberService.createOrFind(
       chatRoomId,
       createChatRoomMemberDto,
       user.id
