@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FriendRequest, User } from '@prisma/client';
+import { UpdateFriendRequestDto } from 'src/friend-requests/dto/update-friend-request.dto';
 import { FriendRequestsService } from 'src/friend-requests/friend-requests.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -160,6 +161,30 @@ describe('FriendRequestsService', () => {
           status: 'ACCEPTED',
         })
       ).resolves.toHaveProperty('status', 'ACCEPTED');
+    });
+
+    it('should not update request sending to myself', async () => {
+      const updateFriendRequestDto: UpdateFriendRequestDto = {
+        creatorId: userArray[1].id,
+        receiverId: userArray[1].id,
+        status: 'ACCEPTED',
+      };
+
+      await expect(
+        friendRequestsService.update(updateFriendRequestDto)
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should not update non-existent request', async () => {
+      const updateFriendRequestDto: UpdateFriendRequestDto = {
+        creatorId: userArray[1].id,
+        receiverId: userArray[2].id,
+        status: 'ACCEPTED',
+      };
+
+      await expect(
+        friendRequestsService.update(updateFriendRequestDto)
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

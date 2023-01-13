@@ -1,8 +1,7 @@
 import { FC } from 'react';
 import { Grid } from '@chakra-ui/react';
 import { useIncomingUsers } from 'hooks/api';
-import { AcceptButton } from 'components/atoms/button/AcceptButton';
-import { RejectButton } from 'components/atoms/button/RejectButton';
+import { AcceptAndRejectButton } from 'components/molecules/AcceptAndRejectButton';
 import { UserCard } from 'features/friends/components/molecules/UserCard';
 
 export const RecognitionList: FC = () => {
@@ -26,12 +25,7 @@ export const RecognitionList: FC = () => {
           username={user.name}
           nickname={user.nickname}
           avatarImageUrl={user.avatarImageUrl}
-          buttons={
-            <>
-              <AcceptButton targetId={user.id} />
-              <RejectButton targetId={user.id} />
-            </>
-          }
+          buttons={<AcceptAndRejectButton targetId={user.id} />}
           isFriend={false}
         />
       ))}
