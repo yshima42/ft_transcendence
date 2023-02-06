@@ -1,5 +1,5 @@
 # https://nodejs.org/ja/docs/guides/nodejs-docker-webapp/
-FROM node:slim
+FROM node:slim as builder
 
 WORKDIR /usr/src/app
 
@@ -10,10 +10,16 @@ COPY prisma .
 RUN yarn install
 
 COPY . .
+RUN yarn build
 
-# reactQueryDevtoolsを本番環境で表示させないため
-# FROMの下につけたいが、yarn installでdependenciesしかインストールされなくなるのでここに書く
-ENV NODE_ENV production
+FROM nginx:1.22
 
-EXPOSE 5173
-CMD [ "yarn", "dev" ]
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+COPY --from=builder /usr/src/app/wait-for-it.sh ./wait-for-it.sh
+
+RUN sed -i '9a \\t\ttry_files \$uri /index.html;' /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

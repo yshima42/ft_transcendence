@@ -4,14 +4,13 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - 5173:5173
+      - 80:80
     restart: on-failure
     depends_on:
       - backend
     networks:
       - front-tier
-    # 新しいバージョンならhealthcheckとdependsonで対応するところ
-    command: ["sh", "-c", "./wait-for-it.sh -t 10 backend:3000 --strict -- yarn dev"]
+    command: ["sh", "-c", "./wait-for-it.sh -t 10 backend:3000 --strict -- nginx -g \"daemon off;\""]
 
   backend:
     build: ./backend
@@ -28,13 +27,10 @@ services:
       - back-tier
     volumes:
       - upload-data-volume:/usr/src/app/upload
-    # 新しいバージョンならhealthcheckとdependsonで対応するところ
     command: ["sh", "-c", "./wait-for-postgres.sh database ./docker-entrypoint.sh"]
 
   database:
     image: postgres:14.4-alpine
-    ports:
-      - 5434:5432
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
