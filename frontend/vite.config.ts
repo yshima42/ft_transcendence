@@ -10,6 +10,17 @@ export default defineConfig({
   },
   resolve: {
     // https://github.com/vitejs/vite/issues/5010
-    preserveSymlinks: true
-  }
+    preserveSymlinks: true,
+    // https://github.com/prisma/prisma/issues/12504
+    alias: {
+      '.prisma/client/index-browser':
+        './node_modules/.prisma/client/index-browser.js',
+    },
+  },
+  // https://github.com/vitejs/vite/issues/3409
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
 });

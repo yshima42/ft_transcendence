@@ -10,9 +10,7 @@ import { ChatRoomMemberService } from 'src/chat-room-member/chat-room-member.ser
 import { UpdateChatRoomMemberDto } from 'src/chat-room-member/dto/update-chat-room-member.dto';
 
 @WebSocket.WebSocketGateway({
-  cors: {
-    origin: 'http://localhost:5173/',
-  },
+  cors: { origin: process.env.FRONTEND_URL },
   namespace: 'chat',
 })
 export class ChatGateway {

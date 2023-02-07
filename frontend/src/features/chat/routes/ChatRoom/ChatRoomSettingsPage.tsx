@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as C from '@chakra-ui/react';
 import { ChatRoomMemberStatus } from '@prisma/client';
+import { API_URL } from 'config';
 import { useBanRedirect } from 'features/chat/hooks/useBanRedirect';
 import { useLeaveChatRoom } from 'features/chat/hooks/useLeaveChatRoom';
 import { ResponseChatRoomMember } from 'features/chat/types/chat';
@@ -13,7 +14,7 @@ import { ChatRoomMemberList } from 'features/chat/components/organisms/ChatRoomM
 export const ChatRoomSettingsPage: React.FC = React.memo(() => {
   const { chatRoomId } = ReactRouter.useParams() as { chatRoomId: string };
   const chatLoginUserEndpoint = `/chat/rooms/${chatRoomId}/members/me`;
-  const chatRoomInviteLink = `http://localhost:5173/app/chat/rooms/${chatRoomId}/confirmation`;
+  const chatRoomInviteLink = `${API_URL}/app/chat/rooms/${chatRoomId}/confirmation`;
   const { data: chatLoginUser } =
     useGetApiOmitUndefined<ResponseChatRoomMember>(chatLoginUserEndpoint);
   useBanRedirect(chatLoginUser);
