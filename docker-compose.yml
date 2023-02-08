@@ -7,37 +7,50 @@ services:
       - 80:80
     restart: on-failure
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - front-tier
-    command: ["sh", "-c", "./wait-for-it.sh -t 10 backend:3000 --strict -- nginx -g \"daemon off;\""]
+    command: ["sh", "-c", "nginx -g \"daemon off;\""]
 
   backend:
     build: ./backend
-    environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     restart: on-failure
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     networks:
       - front-tier
       - back-tier
     volumes:
       - upload-data-volume:/usr/src/app/upload
-    command: ["sh", "-c", "./wait-for-postgres.sh database ./docker-entrypoint.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl localhost:3000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: ["sh", "-c", "./docker-entrypoint.sh"]
 
   database:
     image: postgres:14.4-alpine
     environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
     restart: on-failure
     networks:
       - back-tier
     volumes:
       - postgres-data-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    secrets:
+      - postgres_user
+      - postgres_password
+      - postgres_db
 
 networks:
   front-tier:
@@ -48,3 +61,11 @@ networks:
 volumes:
   postgres-data-volume:
   upload-data-volume:
+
+secrets:
+  postgres_user:
+    file: ./secrets/postgres_user.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  postgres_db:
+    file: ./secrets/postgres_db.txt

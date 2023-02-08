@@ -17,7 +17,6 @@ FROM nginx:1.22
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
-COPY --from=builder /usr/src/app/wait-for-it.sh ./wait-for-it.sh
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
