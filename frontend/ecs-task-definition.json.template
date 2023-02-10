@@ -1,0 +1,96 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "frontend",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/frontend:latest",
+      "cpu": 0,
+      "links": [],
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "entryPoint": [],
+      "command": ["sh", "-c", "nginx -g \"daemon off;\""],
+      "environment": [],
+      "environmentFiles": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "linuxParameters": {
+        "devices": [],
+        "tmpfs": []
+      },
+      "secrets": [],
+      "dependsOn": [
+        {
+          "containerName": "Frontend_ResolvConf_InitContainer",
+          "condition": "SUCCESS"
+        }
+      ],
+      "dnsServers": [],
+      "dnsSearchDomains": [],
+      "extraHosts": [],
+      "dockerSecurityOptions": [],
+      "dockerLabels": {},
+      "ulimits": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/docker-compose/code",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "code"
+        },
+        "secretOptions": []
+      },
+      "systemControls": []
+    },
+    {
+      "name": "Frontend_ResolvConf_InitContainer",
+      "image": "docker/ecs-searchdomain-sidecar:1.0",
+      "cpu": 0,
+      "links": [],
+      "portMappings": [],
+      "essential": false,
+      "entryPoint": [],
+      "command": ["ap-northeast-1.compute.internal", "code.local"],
+      "environment": [],
+      "environmentFiles": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [],
+      "dnsServers": [],
+      "dnsSearchDomains": [],
+      "extraHosts": [],
+      "dockerSecurityOptions": [],
+      "dockerLabels": {},
+      "ulimits": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/docker-compose/code",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "code"
+        },
+        "secretOptions": []
+      },
+      "systemControls": []
+    }
+  ],
+  "family": "code-frontend",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/code-FrontendTaskExecutionRole-1247IXKR1U2X2",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "placementConstraints": [],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "tags": [
+    {
+      "key": "com.docker.compose.project",
+      "value": "code"
+    }
+  ]
+}
