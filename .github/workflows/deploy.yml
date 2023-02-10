@@ -21,6 +21,8 @@ env:
   ECS_SERVICE_BACKEND: "code-BackendService-mVc8u9eQHHEh"
   ECS_SERVICE_FRONTEND: "code-FrontendService-cJcycZbSNk3X"
   ECS_CLUSTER: "code"
+  ECS_TASK_DEFINITION_NAME_BACKEND: "code-backend"
+  ECS_TASK_DEFINITION_NAME_FRONTEND: "code-frontend"
   ECS_TASK_DEFINITION_BACKEND: "backend/ecs-task-definition.json"
   ECS_TASK_DEFINITION_FRONTEND: "frontend/ecs-task-definition.json"
   CONTAINER_NAME_BACKEND: "backend"
@@ -93,13 +95,10 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
           echo "image-frontend=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Create TaskDef backend yaml
-        uses: danielr1996/envsubst-action@1.0.0
-        with:
-          input: backend/ecs-task-definition.json.template
-          output: ${{ env.ECS_TASK_DEFINITION_BACKEND }}
-        env:
-          AWS_ACCOUNT_ID: ${{ steps.aws-credentials.outputs.aws-account-id }}
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_NAME_BACKEND }} --query taskDefinition > ${{ env.ECS_TASK_DEFINITION_BACKEND }}
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_NAME_FRONTEND }} --query taskDefinition > ${{ env.ECS_TASK_DEFINITION_FRONTEND }}
 
       - name: Fill in the new backend image ID in the Amazon ECS task definition
         id: task-def-backend
@@ -116,14 +115,6 @@ jobs:
           service: ${{ env.ECS_SERVICE_BACKEND }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-
-      - name: Create TaskDef frontend yaml
-        uses: danielr1996/envsubst-action@1.0.0
-        with:
-          input: frontend/ecs-task-definition.json.template
-          output: ${{ env.ECS_TASK_DEFINITION_FRONTEND }}
-        env:
-          AWS_ACCOUNT_ID: ${{ steps.aws-credentials.outputs.aws-account-id }}
 
       - name: Fill in the new frontend image ID in the Amazon ECS task definition
         id: task-def-frontend
