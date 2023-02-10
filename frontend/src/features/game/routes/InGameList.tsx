@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { Flex } from '@chakra-ui/react';
+import { Center, Flex } from '@chakra-ui/react';
 import { ContentLayout } from 'components/ecosystems/ContentLayout';
 import { GameOutlineCard } from '../components/GameOutlineCard';
 import { useGameMonitoring } from '../hooks/useGameMonitoring';
@@ -15,7 +15,11 @@ export const InGameList: FC = memo(() => {
   return (
     <ContentLayout title="In-Game List">
       <Flex flexDirection="column" align="center" justify="center" gap="3">
-        {gameOutlineCards}
+        {gameOutlineCards.length === 0 ? (
+          <Center h="50vh">No games in progress.</Center>
+        ) : (
+          gameOutlineCards
+        )}
       </Flex>
     </ContentLayout>
   );
