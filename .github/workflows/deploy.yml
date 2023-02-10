@@ -1,0 +1,133 @@
+# このワークフローはGitHubによって認定されていないアクションを使用します。
+# それらはサードパーティによって提供され、
+# 別個の利用規約、プライバシーポリシー、
+# ドキュメントを参照してください。
+
+# GitHub では、コミット SHA にアクションをピン留めすることが推奨されます。
+# 新しいバージョンを取得するには、SHA を更新する必要があります。
+# タグまたはブランチを参照することもできますが、アクションは警告なしに変更される可能性があります。
+
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: "ap-northeast-1"
+  ECR_REPOSITORY_BACKEND: "backend"
+  ECR_REPOSITORY_FRONTEND: "frontend"
+  ECS_SERVICE_BACKEND: "code-BackendService-mVc8u9eQHHEh"
+  ECS_SERVICE_FRONTEND: "code-FrontendService-cJcycZbSNk3X"
+  ECS_CLUSTER: "code"
+  ECS_TASK_DEFINITION_NAME_BACKEND: "code-backend"
+  ECS_TASK_DEFINITION_NAME_FRONTEND: "code-frontend"
+  ECS_TASK_DEFINITION_BACKEND: "backend/ecs-task-definition.json"
+  ECS_TASK_DEFINITION_FRONTEND: "frontend/ecs-task-definition.json"
+  CONTAINER_NAME_BACKEND: "backend"
+  CONTAINER_NAME_FRONTEND: "frontend"
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create .env
+        run: |
+          echo "JWT_SECRET='${JWT_SECRET}'" > backend/.env
+          echo "DATABASE_URL='${DATABASE_URL}'" >> backend/.env
+          echo "FT_CID='${FT_CID}'" >> backend/.env
+          echo "FT_SECRET='${FT_SECRET}'" >> backend/.env
+          echo "TWO_FACTOR_AUTHENTICATION_APP_NAME='${TWO_FACTOR_AUTH_APP_NAME}'" >> backend/.env
+          echo "FRONTEND_URL='${FRONTEND_URL}'" >> backend/.env
+          echo "BACKEND_URL='${BACKEND_URL}'" >> backend/.env
+          echo "VITE_APP_TITLE='${VITE_APP_TITLE}'" > frontend/.env
+          echo "VITE_API_URL='${VITE_API_URL}'" >> frontend/.env
+          echo "VITE_WS_BASE_URL='${VITE_WS_BASE_URL}'" >> frontend/.env
+          echo "VITE_WS_CHAT_URL='${VITE_WS_CHAT_URL}'" >> frontend/.env
+          echo "VITE_WS_DM_URL='${VITE_WS_DM_URL}'" >> frontend/.env
+          echo "DATABASE_URL='${DATABASE_URL}'" >> frontend/.env
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FT_CID: ${{ secrets.FT_CID }}
+          FT_SECRET: ${{ secrets.FT_SECRET }}
+          TWO_FACTOR_AUTH_APP_NAME: "TransPong"
+          FRONTEND_URL: "https://transpong-42-mk.com"
+          BACKEND_URL: "https://transpong-42-mk.com/api"
+          VITE_APP_TITLE: "TransPong"
+          VITE_API_URL: "https://transpong-42-mk.com/api"
+          VITE_WS_BASE_URL: "https://transpong-42-mk.com"
+          VITE_WS_CHAT_URL: "https://transpong-42-mk.com/chat"
+          VITE_WS_DM_URL: "https://transpong-42-mk.com/dm"
+
+      - name: Configure AWS credentials
+        id: aws-credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG backend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
+          echo "image-backend=$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG frontend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+          echo "image-frontend=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_NAME_BACKEND }} --query taskDefinition > ${{ env.ECS_TASK_DEFINITION_BACKEND }}
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_NAME_FRONTEND }} --query taskDefinition > ${{ env.ECS_TASK_DEFINITION_FRONTEND }}
+
+      - name: Fill in the new backend image ID in the Amazon ECS task definition
+        id: task-def-backend
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_BACKEND }}
+          container-name: ${{ env.CONTAINER_NAME_BACKEND }}
+          image: ${{ steps.build-image.outputs.image-backend }}
+
+      - name: Deploy Amazon ECS backend task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def-backend.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE_BACKEND }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Fill in the new frontend image ID in the Amazon ECS task definition
+        id: task-def-frontend
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION_FRONTEND }}
+          container-name: ${{ env.CONTAINER_NAME_FRONTEND }}
+          image: ${{ steps.build-image.outputs.image-frontend }}
+
+      - name: Deploy Amazon ECS frontend task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def-frontend.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE_FRONTEND }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
