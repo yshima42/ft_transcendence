@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { OnlineStatus, User } from '@prisma/client';
+import { User } from '@prisma/client';
 
 export class UserEntity implements User {
   @ApiProperty({
@@ -26,7 +26,4 @@ export class UserEntity implements User {
     default: 'patrash',
   })
   nickname!: string;
-
-  @ApiProperty({ default: 'ONLINE' })
-  onlineStatus!: OnlineStatus;
 }

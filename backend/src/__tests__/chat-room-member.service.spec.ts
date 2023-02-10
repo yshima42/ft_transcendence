@@ -52,7 +52,6 @@ describe('ChatRoomMemberService', () => {
           name: `test user ${uuidv4()}`,
           avatarImageUrl: `test avatarImageUrl ${uuidv4()}`,
           nickname: `test nickname ${uuidv4()}`,
-          onlineStatus: Type.OnlineStatus.ONLINE,
         },
       });
       testUsers.push(user);
@@ -167,7 +166,6 @@ describe('ChatRoomMemberService', () => {
           name: `test user ${uuidv4()}`,
           avatarImageUrl: `test avatarImageUrl ${uuidv4()}`,
           nickname: `test nickname ${uuidv4()}`,
-          onlineStatus: Type.OnlineStatus.ONLINE,
         },
       });
       testUsers.push(user);

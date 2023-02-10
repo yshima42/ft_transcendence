@@ -1,7 +1,4 @@
 -- CreateEnum
-CREATE TYPE "OnlineStatus" AS ENUM ('ONLINE', 'OFFLINE', 'INGAME');
-
--- CreateEnum
 CREATE TYPE "FriendRequestStatus" AS ENUM ('PENDING', 'ACCEPTED');
 
 -- CreateEnum
@@ -16,7 +13,6 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "avatarImageUrl" TEXT NOT NULL,
     "nickname" TEXT NOT NULL,
-    "onlineStatus" "OnlineStatus" NOT NULL DEFAULT 'ONLINE',
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,
 

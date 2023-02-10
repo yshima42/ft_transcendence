@@ -1,5 +1,3 @@
-import { OnlineStatus } from '@prisma/client';
-
 export type ResponseDmRoom = {
   id: string;
   dmRoomMembers: Array<{
@@ -23,6 +21,5 @@ export type ResponseDm = {
     id: string;
     nickname: string;
     avatarImageUrl: string;
-    onlineStatus: OnlineStatus;
   };
 };

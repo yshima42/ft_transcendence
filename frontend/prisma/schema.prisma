@@ -103,7 +103,6 @@ model User {
   name                                         String               @unique
   avatarImageUrl                               String
   nickname                                     String               @unique
-  onlineStatus                                 OnlineStatus         @default(ONLINE)
   createdAt                                    DateTime             @default(now()) @db.Timestamptz(3)
   updatedAt                                    DateTime             @db.Timestamptz(3)
   Block_Block_sourceIdToUser                   Block[]              @relation("Block_sourceIdToUser")
@@ -140,12 +139,6 @@ enum ChatRoomMemberStatus {
 enum FriendRequestStatus {
   PENDING
   ACCEPTED
-}
-
-enum OnlineStatus {
-  ONLINE
-  OFFLINE
-  INGAME
 }
 
 enum ChatRoomStatus {
