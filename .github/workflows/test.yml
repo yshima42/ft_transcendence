@@ -46,9 +46,9 @@ jobs:
           BACKEND_URL: "http://localhost:3000"
           VITE_APP_TITLE: "TransPong"
           VITE_API_URL: "http://localhost:3000"
-          VITE_WS_BASE_URL: "ws://localhost:3000"
-          VITE_WS_CHAT_URL: "ws://localhost:3000/chat"
-          VITE_WS_DM_URL: "ws://localhost:3000/dm"
+          VITE_WS_BASE_URL: "http://localhost:3000"
+          VITE_WS_CHAT_URL: "http://localhost:3000/chat"
+          VITE_WS_DM_URL: "http://localhost:3000/dm"
       - name: docker-compose up
         run: docker-compose -f backend/docker-compose.yml up -d
       - name: backend install
