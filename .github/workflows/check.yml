@@ -1,0 +1,13 @@
+name: check
+
+on: [pull_request]
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check
+        run: |
+          echo "DUMMY=$DUMMY"
+        env:
+          DUMMY: "${{ secrets.DUMMY }}_aaa"
