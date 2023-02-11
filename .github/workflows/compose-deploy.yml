@@ -77,8 +77,12 @@ jobs:
           echo "FRONTEND_IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> .env
 
       - name: docker compose up
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
         run: |
-          docker context create ecs ecs-actions
+          docker context create ecs ecs-actions --from-env
           docker context list
           docker context use ecs-actions
           docker compose up
