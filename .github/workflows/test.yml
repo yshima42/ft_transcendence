@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ( github.event_name == 'pull_request' ) ||
+    if: ( github.event.pull_request.head.repo.fork == false ) ||
         ( contains(github.event.pull_request.labels.*.name, 'safe to test') )
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +24,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    if: ( github.event_name == 'pull_request' ) ||
+    if: ( github.event.pull_request.head.repo.fork == false ) ||
         ( contains(github.event.pull_request.labels.*.name, 'safe to test') )
     steps:
       - uses: actions/checkout@v3
