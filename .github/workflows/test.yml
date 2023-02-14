@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     if: ( github.event.pull_request.head.repo.fork == false ) ||
-        ( contains(github.event.pull_request.labels.*.name, 'safe-to-test') )
+        ( contains(github.event.pull_request.labels.*.name, 'safe to test') )
     steps:
       - uses: actions/checkout@v3
       - name: backend install
@@ -25,7 +25,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     if: ( github.event.pull_request.head.repo.fork == false ) ||
-        ( contains(github.event.pull_request.labels.*.name, 'safe-to-test') )
+        ( contains(github.event.pull_request.labels.*.name, 'safe to test') )
     steps:
       - uses: actions/checkout@v3
       - name: create .env
