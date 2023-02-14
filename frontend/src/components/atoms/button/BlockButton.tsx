@@ -22,7 +22,7 @@ export const BlockButton: FC<Props> = memo((props) => {
       {...buttonProps}
       data-test="block-button"
     >
-      Block
+      Message Block
     </Button>
   );
 });

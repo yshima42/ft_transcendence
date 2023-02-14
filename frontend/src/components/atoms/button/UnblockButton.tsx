@@ -22,7 +22,7 @@ export const UnblockButton: FC<Props> = memo((props) => {
       {...buttonProps}
       data-test="unblock-button"
     >
-      Unblock
+      Message Unblock
     </Button>
   );
 });

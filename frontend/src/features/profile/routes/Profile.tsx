@@ -8,8 +8,6 @@ import { MatchHistoryCard } from '../components/organisms/MatchHistoryCard';
 import { StatsCard } from '../components/organisms/StatsCard';
 import { UserInfoCard } from '../components/organisms/UserInfoCard';
 
-// /app/profile経由で表示するときはid=undefinedとなり、useProfileでログインユーザーの情報が取れる
-// 少し可読性が低いので、余力あれば書き換えてもいいかもれない。
 export const Profile: FC = memo(() => {
   const { id } = useParams();
   const { user } = useProfile(id);

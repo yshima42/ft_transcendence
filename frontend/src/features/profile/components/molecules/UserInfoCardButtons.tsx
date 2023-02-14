@@ -1,5 +1,5 @@
 import { memo, FC } from 'react';
-import { Box, HStack, Tag, TagLabel } from '@chakra-ui/react';
+import { HStack, Tag, TagLabel } from '@chakra-ui/react';
 import { User } from '@prisma/client';
 import { useBlockRelation, useProfile } from 'hooks/api';
 import { useFriendRelation } from 'hooks/api/friend/useFriendRelation';
@@ -46,18 +46,15 @@ export const UserInfoCardButtons: FC<Props> = memo((props) => {
             <GameOrWatchButton loginUserId={loginUser.id} targetId={user.id} />
             <DmButton targetId={user.id} />
           </HStack>
-          <Box m={2}>
-            <HStack>
-              <FriendButton
-                targetId={user.id}
-                friendRelation={friendRelation}
-              />
-              <BlockRelationButton
-                targetId={user.id}
-                isBlockedUser={isUserBlocked}
-              />
-            </HStack>
-          </Box>
+          <HStack mt={2}>
+            <FriendButton targetId={user.id} friendRelation={friendRelation} />
+          </HStack>
+          <HStack m={2}>
+            <BlockRelationButton
+              targetId={user.id}
+              isBlockedUser={isUserBlocked}
+            />
+          </HStack>
         </>
       )}
     </>
