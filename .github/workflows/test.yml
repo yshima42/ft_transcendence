@@ -1,7 +1,9 @@
 
 name: build
 
-on: [pull_request]
+on:
+  pull_request_target:
+    types: [labeled]
 
 jobs:
   build:
@@ -19,6 +21,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'safe to test')
     steps:
       - uses: actions/checkout@v3
       - name: create .env
