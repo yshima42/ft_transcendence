@@ -12,3 +12,6 @@ jobs:
     steps:
       - name: hellohello
         run: echo HelloHello
+      - uses: actions/checkout@v3
+      - name: echo dummy
+        run:  echo dummy.txt
