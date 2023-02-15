@@ -29,14 +29,7 @@ for (let i = 0; i < 100; i++) {
   idMap.set(userName(i), uuidv4());
 }
 
-const onlineStatus = ['ONLINE', 'OFFLINE', 'INGAME'] as const;
 const FriendRequestStatus = ['PENDING', 'ACCEPTED'] as const;
-
-const getOnlineStatus = () => {
-  const randomIndex = Math.floor(Math.random() * onlineStatus.length);
-
-  return onlineStatus[randomIndex];
-};
 
 const getFriendRequestStatus = () => {
   const randomIndex = Math.floor(Math.random() * FriendRequestStatus.length);
@@ -55,7 +48,6 @@ idMap.forEach((value, key) => {
     avatarImageUrl:
       'https://placehold.jp/2b52ee/ffffff/150x150.png?text=' + key,
     nickname: key,
-    onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
   });
@@ -258,8 +250,6 @@ for (let i = 0; i < 2000; i++) {
     });
   }
 }
-
-
 
 const GAMEWINSCORE = 5;
 const getLoserScore = () => {

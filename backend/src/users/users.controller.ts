@@ -61,7 +61,7 @@ export class UsersController {
   @ApiOperation({
     summary: '自分のユーザー情報取得',
     description:
-      'queryによって取得データを指定可(id, name, nickname, onlineStatus, createdAt, updatedAt)</br>queryが設定されていない場合は全て取得',
+      'queryによって取得データを指定可(id, name, nickname, createdAt, updatedAt)</br>queryが設定されていない場合は全て取得',
   })
   @ApiOkResponse({ type: UserEntity })
   @ApiQuery({
@@ -79,7 +79,7 @@ export class UsersController {
   @ApiOperation({
     summary: '自分のユーザー情報更新',
     description:
-      'bodyでavatarImageUrl, nickname, onlineStatusを設定することで自分のユーザー情報更新</br>一つずつ、全て同時に更新、共に可',
+      'bodyでavatarImageUrl, nickname を設定することで自分のユーザー情報更新</br>一つずつ、全て同時に更新、共に可',
   })
   @ApiCreatedResponse({ type: UserEntity })
   async update(
@@ -94,7 +94,7 @@ export class UsersController {
   @ApiOperation({
     summary: '各ユーザー情報取得',
     description:
-      'queryによって取得データを指定可(id, name, nickname, onlineStatus, createdAt, updatedAt)</br>queryが設定されていない場合は全て取得',
+      'queryによって取得データを指定可(id, name, nickname, createdAt, updatedAt)</br>queryが設定されていない場合は全て取得',
   })
   @ApiQuery({
     name: 'fields',

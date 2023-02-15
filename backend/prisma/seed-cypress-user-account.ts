@@ -34,14 +34,6 @@ for (let i = 1; i <= 10; i++) {
   idMap.set('add-friend' + num(i), uuidv4());
 }
 
-const onlineStatus = ['ONLINE', 'OFFLINE', 'INGAME'] as const;
-
-const getOnlineStatus = () => {
-  const randomIndex = Math.floor(Math.random() * onlineStatus.length);
-
-  return onlineStatus[randomIndex];
-};
-
 const getColorCode = (name: string) => {
   let colorCode = '0C163D';
   if (name.match(/friends/) != null) {
@@ -65,7 +57,6 @@ idMap.forEach((value, key) => {
     avatarImageUrl:
       `https://placehold.jp/${colorCode}/fffffe/150x150.png?text=` + key,
     nickname: 'n-' + key,
-    onlineStatus: getOnlineStatus(),
     createdAt: new Date(),
     updatedAt: new Date(),
   });

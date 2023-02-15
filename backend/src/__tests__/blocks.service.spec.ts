@@ -15,7 +15,6 @@ const userArray: User[] = [
     name: 'blockDummy1',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=1',
     nickname: 'nickname1',
-    onlineStatus: 'ONLINE',
   },
   {
     id: '40e8b4b4-9b39-4b7e-8e31-78e31975d320',
@@ -24,7 +23,6 @@ const userArray: User[] = [
     name: 'blockDummy2',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=2',
     nickname: 'nickname2',
-    onlineStatus: 'OFFLINE',
   },
   {
     id: '5001da8b-0316-411e-a34f-1db29d4d4c4b',
@@ -33,7 +31,6 @@ const userArray: User[] = [
     name: 'blockDummy3',
     avatarImageUrl: 'https://placehold.jp/2b52ee/ffffff/150x150.png?text=3',
     nickname: 'nickname3',
-    onlineStatus: 'INGAME',
   },
 ];
 

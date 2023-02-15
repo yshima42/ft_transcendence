@@ -26,7 +26,6 @@ const createTestUsers = async () => {
         name: `${name}`,
         avatarImageUrl: `test avatarImageUrl ${name}`,
         nickname: `test nickname ${name}`,
-        onlineStatus: Type.OnlineStatus.ONLINE,
       },
     });
     testUsers.push(user);
