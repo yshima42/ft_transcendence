@@ -7,9 +7,7 @@ import { DmService } from './dm.service';
 import { CreateDmDto } from './dto/create-dm.dto';
 
 @WebSocket.WebSocketGateway({
-  cors: {
-    origin: 'http://localhost:5173/',
-  },
+  cors: { origin: process.env.FRONTEND_URL },
   namespace: 'dm',
 })
 export class DmGateway {

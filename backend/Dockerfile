@@ -22,12 +22,10 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/prisma ./prisma
-COPY --from=builder /usr/src/app/wait-for-postgres.sh ./wait-for-postgres.sh
 COPY --from=builder /usr/src/app/docker-entrypoint.sh ./docker-entrypoint.sh
 COPY --from=builder /usr/src/app/.env ./.env
 
-# DBの起動を待つためクライアントが必要
-RUN apt-get -q update && apt-get -qy install postgresql-client
+RUN apt-get -q update && apt-get -qy install curl
 
 EXPOSE 3000
 CMD [ "./docker-entrypoint.sh" ]
