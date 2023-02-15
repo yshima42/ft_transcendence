@@ -77,9 +77,6 @@ export class AuthController {
 
     res.cookie('accessToken', accessToken, this.cookieOptions);
 
-    console.log(ftProfile.intraName, ' login !');
-    console.log(accessToken);
-
     if (isSignUp) {
       return { url: `${this.frontendUrl}/sign-up` };
     } else if (isOtpAuthEnabled) {

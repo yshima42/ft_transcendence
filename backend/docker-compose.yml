@@ -5,12 +5,12 @@ services:
     ports:
       - 5434:5432
     environment:
-      POSTGRES_USER: udemy
-      POSTGRES_PASSWORD: udemy
-      POSTGRES_DB: udemy
+      POSTGRES_USER: transpong
+      POSTGRES_PASSWORD: transpong
+      POSTGRES_DB: transpong
       TZ: Asia/Tokyo
     restart: always
     networks:
-      - lesson
+      - mynetwork
 networks:
-  lesson:
+  mynetwork:

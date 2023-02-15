@@ -28,22 +28,27 @@ jobs:
           echo "FT_CID='${FT_CID}'" >> backend/.env
           echo "FT_SECRET='${FT_SECRET}'" >> backend/.env
           echo "TWO_FACTOR_AUTHENTICATION_APP_NAME='${TWO_FACTOR_AUTH_APP_NAME}'" >> backend/.env
-          echo "FT_SECRET='${FT_SECRET}'" >> backend/.env
           echo "FRONTEND_URL='${FRONTEND_URL}'" >> backend/.env
           echo "BACKEND_URL='${BACKEND_URL}'" >> backend/.env
           echo "VITE_APP_TITLE='${VITE_APP_TITLE}'" > frontend/.env
           echo "VITE_API_URL='${VITE_API_URL}'" >> frontend/.env
+          echo "VITE_WS_BASE_URL='${VITE_WS_BASE_URL}'" >> frontend/.env
+          echo "VITE_WS_CHAT_URL='${VITE_WS_CHAT_URL}'" >> frontend/.env
+          echo "VITE_WS_DM_URL='${VITE_WS_DM_URL}'" >> frontend/.env
           echo "DATABASE_URL='${DATABASE_URL}'" >> frontend/.env
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          DATABASE_URL: "postgresql://udemy:udemy@localhost:5434/udemy?schema=public"
+          DATABASE_URL: "postgresql://transpong:transpong@localhost:5434/transpong?schema=public"
           FT_CID: ${{ secrets.FT_CID }}
           FT_SECRET: ${{ secrets.FT_SECRET }}
           TWO_FACTOR_AUTH_APP_NAME: "TransPong"
-          VITE_APP_TITLE: "My Super Awsome APP"
-          VITE_API_URL: "http://localhost:3000"
           FRONTEND_URL: "http://localhost:5173"
           BACKEND_URL: "http://localhost:3000"
+          VITE_APP_TITLE: "TransPong"
+          VITE_API_URL: "http://localhost:3000"
+          VITE_WS_BASE_URL: "http://localhost:3000"
+          VITE_WS_CHAT_URL: "http://localhost:3000/chat"
+          VITE_WS_DM_URL: "http://localhost:3000/dm"
       - name: docker-compose up
         run: docker-compose -f backend/docker-compose.yml up -d
       - name: backend install

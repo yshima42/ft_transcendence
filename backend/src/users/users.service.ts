@@ -49,9 +49,6 @@ export class UsersService {
       if (attrs.includes('nickname')) {
         userDto.nickname = user.nickname;
       }
-      if (attrs.includes('onlineStatus')) {
-        userDto.onlineStatus = user.onlineStatus;
-      }
     }
 
     return userDto;

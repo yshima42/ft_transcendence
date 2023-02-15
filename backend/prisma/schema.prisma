@@ -29,13 +29,12 @@ datasource db {
 // }
 
 model User {
-  id             String       @id @default(uuid()) @db.Uuid
-  name           String       @unique
+  id             String   @id @default(uuid()) @db.Uuid
+  name           String   @unique
   avatarImageUrl String
-  nickname       String       @unique
-  onlineStatus   OnlineStatus @default(ONLINE)
-  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
+  nickname       String   @unique
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
 
   oneTimePasswordAuth OneTimePasswordAuth?
   creator             FriendRequest[]      @relation("creator")
@@ -49,12 +48,6 @@ model User {
   dms            Dm[]             @relation("dmSender") // ユーザーが送信したDMメッセージ
   ChatRoomMember ChatRoomMember[] // ユーザーが参加しているチャットルーム
   DmRoomMember   DmRoomMember[] // ユーザーが参加しているDMルーム
-}
-
-enum OnlineStatus {
-  ONLINE
-  OFFLINE
-  INGAME
 }
 
 model OneTimePasswordAuth {
